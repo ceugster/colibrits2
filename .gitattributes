@@ -662,6 +662,16 @@ ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/AdminApplicationWorkbe
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/ApplicationInstanceListener.java -text
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/ApplicationInstanceManager.java -text
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/PerspectiveSwitcherMenu.java -text
+ch.eugster.colibri.barcode.bookcenter/.classpath -text
+ch.eugster.colibri.barcode.bookcenter/.project -text
+ch.eugster.colibri.barcode.bookcenter/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.barcode.bookcenter/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.barcode.bookcenter/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.barcode.bookcenter/OSGI-INF/service-component.xml -text
+ch.eugster.colibri.barcode.bookcenter/build.properties -text
+ch.eugster.colibri.barcode.bookcenter/src/ch/eugster/colibri/barcode/bookcenter/Activator.java -text
+ch.eugster.colibri.barcode.bookcenter/src/ch/eugster/colibri/barcode/bookcenter/code/BookCenterCode.java -text
+ch.eugster.colibri.barcode.bookcenter/src/ch/eugster/colibri/barcode/bookcenter/service/BookcenterVerifier.java -text
 ch.eugster.colibri.barcode/.classpath -text
 ch.eugster.colibri.barcode/.project -text
 ch.eugster.colibri.barcode/.settings/org.eclipse.jdt.core.prefs -text

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" enabled="true" immediate="true" name="ch.eugster.colibri.barcode.bookcenter">
+   <implementation class="ch.eugster.colibri.barcode.bookcenter.service.BookcenterVerifier"/>
+   <service>
+      <provide interface="ch.eugster.colibri.barcode.service.BarcodeVerifier"/>
+   </service>
+   <property name="barcode.type" type="String" value="bookcentercode"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <property name="barcode.name" type="String" value="SBZ"/>
+   <property name="barcode.description" type="String" value="Barcode Schweizer Buchzentrum"/>
+</scr:component>
