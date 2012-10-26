@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Print Voucher Plugin
+Bundle-SymbolicName: ch.eugster.colibri.print.voucher;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.print.voucher.Activator
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/service-component.xml
+Import-Package: ch.eugster.colibri.periphery.printer.service,
+ ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.model.payment,
+ ch.eugster.colibri.persistence.model.print,
+ ch.eugster.colibri.print.section,
+ ch.eugster.colibri.print.service,
+ org.osgi.framework;version="1.6.0"
