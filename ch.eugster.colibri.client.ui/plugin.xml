@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="ch.eugster.colibri.client.ui.views.ClientView"
+            id="ch.eugster.colibri.client.view"
+            name="Kasse"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="ch.eugster.colibri.client.ui.app.ClientPerspective"
+            id="ch.eugster.colibri.client.perspective"
+            name="Kasse">
+      </perspective>
+   </extension>
+
+</plugin>
