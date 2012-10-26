@@ -1556,7 +1556,12 @@ ch.eugster.colibri.provider.galileo/galileo/kassenserver_neue_eigenschaften.rtf 
 ch.eugster.colibri.provider.galileo/galileo/kundenserver.VBR -text
 ch.eugster.colibri.provider.galileo/galileo/kundenserver.exe -text
 ch.eugster.colibri.provider.galileo/galileo/kundenserver.tlb -text
+ch.eugster.colibri.provider.galileo/galileo/lagerinfo.VBR -text
+ch.eugster.colibri.provider.galileo/galileo/lagerinfo.dll -text
+ch.eugster.colibri.provider.galileo/galileo/lagerinfo.tlb -text
 ch.eugster.colibri.provider.galileo/galileo/msvcr70.dll -text
+ch.eugster.colibri.provider.galileo/galileo/register.cmd -text
+ch.eugster.colibri.provider.galileo/galileo/unregister.cmd -text
 ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
 ch.eugster.colibri.provider.scheduler/.settings/org.eclipse.jdt.core.prefs -text
