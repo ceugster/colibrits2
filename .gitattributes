@@ -63,6 +63,9 @@ ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/CurrencySorter.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/ReferenceCurrencyWizard.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/ReferenceCurrencyWizardPage.java -text
+ch.eugster.colibri.admin.feature/.project -text
+ch.eugster.colibri.admin.feature/build.properties -text
+ch.eugster.colibri.admin.feature/feature.xml -text
 ch.eugster.colibri.admin/.classpath -text
 ch.eugster.colibri.admin/.project -text
 ch.eugster.colibri.admin/.settings/org.eclipse.jdt.core.prefs -text
