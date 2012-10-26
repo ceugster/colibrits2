@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/ch.eugster.colibri.admin.ui.feature_1.0.0.201203231621.jar" id="ch.eugster.colibri.admin.ui.feature" version="1.0.0.201203231621"/>
+</site>

@@ -520,6 +520,10 @@ ch.eugster.colibri.admin.tax/src/ch/eugster/colibri/admin/tax/wizards/NewCurrent
 ch.eugster.colibri.admin.tax/src/ch/eugster/colibri/admin/tax/wizards/TaxRateEditWizardPage.java -text
 ch.eugster.colibri.admin.tax/src/ch/eugster/colibri/admin/tax/wizards/TaxRateTableWizardPage.java -text
 ch.eugster.colibri.admin.tax/src/ch/eugster/colibri/admin/tax/wizards/TaxRateWizard.java -text
+ch.eugster.colibri.admin.ui.feature/.project -text
+ch.eugster.colibri.admin.ui.feature/build.properties -text
+ch.eugster.colibri.admin.ui.feature/category.xml -text
+ch.eugster.colibri.admin.ui.feature/feature.xml -text
 ch.eugster.colibri.admin.ui/.classpath -text
 ch.eugster.colibri.admin.ui/.project -text
 ch.eugster.colibri.admin.ui/.settings/org.eclipse.jdt.core.prefs -text
