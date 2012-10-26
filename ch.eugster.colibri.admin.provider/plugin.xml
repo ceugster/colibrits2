@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="ch.eugster.colibri.admin.provider.editorContribution"
+            targetID="ch.eugster.colibri.admin.provider.editor">
+         <action
+               actionID="provider.reset"
+               class="ch.eugster.colibri.admin.provider.actions.ResetEditorActionDelegate"
+               hoverIcon="icons/undo_edit.png"
+               icon="icons/undo_edit.png"
+               id="provider.reset"
+               label="Verwerfen"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Reset changes">
+         </action>
+         <action
+               actionID="provider.save"
+               class="ch.eugster.colibri.admin.provider.actions.SaveEditorActionDelegate"
+               hoverIcon="icons/save_edit.png"
+               icon="icons/save_edit.png"
+               id="provider.save"
+               label="Speichern"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen speichern">
+         </action>
+      </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditor"
+            default="false"
+            id="ch.eugster.colibri.admin.provider.editor"
+            name="Warenbewirtschaftung">
+      </editor>
+   </extension>
+
+</plugin>
