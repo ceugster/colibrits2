@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ColibriTS Client
+Bundle-SymbolicName: ch.eugster.colibri.client;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.client.Activator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Christian Eugster
+Import-Package: ch.eugster.colibri.persistence.replication.service,
+ org.eclipse.core.runtime;version="3.4.0",
+ org.eclipse.core.runtime.jobs,
+ org.eclipse.equinox.app;version="1.1.0",
+ org.eclipse.jface.action,
+ org.eclipse.jface.dialogs,
+ org.eclipse.jface.preference,
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.graphics,
+ org.eclipse.swt.widgets,
+ org.eclipse.ui,
+ org.eclipse.ui.application,
+ org.eclipse.ui.plugin,
+ org.eclipse.ui.progress,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.0"
