@@ -1113,3 +1113,4 @@ ch.eugster.colibri.persistence.connection/lib/migration/db-ojb-1.0.4.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/jakarta-regexp-1.3.jar -text
 ch.eugster.colibri.persistence.connection/lib/mysql-connector-java-5.1.7-bin.jar -text
 ch.eugster.colibri.persistence.connection/lib/postgresql-8.4-701.jdbc4.jar -text
+ch.eugster.colibri.persistence.connection/lib/sqljdbc4.jar -text
