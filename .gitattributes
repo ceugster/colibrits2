@@ -1546,6 +1546,7 @@ ch.eugster.colibri.provider.feature/feature.xml -text
 ch.eugster.colibri.provider.galileo.feature/.project -text
 ch.eugster.colibri.provider.galileo.feature/build.properties -text
 ch.eugster.colibri.provider.galileo.feature/feature.xml -text
+ch.eugster.colibri.provider.galileo/galileo/msvcr70.dll -text
 ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
 ch.eugster.colibri.provider.scheduler/.settings/org.eclipse.jdt.core.prefs -text
