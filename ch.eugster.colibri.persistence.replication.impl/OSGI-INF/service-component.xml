@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="false" name="ch.eugster.colibri.persistence.replication">
+   <implementation class="ch.eugster.colibri.persistence.replication.impl.service.ReplicationServiceImpl"/>
+   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="PersistenceService" policy="static" unbind="unsetPersistenceService"/>
+   <service>
+      <provide interface="ch.eugster.colibri.persistence.replication.service.ReplicationService"/>
+   </service>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+</scr:component>

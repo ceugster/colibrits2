@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Transfer
+Bundle-SymbolicName: ch.eugster.colibri.persistence.transfer;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.persistence.transfer.Activator
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: ch.eugster.colibri.persistence.transfer.services
+Import-Package: ch.eugster.colibri.persistence.model,
+ org.eclipse.core.runtime;version="3.4.0",
+ org.osgi.framework;version="1.6.0"
