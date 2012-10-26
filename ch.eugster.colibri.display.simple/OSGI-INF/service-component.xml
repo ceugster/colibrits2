@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.colibri.display.simple">
+   <implementation class="ch.eugster.colibri.display.simple.service.DefaultDisplayService"/>
+   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="persistenceService" policy="static" unbind="unsetPersistenceService"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <reference bind="addCustomerDisplayService" cardinality="1..n" interface="ch.eugster.colibri.periphery.display.service.CustomerDisplayService" name="customerDisplayService" policy="static" unbind="removeCustomerDisplayService"/>
+   <service>
+      <provide interface="ch.eugster.colibri.display.service.DisplayService"/>
+      <provide interface="org.osgi.service.event.EventHandler"/>
+   </service>
+   <property name="custom.label" type="String" value="Layout Kundendisplay"/>
+   <property name="event.topics" type="String">ch/eugster/colibri/client/add/position
+ch/eugster/colibri/client/add/payment
+ch/eugster/colibri/client/store/receipt
+   </property>
+</scr:component>
