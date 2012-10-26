@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Barcode
+Bundle-SymbolicName: ch.eugster.colibri.barcode;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: ch.eugster.colibri.barcode.code,
+ ch.eugster.colibri.barcode.service
+Bundle-ActivationPolicy: lazy
+Import-Package: ch.eugster.colibri.persistence.model

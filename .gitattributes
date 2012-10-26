@@ -662,3 +662,12 @@ ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/AdminApplicationWorkbe
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/ApplicationInstanceListener.java -text
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/ApplicationInstanceManager.java -text
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/PerspectiveSwitcherMenu.java -text
+ch.eugster.colibri.barcode/.classpath -text
+ch.eugster.colibri.barcode/.project -text
+ch.eugster.colibri.barcode/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.barcode/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.barcode/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.barcode/build.properties -text
+ch.eugster.colibri.barcode/src/ch/eugster/colibri/barcode/code/AbstractBarcode.java -text
+ch.eugster.colibri.barcode/src/ch/eugster/colibri/barcode/code/Barcode.java -text
+ch.eugster.colibri.barcode/src/ch/eugster/colibri/barcode/service/BarcodeVerifier.java -text
