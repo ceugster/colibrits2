@@ -1570,6 +1570,7 @@ ch.eugster.colibri.provider.galileo/galileo/wgserve.VBR -text
 ch.eugster.colibri.provider.galileo/galileo/wgserve.dll -text
 ch.eugster.colibri.provider.galileo/galileo/wgserve.exe -text
 ch.eugster.colibri.provider.galileo/galileo/wgserve.tlb -text
+ch.eugster.colibri.provider.galileo/lib/com4j.jar -text
 ch.eugster.colibri.provider.galileo/plugin.xml -text
 ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
