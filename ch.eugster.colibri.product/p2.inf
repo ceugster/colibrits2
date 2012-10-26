@@ -1,0 +1,6 @@
+instructions.configure=\
+  addRepository(type:0,location:http${#58}//localhost/colibrits/updates/);\
+  addRepository(type:1,location:http${#58}//localhost/colibrits/updates/);\
+  addRepository(type:0,location:http${#58}//eugster-informatik.ch/colibrits/updates/);\
+  addRepository(type:1,location:http${#58}//eugster-informatik.ch/colibrits/updates/);
+
