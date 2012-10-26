@@ -1552,6 +1552,10 @@ ch.eugster.colibri.provider.galileo/galileo/galserve.VBR -text
 ch.eugster.colibri.provider.galileo/galileo/galserve.dll -text
 ch.eugster.colibri.provider.galileo/galileo/galserve.ini -text
 ch.eugster.colibri.provider.galileo/galileo/galserve.tlb -text
+ch.eugster.colibri.provider.galileo/galileo/kassenserver_neue_eigenschaften.rtf -text svneol=unset#unset
+ch.eugster.colibri.provider.galileo/galileo/kundenserver.VBR -text
+ch.eugster.colibri.provider.galileo/galileo/kundenserver.exe -text
+ch.eugster.colibri.provider.galileo/galileo/kundenserver.tlb -text
 ch.eugster.colibri.provider.galileo/galileo/msvcr70.dll -text
 ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
