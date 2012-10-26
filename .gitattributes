@@ -1557,26 +1557,6 @@ ch.eugster.colibri.provider.galileo/OSGI-INF/interface-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/provider-property-selector-component.xml -text
 ch.eugster.colibri.provider.galileo/build.properties -text
 ch.eugster.colibri.provider.galileo/com4j-x86.dll -text
-ch.eugster.colibri.provider.galileo/galileo/FOXUSER.DBF -text
-ch.eugster.colibri.provider.galileo/galileo/FOXUSER.FPT -text
-ch.eugster.colibri.provider.galileo/galileo/galserve.VBR -text
-ch.eugster.colibri.provider.galileo/galileo/galserve.dll -text
-ch.eugster.colibri.provider.galileo/galileo/galserve.ini -text
-ch.eugster.colibri.provider.galileo/galileo/galserve.tlb -text
-ch.eugster.colibri.provider.galileo/galileo/kassenserver_neue_eigenschaften.rtf -text svneol=unset#unset
-ch.eugster.colibri.provider.galileo/galileo/kundenserver.VBR -text
-ch.eugster.colibri.provider.galileo/galileo/kundenserver.exe -text
-ch.eugster.colibri.provider.galileo/galileo/kundenserver.tlb -text
-ch.eugster.colibri.provider.galileo/galileo/lagerinfo.VBR -text
-ch.eugster.colibri.provider.galileo/galileo/lagerinfo.dll -text
-ch.eugster.colibri.provider.galileo/galileo/lagerinfo.tlb -text
-ch.eugster.colibri.provider.galileo/galileo/msvcr70.dll -text
-ch.eugster.colibri.provider.galileo/galileo/register.cmd -text
-ch.eugster.colibri.provider.galileo/galileo/unregister.cmd -text
-ch.eugster.colibri.provider.galileo/galileo/wgserve.VBR -text
-ch.eugster.colibri.provider.galileo/galileo/wgserve.dll -text
-ch.eugster.colibri.provider.galileo/galileo/wgserve.exe -text
-ch.eugster.colibri.provider.galileo/galileo/wgserve.tlb -text
 ch.eugster.colibri.provider.galileo/icons/galileo.png -text
 ch.eugster.colibri.provider.galileo/icons/save_edit.png -text
 ch.eugster.colibri.provider.galileo/icons/undo_edit.png -text
