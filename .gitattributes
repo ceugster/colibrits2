@@ -1092,4 +1092,5 @@ ch.eugster.colibri.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery/build.properties -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/Activator.java -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/converters/Converter.java -text
+ch.eugster.colibri.persistence.connection/lib/derby.jar -text
 ch.eugster.colibri.persistence.connection/lib/derbyclient.jar -text
