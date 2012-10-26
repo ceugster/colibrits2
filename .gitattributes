@@ -1094,6 +1094,8 @@ ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/Activator.java -te
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/converters/Converter.java -text
 ch.eugster.colibri.persistence.connection/lib/derby.jar -text
 ch.eugster.colibri.persistence.connection/lib/derbyclient.jar -text
+ch.eugster.colibri.persistence.connection/lib/derbynet.jar -text
+ch.eugster.colibri.persistence.connection/lib/derbytools.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/antlr-2.7.5.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/commons-beanutils-1.7.0.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/commons-betwixt-0.8-dev.jar -text
