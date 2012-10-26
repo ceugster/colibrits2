@@ -1108,3 +1108,4 @@ ch.eugster.colibri.persistence.connection/lib/migration/commons-lang-2.1.jar -te
 ch.eugster.colibri.persistence.connection/lib/migration/commons-logging-1.0.4.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/commons-pool-1.2.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/commons-transaction-1.1.jar -text
+ch.eugster.colibri.persistence.connection/lib/mysql-connector-java-5.1.7-bin.jar -text
