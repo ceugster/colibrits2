@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" enabled="true" immediate="true" name="ch.eugster.colibri.barcode.isbn">
+   <implementation class="ch.eugster.colibri.barcode.isbn.service.impl.IsbnImpl"/>
+   <property name="barcode.type" type="String" value="isbn"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <service>
+      <provide interface="ch.eugster.colibri.barcode.service.BarcodeVerifier"/>
+      <provide interface="ch.eugster.colibri.barcode.isbn.service.IsbnConverter"/>
+   </service>
+   <property name="barcode.name" type="String" value="ISBN"/>
+   <property name="barcode.description" type="String" value="ISBN (alte Form)"/>
+</scr:component>

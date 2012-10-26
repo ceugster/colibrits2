@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Isbn Service
+Bundle-SymbolicName: ch.eugster.colibri.barcode.isbn;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Christian Eugster
+Export-Package: ch.eugster.colibri.barcode.isbn.code
+Service-Component: OSGI-INF/service-component.xml
+Bundle-Activator: ch.eugster.colibri.barcode.isbn.Activator
+Bundle-ActivationPolicy: lazy
+Import-Package: ch.eugster.colibri.barcode.code,
+ ch.eugster.colibri.barcode.ean13.code,
+ ch.eugster.colibri.barcode.service,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.service.component;version="1.1.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.0"
