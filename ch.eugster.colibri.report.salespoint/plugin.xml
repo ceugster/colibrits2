@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="ch.eugster.colibri.report.salespoint.views.SalespointView"
+            id="ch.eugster.colibri.report.salespoint.view"
+            name="Kassen"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="ch.eugster.colibri.report.settlement.perspective">
+         <view
+               closeable="true"
+               id="ch.eugster.colibri.report.salespoint.view"
+               minimized="false"
+               moveable="true"
+               relationship="top"
+               relative="ch.eugster.colibri.report.daterange.view"
+               showTitle="true"
+               standalone="true"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:ch.eugster.colibri.report.menu.views?after=additions">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               label="Kassen"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.report.salespoint.view">
+            </parameter>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>

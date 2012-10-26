@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using JasperAssistant (http://www.jasperassistant.com) -->
+<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+
+<jasperReport name="SettlementDiscounts" language="java" pageWidth="595" pageHeight="842" columnWidth="520" leftMargin="48" rightMargin="27" topMargin="30" bottomMargin="30">
+	<parameter name="printTime" class="java.lang.String" isForPrompting="false">
+	</parameter>
+	<parameter name="salespoints" class="java.lang.String" isForPrompting="false">
+	</parameter>
+	<parameter name="dateRange" class="java.lang.String" isForPrompting="false">
+	</parameter>
+	<parameter name="header" class="java.lang.String">
+	</parameter>
+	<field name="salespoint" class="java.lang.String">
+	</field>
+	<field name="year" class="java.lang.Integer">
+	</field>
+	<field name="month" class="java.lang.Integer">
+	</field>
+	<field name="day" class="java.lang.Integer">
+	</field>
+	<field name="amount" class="java.lang.Double">
+	</field>
+	<field name="discount" class="java.lang.Double">
+	</field>
+	<field name="percent" class="java.lang.Double">
+	</field>
+	<field name="fullAmount" class="java.lang.Double">
+	</field>
+	<variable name="fullAmountMonthSum" class="java.lang.Double" resetType="Group" resetGroup="Month" calculation="Sum">
+		<variableExpression><![CDATA[$F{fullAmount}]]></variableExpression>
+	</variable>
+	<variable name="discountMonthSum" class="java.lang.Double" resetType="Group" resetGroup="Month" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount}]]></variableExpression>
+	</variable>
+	<variable name="percentMonthAverage" class="java.lang.Double" resetType="Group" resetGroup="Month" calculation="Average">
+		<variableExpression><![CDATA[$F{percent}]]></variableExpression>
+	</variable>
+	<variable name="amountMonthSum" class="java.lang.Double" resetType="Group" resetGroup="Month" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="fullAmountYearSum" class="java.lang.Double" resetType="Group" resetGroup="Year" calculation="Sum">
+		<variableExpression><![CDATA[$F{fullAmount}]]></variableExpression>
+	</variable>
+	<variable name="discountYearSum" class="java.lang.Double" resetType="Group" resetGroup="Year" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount}]]></variableExpression>
+	</variable>
+	<variable name="percentYearAverage" class="java.lang.Double" resetType="Group" resetGroup="Year" calculation="Average">
+		<variableExpression><![CDATA[$F{percent}]]></variableExpression>
+	</variable>
+	<variable name="amountYearSum" class="java.lang.Double" resetType="Group" resetGroup="Year" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="fullAmountSalespointSum" class="java.lang.Double" resetType="Group" resetGroup="Salespoint" calculation="Sum">
+		<variableExpression><![CDATA[$F{fullAmount}]]></variableExpression>
+	</variable>
+	<variable name="discountSalespointSum" class="java.lang.Double" resetType="Group" resetGroup="Salespoint" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount}]]></variableExpression>
+	</variable>
+	<variable name="percentSalespointAverage" class="java.lang.Double" resetType="Group" resetGroup="Salespoint" calculation="Average">
+		<variableExpression><![CDATA[$F{percent}]]></variableExpression>
+	</variable>
+	<variable name="amountSalespointSum" class="java.lang.Double" resetType="Group" resetGroup="Salespoint" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="fullAmountSum" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{fullAmount}]]></variableExpression>
+	</variable>
+	<variable name="discountSum" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{discount}]]></variableExpression>
+	</variable>
+	<variable name="percentAverage" class="java.lang.Double" calculation="Average">
+		<variableExpression><![CDATA[$F{percent}]]></variableExpression>
+	</variable>
+	<variable name="amountSum" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<group name="Salespoint">
+		<groupHeader>
+		<band height="14">
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="520" height="14" isPrintInFirstWholeBand="true" backcolor="#c0c0c0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{salespoint}]]></textFieldExpression>
+			</textField>
+		</band>
+		</groupHeader>
+		<groupFooter>
+		<band height="14">
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#c0c0c0"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Total " + $F{salespoint}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="280" y="0" width="64" height="14" backcolor="#c0c0c0"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountSalespointSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="344" y="0" width="64" height="14" backcolor="#c0c0c0"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountSalespointSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.0%">
+				<reportElement positionType="Float" mode="Opaque" x="408" y="0" width="48" height="14" backcolor="#c0c0c0"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentSalespointAverage}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="456" y="0" width="64" height="14" backcolor="#c0c0c0"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountSalespointSum}]]></textFieldExpression>
+			</textField>
+		</band>
+		</groupFooter>
+	</group>
+	<group name="Year">
+		<groupExpression><![CDATA[$F{year}]]></groupExpression>
+		<groupHeader>
+		<band height="14">
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="520" height="14" backcolor="#d4d4d4"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["      " + $F{year}.toString()]]></textFieldExpression>
+			</textField>
+		</band>
+		</groupHeader>
+		<groupFooter>
+		<band height="14">
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#d4d4d4"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["      Total " + $F{year}.toString()]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="280" y="0" width="64" height="14" backcolor="#d4d4d4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountYearSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="344" y="0" width="64" height="14" backcolor="#d4d4d4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountYearSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.0%">
+				<reportElement positionType="Float" mode="Opaque" x="408" y="0" width="48" height="14" backcolor="#d4d4d4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentYearAverage}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="456" y="0" width="64" height="14" backcolor="#d4d4d4"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountYearSum}]]></textFieldExpression>
+			</textField>
+		</band>
+		</groupFooter>
+	</group>
+	<group name="Month">
+		<groupExpression><![CDATA[$F{month}]]></groupExpression>
+		<groupHeader>
+		<band height="14">
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="1" y="0" width="519" height="14" backcolor="#e9e9e9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{month}.intValue() == 1 ? "            Januar" :
+$F{month}.intValue() == 2 ? "            Februar" :
+$F{month}.intValue() == 3 ? "            März" :
+$F{month}.intValue() == 4 ? "            April" :
+$F{month}.intValue() == 5 ? "            Mai" :
+$F{month}.intValue() == 6 ? "            Juni" :
+$F{month}.intValue() == 7 ? "            Juli" :
+$F{month}.intValue() == 8 ? "            August" :
+$F{month}.intValue() == 9 ? "            September" :
+$F{month}.intValue() == 10 ? "            Oktober" :
+$F{month}.intValue() == 11 ? "            November" :
+$F{month}.intValue() == 12 ? "            Dezember" : ""]]></textFieldExpression>
+			</textField>
+		</band>
+		</groupHeader>
+		<groupFooter>
+		<band height="14">
+			<textField>
+				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#e9e9e9"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{month}.intValue() == 1 ? "            Total Januar" :
+$F{month}.intValue() == 2 ? "            Total Februar" :
+$F{month}.intValue() == 3 ? "            Total März" :
+$F{month}.intValue() == 4 ? "            Total April" :
+$F{month}.intValue() == 5 ? "            Total Mai" :
+$F{month}.intValue() == 6 ? "            Total Juni" :
+$F{month}.intValue() == 7 ? "            Total Juli" :
+$F{month}.intValue() == 8 ? "            Total August" :
+$F{month}.intValue() == 9 ? "            Total September" :
+$F{month}.intValue() == 10 ? "            Total Oktober" :
+$F{month}.intValue() == 11 ? "            Total November" :
+$F{month}.intValue() == 12 ? "            Total Dezember" : ""]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="280" y="0" width="65" height="14" backcolor="#e9e9e9"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountMonthSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="344" y="0" width="65" height="14" backcolor="#e9e9e9"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountMonthSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.0%">
+				<reportElement positionType="Float" mode="Opaque" x="408" y="0" width="49" height="14" backcolor="#e9e9e9"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentMonthAverage}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" mode="Opaque" x="456" y="0" width="65" height="14" backcolor="#e9e9e9"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountMonthSum}]]></textFieldExpression>
+			</textField>
+		</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="104">
+			<staticText>
+				<reportElement positionType="Float" x="1" y="47" width="400" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Zusammenfassung Rabatte]]></text>
+			</staticText>
+			<textField>
+				<reportElement positionType="Float" x="400" y="0" width="120" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{printTime}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="1" y="71" width="480" height="12"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{salespoints}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="1" y="83" width="480" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{dateRange}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement positionType="Float" x="1" y="98" width="520" height="1"/>
+				<graphicElement pen="Thin"/>
+			</line>
+			<textField>
+				<reportElement positionType="Float" x="0" y="0" width="394" height="47"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{header}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="24">
+			<staticText>
+				<reportElement positionType="Float" x="0" y="4" width="140" height="12"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Datum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="280" y="4" width="64" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Bruttobetrag]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="344" y="4" width="64" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Rabatt]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="408" y="4" width="48" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[in %]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="456" y="4" width="64" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Nettobetrag]]></text>
+			</staticText>
+			<line>
+				<reportElement positionType="Float" x="0" y="20" width="520" height="1"/>
+				<graphicElement/>
+			</line>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="14">
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" x="280" y="0" width="64" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{fullAmount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" x="344" y="0" width="64" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{discount}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.0%">
+				<reportElement positionType="Float" x="408" y="0" width="48" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{percent}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" x="456" y="0" width="64" height="14"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="0" y="0" width="280" height="14"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["                  " + $F{day}.toString() + "." + $F{month}.toString() + "." + $F{year}.toString()]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30">
+			<textField>
+				<reportElement x="0" y="10" width="520" height="12"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="30">
+			<line>
+				<reportElement positionType="Float" x="0" y="4" width="520" height="1"/>
+				<graphicElement pen="Thin"/>
+			</line>
+			<line>
+				<reportElement positionType="Float" x="0" y="24" width="520" height="1"/>
+				<graphicElement/>
+			</line>
+			<textField>
+				<reportElement positionType="Float" x="0" y="8" width="280" height="12"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Total"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" x="280" y="8" width="64" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" x="344" y="8" width="64" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountSum}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0.0%">
+				<reportElement positionType="Float" x="408" y="8" width="48" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentAverage}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement positionType="Float" x="456" y="8" width="64" height="12"/>
+				<textElement textAlignment="Right">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountSum}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

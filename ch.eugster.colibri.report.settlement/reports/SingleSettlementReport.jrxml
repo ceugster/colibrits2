@@ -1,0 +1,790 @@
+<?xml version="1.0" encoding="UTF-8"  ?>
+<!-- Created with iReport - A designer for JasperReports -->
+<!DOCTYPE jasperReport PUBLIC "//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
+<jasperReport
+		 name="SingleSettlementReport"
+		 columnCount="1"
+		 printOrder="Vertical"
+		 orientation="Portrait"
+		 pageWidth="595"
+		 pageHeight="842"
+		 columnWidth="519"
+		 columnSpacing="0"
+		 leftMargin="38"
+		 rightMargin="38"
+		 topMargin="30"
+		 bottomMargin="30"
+		 whenNoDataType="NoPages"
+		 isTitleNewPage="false"
+		 isSummaryNewPage="false">
+	<property name="ireport.scriptlethandling" value="0" />
+	<property name="ireport.encoding" value="UTF-8" />
+	<import value="java.util.*" />
+	<import value="net.sf.jasperreports.engine.*" />
+	<import value="net.sf.jasperreports.engine.data.*" />
+
+	<parameter name="printTime" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="salespoints" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="receiptCount" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="header" isForPrompting="true" class="java.lang.String"/>
+	<parameter name="settlementNumber" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="settlementDate" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="taxNumber" isForPrompting="false" class="java.lang.String"/>
+	<parameter name="taxInclusive" isForPrompting="false" class="java.lang.String"/>
+
+	<field name="text" class="java.lang.String"/>
+	<field name="quantity" class="java.lang.Integer"/>
+	<field name="amount1" class="java.lang.Double"/>
+	<field name="amount2" class="java.lang.Double"/>
+	<field name="group" class="java.lang.Integer"/>
+	<field name="section" class="java.lang.Integer"/>
+	<field name="code" class="java.lang.String"/>
+
+	<variable name="sum_quantity" class="java.lang.Integer" resetType="Group" resetGroup="Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{quantity}]]></variableExpression>
+		<initialValueExpression><![CDATA[null]]></initialValueExpression>
+	</variable>
+	<variable name="sum_amount1" class="java.lang.Double" resetType="Group" resetGroup="Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount1}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0d)]]></initialValueExpression>
+	</variable>
+	<variable name="sum_amount2" class="java.lang.Double" resetType="Group" resetGroup="Group" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount2}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0d)]]></initialValueExpression>
+	</variable>
+	<variable name="total_quantity" class="java.lang.Integer" resetType="Group" resetGroup="Section" calculation="Sum">
+		<variableExpression><![CDATA[$F{quantity}]]></variableExpression>
+		<initialValueExpression><![CDATA[null]]></initialValueExpression>
+	</variable>
+	<variable name="total_amount1" class="java.lang.Double" resetType="Group" resetGroup="Section" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount1}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0d)]]></initialValueExpression>
+	</variable>
+	<variable name="total_amount2" class="java.lang.Double" resetType="Group" resetGroup="Section" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount2}]]></variableExpression>
+		<initialValueExpression><![CDATA[new Double(0d)]]></initialValueExpression>
+	</variable>
+
+		<group  name="Section" >
+			<groupExpression><![CDATA[$F{section}]]></groupExpression>
+			<groupHeader>
+			<band height="40"  isSplitAllowed="false" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="21"
+						width="264"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="9" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "Positionen" : 
+$F{section}.equals(new Integer(2)) ? "Zahlungen" : 
+$F{section}.equals(new Integer(3)) ? "Zusammenfassung" : 
+$F{section}.equals(new Integer(4)) ? "Mehrwertsteuer" :
+$F{section}.equals(new Integer(5)) ? "Einlagen/Entnahmen" :
+$F{section}.equals(new Integer(6)) ? "Rücknahmen" :
+$F{section}.equals(new Integer(7)) ? "Rechnungen an der Kasse bezahlt" :
+$F{section}.equals(new Integer(8)) ? "Stornierungen" :
+$F{section}.equals(new Integer(9)) ? "Kassenstock ".concat($F{code}) :
+$F{section}.equals(new Integer(10)) ? "Kassensturz ".concat($F{code}) : ""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="264"
+						y="21"
+						width="64"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField-7"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "" : 
+$F{section}.equals(new Integer(2)) ? "" : 
+$F{section}.equals(new Integer(3)) ? "" : 
+$F{section}.equals(new Integer(4)) ? "Menge" :
+$F{section}.equals(new Integer(5)) ? "Menge" :
+$F{section}.equals(new Integer(6)) ? "Menge" :
+$F{section}.equals(new Integer(7)) ? "Menge" :
+$F{section}.equals(new Integer(8)) ? "Menge" :
+$F{section}.equals(new Integer(9)) ? "" :
+$F{section}.equals(new Integer(10)) ? "" : ""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="327"
+						y="21"
+						width="97"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField-8"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "" : 
+$F{section}.equals(new Integer(2)) ? "" : 
+$F{section}.equals(new Integer(3)) ? "" : 
+$F{section}.equals(new Integer(4)) ? $P{taxInclusive} :
+$F{section}.equals(new Integer(5)) ? "Betrag FW" :
+$F{section}.equals(new Integer(6)) ? "Betrag" :
+$F{section}.equals(new Integer(7)) ? "" :
+$F{section}.equals(new Integer(8)) ? "" :
+$F{section}.equals(new Integer(9)) ? "" :
+$F{section}.equals(new Integer(10)) ? "" : ""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="424"
+						y="21"
+						width="96"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField-9"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "" : 
+$F{section}.equals(new Integer(2)) ? "" : 
+$F{section}.equals(new Integer(3)) ? "" : 
+$F{section}.equals(new Integer(4)) ? "MwSt" :
+$F{section}.equals(new Integer(5)) ? "Betrag" :
+$F{section}.equals(new Integer(6)) ? "MwSt" :
+$F{section}.equals(new Integer(7)) ? "Betrag" :
+$F{section}.equals(new Integer(8)) ? "Betrag" :
+$F{section}.equals(new Integer(9)) ? "" :
+$F{section}.equals(new Integer(10)) ? "" : ""]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="19"  isSplitAllowed="true" >
+				<rectangle>
+					<reportElement
+						x="0"
+						y="0"
+						width="520"
+						height="19"
+						backcolor="#C0C0C0"
+						key="rectangle"/>
+					<graphicElement stretchType="NoStretch" pen="None"/>
+				</rectangle>
+				<textField isStretchWithOverflow="false" pattern="#,##0" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="264"
+						y="0"
+						width="64"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="9" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$F{section}.equals(new Integer(1)) ? $V{total_quantity} :
+$F{section}.equals(new Integer(2)) ? $V{total_quantity} :
+$F{section}.equals(new Integer(4)) ? $V{total_quantity} :
+$F{section}.equals(new Integer(5)) ? $V{total_quantity} :
+$F{section}.equals(new Integer(6)) ? Math.abs($V{total_quantity}) : 
+$F{section}.equals(new Integer(7)) ? $V{total_quantity} :
+$F{section}.equals(new Integer(8)) ? $V{total_quantity} :
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="328"
+						y="0"
+						width="96"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="9" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{section}.equals(new Integer(1)) ? $V{total_amount1} :
+$F{section}.equals(new Integer(2)) ? null :
+$F{section}.equals(new Integer(4)) ? $V{total_amount1} :
+$F{section}.equals(new Integer(5)) ? null: 
+$F{section}.equals(new Integer(6)) ? $V{total_amount1}: 
+$F{section}.equals(new Integer(10)) ? $V{total_amount1}: 
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="424"
+						y="0"
+						width="96"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="9" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{section}.equals(new Integer(1)) ? $V{total_amount2} :
+$F{section}.equals(new Integer(2)) ? $V{total_amount2} :
+$F{section}.equals(new Integer(4)) ? $V{total_amount2} : 
+$F{section}.equals(new Integer(5)) ? $V{total_amount2} : 
+$F{section}.equals(new Integer(6)) ? $V{total_amount2} : 
+$F{section}.equals(new Integer(7)) ? $V{total_amount2} : 
+$F{section}.equals(new Integer(8)) ? $V{total_amount2} : 
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="264"
+						height="19"
+						backcolor="#C0C0C0"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="9" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "Total Positionen" : 
+$F{section}.equals(new Integer(2)) ? "Total Zahlungen" : 
+$F{section}.equals(new Integer(3)) ? "" :
+$F{section}.equals(new Integer(4)) ? "Total Mehrwertsteuer" :
+$F{section}.equals(new Integer(5)) ? "Total Einlagen/Entnahmen" :
+$F{section}.equals(new Integer(6)) ? "Total Rücknahmen" :
+$F{section}.equals(new Integer(7)) ? "Total Rechnungen an der Kasse bezahlt" :
+$F{section}.equals(new Integer(8)) ? "Total Stornierungen" : 
+$F{section}.equals(new Integer(8)) ? "Total Kassenstock ".concat($F{code}) : 
+$F{section}.equals(new Integer(8)) ? "Total Kassensturz ".concat($F{code}) : 
+""]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupFooter>
+		</group>
+		<group  name="Group" >
+			<groupExpression><![CDATA[$F{group}]]></groupExpression>
+			<groupHeader>
+			<band height="15"  isSplitAllowed="true" >
+				<printWhenExpression><![CDATA[$F{section}.equals(new Integer(1)) || 
+$F{section}.equals(new Integer(2)) || 
+$F{section}.equals(new Integer(9)) || 
+$F{section}.equals(new Integer(10))
+]]></printWhenExpression>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="264"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? 
+($F{group}.equals(new Integer(0)) ? "Warengruppen (umsatzwirksam)" :
+($F{group}.equals(new Integer(1)) ? "Sonstige Leistungen (umsatzneutral)" :
+($F{group}.equals(new Integer(2)) ? "Ausgaben Mat./DL" : 
+($F{group}.equals(new Integer(3)) ? "Ausgaben Inv." :
+($F{group}.equals(new Integer(4)) ? "Einlagen" :
+($F{group}.equals(new Integer(5)) ? "Entnahmen" : ""
+ )))))) : 
+$F{section}.equals(new Integer(2)) ?
+($F{group}.equals(new Integer(0)) ? "Zahlungsarten" : 
+($F{group}.equals(new Integer(1)) ? "Fremdwährungen" : ""
+)) :
+$F{section}.equals(new Integer(3)) ? 
+($F{group}.equals(new Integer(0)) ? "Umsatzsteuer" :
+($F{group}.equals(new Integer(1)) ? "Vorsteuer Mat./Dienstl." :
+($F{group}.equals(new Integer(2)) ? "Vorsteuer Inv." : ""
+ ))) : 
+$F{section}.equals(new Integer(9)) ? "Währung " + $F{code} :
+$F{section}.equals(new Integer(10)) ? "Währung " + $F{code} :
+""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="328"
+						y="0"
+						width="96"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? (($F{group}.equals(new Integer(4)) || $F{group}.equals(new Integer(5))) ? "Betrag FW" : $P{taxInclusive}) : 
+$F{section}.equals(new Integer(2)) ? ($F{group}.equals(new Integer(0)) ? "" : "Betrag FW") :
+$F{section}.equals(new Integer(2)) ?  "Betrag" :
+$F{section}.equals(new Integer(3)) ? $P{taxInclusive} :
+$F{section}.equals(new Integer(4)) ? "Betrag FW" :
+$F{section}.equals(new Integer(5)) ? "Betrag" :
+$F{section}.equals(new Integer(6)) ? "Betrag" :
+$F{section}.equals(new Integer(7)) ? "Betrag" :
+$F{section}.equals(new Integer(9)) ? "gerechnet" : ""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="264"
+						y="0"
+						width="64"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "Menge" : 
+$F{section}.equals(new Integer(2)) ? "Menge" : 
+$F{section}.equals(new Integer(3)) ? "Menge" :
+$F{section}.equals(new Integer(4)) ? "Menge" : 
+$F{section}.equals(new Integer(10)) ? "Menge" :
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="424"
+						y="0"
+						width="96"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ? "Mwst-Betrag" : 
+$F{section}.equals(new Integer(2)) ? "Betrag" :
+$F{section}.equals(new Integer(4)) ? "Mwst-Betrag" :
+$F{section}.equals(new Integer(5)) ? "Betrag" : 
+$F{section}.equals(new Integer(9)) ? "gezählt" :
+$F{section}.equals(new Integer(10)) ? "Betrag" : ""]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupHeader>
+			<groupFooter>
+			<band height="15"  isSplitAllowed="true" >
+				<printWhenExpression><![CDATA[$F{section}.equals(new Integer(1)) || 
+$F{section}.equals(new Integer(2)) || 
+$F{section}.equals(new Integer(9)) || 
+$F{section}.equals(new Integer(10))
+]]></printWhenExpression>
+				<rectangle>
+					<reportElement
+						x="0"
+						y="0"
+						width="520"
+						height="12"
+						backcolor="#DCDCDC"
+						key="rectangle"/>
+					<graphicElement stretchType="NoStretch" pen="None"/>
+				</rectangle>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="0"
+						y="0"
+						width="264"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{section}.equals(new Integer(1)) ?
+ ($F{group}.equals(new Integer(0)) ? "Total Warengruppen (umsatzwirksam)" :
+ ($F{group}.equals(new Integer(1)) ? "Total Sonstige Leistungen (umsatzneutral)" : 
+ ($F{group}.equals(new Integer(2)) ? "Total Ausgaben Mat./DL" :
+ ($F{group}.equals(new Integer(3)) ? "Total Ausgaben Inv." :
+ ($F{group}.equals(new Integer(4)) ? "Total Einlagen" :
+ ($F{group}.equals(new Integer(5)) ? "Total Entnahmen" : ""
+ )))))) : 
+$F{section}.equals(new Integer(2)) ? 
+($F{group}.equals(new Integer(0)) ? "Total Zahlungsarten": 
+($F{group}.equals(new Integer(1)) ? "Total Fremdwährungen" : ""
+)) :
+$F{section}.equals(new Integer(3)) ? 
+($F{group}.equals(new Integer(0)) ? "Total Umsatzsteuer" :
+($F{group}.equals(new Integer(1)) ? "Total Vorsteuer Mat./Dienstl." :
+($F{group}.equals(new Integer(2)) ? "Total Vorsteuer Inv." : ""
+ ))) : 
+$F{section}.equals(new Integer(9)) ? "Kassastock" :
+$F{section}.equals(new Integer(10)) ? "Total" :
+  ""]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="264"
+						y="0"
+						width="64"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField"
+						isRemoveLineWhenBlank="true"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$F{section}.equals(new Integer(1)) ? $V{sum_quantity} :
+$F{section}.equals(new Integer(2)) ? $V{sum_quantity} : 
+$F{section}.equals(new Integer(10)) ? $V{sum_quantity} :
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="328"
+						y="0"
+						width="96"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{section}.equals(new Integer(1)) ? 
+ ($F{group}.equals(new Integer(0)) ? $V{sum_amount1} : 
+ ($F{group}.equals(new Integer(1)) ? $V{sum_amount1} :
+ ($F{group}.equals(new Integer(1)) ? $V{sum_amount1} :
+ ($F{group}.equals(new Integer(1)) ? $V{sum_amount1} : null
+ )))) : 
+$F{section}.equals(new Integer(9)) ? $V{sum_amount1} : 
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						mode="Opaque"
+						x="424"
+						y="0"
+						width="96"
+						height="15"
+						backcolor="#DCDCDC"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="8" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{section}.equals(new Integer(1)) ? $V{sum_amount2} :
+$F{section}.equals(new Integer(2)) ? $V{sum_amount2} :
+$F{section}.equals(new Integer(4)) ? null :
+$F{section}.equals(new Integer(5)) ? $V{sum_amount2} : 
+$F{section}.equals(new Integer(9)) ? $V{sum_amount2} : 
+$F{section}.equals(new Integer(10)) ? $V{sum_amount2} : 
+null]]></textFieldExpression>
+				</textField>
+			</band>
+			</groupFooter>
+		</group>
+		<background>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</background>
+		<title>
+			<band height="122"  isSplitAllowed="true" >
+				<staticText>
+					<reportElement
+						x="0"
+						y="61"
+						width="112"
+						height="20"
+						key="staticText"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" size="14" isBold="true"/>
+					</textElement>
+				<text><![CDATA[Tagesabschluss]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="369"
+						y="1"
+						width="150"
+						height="14"
+						key="textField"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{printTime}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="32"
+						y="83"
+						width="469"
+						height="12"
+						key="textField"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{salespoints}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="32"
+						y="96"
+						width="468"
+						height="12"
+						key="textField"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{receiptCount}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="0"
+						width="354"
+						height="60"
+						key="textField"
+						positionType="Float"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{header}]]></textFieldExpression>
+				</textField>
+				<line direction="TopDown">
+					<reportElement
+						x="1"
+						y="115"
+						width="518"
+						height="1"
+						key="line"
+						positionType="Float"/>
+					<graphicElement stretchType="NoStretch"/>
+				</line>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="117"
+						y="62"
+						width="162"
+						height="19"
+						key="textField-4"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{settlementNumber}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="287"
+						y="62"
+						width="162"
+						height="19"
+						key="textField-5"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" pdfFontName="Helvetica-Bold" size="14" isBold="true"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{settlementDate}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="1"
+						y="96"
+						width="30"
+						height="12"
+						key="staticText-2"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<text><![CDATA[Belege]]></text>
+				</staticText>
+				<staticText>
+					<reportElement
+						x="1"
+						y="83"
+						width="31"
+						height="11"
+						key="staticText-3"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+				<text><![CDATA[Kasse]]></text>
+				</staticText>
+			</band>
+		</title>
+		<pageHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</pageHeader>
+		<columnHeader>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnHeader>
+		<detail>
+			<band height="13"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="0"
+						y="2"
+						width="264"
+						height="11"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$F{text}]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="264"
+						y="2"
+						width="64"
+						height="11"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$F{section}.equals(new Integer(0)) ? $F{quantity} :
+$F{section}.equals(new Integer(1)) ? $F{quantity} :
+$F{section}.equals(new Integer(2)) ? $F{quantity} :
+$F{section}.equals(new Integer(3)) ? $F{quantity} :
+$F{section}.equals(new Integer(4)) ? $F{quantity} :
+$F{section}.equals(new Integer(5)) ? $F{quantity} :
+$F{section}.equals(new Integer(6)) ? Math.abs($F{quantity}) :
+$F{section}.equals(new Integer(7)) ? $F{quantity} :
+$F{section}.equals(new Integer(8)) ? $F{quantity} :
+$F{section}.equals(new Integer(10)) ? $F{quantity} :
+null]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="328"
+						y="2"
+						width="96"
+						height="11"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{section}.equals(new Integer(1)) ? $F{amount1} : 
+$F{section}.equals(new Integer(2)) ? ($F{group}.equals(new Integer(1)) ? $F{amount1} : null) :
+$F{section}.equals(new Integer(3)) ? $F{amount1} :
+$F{section}.equals(new Integer(4)) ? $F{amount1} :
+$F{section}.equals(new Integer(5)) ? $F{amount1} :
+$F{section}.equals(new Integer(6)) ? $F{amount1} : 
+$F{section}.equals(new Integer(7)) ? $F{amount1} : 
+$F{section}.equals(new Integer(8)) ? $F{amount1} : 
+$F{section}.equals(new Integer(9)) ? $F{amount1} : 
+$F{section}.equals(new Integer(10)) ? $F{amount1} : 
+null
+]]></textFieldExpression>
+				</textField>
+				<textField isStretchWithOverflow="false" pattern="#,##0.00" isBlankWhenNull="true" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="424"
+						y="2"
+						width="96"
+						height="11"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Double"><![CDATA[$F{section}.equals(new Integer(1)) ? $F{amount2} :
+$F{section}.equals(new Integer(2)) ? $F{amount2} :
+$F{section}.equals(new Integer(3)) ? $F{amount2} :
+$F{section}.equals(new Integer(4)) ? $F{amount2} :
+$F{section}.equals(new Integer(5)) ? $F{amount2} :
+$F{section}.equals(new Integer(6)) ? $F{amount2} : 
+$F{section}.equals(new Integer(7)) ? $F{amount2} : 
+$F{section}.equals(new Integer(8)) ? $F{amount2} : 
+$F{section}.equals(new Integer(9)) ? $F{amount2} : 
+$F{section}.equals(new Integer(10)) ? $F{amount2} : 
+null
+]]></textFieldExpression>
+				</textField>
+			</band>
+		</detail>
+		<columnFooter>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</columnFooter>
+		<pageFooter>
+			<band height="28"  isSplitAllowed="true" >
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="279"
+						y="15"
+						width="240"
+						height="13"
+						key="textField"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement textAlignment="Right">
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement
+						x="0"
+						y="15"
+						width="54"
+						height="13"
+						key="staticText-1"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<text><![CDATA[Steuernummer]]></text>
+				</staticText>
+				<textField isStretchWithOverflow="false" isBlankWhenNull="false" evaluationTime="Now" hyperlinkType="None"  hyperlinkTarget="Self" >
+					<reportElement
+						x="57"
+						y="15"
+						width="178"
+						height="13"
+						key="textField-6"/>
+					<box topBorder="None" topBorderColor="#000000" leftBorder="None" leftBorderColor="#000000" rightBorder="None" rightBorderColor="#000000" bottomBorder="None" bottomBorderColor="#000000"/>
+					<textElement>
+						<font fontName="SansSerif" size="8"/>
+					</textElement>
+				<textFieldExpression   class="java.lang.String"><![CDATA[$P{taxNumber}]]></textFieldExpression>
+				</textField>
+			</band>
+		</pageFooter>
+		<summary>
+			<band height="0"  isSplitAllowed="true" >
+			</band>
+		</summary>
+</jasperReport>

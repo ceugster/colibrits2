@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="ch.eugster.colibri.report.destination.views.DestinationView"
+            id="ch.eugster.colibri.report.destination.view"
+            name="Ausgabe"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:ch.eugster.colibri.report.menu.views?after=additions">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               label="Ausgabe"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.report.destination.view">
+            </parameter>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>

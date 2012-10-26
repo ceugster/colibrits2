@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="ch.eugster.colibri.report.daterange.views.DateView"
+            id="ch.eugster.colibri.report.daterange.view"
+            name="Datumsbereich"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:ch.eugster.colibri.report.menu.views?after=additions">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               label="Datumsbereich"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.report.daterange.view">
+            </parameter>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>

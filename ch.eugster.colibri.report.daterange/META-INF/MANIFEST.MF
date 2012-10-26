@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Daterange Plugin
+Bundle-SymbolicName: ch.eugster.colibri.report.daterange;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.report.daterange.Activator
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: ch.eugster.colibri.report.daterange.views
+Import-Package: org.eclipse.core.runtime;version="3.4.0",
+ org.eclipse.jface.dialogs,
+ org.eclipse.jface.util,
+ org.eclipse.jface.viewers,
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.layout,
+ org.eclipse.swt.widgets,
+ org.eclipse.ui,
+ org.eclipse.ui.part,
+ org.eclipse.ui.plugin,
+ org.osgi.framework;version="1.6.0"

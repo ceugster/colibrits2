@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="ch.eugster.colibri.report.settlement.ReportSettlementPerspective"
+            id="ch.eugster.colibri.report.settlement.perspective"
+            name="Abrechnungen">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="ch.eugster.colibri.report.settlement.category"
+            class="ch.eugster.colibri.report.settlement.views.SettlementView"
+            id="ch.eugster.colibri.report.settlement.view"
+            name="Abschlüsse"
+            restorable="true">
+      </view>
+      <category
+            id="ch.eugster.colibri.report.settlement.category"
+            name="Berichte">
+      </category>
+   </extension>
+   <extension
+         id="ch.eugster.colibr.report.application"
+         name="ColibriTS II"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="ch.eugster.colibri.report.app.ReportApplication">
+         </run>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu?ch.eugster.colibri.report.menu.views?after=additions">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               label="Abschluss"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.report.settlement.view">
+            </parameter>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:ch.eugster.colibri.report.perspective.toolbar?after=additions">
+         <command
+               commandId="org.eclipse.ui.perspectives.showPerspective"
+               label="Abschlüsse"
+               mode="FORCE_TEXT"
+               style="radio"
+               tooltip="Zur Perspktive Abschlüsse wechseln">
+            <parameter
+                  name="org.eclipse.ui.perspectives.showPerspective.perspectiveId"
+                  value="ch.eugster.colibri.admin.currency.perspective">
+            </parameter>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>
