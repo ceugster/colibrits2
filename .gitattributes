@@ -1546,6 +1546,10 @@ ch.eugster.colibri.provider.feature/feature.xml -text
 ch.eugster.colibri.provider.galileo.feature/.project -text
 ch.eugster.colibri.provider.galileo.feature/build.properties -text
 ch.eugster.colibri.provider.galileo.feature/feature.xml -text
+ch.eugster.colibri.provider.galileo/.classpath -text
+ch.eugster.colibri.provider.galileo/.project -text
+ch.eugster.colibri.provider.galileo/build.properties -text
+ch.eugster.colibri.provider.galileo/com4j-x86.dll -text
 ch.eugster.colibri.provider.galileo/galileo/FOXUSER.DBF -text
 ch.eugster.colibri.provider.galileo/galileo/FOXUSER.FPT -text
 ch.eugster.colibri.provider.galileo/galileo/galserve.VBR -text
@@ -1566,6 +1570,7 @@ ch.eugster.colibri.provider.galileo/galileo/wgserve.VBR -text
 ch.eugster.colibri.provider.galileo/galileo/wgserve.dll -text
 ch.eugster.colibri.provider.galileo/galileo/wgserve.exe -text
 ch.eugster.colibri.provider.galileo/galileo/wgserve.tlb -text
+ch.eugster.colibri.provider.galileo/plugin.xml -text
 ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
 ch.eugster.colibri.provider.scheduler/.settings/org.eclipse.jdt.core.prefs -text

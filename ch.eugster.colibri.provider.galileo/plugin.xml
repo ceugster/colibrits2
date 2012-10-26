@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="ch.eugster.colibri.provider.galileo.handler.ImportProductGroupHandler"
+            description="Warengruppen aus Warenbewirtschaftung importieren"
+            id="ch.eugster.colibri.provider.galileo2.commands.import.productGroups"
+            name="Warengruppen importieren">
+      </command>
+      <command
+            defaultHandler="ch.eugster.colibri.provider.galileo.handler.SynchronizeProductGroupsHandler"
+            id="ch.eugster.colibri.provider.galileo2.commands.synchhronize.productGroups"
+            name="Warengruppen mit Warenbewirtschaftung synchronisieren">
+      </command>
+      <command
+            defaultHandler="ch.eugster.colibri.provider.galileo.handler.AddGalileoTaxCodes"
+            id="ch.eugster.colibri.provider.galileo2.commands.setProviderTaxCodes"
+            name="Galileo-Mehrwertsteuercodes  zuordnen">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:ch.eugster.colibri.admin.menu.actions?after=additions">
+         <separator
+               name="ch.eugster.colibri.provider.galileo2.separator1"
+               visible="true">
+         </separator>
+         <menu
+               icon="icons/galileo.png"
+               label="Warengruppen">
+            <command
+                  commandId="ch.eugster.colibri.provider.galileo2.commands.import.productGroups"
+                  icon="icons/galileo.png"
+                  label="Warengruppen importieren"
+                  style="push"
+                  tooltip="Warengruppen aus der Warenbewirtschaftung importieren">
+            </command>
+            <command
+                  commandId="ch.eugster.colibri.provider.galileo2.commands.synchhronize.productGroups"
+                  icon="icons/galileo.png"
+                  label="Warengruppen synchronisieren"
+                  style="push"
+                  tooltip="Warengruppen mit Warenbewirtschaftung synchronisieren">
+            </command>
+         </menu>
+         <separator
+               name="ch.eugster.colibri.provider.galileo2.separator2"
+               visible="true">
+         </separator>
+         <command
+               commandId="ch.eugster.colibri.provider.galileo2.commands.setProviderTaxCodes"
+               label="Galileo Mehrwertsteuercodes zuordnen"
+               style="push">
+         </command>
+         <separator
+               name="ch.eugster.colibri.provider.galileo.separator1"
+               visible="true">
+         </separator>
+      </menuContribution>
+   </extension>
+</plugin>
