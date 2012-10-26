@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT   database    (current, connection*)
+>
+<!ELEMENT   current     (connection)
+>
+<!ATTLIST   current
+            log-level                           (OFF|SEVERE|WARNING|INFO|CONFIG|FINE|FINER|FINEST|ALL)  "OFF"
+>
+<!ELEMENT   connection  (#PCDATA)
+>
+<!ATTLIST   connection
+            ch.eugster.colibri.persistence.impl.use.embedded.database   (true|false)    "true"
+            javax.persistence.jdbc.driver      (CDATA)     #REQUIRED
+            javax.persistence.jdbc.url         (CDATA)     #REQUIRED
+            javax.persistence.jdbc.user        (CDATA)     #REQUIRED
+            javax.persistence.jdbc.password    (CDATA)     #REQUIRED
+>

@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE descriptor-repository PUBLIC "-//Apache Software Foundation//DTD OJB Repository//EN" "repository.dtd">
+<!--
+#/* Copyright 2002-2004 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<!-- This is a sample metadata repository for the
+     Apache ObJectRelationalBridge (OJB) System.
+     Use this file as a template for building your own mappings.
+-->
+<!-- doctype definition
+     By default we are using a local DTD that is expected to reside
+     in the same directory as this repository.xml file.
+     If you intend to validate your repository.xml against
+     the public dtd at the Apache site, please replace the string
+     "repository.dtd"
+     by the public adress
+     "http://db.apache.org/ojb/dtds/1.0/repository.dtd".
+     In this case validation will only work if the machine you
+     run your application on can connect to the internet!
+-->
+<descriptor-repository version="1.0" isolation-level="read-uncommitted" proxy-prefetching-limit="50">
+   <!-- include all used database connections -->
+   <!-- @version $Id: repository_database.xml,v 1.22.2.14 2005/08/22 15:27:29 arminw Exp $ -->
+   <!--
+/* Copyright 2002-2005 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+   <!--
+Define all database connections here.
+One defined connection should be defined as the default one,
+by setingt default-connection="true" - this could be done at runtime too.
+
+It is possible to set user/password at
+runtime or to let different users login at runtime
+using the same database.
+Use PBKey objects for the same jcdAlias name,
+but with different user/password.
+
+It is also possible to add jdbc-connection-descriptor elements
+at runtime,  using the MetadataManager.
+-->
+   <!-- This connection is used as the default one within OJB -->
+   <!--    <jdbc-connection-descriptor
+   		jcd-alias="@JCD_ALIAS@"
+   		default-connection="true"
+   		platform="@DBMS_NAME@"
+   		jdbc-level="@JDBC_LEVEL@"
+   		driver="@DRIVER_NAME@"
+   		protocol="@URL_PROTOCOL@"
+   		subprotocol="@URL_SUBPROTOCOL@"
+   		dbalias="@URL_DBALIAS@"
+   		username="@USER_NAME@"
+   		password="@USER_PASSWD@"
+   		batch-mode="false"
+        useAutoCommit="1"
+        ignoreAutoCommitExceptions="false"
+     >
+-->
+   <!--
+            On initialization of connections the ConnectionFactory change the 'autoCommit'
+            state dependent of the used 'useAutoCommit' setting. This doesn't work in all
+            situations/environments, thus for useAutoCommit="1" the ConnectionFactory does
+            no longer set autoCommit to true on connection creation.
+            To use the old behavior (OJB version 1.0.3 or earlier) set this property
+            to 'true', then OJB change the autoCommit state (if needed) of
+            new obtained connections at connection initialization to 'true'.
+            If 'false' or this property is removed, OJB don't try to change connection
+            autoCommit state at connection initialization.
+        -->
+   <!--        <attribute attribute-name="initializationCheck" attribute-value="false" />
+-->
+   <!-- alternative cache implementations, see docs section "Caching" -->
+   <!--        <object-cache class="org.apache.ojb.broker.cache.ObjectCacheTwoLevelImpl">
+-->
+   <!-- meaning of attributes, please see docs section "Caching" -->
+   <!-- common attributes -->
+   <!--            <attribute attribute-name="cacheExcludes" attribute-value=""/>
+-->
+   <!-- ObjectCacheTwoLevelImpl attributes -->
+   <!--            <attribute attribute-name="applicationCache" attribute-value="org.apache.ojb.broker.cache.ObjectCacheDefaultImpl"/>
+            <attribute attribute-name="copyStrategy" attribute-value="org.apache.ojb.broker.cache.ObjectCacheTwoLevelImpl$CopyStrategyImpl"/>
+            <attribute attribute-name="forceProxies" attribute-value="false"/>
+-->
+   <!-- ObjectCacheDefaultImpl attributes -->
+   <!--            <attribute attribute-name="timeout" attribute-value="900"/>
+            <attribute attribute-name="autoSync" attribute-value="true"/>
+            <attribute attribute-name="cachingKeyType" attribute-value="0"/>
+            <attribute attribute-name="useSoftReferences" attribute-value="true"/>
+        </object-cache>
+-->
+   <!-- For more info, see section "Connection Handling" in docs -->
+   <!--        <connection-pool
+            maxActive="30"
+            validationQuery="@VALIDATION_QUERY@"
+            testOnBorrow="@TEST_ON_BORROW@"
+            testOnReturn="@TEST_ON_RETURN@"
+            whenExhaustedAction="0"
+            maxWait="10000">
+-->
+   <!-- Set fetchSize to 0 to use driver's default. -->
+   <!--            <attribute attribute-name="fetchSize" attribute-value="0"/>
+-->
+   <!-- Attributes with name prefix "jdbc." are passed directly to the JDBC driver. -->
+   <!-- Example setting (used by Oracle driver when Statement batching is enabled) -->
+   <!--            <attribute attribute-name="jdbc.defaultBatchValue" attribute-value="5"/>
+-->
+   <!-- Attributes determining if ConnectionFactoryDBCPImpl
+                 should also pool PreparedStatement. This is programmatically disabled
+                 when using platform=Oracle9i since Oracle statement caching will conflict
+                 with DBCP ObjectPool-based PreparepdStatement caching (ie setting true
+                 here has no effect for Oracle9i platform). -->
+   <!--            <attribute attribute-name="dbcp.poolPreparedStatements" attribute-value="false"/>
+            <attribute attribute-name="dbcp.maxOpenPreparedStatements" attribute-value="10"/>
+-->
+   <!-- Attribute determining if the Commons DBCP connection wrapper will allow
+                 access to the underlying concrete Connection instance from the JDBC-driver
+                 (normally this is not allowed, like in J2EE-containers using wrappers). -->
+   <!--            <attribute attribute-name="dbcp.accessToUnderlyingConnectionAllowed" attribute-value="false"/>
+        </connection-pool>
+-->
+   <!-- alternative sequence manager implementations, see "Sequence Manager" guide -->
+   <!--        <sequence-manager className="org.apache.ojb.broker.util.sequence.SequenceManagerHighLowImpl">
+-->
+   <!-- attributes supported by SequenceManagerHighLowImpl,
+            SequenceManagerInMemoryImpl, SequenceManagerNextValImpl
+            please see "Sequence Manager" guide or/and javadoc of class for more information -->
+   <!--            <attribute attribute-name="seq.start" attribute-value="200000"/>
+            <attribute attribute-name="autoNaming" attribute-value="true"/>
+-->
+   <!-- attributes supported by SequenceManagerHighLowImpl
+            please see "Sequence Manager" guide or/and javadoc of classes for more information -->
+   <!--            <attribute attribute-name="grabSize" attribute-value="20"/>
+-->
+   <!-- optional attributes supported by SequenceManagerNextValImpl (support depends
+            on the used database), please see "Sequence Manager" guide or/and javadoc of
+            classes for more information -->
+   <!-- attribute attribute-name="seq.as" attribute-value="INTEGER"/ -->
+   <!-- attribute attribute-name="seq.incrementBy" attribute-value="1"/ -->
+   <!-- attribute attribute-name="seq.maxValue" attribute-value="999999999999999999999999999"/ -->
+   <!-- attribute attribute-name="seq.minValue" attribute-value="1"/ -->
+   <!-- attribute attribute-name="seq.cycle" attribute-value="false"/ -->
+   <!-- attribute attribute-name="seq.cache" attribute-value="20"/ -->
+   <!-- attribute attribute-name="seq.order" attribute-value="false"/ -->
+   <!--        </sequence-manager>
+   </jdbc-connection-descriptor>
+-->
+   <!-- Datasource example -->
+   <!-- jdbc-connection-descriptor
+        jcd-alias="default"
+        default-connection="true"
+   		platform="Hsqldb"
+   		jdbc-level="2.0"
+   		jndi-datasource-name="java:DefaultDS"
+   		username="sa"
+   		password=""
+        batch-mode="false"
+        useAutoCommit="0"
+        ignoreAutoCommitExceptions="false"
+   >
+        Add the other elements like object-cache, connection-pool, sequence-manager here.
+
+   </jdbc-connection-descriptor -->
+   <!-- include ojb internal mappings here -->
+   <!-- OJB INTERNAL MAPPINGS START HERE, DO NOT EDIT -->
+   <!--
+#/* Copyright 2002-2004 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+   <!-- The OJB HIGH/LOW SequenceManagerTable -->
+   <class-descriptor class="org.apache.ojb.broker.util.sequence.HighLowSequence" table="ojb_hl_seq" accept-locks="true" refresh="false">
+      <object-cache class="org.apache.ojb.broker.cache.ObjectCacheEmptyImpl" />
+      <!-- TODO: Rename column TABLENAME to NAME or SEQ_NAME -->
+      <field-descriptor name="name" column="TABLENAME" jdbc-type="VARCHAR" primarykey="true" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="maxKey" column="MAX_KEY" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="grabSize" column="GRAB_SIZE" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="version" column="VERSION" jdbc-type="INTEGER" locking="true" primarykey="false" nullable="true" indexed="false" autoincrement="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <!-- THIS IS THE OJB NAMED ROOTS TABLE, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.NamedRootsMap$NamedEntry" table="OJB_NRM" accept-locks="true" refresh="false">
+      <field-descriptor name="name" column="NAME" jdbc-type="VARCHAR" primarykey="true" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="oid" column="OID_" jdbc-type="LONGVARBINARY" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <!-- THIS IS THE OJB DLIST IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DListImpl" table="OJB_DLIST" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="elements" element-class-ref="org.apache.ojb.odmg.collections.DListEntry" auto-retrieve="true" auto-update="none" auto-delete="none" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <inverse-foreignkey field-ref="dlistId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <!-- THIS IS THE OJB DLIST ENTRY IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DListEntry" table="OJB_DLIST_ENTRIES" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="dlistId" column="DLIST_ID" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="position" column="POSITION_" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="oid" column="OID_" jdbc-type="LONGVARBINARY" conversion="org.apache.ojb.broker.accesslayer.conversions.Object2ByteArrFieldConversion" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <!-- THIS IS THE OJB DBAG IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DBagImpl" table="OJB_DLIST" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="elements" element-class-ref="org.apache.ojb.odmg.collections.DListEntry" auto-retrieve="true" auto-update="none" auto-delete="none" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <inverse-foreignkey field-ref="dlistId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <!-- THIS IS THE OJB DSET IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DSetImpl" table="OJB_DSET" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="elements" element-class-ref="org.apache.ojb.odmg.collections.DSetEntry" auto-retrieve="true" auto-update="none" auto-delete="none" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <inverse-foreignkey field-ref="dlistId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <!-- THIS IS THE OJB DSET ENTRY IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DSetEntry" table="OJB_DSET_ENTRIES" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="dlistId" column="DLIST_ID" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="position" column="POSITION_" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="oid" column="OID_" jdbc-type="LONGVARBINARY" conversion="org.apache.ojb.broker.accesslayer.conversions.Object2ByteArrFieldConversion" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <!-- THIS IS THE OJB DMAP IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DMapImpl" table="OJB_DMAP" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="entries" element-class-ref="org.apache.ojb.odmg.collections.DMapEntry" collection-class="org.apache.ojb.broker.util.collections.ManageableHashSet" auto-retrieve="true" auto-update="none" auto-delete="none" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <inverse-foreignkey field-ref="dmapId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <!-- THIS IS THE OJB DMAP ENTRY IMPLEMENTATION, DO NOT EDIT-->
+   <class-descriptor class="org.apache.ojb.odmg.collections.DMapEntry" table="OJB_DMAP_ENTRIES" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="ID" jdbc-type="INTEGER" primarykey="true" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="dmapId" column="DMAP_ID" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="keyOid" column="KEY_OID" jdbc-type="LONGVARBINARY" conversion="org.apache.ojb.broker.accesslayer.conversions.Object2ByteArrFieldConversion" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="valueOid" column="VALUE_OID" jdbc-type="LONGVARBINARY" conversion="org.apache.ojb.broker.accesslayer.conversions.Object2ByteArrFieldConversion" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <!-- END OF OJB INTERNAL MAPPINGS-->
+   <!-- include user defined mappings here -->
+   <!-- Please keep user defined mappings in this file only
+     to avoid mixing user defined and system mappings. -->
+   <!-- Mapping of User defined classes starts here -->
+   <!--
+#/* Copyright 2002-2004 The Apache Software Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+   <!-- This file usually contains the mappings for the application classes. -->
+   <!-- Mapping of User defined classes ends here -->
+   <!-- Tax beinhaltet die verschiedenen Kombinationen von TaxType (Umsatzsteuer, Vorsteuer) 
+	und TaxRate (Vollstaendiger Steuersatz, Reduzierter Steuersatz, Steuerfrei), die in colibri.xml
+	definiert sind. -->
+   <class-descriptor class="ch.eugster.pos.db.Block" table="pos_block" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="visible" column="visible" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="clazz" column="class" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontSize" column="font_size" jdbc-type="FLOAT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontStyle" column="font_style" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="tabs" element-class-ref="ch.eugster.pos.db.Tab" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="blockId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Coin" table="pos_coin" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="value" column="value" jdbc-type="DOUBLE" indexed="true" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="foreignCurrencyId" column="foreign_currency_id" jdbc-type="BIGINT" indexed="false" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="foreignCurrency" class-ref="ch.eugster.pos.db.ForeignCurrency" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="foreignCurrencyId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.CurrentTax" table="pos_current_tax" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="taxId" column="tax_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fibuId" column="fibu_id" jdbc-type="VARCHAR" length="10" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="percentage" column="percentage" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="validationDate" column="validation_date" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="tax" class-ref="ch.eugster.pos.db.Tax" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="taxId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.FixKey" table="pos_fixkey" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fixKeyGroupId" column="fix_key_group_id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="block" column="block" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="textEditable" column="text_editable" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="row" column="row" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="column" column="col" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgRed" column="bg_red" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgGreen" column="bg_green" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgBlue" column="bg_blue" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fgRed" column="fg_red" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fgGreen" column="fg_green" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fgBlue" column="fg_blue" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontSize" column="font_size" jdbc-type="FLOAT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontStyle" column="font_style" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="align" column="align" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="valign" column="valign" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="imagepath" column="image_path" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="relHorizontalTextPos" column="rel_horizontal_text_pos" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="relVerticalTextPos" column="rel_vertical_text_pos" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="text" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="command" column="command" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="className" column="class_name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="actionType" column="action_type" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgRedFailover" column="bg_red_failover" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgGreenFailover" column="bg_green_failover" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgBlueFailover" column="bg_blue_failover" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="fixKeyGroup" class-ref="ch.eugster.pos.db.FixKeyGroup" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="fixKeyGroupId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.FixKeyGroup" table="pos_fixkey_group" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="fixKeys" element-class-ref="ch.eugster.pos.db.FixKey" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="fixKeyGroupId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.ForeignCurrency" table="pos_foreign_currency" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="quotation" column="quotation" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="account" column="account" jdbc-type="VARCHAR" length="20" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="roundFactor" column="round_factor" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="VARCHAR" length="3" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="20" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="region" column="region" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Function" table="pos_function" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="clazz" column="class" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="actionType" column="action_type" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="255" indexed="true" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="shortname" column="shortname" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.CustomKey" table="pos_key" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="tabId" column="tab_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="textEditable" column="editable" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="row" column="row" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="column" column="col" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgRed" column="bg_red" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgGreen" column="bg_green" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgBlue" column="bg_blue" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgRed2" column="bg_red2" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgGreen2" column="bg_green2" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bgBlue2" column="bg_blue2" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fgRed" column="fg_red" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fgGreen" column="fg_green" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fgBlue" column="fg_blue" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontSize" column="font_size" jdbc-type="FLOAT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontStyle" column="font_style" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="align" column="align" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="valign" column="valign" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="text" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="command" column="command" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="imagepath" column="image_path" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="relHorizontalTextPos" column="rel_horizontal_text_pos" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="relVerticalTextPos" column="rel_vertical_text_pos" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="className" column="class_name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="value" column="value" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="parentClassName" column="parent_class_name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="parentId" column="parent_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="actionType" column="action_type" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="setDefaultTab" column="set_default_tab" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="paymentTypeId" column="payment_type_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="tab" class-ref="ch.eugster.pos.db.Tab" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="tabId" />
+      </reference-descriptor>
+      <reference-descriptor name="paymentType" class-ref="ch.eugster.pos.db.PaymentType" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="paymentTypeId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.KeyGroup" table="pos_key_group" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="255" indexed="true" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="clazz" column="class" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="actionClass" column="action_class" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="actionType" column="action_type" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Option" table="pos_option" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="VARCHAR" length="1" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Payment" table="pos_payment" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="receiptId" column="receipt_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="paymentTypeId" column="payment_type_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="foreignCurrencyId" column="foreign_currency_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="quotation" column="quotation" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amount" column="amount" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amountFC" column="amount_fc" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="roundFactor" column="round_factor" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="roundFactorFC" column="round_factor_fc" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="back" column="back" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="salespointId" column="salespoint_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="settlement" column="settlement" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="isInputOrWithdraw" column="is_input_or_withdraw" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="receipt" class-ref="ch.eugster.pos.db.Receipt" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="receiptId" />
+      </reference-descriptor>
+      <reference-descriptor name="paymentType" class-ref="ch.eugster.pos.db.PaymentType" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="paymentTypeId" />
+      </reference-descriptor>
+      <reference-descriptor name="foreignCurrency" class-ref="ch.eugster.pos.db.ForeignCurrency" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="foreignCurrencyId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.PaymentType" table="pos_payment_type" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="paymentTypeGroupId" column="payment_type_group_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="foreignCurrencyId" column="foreign_currency_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="removeable" column="removeable" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="account" column="account" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="voucher" column="is_voucher" jdbc-type="BIT" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="cash" column="cash" jdbc-type="BIT" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="exportId" column="export_id" jdbc-type="VARCHAR" length="10" primarykey="false" indexed="false" access="readwrite" autoincrement="false" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="openCashdrawer" column="open_cashdrawer" jdbc-type="BIT" primarykey="false" indexed="false" access="readwrite" autoincrement="false" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="back" column="back" jdbc-type="BIT" primarykey="false" indexed="false" access="readwrite" autoincrement="false" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="sort" column="sort" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="paymentTypeGroup" class-ref="ch.eugster.pos.db.PaymentTypeGroup" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="paymentTypeGroupId" />
+      </reference-descriptor>
+      <reference-descriptor name="foreignCurrency" class-ref="ch.eugster.pos.db.ForeignCurrency" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="foreignCurrencyId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.PaymentTypeGroup" table="pos_payment_type_group" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="visible" column="visible" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="defaultAccount" column="default_account" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="paymentTypes" element-class-ref="ch.eugster.pos.db.PaymentType" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="paymentTypeGroupId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Position" table="pos_position" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="receiptId" column="receipt_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="productId" column="product_id" jdbc-type="VARCHAR" length="50" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="productGroupId" column="product_group_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="currentTaxId" column="current_tax_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="quantity" column="quantity" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="price" column="price" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="discount" column="discount" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="type" column="type" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="galileoBook" column="galileo_book" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="galileoBooked" column="galileo_booked" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="optCode" column="opt_code" jdbc-type="CHAR" length="1" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="author" column="author" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="title" column="title" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="publisher" column="publisher" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="isbn" column="isbn" jdbc-type="VARCHAR" length="13" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="bznr" column="bznr" jdbc-type="VARCHAR" length="10" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="productNumber" column="product_number" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="ordered" column="ordered" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="orderId" column="order_id" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="stock" column="stock" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="updateCustomerAccount" column="update_customer_account" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="payedInvoice" column="payed_invoice" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="invoice" column="invoice" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="invoiceDate" column="invoice_date" jdbc-type="DATE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="tax" column="tax" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amountFC" column="amount_fc" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amount" column="amount" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="receipt" class-ref="ch.eugster.pos.db.Receipt" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="receiptId" />
+      </reference-descriptor>
+      <reference-descriptor name="productGroup" class-ref="ch.eugster.pos.db.ProductGroup" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="productGroupId" />
+      </reference-descriptor>
+      <reference-descriptor name="currentTax" class-ref="ch.eugster.pos.db.CurrentTax" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="currentTaxId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.ProductGroup" table="pos_product_group" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="isDefault" column="is_default" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="galileoId" column="galileo_id" jdbc-type="VARCHAR" length="3" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="defaultTaxId" column="default_tax_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="shortname" column="shortname" jdbc-type="VARCHAR" length="50" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="quantityProposal" column="quantity_proposal" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="priceProposal" column="price_proposal" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="optCodeProposal" column="opt_code_proposal" jdbc-type="VARCHAR" length="1" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="account" column="account" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="paidInvoice" column="paid_invoice" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="modified" column="modified" jdbc-type="BIT" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="type" column="type" jdbc-type="INTEGER" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="exportId" column="export_id" jdbc-type="VARCHAR" length="10" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="withdraw" column="withdraw" jdbc-type="BIT" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="foreignCurrencyId" column="foreign_currency_id" jdbc-type="BIGINT" primarykey="false" nullable="false" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="defaultTax" class-ref="ch.eugster.pos.db.Tax" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="defaultTaxId" />
+      </reference-descriptor>
+      <reference-descriptor name="foreignCurrency" class-ref="ch.eugster.pos.db.ForeignCurrency" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="foreignCurrencyId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Receipt" table="pos_receipt" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="number" column="number" indexed="true" jdbc-type="VARCHAR" length="25" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="transactionId" column="transaction_id" jdbc-type="BIGINT" primarykey="false" indexed="true" access="readwrite" autoincrement="false" nullable="false" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="bookingId" column="booking_id" jdbc-type="BIGINT" primarykey="false" indexed="true" access="readwrite" autoincrement="false" nullable="false" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="salespointId" column="salespoint_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="userId" column="user_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="foreignCurrencyId" column="foreign_currency_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="status" column="status" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="settlement" column="settlement" jdbc-type="BIGINT" primarykey="false" indexed="true" nullable="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amount" column="amount" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="customerId" column="customer_id" jdbc-type="VARCHAR" length="13" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="transferred" column="transferred" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="salespoint" class-ref="ch.eugster.pos.db.Salespoint" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="salespointId" />
+      </reference-descriptor>
+      <reference-descriptor name="user" class-ref="ch.eugster.pos.db.User" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="userId" />
+      </reference-descriptor>
+      <reference-descriptor name="foreignCurrency" class-ref="ch.eugster.pos.db.ForeignCurrency" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="foreignCurrencyId" />
+      </reference-descriptor>
+      <collection-descriptor name="positions" element-class-ref="ch.eugster.pos.db.Position" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="receiptId" />
+      </collection-descriptor>
+      <collection-descriptor name="payments" element-class-ref="ch.eugster.pos.db.Payment" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="receiptId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Salespoint" table="pos_salespoint" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="place" column="place" jdbc-type="VARCHAR" length="255" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="stock" column="stock" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="currentReceiptId" column="current_receipt_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="currentDate" column="current_settle_date" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="active" column="active" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="exportId" column="export_id" jdbc-type="VARCHAR" length="10" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="variableStock" column="variable_stock" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="stocks" element-class-ref="ch.eugster.pos.db.Stock" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="salespointId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Stock" table="pos_stock" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="salespointId" column="salespoint_id" jdbc-type="BIGINT" primarykey="false" nullable="false" indexed="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="foreignCurrencyId" column="foreign_currency_id" jdbc-type="BIGINT" primarykey="false" nullable="false" indexed="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="stock" column="stock" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="salespoint" class-ref="ch.eugster.pos.db.Salespoint" proxy="false" refresh="true" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="salespointId" />
+      </reference-descriptor>
+      <reference-descriptor name="foreignCurrency" class-ref="ch.eugster.pos.db.ForeignCurrency" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="foreignCurrencyId" />
+      </reference-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Tab" table="pos_tab" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" access="readwrite" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="blockId" column="block_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="defaultTabPosition" column="default_tab_position" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="defaultTabPayment" column="default_tab_payment" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="order" column="sequence" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="rows" column="rowz" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="columns" column="columnz" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="visible" column="visible" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontSize" column="font_size" jdbc-type="FLOAT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="fontStyle" column="font_style" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="title" column="title" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="block" class-ref="ch.eugster.pos.db.Block" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="blockId" />
+      </reference-descriptor>
+      <collection-descriptor name="keys" element-class-ref="ch.eugster.pos.db.CustomKey" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="tabId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Tax" table="pos_tax" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="currentTaxId" column="current_tax_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="taxTypeId" column="tax_type_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="taxRateId" column="tax_rate_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="VARCHAR" length="20" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="galileoId" column="galileo_id" jdbc-type="VARCHAR" length="1" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code128Id" column="code128_id" jdbc-type="VARCHAR" length="1" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="account" column="account" jdbc-type="VARCHAR" length="20" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <reference-descriptor name="taxType" class-ref="ch.eugster.pos.db.TaxType" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="taxTypeId" />
+      </reference-descriptor>
+      <reference-descriptor name="taxRate" class-ref="ch.eugster.pos.db.TaxRate" proxy="false" refresh="false" auto-retrieve="true" auto-update="false" auto-delete="false" otm-dependent="false">
+         <foreignkey field-ref="taxRateId" />
+      </reference-descriptor>
+      <collection-descriptor name="currentTaxes" element-class-ref="ch.eugster.pos.db.CurrentTax" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="taxId" />
+      </collection-descriptor>
+      <collection-descriptor name="productGroups" element-class-ref="ch.eugster.pos.db.ProductGroup" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="defaultTaxId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.TaxRate" table="pos_tax_rate" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="CHAR" length="1" indexed="true" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="taxes" element-class-ref="ch.eugster.pos.db.Tax" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="taxRateId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.TaxType" table="pos_tax_type" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" access="readwrite" autoincrement="true" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="CHAR" length="1" indexed="true" primarykey="false" nullable="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="name" column="name" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <collection-descriptor name="taxes" element-class-ref="ch.eugster.pos.db.Tax" auto-retrieve="true" auto-update="true" auto-delete="true" sort="ASC" proxy="false" refresh="false" otm-dependent="false">
+         <orderby name="id" sort="ASC" />
+         <inverse-foreignkey field-ref="taxTypeId" />
+      </collection-descriptor>
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.User" table="pos_user" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" indexed="true" access="readwrite" autoincrement="true" nullable="true" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="timestamp" column="timestamp" jdbc-type="TIMESTAMP" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="deleted" column="deleted" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="username" column="username" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="password" column="password" jdbc-type="VARCHAR" length="100" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="posLogin" column="pos_login" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="status" column="status" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="defaultUser" column="default_user" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="reverseReceipts" column="reverse_receipts" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Version" table="pos_version" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="data" column="data_version" jdbc-type="INTEGER" primarykey="true" access="readwrite" autoincrement="false" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" />
+      <field-descriptor name="transactionId" column="transaction_id" jdbc-type="BIGINT" primarykey="false" access="readwrite" autoincrement="false" nullable="true" indexed="false" locking="false" update-lock="true" default-fetch="false" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Setting" table="pos_setting" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" nullable="false" indexed="true" autoincrement="true" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="use" column="com_use" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="comClassname" column="com_classname" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="hold" column="com_hold" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="update" column="com_update" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="path" column="com_path" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="showAddCustomerMessage" column="com_show_add_customer_message" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="searchCd" column="com_search_cd" jdbc-type="BIT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="cdPath" column="com_cd_path" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+   <class-descriptor class="ch.eugster.pos.db.Settlement" table="pos_settlement" isolation-level="read-uncommitted" accept-locks="true" refresh="false">
+      <field-descriptor name="id" column="id" jdbc-type="BIGINT" primarykey="true" nullable="false" indexed="true" autoincrement="true" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="salespointId" column="salespoint_id" jdbc-type="BIGINT" primarykey="false" nullable="false" indexed="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="settlement" column="settlement" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="true" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="lineNumber" column="line_number" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="type" column="type" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="subtype" column="subtype" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="cashtype" column="cashtype" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="referenceClassName" column="reference_class_name" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="referenceObjectId" column="reference_object_id" jdbc-type="BIGINT" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="shortText" column="short_text" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="longText" column="long_text" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="value" column="value" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="quantity" column="quantity" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amount1" column="amount1" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="amount2" column="amount2" jdbc-type="DOUBLE" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="code" column="code" jdbc-type="VARCHAR" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+      <field-descriptor name="receipts" column="receipts" jdbc-type="INTEGER" primarykey="false" nullable="true" indexed="false" autoincrement="false" locking="false" update-lock="true" default-fetch="false" access="readwrite" />
+   </class-descriptor>
+</descriptor-repository>
+

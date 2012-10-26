@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.colibri.persistence.connection">
+   <implementation class="ch.eugster.colibri.persistence.connection.service.PersistenceServiceImpl"/>
+   <service>
+      <provide interface="ch.eugster.colibri.persistence.service.PersistenceService"/>
+   </service>
+   <reference bind="setEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <reference bind="setPersistenceProvider" cardinality="1..1" interface="javax.persistence.spi.PersistenceProvider" name="PersistenceProvider" policy="static" unbind="unsetPersistenceProvider"/>
+</scr:component>

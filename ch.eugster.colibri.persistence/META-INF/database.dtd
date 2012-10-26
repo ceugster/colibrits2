@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT database (current, connection*)
+>
+<!ELEMENT current (connection)
+>
+<!ATTLIST current
+    eclipselink.logging.level                      CDATA           "WARNING"
+>
+<!ELEMENT connection	(#PCDATA)
+>
+<!ATTLIST connection
+	ch.eugster.colibri.persistence.server.embedded (true|false)    "true"
+	javax.persistence.jdbc.driver				   CDATA           #REQUIRED
+	javax.persistence.jdbc.password			       CDATA           #IMPLIED
+	javax.persistence.jdbc.url				       CDATA           #REQUIRED
+	javax.persistence.jdbc.user				       CDATA           "colibri"
+	ch.eugster.colibri.persistence.local.schema    CDATA           #REQUIRED
+	comment                                        CDATA           #IMPLIED
+>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="ch.eugster.colibri.persistence.connection.handlers.SelectConnectionHandler"
+            id="ch.eugster.colibri.persistence.connection.select"
+            name="Verbindungen...">
+      </command>
+      <command
+            defaultHandler="ch.eugster.colibri.persistence.connection.handlers.StartDatabaseConnectionService"
+            id="ch.eugster.colibri.persistence.connection.startProvider"
+            name="Datenbankservice starten">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:file?after=additions">
+         <command
+               commandId="ch.eugster.colibri.persistence.connection.select"
+               icon="icons/Database.png"
+               label="Datenbankverbindungen bearbeiten..."
+               style="push">
+         </command>
+         <command
+               commandId="ch.eugster.colibri.persistence.connection.startProvider"
+               icon="icons/Database.png"
+               label="Datenbankverbindung herstellen"
+               style="push">
+         </command>
+         <separator
+               name="ch.eugster.colibri.persistence.connection.separator1"
+               visible="true">
+         </separator>
+      </menuContribution>
+   </extension>
+
+</plugin>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+    <persistence-unit name="ch.eugster.colibri.persistence.local" transaction-type="RESOURCE_LOCAL">
+       <class>ch.eugster.colibri.persistence.model.AbstractEntity</class>
+       <class>ch.eugster.colibri.persistence.model.CommonSettings</class>
+       <class>ch.eugster.colibri.persistence.model.Configurable</class>
+       <class>ch.eugster.colibri.persistence.model.Currency</class>
+       <class>ch.eugster.colibri.persistence.model.CurrentTax</class>
+       <class>ch.eugster.colibri.persistence.model.CurrentTaxCodeMapping</class>
+       <class>ch.eugster.colibri.persistence.model.CustomerDisplaySettings</class>
+       <class>ch.eugster.colibri.persistence.model.Display</class>
+       <class>ch.eugster.colibri.persistence.model.DisplayArea</class>
+       <class>ch.eugster.colibri.persistence.model.ExternalProductGroup</class>
+       <class>ch.eugster.colibri.persistence.model.Key</class>
+       <class>ch.eugster.colibri.persistence.model.Money</class>
+       <class>ch.eugster.colibri.persistence.model.Payment</class>
+       <class>ch.eugster.colibri.persistence.model.PaymentType</class>
+       <class>ch.eugster.colibri.persistence.model.Position</class>
+       <class>ch.eugster.colibri.persistence.model.Printout</class>
+       <class>ch.eugster.colibri.persistence.model.PrintoutArea</class>
+       <class>ch.eugster.colibri.persistence.model.Product</class>
+       <class>ch.eugster.colibri.persistence.model.ProductGroup</class>
+       <class>ch.eugster.colibri.persistence.model.ProductGroupMapping</class>
+       <class>ch.eugster.colibri.persistence.model.Profile</class>
+       <class>ch.eugster.colibri.persistence.model.ProviderProperty</class>
+       <class>ch.eugster.colibri.persistence.model.Receipt</class>
+       <class>ch.eugster.colibri.persistence.model.ReceiptPrinterSettings</class>
+       <class>ch.eugster.colibri.persistence.model.Role</class>
+       <class>ch.eugster.colibri.persistence.model.RoleProperty</class>
+       <class>ch.eugster.colibri.persistence.model.Salespoint</class>
+       <class>ch.eugster.colibri.persistence.model.SalespointCustomerDisplaySettings</class>
+       <class>ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings</class>
+       <class>ch.eugster.colibri.persistence.model.Sequence</class>
+       <class>ch.eugster.colibri.persistence.model.Settlement</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementAbstractPosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementAbstractSinglePosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementDetail</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementInternal</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementMoney</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementPayedInvoice</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementPayment</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementPosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementReceipt</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementRestitutedPosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementTax</class>
+       <class>ch.eugster.colibri.persistence.model.Stock</class>
+       <class>ch.eugster.colibri.persistence.model.Tab</class>
+       <class>ch.eugster.colibri.persistence.model.Tax</class>
+       <class>ch.eugster.colibri.persistence.model.TaxCodeMapping</class>
+       <class>ch.eugster.colibri.persistence.model.TaxRate</class>
+       <class>ch.eugster.colibri.persistence.model.TaxType</class>
+       <class>ch.eugster.colibri.persistence.model.User</class>
+       <class>ch.eugster.colibri.persistence.model.Version</class>
+       
+       <properties>
+<!-- 
+        <property name="eclipselink.ddl-generation" value="none"/>
+        <property name="eclipselink.ddl-generation" value="create-tables"/>
+        <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+        <property name="eclipselink.ddl-generation.output-mode" value="sql-script"/>
+        <property name="eclipselink.ddl-generation.output-mode" value="database"/>
+        <property name="eclipselink.ddl-generation.output-mode" value="both"/>
+-->
+       </properties>
+    </persistence-unit>
+    <persistence-unit name="ch.eugster.colibri.persistence.server" transaction-type="RESOURCE_LOCAL">
+       <class>ch.eugster.colibri.persistence.model.AbstractEntity</class>
+       <class>ch.eugster.colibri.persistence.model.CommonSettings</class>
+       <class>ch.eugster.colibri.persistence.model.Configurable</class>
+       <class>ch.eugster.colibri.persistence.model.Currency</class>
+       <class>ch.eugster.colibri.persistence.model.CurrentTax</class>
+       <class>ch.eugster.colibri.persistence.model.CurrentTaxCodeMapping</class>
+       <class>ch.eugster.colibri.persistence.model.CustomerDisplaySettings</class>
+       <class>ch.eugster.colibri.persistence.model.Display</class>
+       <class>ch.eugster.colibri.persistence.model.DisplayArea</class>
+       <class>ch.eugster.colibri.persistence.model.ExternalProductGroup</class>
+       <class>ch.eugster.colibri.persistence.model.Key</class>
+       <class>ch.eugster.colibri.persistence.model.Money</class>
+       <class>ch.eugster.colibri.persistence.model.Payment</class>
+       <class>ch.eugster.colibri.persistence.model.PaymentType</class>
+       <class>ch.eugster.colibri.persistence.model.Position</class>
+       <class>ch.eugster.colibri.persistence.model.Printout</class>
+       <class>ch.eugster.colibri.persistence.model.PrintoutArea</class>
+       <class>ch.eugster.colibri.persistence.model.Product</class>
+       <class>ch.eugster.colibri.persistence.model.ProductGroup</class>
+       <class>ch.eugster.colibri.persistence.model.ProductGroupMapping</class>
+       <class>ch.eugster.colibri.persistence.model.Profile</class>
+       <class>ch.eugster.colibri.persistence.model.ProviderProperty</class>
+       <class>ch.eugster.colibri.persistence.model.Receipt</class>
+       <class>ch.eugster.colibri.persistence.model.ReceiptPrinterSettings</class>
+       <class>ch.eugster.colibri.persistence.model.Role</class>
+       <class>ch.eugster.colibri.persistence.model.RoleProperty</class>
+       <class>ch.eugster.colibri.persistence.model.Salespoint</class>
+       <class>ch.eugster.colibri.persistence.model.SalespointCustomerDisplaySettings</class>
+       <class>ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings</class>
+       <class>ch.eugster.colibri.persistence.model.Sequence</class>
+       <class>ch.eugster.colibri.persistence.model.Settlement</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementAbstractPosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementAbstractSinglePosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementDetail</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementInternal</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementMoney</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementPayedInvoice</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementPayment</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementPosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementReceipt</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementRestitutedPosition</class>
+       <class>ch.eugster.colibri.persistence.model.SettlementTax</class>
+       <class>ch.eugster.colibri.persistence.model.Stock</class>
+       <class>ch.eugster.colibri.persistence.model.Tab</class>
+       <class>ch.eugster.colibri.persistence.model.Tax</class>
+       <class>ch.eugster.colibri.persistence.model.TaxCodeMapping</class>
+       <class>ch.eugster.colibri.persistence.model.TaxRate</class>
+       <class>ch.eugster.colibri.persistence.model.TaxType</class>
+       <class>ch.eugster.colibri.persistence.model.User</class>
+       <class>ch.eugster.colibri.persistence.model.Version</class>
+    </persistence-unit>
+</persistence>
