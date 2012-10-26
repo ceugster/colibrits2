@@ -1,4 +1,27 @@
 * text=auto !eol
+ch.eugster.colibri.admin.common.settings/.classpath -text
+ch.eugster.colibri.admin.common.settings/.project -text
+ch.eugster.colibri.admin.common.settings/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.admin.common.settings/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.admin.common.settings/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.admin.common.settings/build.properties -text
+ch.eugster.colibri.admin.common.settings/icons/books.gif -text
+ch.eugster.colibri.admin.common.settings/icons/gluehbirne_16.png -text
+ch.eugster.colibri.admin.common.settings/icons/gluehbirne_grey_16.png -text
+ch.eugster.colibri.admin.common.settings/icons/layout_16.png -text
+ch.eugster.colibri.admin.common.settings/icons/printer.png -text
+ch.eugster.colibri.admin.common.settings/icons/register_16.png -text
+ch.eugster.colibri.admin.common.settings/icons/save_edit.png -text
+ch.eugster.colibri.admin.common.settings/icons/undo_edit.png -text
+ch.eugster.colibri.admin.common.settings/plugin.xml -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/Activator.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/AdminCommonSettingsPerspective.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/editors/GeneralSettingsEditor.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/editors/GeneralSettingsEditorInput.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/handlers/ShowCommonSettingsViewHandler.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/views/CommonSettingsContentProvider.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/views/CommonSettingsLabelProvider.java -text
+ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/views/CommonSettingsView.java -text
 ch.eugster.colibri.admin/.classpath -text
 ch.eugster.colibri.admin/.project -text
 ch.eugster.colibri.admin/.settings/org.eclipse.jdt.core.prefs -text
