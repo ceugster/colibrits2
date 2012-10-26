@@ -688,6 +688,16 @@ ch.eugster.colibri.barcode.code128/build.properties -text
 ch.eugster.colibri.barcode.code128/src/ch/eugster/colibri/barcode/code128/Activator.java -text
 ch.eugster.colibri.barcode.code128/src/ch/eugster/colibri/barcode/code128/code/Code128.java -text
 ch.eugster.colibri.barcode.code128/src/ch/eugster/colibri/barcode/code128/service/impl/Code128Service.java -text
+ch.eugster.colibri.barcode.ean13/.classpath -text
+ch.eugster.colibri.barcode.ean13/.project -text
+ch.eugster.colibri.barcode.ean13/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.barcode.ean13/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.barcode.ean13/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.barcode.ean13/OSGI-INF/service-component.xml -text
+ch.eugster.colibri.barcode.ean13/build.properties -text
+ch.eugster.colibri.barcode.ean13/src/ch/eugster/colibri/barcode/ean13/Activator.java -text
+ch.eugster.colibri.barcode.ean13/src/ch/eugster/colibri/barcode/ean13/code/Ean13.java -text
+ch.eugster.colibri.barcode.ean13/src/ch/eugster/colibri/barcode/ean13/service/impl/Ean13Verifier.java -text
 ch.eugster.colibri.barcode/.classpath -text
 ch.eugster.colibri.barcode/.project -text
 ch.eugster.colibri.barcode/.settings/org.eclipse.jdt.core.prefs -text

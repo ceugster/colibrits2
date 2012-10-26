@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ean13 Service
+Bundle-SymbolicName: ch.eugster.colibri.barcode.ean13;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Christian Eugster
+Service-Component: OSGI-INF/service-component.xml
+Bundle-Activator: ch.eugster.colibri.barcode.ean13.Activator
+Bundle-ActivationPolicy: lazy
+Export-Package: ch.eugster.colibri.barcode.ean13.code
+Import-Package: ch.eugster.colibri.barcode.code,
+ ch.eugster.colibri.barcode.service,
+ ch.eugster.colibri.persistence.model,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.service.component;version="1.1.0",
+ org.osgi.service.log;version="1.3.0",
+ org.osgi.util.tracker;version="1.5.0"
