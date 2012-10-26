@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Plugin Tagesabschluss
+Bundle-SymbolicName: ch.eugster.colibri.settlement;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.settlement.Activator
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/service-component.xml
+Bundle-ClassPath: lib/jdom-1.1.2.jar,
+ .
+Import-Package: ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.queries,
+ ch.eugster.colibri.persistence.rules,
+ ch.eugster.colibri.persistence.service,
+ org.eclipse.core.runtime.jobs,
+ org.osgi.framework;version="1.6.0",
+ org.osgi.service.component;version="1.1.0",
+ org.osgi.service.log;version="1.3.0"

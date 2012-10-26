@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.log.writer">
+   <implementation class="ch.eugster.log.writer.LogWriterComponent"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="LogService" policy="static" unbind="unsetLogService"/>
+</scr:component>
