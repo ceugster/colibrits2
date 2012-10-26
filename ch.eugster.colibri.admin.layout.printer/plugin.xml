@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="ch.eugster.colibri.admin.layout.printer.editors.PrintoutEditor"
+            default="false"
+            icon="icons/layout_16.png"
+            id="ch.eugster.colibri.admin.layout.editor.printer"
+            name="Layout Belegdrucker">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="ch.eugster.colibri.admin.layout.editor.printer.action"
+            targetID="ch.eugster.colibri.admin.layout.editor.printer">
+         <action
+               actionID="receipt.reset"
+               class="ch.eugster.colibri.admin.ui.menus.ResetEditorActionDelegate"
+               icon="icons/undo_edit.png"
+               id="receipt.reset"
+               label="Verwerfen"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen verwerfen">
+         </action>
+         <action
+               actionID="receipt.save"
+               class="ch.eugster.colibri.admin.ui.menus.SaveEditorActionDelegate"
+               icon="icons/save_edit.png"
+               id="receipt.save"
+               label="Speichern"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen speichern">
+         </action>
+      </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:ch.eugster.colibri.admin.periphery.view">
+         <dynamic
+               class="ch.eugster.colibri.admin.layout.printer.menu.EditPrintoutMenu"
+               id="ch.eugster.colibri.admin.layout.printer.menu">
+         </dynamic>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:ch.eugster.colibri.admin.salespoint.view?after=sparator.layout">
+         <separator
+               name="ch.eugster.colibri.admin.layout.separator1"
+               visible="true">
+         </separator>
+         <dynamic
+               class="ch.eugster.colibri.admin.layout.printer.menu.EditPrintoutMenu"
+               id="ch.eugster.colibri.admin.layout.printer.menu">
+         </dynamic>
+      </menuContribution>
+   </extension>
+
+</plugin>
