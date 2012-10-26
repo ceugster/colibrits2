@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="ch.eugster.colibri.insert.receipt.application"
+         name="Anwendung zum Einfügen von Belegen und Erstellen von Tagesabschlüssen"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="ch.eugster.colibri.insert.receipt.app.InsertReceiptApplication">
+         </run>
+      </application>
+   </extension>
+
+</plugin>

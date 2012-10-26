@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!ELEMENT transfer (receipt*)>
+<!ATTLIST transfer
+	salespoint			CDATA	#REQUIRED
+	date				CDATA	#REQUIRED
+	count				CDATA	#REQUIRED
+>
+
+<!ELEMENT receipt (position+, payment*)>
+<!ATTLIST receipt
+	id						CDATA			#REQUIRED
+	timestamp 				CDATA			#REQUIRED
+	number 					CDATA			#REQUIRED
+	transaction-id			CDATA			#REQUIRED
+	booking-id				CDATA			#REQUIRED
+	salespoint-id 			CDATA			#REQUIRED
+	user-id 				CDATA			#REQUIRED
+	foreign-currency-id		CDATA			#REQUIRED
+	status					CDATA			#REQUIRED
+	settlement				CDATA			#REQUIRED
+	amount					CDATA			#REQUIRED
+	customer-id				CDATA			#REQUIRED
+	transferred				(true|false)	#REQUIRED
+>
+
+<!ELEMENT position (#PCDATA)>
+<!ATTLIST position
+	id						CDATA			#REQUIRED
+	receipt-id				CDATA			#REQUIRED
+	product-id 				CDATA			#REQUIRED
+	product-group-id		CDATA			#REQUIRED
+	tax-id					CDATA			#REQUIRED
+	current-tax-id			CDATA			#REQUIRED
+	quantity 				CDATA			#REQUIRED
+	price 					CDATA			#REQUIRED
+	discount	 			CDATA			#REQUIRED
+	galileo-book			(true|false)	#REQUIRED
+	galileo-booked			(true|false)	#REQUIRED
+	opt-code 				CDATA			#REQUIRED
+	author	 				CDATA			#REQUIRED
+	title 					CDATA			#REQUIRED
+	publisher 				CDATA			#REQUIRED
+	isbn					CDATA			#REQUIRED
+	bznr					CDATA			#REQUIRED
+	product-number			CDATA			#REQUIRED
+	ordered					(true|false)	#REQUIRED
+	order-id				CDATA			#REQUIRED
+	stock					(true|false)	#REQUIRED
+	update-customer-account    (true|false)    #REQUIRED
+	payed-invoice          (true|false)    #REQUIRED
+	invoice                CDATA           #REQUIRED
+	invoice-date           CDATA           #REQUIRED
+	tax                    CDATA           #REQUIRED
+	type                   CDATA           #REQUIRED
+	amount-fc              CDATA           #REQUIRED
+    amount                 CDATA           #REQUIRED
+>
+
+<!ELEMENT payment (#PCDATA)>
+<!ATTLIST payment
+	id						CDATA			#REQUIRED
+	receipt-id				CDATA			#REQUIRED
+	payment-type-id			CDATA			#REQUIRED
+	foreign-currency-id		CDATA			#REQUIRED
+	quotation 				CDATA			#REQUIRED
+	amount 					CDATA			#REQUIRED
+	amount-fc				CDATA			#REQUIRED
+	round-factor			CDATA			#REQUIRED
+	round-factor-fc			CDATA			#REQUIRED
+	back					(true|false)	#REQUIRED
+	settlement				CDATA			#REQUIRED
+	salespoint-id			CDATA			#REQUIRED
+	is-input-or-withdraw    (true|false)    #REQUIRED
+>

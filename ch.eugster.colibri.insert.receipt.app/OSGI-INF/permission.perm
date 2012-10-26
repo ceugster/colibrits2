@@ -1,0 +1,2 @@
+(org.osgi.framework.ServicePermission
+"org.eclipse.osgi.framework.console.CommandProvider" "register")

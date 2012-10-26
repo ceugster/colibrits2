@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="ch.eugster.colibri.insert.receipts">
+   <implementation class="ch.eugster.colibri.insert.receipt.app.InsertReceiptService"/>
+   <service>
+      <provide interface="ch.eugster.colibri.insert.receipt.app.InsertReceiptService"/>
+   </service>
+   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="PersistenceService" policy="static" unbind="unsetPersistenceService"/>
+   <reference bind="setSettlementService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.SettlementService" name="SettlementService" policy="static" unbind="unsetSettlementService"/>
+   <reference bind="setTransferAgent" cardinality="1..1" interface="ch.eugster.colibri.persistence.transfer.services.TransferAgent" name="TransferAgent" policy="static" unbind="unsetTransferAgent"/>
+   <reference bind="setPrintService" cardinality="0..n" interface="ch.eugster.colibri.print.service.PrintService" name="PrintService" policy="static" unbind="unsetPrintService"/>
+</scr:component>

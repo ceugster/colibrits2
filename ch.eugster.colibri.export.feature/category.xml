@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/ch.eugster.colibri.export.feature_1.0.0.201203221102.jar" id="ch.eugster.colibri.export.feature" version="1.0.0.201203221102">
+      <category name="export"/>
+   </feature>
+   <category-def name="export" label="Export"/>
+</site>

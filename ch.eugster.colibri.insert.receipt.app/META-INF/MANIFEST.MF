@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Insert Receipts Application
+Bundle-SymbolicName: ch.eugster.colibri.insert.receipt.app;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.insert.receipt.app.Activator
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Service-Component: OSGI-INF/service-component.xml
+Import-Package: ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.model.print,
+ ch.eugster.colibri.persistence.model.product,
+ ch.eugster.colibri.persistence.queries,
+ ch.eugster.colibri.persistence.service,
+ ch.eugster.colibri.persistence.transfer.services,
+ ch.eugster.colibri.print.service,
+ org.eclipse.equinox.app;version="1.1.0",
+ org.eclipse.osgi.framework.console;version="1.1.0",
+ org.osgi.framework;version="1.6.0",
+ org.osgi.service.component;version="1.1.0",
+ org.osgi.util.tracker;version="1.5.0"
+
