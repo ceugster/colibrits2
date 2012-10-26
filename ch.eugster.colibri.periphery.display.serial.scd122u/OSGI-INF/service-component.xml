@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.periphery.display.serial.scd122u">
+   <implementation class="ch.eugster.colibri.periphery.display.serial.scd122u.service.Scd122uCustomerDisplayService"/>
+   <property name="custom.device" type="String" value="Star SCD122U Customer Display"/>
+   <property name="custom.group" type="Integer" value="1"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="persistenceService" policy="static" unbind="unsetPersistenceService"/>
+   <reference bind="setEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
+   <service>
+      <provide interface="ch.eugster.colibri.periphery.display.service.CustomerDisplayService"/>
+   </service>
+   <property name="custom.port" type="String" value="COM3:"/>
+   <property name="custom.convert" type="String">#Ä
+196=91
+#Ö
+214=92
+#Ü
+220=93
+#ä
+228=123
+#ö
+246=124
+#ü
+252=125
+   </property>
+   <property name="custom.cols" type="Integer" value="20"/>
+   <property name="custom.rows" type="Integer" value="2"/>
+   <property name="custom.delay" type="Integer" value="5"/>
+</scr:component>
