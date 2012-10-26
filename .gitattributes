@@ -662,6 +662,9 @@ ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/AdminApplicationWorkbe
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/ApplicationInstanceListener.java -text
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/ApplicationInstanceManager.java -text
 ch.eugster.colibri.admin/src/ch/eugster/colibri/admin/app/PerspectiveSwitcherMenu.java -text
+ch.eugster.colibri.barcode.bookcenter.feature/.project -text
+ch.eugster.colibri.barcode.bookcenter.feature/build.properties -text
+ch.eugster.colibri.barcode.bookcenter.feature/feature.xml -text
 ch.eugster.colibri.barcode.bookcenter/.classpath -text
 ch.eugster.colibri.barcode.bookcenter/.project -text
 ch.eugster.colibri.barcode.bookcenter/.settings/org.eclipse.jdt.core.prefs -text
