@@ -675,6 +675,9 @@ ch.eugster.colibri.barcode.bookcenter/build.properties -text
 ch.eugster.colibri.barcode.bookcenter/src/ch/eugster/colibri/barcode/bookcenter/Activator.java -text
 ch.eugster.colibri.barcode.bookcenter/src/ch/eugster/colibri/barcode/bookcenter/code/BookCenterCode.java -text
 ch.eugster.colibri.barcode.bookcenter/src/ch/eugster/colibri/barcode/bookcenter/service/BookcenterVerifier.java -text
+ch.eugster.colibri.barcode.code128.feature/.project -text
+ch.eugster.colibri.barcode.code128.feature/build.properties -text
+ch.eugster.colibri.barcode.code128.feature/feature.xml -text
 ch.eugster.colibri.barcode/.classpath -text
 ch.eugster.colibri.barcode/.project -text
 ch.eugster.colibri.barcode/.settings/org.eclipse.jdt.core.prefs -text
