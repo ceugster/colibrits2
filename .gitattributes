@@ -80,6 +80,7 @@ ch.eugster.colibri.admin.layout.display/src/ch/eugster/colibri/admin/layout/disp
 ch.eugster.colibri.admin.layout.display/src/ch/eugster/colibri/admin/layout/display/editors/DisplayEditor.java -text
 ch.eugster.colibri.admin.layout.display/src/ch/eugster/colibri/admin/layout/display/editors/DisplayEditorInput.java -text
 ch.eugster.colibri.admin.layout.display/src/ch/eugster/colibri/admin/layout/display/menu/EditDisplayMenu.java -text
+ch.eugster.colibri.admin.layout.feature/.project -text
 ch.eugster.colibri.admin/.classpath -text
 ch.eugster.colibri.admin/.project -text
 ch.eugster.colibri.admin/.settings/org.eclipse.jdt.core.prefs -text
