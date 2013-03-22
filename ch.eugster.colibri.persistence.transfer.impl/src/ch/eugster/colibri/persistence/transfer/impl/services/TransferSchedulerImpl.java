@@ -35,6 +35,12 @@ public class TransferSchedulerImpl implements TransferScheduler
 
 	private EventAdmin eventAdmin;
 
+	private int transferDelay;
+	
+	private int repeatDelay;
+	
+	private int receiptCount;
+	
 	public void setEventAdmin(final EventAdmin eventAdmin)
 	{
 		this.eventAdmin = eventAdmin;
@@ -71,14 +77,16 @@ public class TransferSchedulerImpl implements TransferScheduler
 
 		CommonSettingsQuery query = (CommonSettingsQuery) persistenceService.getCacheService().getQuery(CommonSettings.class);
 		CommonSettings settings = query.findDefault();
-		if (settings != null)
-		{
-			transferJob = new TransferJob("Belegtransfer...", settings);
-	//		transferJob.setSystem(true);
-			transferJob.setRule(ServerDatabaseRule.getRule());
-			transferJob.setPriority(Job.LONG);
-			transferJob.schedule(Integer.valueOf(settings.getTransferDelay()).longValue());
-		}
+		transferJob = new TransferJob("Belegtransfer...");
+		transferJob.setRule(ServerDatabaseRule.getRule());
+		transferJob.setPriority(Job.LONG);
+		int value = settings == null ? 60000 : settings.getTransferDelay();
+		transferDelay = value == 0 ? 60000 : value;
+		value = settings == null ? 15000 : settings.getTransferRepeatDelay();
+		repeatDelay = value == 0 ? 15000 : value;
+		value = settings == null ? 5 : settings.getTransferReceiptCount();
+		receiptCount = value == 0 ? 5 : value;
+		transferJob.schedule(transferDelay);
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
@@ -95,17 +103,9 @@ public class TransferSchedulerImpl implements TransferScheduler
 	{
 		private boolean running = true;
 
-		private CommonSettings settings;
-		
-		public TransferJob(String name, CommonSettings settings)
+		public TransferJob(String name)
 		{
 			super(name);
-			this.settings = settings;
-		}
-		
-		public long getRepeatDelay()
-		{
-			return settings == null ? 60000 : settings.getTransferRepeatDelay();
 		}
 		
 		@Override
@@ -116,7 +116,7 @@ public class TransferSchedulerImpl implements TransferScheduler
 			{
 				final ReceiptQuery query = (ReceiptQuery) TransferSchedulerImpl.this.persistenceService
 						.getCacheService().getQuery(Receipt.class);
-				final Receipt[] receipts = query.selectTransferables(settings.getTransferReceiptCount()).toArray(new Receipt[0]);
+				final Receipt[] receipts = query.selectTransferables(receiptCount).toArray(new Receipt[0]);
 				for (final Receipt receipt : receipts)
 				{
 					if (monitor.isCanceled())
@@ -156,7 +156,7 @@ public class TransferSchedulerImpl implements TransferScheduler
 			}
 			finally
 			{
-				schedule(getRepeatDelay());
+				schedule(repeatDelay);
 			}
 			return Status.OK_STATUS;
 		}
