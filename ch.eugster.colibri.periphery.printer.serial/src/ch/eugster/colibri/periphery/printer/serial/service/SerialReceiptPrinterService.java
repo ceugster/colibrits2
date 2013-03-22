@@ -65,6 +65,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		if (printer != null)
 		{
 			final String printable = this.getConverter().convert(text);
+			System.out.println(printable);
 			printer.print(printable + "\n");
 			this.cutPaper(this.getLinesBeforeCut());
 			closePrinter();
@@ -83,6 +84,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		{
 			Converter converter = new Converter(settings == null ? this.getReceiptPrinterSettings().getConverter() : settings.getConverter());
 			final String printable = converter.convert(text);
+			System.out.println(printable);
 			printer.print(printable + "\n");
 			this.cutPaper(settings == null ? this.getReceiptPrinterSettings().getLinesBeforeCut() : settings.getLinesBeforeCut());
 			closePrinter();
@@ -101,6 +103,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			for (final String line : text)
 			{
 				final String printable = this.getConverter().convert(line);
+				System.out.println(printable);
 				printer.print(printable + "\n");
 			}
 			this.cutPaper(this.getLinesBeforeCut());
