@@ -1902,7 +1902,7 @@ ch.eugster.log.file/.project -text
 ch.eugster.log.file/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.log.file/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.log.file/META-INF/MANIFEST.MF -text
-ch.eugster.log.file/OSGI-INF/file-logger-component.xml -text
+ch.eugster.log.file/OSGI-INF/component.xml -text
 ch.eugster.log.file/build.properties -text
 ch.eugster.log.file/src/ch/eugster/log/file/FileLoggerComponent.java -text
 ch.eugster.log.writer/.classpath -text
