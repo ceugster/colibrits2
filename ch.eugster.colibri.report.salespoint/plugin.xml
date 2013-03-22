@@ -13,7 +13,7 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="ch.eugster.colibri.report.settlement.perspective">
+            targetID="ch.eugster.colibri.report.*">
          <view
                closeable="true"
                id="ch.eugster.colibri.report.salespoint.view"
