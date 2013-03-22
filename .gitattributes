@@ -1897,6 +1897,9 @@ ch.eugster.log.console/META-INF/MANIFEST.MF -text
 ch.eugster.log.console/OSGI-INF/console-logger-component.xml -text
 ch.eugster.log.console/build.properties -text
 ch.eugster.log.console/src/ch/eugster/log/console/ConsoleLoggerComponent.java -text
+ch.eugster.log.feature/.project -text
+ch.eugster.log.feature/build.properties -text
+ch.eugster.log.feature/feature.xml -text
 ch.eugster.log.file/.classpath -text
 ch.eugster.log.file/.project -text
 ch.eugster.log.file/.settings/org.eclipse.jdt.core.prefs -text
