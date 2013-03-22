@@ -57,6 +57,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
 import org.eclipse.persistence.annotations.Convert;
+import org.eclipse.persistence.annotations.Converter;
 
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
@@ -130,6 +131,11 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Basic
 	@Column(name = "po_quantity")
 	private int quantity;
+
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "po_ebook")
+	private boolean ebook;
 
 	// @Basic
 	// @Column(name = "po_dc_amount", columnDefinition = "DECIMAL(18, 6)")
@@ -295,6 +301,11 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 		return this.fromStock;
 	}
 
+	public boolean isEbook()
+	{
+		return ebook;
+	}
+	
 	public boolean isOrdered()
 	{
 		return this.ordered;
@@ -389,6 +400,11 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 		this.propertyChangeSupport.firePropertyChange("order", this.order, this.order = order);
 	}
 
+	public void setEbook(boolean ebook)
+	{
+		this.ebook = ebook;
+	}
+	
 	public void setOrdered(final boolean ordered)
 	{
 		this.propertyChangeSupport.firePropertyChange("ordered", this.ordered, this.ordered = ordered);

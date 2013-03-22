@@ -107,6 +107,11 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 	private boolean allowTestSettlement;
 
 	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "cs_force_settlement")
+	private boolean forceSettlement;
+
+	@Basic
 	@Column(name="cs_transfer_delay")
 	private int transferDelay;
 	
@@ -456,6 +461,14 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 
 	public void setMaximizedClientWindow(boolean maximizedClientWindow) {
 		this.maximizedClientWindow = maximizedClientWindow;
+	}
+
+	public boolean isForceSettlement() {
+		return forceSettlement;
+	}
+
+	public void setForceSettlement(boolean forceSettlement) {
+		this.propertyChangeSupport.firePropertyChange("forceSettlement", this.forceSettlement, this.forceSettlement = forceSettlement);
 	}
 
 	public enum HostnameResolver

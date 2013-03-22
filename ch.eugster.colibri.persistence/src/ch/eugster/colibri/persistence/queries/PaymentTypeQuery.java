@@ -7,6 +7,9 @@ import org.eclipse.persistence.expressions.ExpressionBuilder;
 
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 
 public class PaymentTypeQuery extends AbstractQuery<PaymentType>
@@ -38,6 +41,15 @@ public class PaymentTypeQuery extends AbstractQuery<PaymentType>
 		final Expression paymentTypeGroupCriteria = new ExpressionBuilder().get("paymentTypeGroup").equal(
 				paymentTypeGroup);
 		return this.select(paymentTypeGroupCriteria.and(currencyCriteria));
+	}
+
+	public long countWithoutMapping()
+	{
+		final ExpressionBuilder expressionBuilder = new ExpressionBuilder(PaymentType.class);
+		final Expression isNull = expressionBuilder.get("mappingId").isNull();
+		final Expression isEmpty = expressionBuilder.get("mappingId").equal("");
+		final Expression deleted = expressionBuilder.get("deleted").equal(false);
+		return this.count(deleted.and(isNull.or(isEmpty)));
 	}
 
 	@Override

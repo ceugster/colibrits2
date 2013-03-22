@@ -63,7 +63,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(update.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
-		final Expression states = saved.or(reversed);
+		final Expression states = deleted.and(saved.or(reversed));
 		final long value = this.count(states);
 		return value;
 	}
@@ -128,7 +128,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(update.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
-		final Expression states = saved.or(reversed);
+		final Expression states = deleted.and(saved.or(reversed));
 		final Collection<Position> positions = this.select(states, maxRows);
 		return positions;
 	}
@@ -281,7 +281,15 @@ public class PositionQuery extends AbstractQuery<Position>
 		{
 			Long id = (Long) result.get("productGroup");
 			final ProductGroup productGroup = (ProductGroup) this.getConnectionService().find(ProductGroup.class, id);
-			final Currency defaultCurrency = settlement.getSalespoint().getPaymentType().getCurrency();
+			Currency defaultCurrency = null;
+			if (settlement == null)
+			{
+				defaultCurrency = this.getConnectionService().getEntityManager().find(Currency.class, result.get("defaultCurrency"));
+			}
+			else
+			{
+				defaultCurrency = settlement.getSalespoint().getPaymentType().getCurrency();
+			}
 
 			System.out.println(productGroup.getId() + ", " + productGroup.getName() + ", "
 					+ productGroup.getProductGroupType().toString());

@@ -1,5 +1,7 @@
 package ch.eugster.colibri.persistence.service;
 
+import java.io.File;
+
 import javax.persistence.EntityManager;
 
 import ch.eugster.colibri.persistence.model.AbstractEntity;
@@ -25,6 +27,10 @@ public interface ConnectionService
 
 	public static final String PERSISTENCE_UNIT_LOCAL = "ch.eugster.colibri.persistence.local";
 
+	public static final String OJB_MIGRATION_COLIBRI_XML_FILE = "colibri.xml";
+	
+	public static final String OJB_MIGRATION_DIR = "Migration";
+	
 	AbstractEntity delete(AbstractEntity entity);
 
 	AbstractEntity find(Class<? extends AbstractEntity> clazz, Long id);
@@ -37,6 +43,8 @@ public interface ConnectionService
 
 	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp);
 
+	void remove(AbstractEntity entity);
+	
 	void persist(AbstractEntity entity);
 
 	AbstractQuery<? extends AbstractEntity> getQuery(ConnectionService connectionService,

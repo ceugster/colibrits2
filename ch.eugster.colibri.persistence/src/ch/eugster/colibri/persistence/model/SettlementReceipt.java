@@ -76,7 +76,7 @@ public class SettlementReceipt extends AbstractEntity implements Comparable<Sett
 
 	private SettlementReceipt(final Settlement settlement, final Receipt receipt)
 	{
-		this.settlement = settlement;
+		this.settlement = settlement == null ? receipt.getSettlement() : settlement;
 		this.setReceipt(receipt);
 	}
 

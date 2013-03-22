@@ -50,10 +50,19 @@ public class ProductGroupQuery extends AbstractQuery<ProductGroup>
 
 	public Collection<ProductGroup> selectByProductGroupTypeWithoutPayedInvoice(final ProductGroupType productGroupType)
 	{
-		final ExpressionBuilder expressionBuilder = new ExpressionBuilder(ProductGroup.class);
-		Expression expression = expressionBuilder.get("productGroupType").equal(productGroupType)
+		final ExpressionBuilder criteria = new ExpressionBuilder(ProductGroup.class);
+		Expression expression = criteria.get("productGroupType").equal(productGroupType)
 				.and(new ExpressionBuilder().get("proposalOption").notEqual(Option.PAYED_INVOICE));
 		return this.select(expression);
+	}
+
+	public long countWithoutMapping()
+	{
+		final ExpressionBuilder expressionBuilder = new ExpressionBuilder(ProductGroup.class);
+		final Expression isNull = expressionBuilder.get("mappingId").isNull();
+		final Expression isEmpty = expressionBuilder.get("mappingId").equal("");
+		final Expression deleted = expressionBuilder.get("deleted").equal(false);
+		return this.count(deleted.and(isNull.or(isEmpty)));
 	}
 
 	@Override

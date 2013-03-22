@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
 
@@ -35,6 +38,14 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 	{
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("user").equal(user));
+		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
+		return this.count(expression);
+	}
+
+	public long countParked(final Salespoint salespoint)
+	{
+		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").get("salespoint").equal(salespoint));
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
 		return this.count(expression);
 	}
@@ -188,12 +199,32 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return receipts;
 	}
 
+	public Collection<Receipt> selectParked(final Salespoint salespoint)
+	{
+		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").get("salespoint").equal(salespoint));
+		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
+		return this.select(expression);
+	}
+
 	public Collection<Receipt> selectParked(final User user)
 	{
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("user").equal(user));
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
 		return this.select(expression);
+	}
+	
+	public int removeParked(final Salespoint salespoint)
+	{
+		int result = 0;
+		Collection<Receipt> receipts = selectParked(salespoint);
+		for (Receipt receipt : receipts)
+		{
+			this.getConnectionService().remove(receipt);
+			result++;
+		}
+		return result;
 	}
 
 	public Collection<Receipt> selectProviderNotUpdated(final int maxResults)

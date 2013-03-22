@@ -1,6 +1,8 @@
 package ch.eugster.colibri.persistence.model;
 
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -104,6 +106,11 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 	@Column(name = "sp_local_pp")
 	@Convert("booleanConverter")
 	private boolean localProviderProperties;
+
+	@Basic
+	@Column(name = "sp_force_settlement")
+	@Convert("booleanConverter")
+	private Boolean forceSettlement;
 
 	@OneToOne(optional = true)
 	@JoinColumn(name = "sp_di_id")
@@ -477,5 +484,54 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 			names.append(salespoint.getName());
 		}
 		return names.toString();
+	}
+
+	public boolean isForceSettlement() 
+	{
+		return forceSettlement == null ? this.getCommonSettings().isForceSettlement() : forceSettlement.booleanValue();
+	}
+
+	public void setForceSettlement(boolean forceSettlement) 
+	{
+		if (forceSettlement == this.getCommonSettings().isForceSettlement())
+		{
+			if (this.forceSettlement != null)
+			{
+				this.propertyChangeSupport.firePropertyChange("forceSettlement", this.forceSettlement, this.forceSettlement = null);
+			}
+		}
+		else
+		{
+			if (this.forceSettlement == null || this.forceSettlement.booleanValue() != forceSettlement)
+			{
+				this.propertyChangeSupport.firePropertyChange("forceSettlement", this.forceSettlement, this.forceSettlement = null);
+			}
+		}
+	}
+	
+	public boolean settlementRequired()
+	{
+		if (!this.isForceSettlement())
+		{
+			return false;
+		}
+		if (this.settlement == null)
+		{
+			return false;
+		}
+		if (this.settlement.getReceiptCount() == 0L)
+		{
+			return false;
+		}
+		if (this.settlement.getSettled() != null)
+		{
+			return false;
+		}
+		Calendar today = GregorianCalendar.getInstance();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		return this.settlement.getTimestamp().before(today);
 	}
 }
