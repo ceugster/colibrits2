@@ -7,11 +7,9 @@
 package ch.eugster.colibri.report.settlement.views;
 
 import java.awt.Toolkit;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -27,20 +25,11 @@ import java.util.Hashtable;
 import java.util.PropertyResourceBundle;
 
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRMapArrayDataSource;
-import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.util.JRLoader;
-import net.sf.jasperreports.engine.util.JRProperties;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -368,73 +357,10 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 	}
 
 	@Override
-	public JasperReport getReport() throws JRException
+	public InputStream getReport() throws IOException
 	{
-		final File reportFile = getFile(getReportName() + ".jasper");
-		final File designFile = getFile(getReportName() + ".jrxml");
-
-		if (reportFile.exists())
-		{
-			if (designFile.exists())
-			{
-				if (designFile.lastModified() > reportFile.lastModified())
-				{
-					reportFile.delete();
-				}
-			}
-		}
-		if (!reportFile.exists())
-		{
-			if (designFile.exists())
-			{
-				try
-				{
-					URL url = Platform.getBundle("ch.eugster.colibri.report").getEntry("/lib/jasperreports-1.2.6.jar");
-					url = FileLocator.toFileURL(url);
-					File file = null;
-					try
-					{
-						file = new File(url.toURI());
-					}
-					catch (URISyntaxException e)
-					{
-						file = new File(url.getPath());
-					}
-					JRProperties.setProperty(JRProperties.COMPILER_CLASSPATH, file.getAbsolutePath());
-					final JasperDesign design = JRXmlLoader.load(designFile.getAbsolutePath());
-					JasperCompileManager.compileReportToFile(design, reportFile.getAbsolutePath());
-				}
-				catch (IOException e)
-				{
-					throw new JRException("Die Berichtsbibliotek ist nicht vorhanden.");
-				}
-
-			}
-		}
-		return (JasperReport) JRLoader.loadObject(reportFile);
-	}
-
-	private File getFile(String reportName) throws JRException
-	{
-		try
-		{
-			URL url = Activator.getDefault().getBundle().getEntry("/reports");
-			url = FileLocator.toFileURL(url);
-			File reports = null;
-			try
-			{
-				reports = new File(url.toURI());
-			}
-			catch (URISyntaxException e)
-			{
-				reports = new File(url.getPath());
-			}
-			return new File(reports.getAbsolutePath() + File.separator + reportName);
-		}
-		catch (IOException e)
-		{
-			throw new JRException("Das Verzeichnis 'reports' im Plugin " + Activator.PLUGIN_ID + " existiert nicht.");
-		}
+		URL url = Activator.getDefault().getBundle().getEntry("reports/" + getReportName() + ".jrxml");
+		return url.openStream();
 	}
 
 	@Override

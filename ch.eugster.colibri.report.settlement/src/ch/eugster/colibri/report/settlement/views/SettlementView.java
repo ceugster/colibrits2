@@ -1,25 +1,17 @@
 package ch.eugster.colibri.report.settlement.views;
 
-import java.lang.reflect.InvocationTargetException;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Hashtable;
+import java.util.Map;
 
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperPrintManager;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.view.JasperViewer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -31,6 +23,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -41,11 +34,12 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
+import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.report.daterange.views.DateView;
 import ch.eugster.colibri.report.destination.views.DestinationView;
-import ch.eugster.colibri.report.destination.views.DestinationView.Destination;
-import ch.eugster.colibri.report.destination.views.DestinationView.Format;
+import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.salespoint.views.SalespointView;
 import ch.eugster.colibri.report.settlement.Activator;
 
@@ -57,9 +51,9 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 
 	private TabFolder tabFolder;
 
-	private Destination selectedDestination;
+	private ReportService.Destination selectedDestination;
 
-	private Format selectedFormat;
+	private ReportService.Format selectedFormat;
 
 	private Button start;
 
@@ -194,62 +188,16 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 				{
 					try
 					{
-						final JRDataSource source = selectedChild.createDataSource();
+						final JRDataSource dataSource = selectedChild.createDataSource();
 						final Hashtable<String, Object> parameters = selectedChild.getParameters();
-						final JasperReport report = selectedChild.getReport();
-						final String reportName = selectedChild.getReportName();
-
+						final InputStream report = selectedChild.getReport();
+						
 						start.setEnabled(false);
-						IRunnableWithProgress op = new IRunnableWithProgress()
-						{
-							@Override
-							public void run(IProgressMonitor monitor) throws InvocationTargetException,
-									InterruptedException
-							{
-								try
-								{
-									monitor.beginTask("Die Auswertung wird gedruckt...", IProgressMonitor.UNKNOWN);
-									try
-									{
-										if (report == null)
-										{
-											throw new JRException("Die Berichtsvorlage " + reportName
-													+ " ist im Berichtsverzeichnis nicht vorhanden.");
-										}
-										IStatus status = printReport(report, parameters, source);
-										if (status.getSeverity() == IStatus.CANCEL)
-										{
-											MessageDialog.openInformation(SettlementView.this.getSite().getShell(),
-													"Auswahlfehler", status.getMessage());
-										}
-									}
-									catch (JRException e)
-									{
-										IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e
-												.getLocalizedMessage(), e);
-										ErrorDialog.openError(SettlementView.this.getSite().getShell(), "Fehler",
-												"Beim Verarbeiten des Berichts ist ein Fehler aufgetreten.", status);
-									}
-								}
-								finally
-								{
-									monitor.done();
-								}
-							}
-						};
-						ProgressMonitorDialog dialog = new ProgressMonitorDialog(SettlementView.this.getSite()
-								.getShell());
-						dialog.run(true, true, op);
+						printReport(report, dataSource, parameters);
+						start.setEnabled(true);
 					}
-					catch (InvocationTargetException ex)
+					catch (IOException ex)
 					{
-					}
-					catch (InterruptedException ex)
-					{
-					}
-					catch (JRException ex)
-					{
-
 					}
 					finally
 					{
@@ -297,7 +245,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		{
 			DestinationView view = (DestinationView) part;
 			selectedDestination = view.getSelectedDestination();
-			if (selectedDestination.equals(Destination.FILE))
+			if (selectedDestination.equals(ReportService.Destination.EXPORT))
 			{
 				selectedFormat = view.getSelectedFormat();
 			}
@@ -311,7 +259,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		{
 			return false;
 		}
-		if (this.selectedDestination.equals(Destination.FILE))
+		if (this.selectedDestination.equals(ReportService.Destination.EXPORT))
 		{
 			return this.selectedFormat != null;
 		}
@@ -340,97 +288,89 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		start.setEnabled(!event.getSelection().isEmpty());
 	}
 
-//	private void prepareReport()
-//	{
-//		JRDataSource source = selectedChild.createDataSource();
-//		Hashtable<String, Object> parameters = selectedChild.getParameters();
-//		try
-//		{
-//			JasperReport report = selectedChild.getReport();
-//			if (report == null)
-//			{
-//				throw new JRException("Die Berichtsvorlage " + selectedChild.getReportName()
-//						+ " ist im Berichtsverzeichnis nicht vorhanden.");
-//			}
-//			IStatus status = printReport(report, parameters, source);
-//			if (status.getSeverity() == IStatus.CANCEL)
-//			{
-//				MessageDialog.openInformation(this.getSite().getShell(), "Auswahlfehler", status.getMessage());
-//			}
-//		}
-//		catch (JRException e)
-//		{
-//			IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
-//			ErrorDialog.openError(this.getSite().getShell(), "Fehler",
-//					"Beim Verarbeiten des Berichts ist ein Fehler aufgetreten.", status);
-//		}
-//	}
-
-	protected IStatus printReport(JasperReport report, Hashtable<String, Object> parameters, final JRDataSource source)
-			throws JRException
+	protected IStatus printReport(final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)
 	{
 		if (this.selectedDestination == null)
 		{
 			return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Sie haben kein Ausgabeziel ausgewählt.");
 		}
-		if (selectedDestination.equals(Destination.FILE))
+		File exportFile = null;
+		if (selectedDestination.equals(ReportService.Destination.EXPORT))
 		{
 			if (this.selectedFormat == null)
 			{
 				return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Sie haben kein Dateiformat ausgewählt.");
 			}
+			else
+			{
+				FileDialog dialog = new FileDialog(this.getSite().getShell());
+				dialog.setFileName("*" + selectedFormat.extension());
+				dialog.setFilterExtensions(new String[] { "*" + selectedFormat.extension() });
+				dialog.setFilterIndex(0);
+				dialog.setFilterNames(new String[] { selectedFormat.label() });
+				dialog.setText("Datei");
+				String path = dialog.open();
+				if (path == null)
+				{
+					return new Status(IStatus.OK, Activator.PLUGIN_ID, "");
+				}
+				exportFile = new File(path);
+			}
 		}
 
-		JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, source);
-
-		switch (selectedDestination)
+		ServiceTracker<ReportService, ReportService> tracker = new ServiceTracker<ReportService, ReportService>(Activator.getDefault().getBundle().getBundleContext(), ReportService.class, null);
+		try
 		{
-			case FILE:
+			tracker.open();
+			final ReportService service = tracker.getService();
+			if (service != null)
 			{
-				switch (selectedFormat)
+				switch (selectedDestination)
 				{
-					case HTML:
+					case EXPORT:
 					{
-						JasperExportManager.exportReportToHtmlFile(jasperPrint, "C:\file.html");
+						service.export(report, dataSource, parameters, selectedFormat, exportFile);
 						break;
 					}
-					case PDF:
+					case PRINTER:
 					{
-						JasperExportManager.exportReportToPdfFile(jasperPrint, "C:\file.pdf");
+						service.print(report, dataSource, parameters, false);
 						break;
 					}
-					case XML:
+					case RECEIPT_PRINTER:
 					{
-						JasperExportManager.exportReportToXmlFile(jasperPrint, "C:\file.xml", false);
+					}
+					case PREVIEW:
+					{
+						UIJob job = new UIJob("preview")
+						{
+							@Override
+							public IStatus runInUIThread(IProgressMonitor monitor) 
+							{
+								service.view(report, dataSource, parameters);
+								return Status.OK_STATUS;
+							}
+						};
+						job.setSystem(true);
+						job.schedule();
 						break;
 					}
 					default:
 					{
-						MessageDialog.openInformation(this.getSite().getShell(), "Fehler",
-								"Das gewählte Format wird zur Zeit nicht unterstützt.");
+						return new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
+								"Das ausgewählte Ausgabeziel ist nicht verfügbar.");
 					}
 				}
 			}
-			case PRINTER:
-			{
-				JasperPrintManager.printReport(jasperPrint, true);
-				break;
-			}
-			case RECEIPT_PRINTER:
-			{
-			}
-			case SCREEN:
-			{
-				JasperViewer.viewReport(jasperPrint, false);
-				break;
-			}
-			default:
-			{
-				return new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
-						"Das ausgewählte Ausgabeziel ist nicht verfügbar.");
-			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			tracker.close();
 		}
 		return Status.OK_STATUS;
 	}
-
 }

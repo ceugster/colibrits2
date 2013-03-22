@@ -1,32 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created using JasperAssistant (http://www.jasperassistant.com) -->
-<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
-
-<jasperReport name="SettlementDiscounts" language="java" pageWidth="595" pageHeight="842" columnWidth="520" leftMargin="48" rightMargin="27" topMargin="30" bottomMargin="30">
-	<parameter name="printTime" class="java.lang.String" isForPrompting="false">
-	</parameter>
-	<parameter name="salespoints" class="java.lang.String" isForPrompting="false">
-	</parameter>
-	<parameter name="dateRange" class="java.lang.String" isForPrompting="false">
-	</parameter>
-	<parameter name="header" class="java.lang.String">
-	</parameter>
-	<field name="salespoint" class="java.lang.String">
-	</field>
-	<field name="year" class="java.lang.Integer">
-	</field>
-	<field name="month" class="java.lang.Integer">
-	</field>
-	<field name="day" class="java.lang.Integer">
-	</field>
-	<field name="amount" class="java.lang.Double">
-	</field>
-	<field name="discount" class="java.lang.Double">
-	</field>
-	<field name="percent" class="java.lang.Double">
-	</field>
-	<field name="fullAmount" class="java.lang.Double">
-	</field>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SettlementDiscounts" pageWidth="595" pageHeight="842" columnWidth="520" leftMargin="48" rightMargin="27" topMargin="30" bottomMargin="30" uuid="a3fe0bdb-349e-4cea-91ce-ff13ac9c5ab1">
+	<parameter name="printTime" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="salespoints" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="dateRange" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="header" class="java.lang.String"/>
+	<field name="salespoint" class="java.lang.String"/>
+	<field name="year" class="java.lang.Integer"/>
+	<field name="month" class="java.lang.Integer"/>
+	<field name="day" class="java.lang.Integer"/>
+	<field name="amount" class="java.lang.Double"/>
+	<field name="discount" class="java.lang.Double"/>
+	<field name="percent" class="java.lang.Double"/>
+	<field name="fullAmount" class="java.lang.Double"/>
 	<variable name="fullAmountMonthSum" class="java.lang.Double" resetType="Group" resetGroup="Month" calculation="Sum">
 		<variableExpression><![CDATA[$F{fullAmount}]]></variableExpression>
 	</variable>
@@ -77,119 +63,119 @@
 	</variable>
 	<group name="Salespoint">
 		<groupHeader>
-		<band height="14">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="520" height="14" isPrintInFirstWholeBand="true" backcolor="#c0c0c0"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{salespoint}]]></textFieldExpression>
-			</textField>
-		</band>
+			<band height="14" splitType="Stretch">
+				<textField>
+					<reportElement uuid="2b519618-202a-4bb5-ba51-e3a9c282b3b6" positionType="Float" mode="Opaque" x="0" y="0" width="520" height="14" isPrintInFirstWholeBand="true" backcolor="#C0C0C0"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{salespoint}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupHeader>
 		<groupFooter>
-		<band height="14">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#c0c0c0"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Total " + $F{salespoint}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="280" y="0" width="64" height="14" backcolor="#c0c0c0"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountSalespointSum}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="344" y="0" width="64" height="14" backcolor="#c0c0c0"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountSalespointSum}]]></textFieldExpression>
-			</textField>
-			<textField pattern="0.0%">
-				<reportElement positionType="Float" mode="Opaque" x="408" y="0" width="48" height="14" backcolor="#c0c0c0"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentSalespointAverage}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="456" y="0" width="64" height="14" backcolor="#c0c0c0"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountSalespointSum}]]></textFieldExpression>
-			</textField>
-		</band>
+			<band height="14" splitType="Stretch">
+				<textField>
+					<reportElement uuid="58771c7e-4e72-482b-85e4-8d1532d4540d" positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#C0C0C0"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total " + $F{salespoint}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="8b258dc7-a437-441b-92d6-f839fd04ac09" positionType="Float" mode="Opaque" x="280" y="0" width="64" height="14" backcolor="#C0C0C0"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{fullAmountSalespointSum}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="81a1b3bb-af5e-44ed-8df5-957bbdccfdbd" positionType="Float" mode="Opaque" x="344" y="0" width="64" height="14" backcolor="#C0C0C0"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{discountSalespointSum}]]></textFieldExpression>
+				</textField>
+				<textField pattern="0.0%">
+					<reportElement uuid="47039c02-c2ba-475d-bb21-6a994f541fd1" positionType="Float" mode="Opaque" x="408" y="0" width="48" height="14" backcolor="#C0C0C0"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{percentSalespointAverage}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="230c7761-a915-4e63-a87f-37442304a473" positionType="Float" mode="Opaque" x="456" y="0" width="64" height="14" backcolor="#C0C0C0"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{amountSalespointSum}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<group name="Year">
 		<groupExpression><![CDATA[$F{year}]]></groupExpression>
 		<groupHeader>
-		<band height="14">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="520" height="14" backcolor="#d4d4d4"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["      " + $F{year}.toString()]]></textFieldExpression>
-			</textField>
-		</band>
+			<band height="14" splitType="Stretch">
+				<textField>
+					<reportElement uuid="351e7a82-863b-4bbd-8dfb-1a98cd58f0c5" positionType="Float" mode="Opaque" x="0" y="0" width="520" height="14" backcolor="#D4D4D4"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["      " + $F{year}.toString()]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupHeader>
 		<groupFooter>
-		<band height="14">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#d4d4d4"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["      Total " + $F{year}.toString()]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="280" y="0" width="64" height="14" backcolor="#d4d4d4"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountYearSum}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="344" y="0" width="64" height="14" backcolor="#d4d4d4"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountYearSum}]]></textFieldExpression>
-			</textField>
-			<textField pattern="0.0%">
-				<reportElement positionType="Float" mode="Opaque" x="408" y="0" width="48" height="14" backcolor="#d4d4d4"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentYearAverage}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="456" y="0" width="64" height="14" backcolor="#d4d4d4"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountYearSum}]]></textFieldExpression>
-			</textField>
-		</band>
+			<band height="14" splitType="Stretch">
+				<textField>
+					<reportElement uuid="0bd7dbd0-e1a0-41f1-a90e-a895568e97bd" positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#D4D4D4"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA["      Total " + $F{year}.toString()]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="40303fed-28d4-4461-812e-2dd076d1d8f6" positionType="Float" mode="Opaque" x="280" y="0" width="64" height="14" backcolor="#D4D4D4"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{fullAmountYearSum}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="07c7bd1b-c1e9-456f-8788-8ed291d6fa0a" positionType="Float" mode="Opaque" x="344" y="0" width="64" height="14" backcolor="#D4D4D4"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{discountYearSum}]]></textFieldExpression>
+				</textField>
+				<textField pattern="0.0%">
+					<reportElement uuid="88332c86-3f7f-4218-b80a-1c272553460f" positionType="Float" mode="Opaque" x="408" y="0" width="48" height="14" backcolor="#D4D4D4"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{percentYearAverage}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="ef1b0ab0-fde1-45e7-b06f-6d1d248c7cfa" positionType="Float" mode="Opaque" x="456" y="0" width="64" height="14" backcolor="#D4D4D4"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{amountYearSum}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<group name="Month">
 		<groupExpression><![CDATA[$F{month}]]></groupExpression>
 		<groupHeader>
-		<band height="14">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="1" y="0" width="519" height="14" backcolor="#e9e9e9"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{month}.intValue() == 1 ? "            Januar" :
+			<band height="14" splitType="Stretch">
+				<textField>
+					<reportElement uuid="a5846036-a6eb-4219-85cd-5953504f022c" positionType="Float" mode="Opaque" x="1" y="0" width="519" height="14" backcolor="#E9E9E9"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{month}.intValue() == 1 ? "            Januar" :
 $F{month}.intValue() == 2 ? "            Februar" :
 $F{month}.intValue() == 3 ? "            März" :
 $F{month}.intValue() == 4 ? "            April" :
@@ -201,17 +187,17 @@ $F{month}.intValue() == 9 ? "            September" :
 $F{month}.intValue() == 10 ? "            Oktober" :
 $F{month}.intValue() == 11 ? "            November" :
 $F{month}.intValue() == 12 ? "            Dezember" : ""]]></textFieldExpression>
-			</textField>
-		</band>
+				</textField>
+			</band>
 		</groupHeader>
 		<groupFooter>
-		<band height="14">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#e9e9e9"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{month}.intValue() == 1 ? "            Total Januar" :
+			<band height="14" splitType="Stretch">
+				<textField>
+					<reportElement uuid="17358e01-1886-4c62-9cf7-394f0b2ab971" positionType="Float" mode="Opaque" x="0" y="0" width="280" height="14" backcolor="#E9E9E9"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{month}.intValue() == 1 ? "            Total Januar" :
 $F{month}.intValue() == 2 ? "            Total Februar" :
 $F{month}.intValue() == 3 ? "            Total März" :
 $F{month}.intValue() == 4 ? "            Total April" :
@@ -223,216 +209,218 @@ $F{month}.intValue() == 9 ? "            Total September" :
 $F{month}.intValue() == 10 ? "            Total Oktober" :
 $F{month}.intValue() == 11 ? "            Total November" :
 $F{month}.intValue() == 12 ? "            Total Dezember" : ""]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="280" y="0" width="65" height="14" backcolor="#e9e9e9"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountMonthSum}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="344" y="0" width="65" height="14" backcolor="#e9e9e9"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountMonthSum}]]></textFieldExpression>
-			</textField>
-			<textField pattern="0.0%">
-				<reportElement positionType="Float" mode="Opaque" x="408" y="0" width="49" height="14" backcolor="#e9e9e9"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentMonthAverage}]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" mode="Opaque" x="456" y="0" width="65" height="14" backcolor="#e9e9e9"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountMonthSum}]]></textFieldExpression>
-			</textField>
-		</band>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="e6059ef2-a398-4868-a2da-f16211f2d847" positionType="Float" mode="Opaque" x="280" y="0" width="65" height="14" backcolor="#E9E9E9"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{fullAmountMonthSum}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="78cd23f8-2d21-425f-acb0-089c7bbef26e" positionType="Float" mode="Opaque" x="344" y="0" width="65" height="14" backcolor="#E9E9E9"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{discountMonthSum}]]></textFieldExpression>
+				</textField>
+				<textField pattern="0.0%">
+					<reportElement uuid="7d9891ba-45fc-4b15-bd6b-f91180d63be7" positionType="Float" mode="Opaque" x="408" y="0" width="49" height="14" backcolor="#E9E9E9"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{percentMonthAverage}]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00">
+					<reportElement uuid="5ee8c077-70eb-4735-8fb8-786233ea0681" positionType="Float" mode="Opaque" x="456" y="0" width="65" height="14" backcolor="#E9E9E9"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{amountMonthSum}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<title>
-		<band height="104">
+		<band height="104" splitType="Stretch">
 			<staticText>
-				<reportElement positionType="Float" x="1" y="47" width="400" height="20"/>
+				<reportElement uuid="d72742a2-c997-4ddc-8b16-98c21a15df6f" positionType="Float" x="1" y="47" width="400" height="20"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Zusammenfassung Rabatte]]></text>
 			</staticText>
 			<textField>
-				<reportElement positionType="Float" x="400" y="0" width="120" height="12"/>
+				<reportElement uuid="1a174b0e-842a-41f5-9157-43e6d68ddd42" positionType="Float" x="400" y="0" width="120" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{printTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{printTime}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="1" y="71" width="480" height="12"/>
+				<reportElement uuid="617d2217-ff96-4c48-800f-74b148ded203" positionType="Float" x="1" y="71" width="480" height="12"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{salespoints}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{salespoints}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="1" y="83" width="480" height="12"/>
+				<reportElement uuid="dfcd0c8d-a04c-45f3-b416-d0e88faf5393" positionType="Float" x="1" y="83" width="480" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{dateRange}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dateRange}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement positionType="Float" x="1" y="98" width="520" height="1"/>
-				<graphicElement pen="Thin"/>
+				<reportElement uuid="466d27ca-e46c-43e4-9e26-006b688ab065" positionType="Float" x="1" y="98" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+				</graphicElement>
 			</line>
 			<textField>
-				<reportElement positionType="Float" x="0" y="0" width="394" height="47"/>
+				<reportElement uuid="1588c233-c324-44d8-a0ca-8c3f971ff4a7" positionType="Float" x="0" y="0" width="394" height="47"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{header}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{header}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="24">
+		<band height="24" splitType="Stretch">
 			<staticText>
-				<reportElement positionType="Float" x="0" y="4" width="140" height="12"/>
+				<reportElement uuid="d1dc98db-8647-43c3-8e35-6d92fa06d551" positionType="Float" x="0" y="4" width="140" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Datum]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="280" y="4" width="64" height="12"/>
+				<reportElement uuid="99173366-d106-43a3-a884-a249328a0b43" positionType="Float" x="280" y="4" width="64" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Bruttobetrag]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="344" y="4" width="64" height="12"/>
+				<reportElement uuid="60c83b3c-85b0-4614-a755-ffc24faba73d" positionType="Float" x="344" y="4" width="64" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Rabatt]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="408" y="4" width="48" height="12"/>
+				<reportElement uuid="5731b285-d057-4177-b2c7-69adc925a2b8" positionType="Float" x="408" y="4" width="48" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[in %]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="456" y="4" width="64" height="12"/>
+				<reportElement uuid="eec1bd6f-5442-4008-81dd-813747a936a5" positionType="Float" x="456" y="4" width="64" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Nettobetrag]]></text>
 			</staticText>
 			<line>
-				<reportElement positionType="Float" x="0" y="20" width="520" height="1"/>
-				<graphicElement/>
+				<reportElement uuid="44701365-2f70-4aa3-b4a3-828eb73d22ab" positionType="Float" x="0" y="20" width="520" height="1"/>
 			</line>
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="14">
+		<band height="14" splitType="Stretch">
 			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" x="280" y="0" width="64" height="14"/>
+				<reportElement uuid="468d17b8-251f-4bd2-a0b5-6a06305607e2" positionType="Float" x="280" y="0" width="64" height="14"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$F{fullAmount}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{fullAmount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" x="344" y="0" width="64" height="14"/>
+				<reportElement uuid="fc364390-f387-4f70-81c6-1bb66607bf8a" positionType="Float" x="344" y="0" width="64" height="14"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$F{discount}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{discount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="0.0%">
-				<reportElement positionType="Float" x="408" y="0" width="48" height="14"/>
+				<reportElement uuid="b58608f2-76ed-480a-a2ff-8c43607977a4" positionType="Float" x="408" y="0" width="48" height="14"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$F{percent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{percent}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" x="456" y="0" width="64" height="14"/>
+				<reportElement uuid="59a32825-2a57-4a47-8415-e724c1381d5f" positionType="Float" x="456" y="0" width="64" height="14"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$F{amount}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="0" y="0" width="280" height="14"/>
+				<reportElement uuid="5484c6da-5452-4dc6-98fa-6fdd11ce679b" positionType="Float" x="0" y="0" width="280" height="14"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["                  " + $F{day}.toString() + "." + $F{month}.toString() + "." + $F{year}.toString()]]></textFieldExpression>
+				<textFieldExpression><![CDATA["                  " + $F{day}.toString() + "." + $F{month}.toString() + "." + $F{year}.toString()]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="30">
+		<band height="30" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="10" width="520" height="12"/>
+				<reportElement uuid="ed0573c6-0f98-4ab8-ba5d-4c57a6daf971" x="0" y="10" width="520" height="12"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="30">
+		<band height="30" splitType="Stretch">
 			<line>
-				<reportElement positionType="Float" x="0" y="4" width="520" height="1"/>
-				<graphicElement pen="Thin"/>
+				<reportElement uuid="30cf4f98-b299-4830-856e-212f7afb29f0" positionType="Float" x="0" y="4" width="520" height="1"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+				</graphicElement>
 			</line>
 			<line>
-				<reportElement positionType="Float" x="0" y="24" width="520" height="1"/>
-				<graphicElement/>
+				<reportElement uuid="06070031-81a7-425d-b6d7-f920698545bb" positionType="Float" x="0" y="24" width="520" height="1"/>
 			</line>
 			<textField>
-				<reportElement positionType="Float" x="0" y="8" width="280" height="12"/>
+				<reportElement uuid="bb0fed1f-687b-4da7-adba-64c2248c7b3c" positionType="Float" x="0" y="8" width="280" height="12"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA["Total"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Total"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" x="280" y="8" width="64" height="12"/>
+				<reportElement uuid="caacd317-1d2b-46e2-8d0d-b2b659ae8df7" positionType="Float" x="280" y="8" width="64" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{fullAmountSum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{fullAmountSum}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" x="344" y="8" width="64" height="12"/>
+				<reportElement uuid="67c0dc9f-18e9-465c-b31b-b87d0de25f3f" positionType="Float" x="344" y="8" width="64" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{discountSum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{discountSum}]]></textFieldExpression>
 			</textField>
 			<textField pattern="0.0%">
-				<reportElement positionType="Float" x="408" y="8" width="48" height="12"/>
+				<reportElement uuid="a477cbcc-3019-42f2-a2a3-8b366c3c2b79" positionType="Float" x="408" y="8" width="48" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{percentAverage}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{percentAverage}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement positionType="Float" x="456" y="8" width="64" height="12"/>
+				<reportElement uuid="ffec9d85-4d90-4692-a79f-cf1cf72e39ab" positionType="Float" x="456" y="8" width="64" height="12"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{amountSum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{amountSum}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

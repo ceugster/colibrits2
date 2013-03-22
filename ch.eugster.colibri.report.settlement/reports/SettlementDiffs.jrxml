@@ -1,36 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created using JasperAssistant (http://www.jasperassistant.com) -->
-<!DOCTYPE jasperReport PUBLIC "-//JasperReports//DTD Report Design//EN" "http://jasperreports.sourceforge.net/dtds/jasperreport.dtd">
-
-<jasperReport name="SettlementDiffs" language="java" pageWidth="595" pageHeight="842" columnWidth="519" leftMargin="38" rightMargin="38" topMargin="30" bottomMargin="30">
-	<parameter name="printTime" class="java.lang.String" isForPrompting="false">
-	</parameter>
-	<parameter name="salespoints" class="java.lang.String" isForPrompting="false">
-	</parameter>
-	<parameter name="dateRange" class="java.lang.String" isForPrompting="false">
-	</parameter>
-	<parameter name="settlements" class="java.lang.String">
-	</parameter>
-	<parameter name="receiptCount" class="java.lang.String">
-	</parameter>
-	<parameter name="header" class="java.lang.String">
-	</parameter>
-	<field name="salespoint" class="java.lang.String">
-	</field>
-	<field name="settlement" class="java.lang.String">
-	</field>
-	<field name="code" class="java.lang.String">
-	</field>
-	<field name="date" class="java.util.Date">
-	</field>
-	<field name="type" class="java.lang.Integer">
-	</field>
-	<field name="subtype" class="java.lang.Integer">
-	</field>
-	<field name="cashtype" class="java.lang.Integer">
-	</field>
-	<field name="amount" class="java.lang.Double">
-	</field>
+<!-- Created with Jaspersoft Studio version last-->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SettlementDiffs" pageWidth="595" pageHeight="842" columnWidth="519" leftMargin="38" rightMargin="38" topMargin="30" bottomMargin="30" uuid="8b2c8dec-9c3b-4f1b-b455-b99cf0ee814d">
+	<parameter name="printTime" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="salespoints" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="dateRange" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="settlements" class="java.lang.String"/>
+	<parameter name="receiptCount" class="java.lang.String"/>
+	<parameter name="header" class="java.lang.String"/>
+	<field name="salespoint" class="java.lang.String"/>
+	<field name="settlement" class="java.lang.String"/>
+	<field name="code" class="java.lang.String"/>
+	<field name="date" class="java.util.Date"/>
+	<field name="type" class="java.lang.Integer"/>
+	<field name="subtype" class="java.lang.Integer"/>
+	<field name="cashtype" class="java.lang.Integer"/>
+	<field name="amount" class="java.lang.Double"/>
 	<variable name="sum_amount" class="java.lang.Double" resetType="Group" resetGroup="currency" calculation="Sum">
 		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 		<initialValueExpression><![CDATA[new Double(0d)]]></initialValueExpression>
@@ -38,147 +22,148 @@
 	<group name="Type">
 		<groupExpression><![CDATA[$F{type}]]></groupExpression>
 		<groupHeader>
-		<band height="40">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="21" width="519" height="19" backcolor="#c0c0c0"/>
-				<textElement verticalAlignment="Middle">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{salespoint}]]></textFieldExpression>
-			</textField>
-		</band>
+			<band height="40" splitType="Stretch">
+				<textField>
+					<reportElement uuid="abf88111-33ec-477e-b8c8-b9222863042b" positionType="Float" mode="Opaque" x="0" y="21" width="519" height="19" backcolor="#C0C0C0"/>
+					<textElement verticalAlignment="Middle">
+						<font size="9"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{salespoint}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupHeader>
 		<groupFooter>
-		<band height="19">
-			<rectangle>
-				<reportElement positionType="Float" x="0" y="0" width="520" height="19" backcolor="#c0c0c0"/>
-				<graphicElement pen="None"/>
-			</rectangle>
-		</band>
+			<band height="19" splitType="Stretch">
+				<rectangle>
+					<reportElement uuid="af121bf8-57cf-4ca0-b4a2-e12d6492e782" positionType="Float" x="0" y="0" width="520" height="19" backcolor="#C0C0C0"/>
+					<graphicElement>
+						<pen lineWidth="0.0" lineStyle="Solid"/>
+					</graphicElement>
+				</rectangle>
+			</band>
 		</groupFooter>
 	</group>
 	<group name="currency">
 		<groupExpression><![CDATA[$F{code}]]></groupExpression>
 		<groupHeader>
-		<band height="15">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="314" height="12" backcolor="#e8e8e8"/>
-				<textElement>
-					<font size="8"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{code}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement positionType="Float" mode="Opaque" x="314" y="0" width="111" height="12" backcolor="#e8e8e8"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[Datum]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" mode="Opaque" x="425" y="0" width="94" height="12" backcolor="#e8e8e8"/>
-				<textElement textAlignment="Right">
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[Differenz]]></text>
-			</staticText>
-		</band>
+			<band height="15" splitType="Stretch">
+				<textField>
+					<reportElement uuid="b03a0d09-042d-4a49-80fb-35bc14029f56" positionType="Float" mode="Opaque" x="0" y="0" width="314" height="12" backcolor="#E8E8E8"/>
+					<textElement>
+						<font size="8"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement uuid="7ace6a72-7639-4447-9b99-5416cf954fa5" positionType="Float" mode="Opaque" x="314" y="0" width="111" height="12" backcolor="#E8E8E8"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Datum]]></text>
+				</staticText>
+				<staticText>
+					<reportElement uuid="1c9de956-9ca1-4c31-bfb6-0358008ce80e" positionType="Float" mode="Opaque" x="425" y="0" width="94" height="12" backcolor="#E8E8E8"/>
+					<textElement textAlignment="Right">
+						<font size="8"/>
+					</textElement>
+					<text><![CDATA[Differenz]]></text>
+				</staticText>
+			</band>
 		</groupHeader>
 		<groupFooter>
-		<band height="19">
-			<textField>
-				<reportElement positionType="Float" mode="Opaque" x="1" y="4" width="424" height="15" backcolor="#e8e8e8"/>
-				<textElement verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["Differenz kumuliert"]]></textFieldExpression>
-			</textField>
-			<textField pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement positionType="Float" mode="Opaque" x="425" y="4" width="94" height="15" backcolor="#e8e8e8"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="8" isBold="false"/>
-				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$V{sum_amount}]]></textFieldExpression>
-			</textField>
-		</band>
+			<band height="19" splitType="Stretch">
+				<textField>
+					<reportElement uuid="c0561d45-0915-4a4c-a44f-0b2327e76a80" positionType="Float" mode="Opaque" x="1" y="4" width="424" height="15" backcolor="#E8E8E8"/>
+					<textElement verticalAlignment="Middle">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Differenz kumuliert"]]></textFieldExpression>
+				</textField>
+				<textField pattern="#,##0.00" isBlankWhenNull="true">
+					<reportElement uuid="f713d64e-b7f0-4514-aa10-93ca9c945674" positionType="Float" mode="Opaque" x="425" y="4" width="94" height="15" backcolor="#E8E8E8"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font size="8" isBold="false"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$V{sum_amount}]]></textFieldExpression>
+				</textField>
+			</band>
 		</groupFooter>
 	</group>
 	<title>
-		<band height="114">
+		<band height="114" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="59" width="228" height="20"/>
+				<reportElement uuid="37f2c824-8b39-40d9-b1e2-9627c3ad163f" x="0" y="59" width="228" height="20"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tagesabschlussdifferenzen]]></text>
 			</staticText>
 			<textField>
-				<reportElement positionType="Float" x="369" y="1" width="150" height="14"/>
+				<reportElement uuid="6a29eaa6-4c8b-4e32-8dfe-37c48dda8d26" positionType="Float" x="369" y="1" width="150" height="14"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{printTime}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{printTime}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="0" y="83" width="500" height="12"/>
+				<reportElement uuid="a4d47988-f773-4e40-9835-60825691846d" positionType="Float" x="0" y="83" width="500" height="12"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{salespoints}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{salespoints}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="0" y="95" width="500" height="12"/>
+				<reportElement uuid="5fe64e74-e1f5-4d44-82dd-692c6e3bfdff" positionType="Float" x="0" y="95" width="500" height="12"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{dateRange}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dateRange}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement positionType="Float" x="0" y="0" width="354" height="60"/>
+				<reportElement uuid="028f3a1a-0c42-4b96-b76f-244b387b7cef" positionType="Float" x="0" y="0" width="354" height="60"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$P{header}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{header}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement positionType="Float" x="1" y="110" width="518" height="1"/>
-				<graphicElement/>
+				<reportElement uuid="6e310b6f-d66a-4399-850f-a4892a312625" positionType="Float" x="1" y="110" width="518" height="1"/>
 			</line>
 		</band>
 	</title>
 	<detail>
-		<band height="14">
+		<band height="14" splitType="Stretch">
 			<textField>
-				<reportElement positionType="Float" x="0" y="2" width="314" height="11"/>
+				<reportElement uuid="cc42a102-1aac-4b45-a1fe-b6f1e06fd907" positionType="Float" x="0" y="2" width="314" height="11"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{settlement}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{settlement}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="425" y="2" width="94" height="11"/>
+				<reportElement uuid="6bbae435-acfb-49c4-b1d2-eceef388e47d" positionType="Float" x="425" y="2" width="94" height="11"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Double"><![CDATA[$F{amount}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yy HH:mm">
-				<reportElement positionType="Float" x="314" y="2" width="111" height="11"/>
+				<reportElement uuid="a38a02d4-d9ff-4cb4-8c44-3f414fab9476" positionType="Float" x="314" y="2" width="111" height="11"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression class="java.util.Date"><![CDATA[$F{date}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<pageFooter>
-		<band height="28">
+		<band height="28" splitType="Stretch">
 			<textField>
-				<reportElement x="281" y="15" width="238" height="13"/>
+				<reportElement uuid="e0cd46de-8dbb-4414-a5db-15bbbb682453" x="281" y="15" width="238" height="13"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>

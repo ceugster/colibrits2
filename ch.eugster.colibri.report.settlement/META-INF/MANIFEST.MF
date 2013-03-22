@@ -6,13 +6,17 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.report.settlement.Activator
 Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
 Import-Package: ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.model.key,
+ ch.eugster.colibri.persistence.model.payment,
  ch.eugster.colibri.persistence.model.print,
+ ch.eugster.colibri.persistence.model.product,
+ ch.eugster.colibri.persistence.model.report,
  ch.eugster.colibri.persistence.queries,
  ch.eugster.colibri.persistence.service,
  ch.eugster.colibri.report.daterange.views,
  ch.eugster.colibri.report.destination.views,
+ ch.eugster.colibri.report.engine,
  ch.eugster.colibri.report.salespoint.views,
  ch.eugster.colibri.ui.filters,
  net.sf.jasperreports.engine,
@@ -20,7 +24,6 @@ Import-Package: ch.eugster.colibri.persistence.model,
  net.sf.jasperreports.engine.design,
  net.sf.jasperreports.engine.util,
  net.sf.jasperreports.engine.xml,
- net.sf.jasperreports.view,
  org.eclipse.core.runtime;version="3.4.0",
  org.eclipse.jface.dialogs,
  org.eclipse.jface.operation,
@@ -33,6 +36,9 @@ Import-Package: ch.eugster.colibri.persistence.model,
  org.eclipse.ui,
  org.eclipse.ui.part,
  org.eclipse.ui.plugin,
+ org.eclipse.ui.progress,
  org.osgi.framework;version="1.6.0",
  org.osgi.service.event;version="1.3.0",
  org.osgi.util.tracker;version="1.5.0"
+Require-Bundle: org.eclipse.ui
+Bundle-ActivationPolicy: lazy

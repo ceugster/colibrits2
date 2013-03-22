@@ -24,19 +24,6 @@
       </category>
    </extension>
    <extension
-         id="ch.eugster.colibr.report.application"
-         name="ColibriTS II"
-         point="org.eclipse.core.runtime.applications">
-      <application
-            cardinality="singleton-global"
-            thread="main"
-            visible="true">
-         <run
-               class="ch.eugster.colibri.report.app.ReportApplication">
-         </run>
-      </application>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
@@ -62,10 +49,21 @@
                tooltip="Zur Perspktive Abschlüsse wechseln">
             <parameter
                   name="org.eclipse.ui.perspectives.showPerspective.perspectiveId"
-                  value="ch.eugster.colibri.admin.currency.perspective">
+                  value="ch.eugster.colibri.report.settlement.perspective">
             </parameter>
          </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="ch.eugster.colibri.report.settlement.perspective">
+         <view
+               id="ch.eugster.colibri.report.settlement.view"
+               minimized="false"
+               relationship="stack">
+         </view>
+      </perspectiveExtension>
    </extension>
 
 </plugin>

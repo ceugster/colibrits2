@@ -1709,6 +1709,7 @@ ch.eugster.colibri.report.settlement.feature/build.properties -text
 ch.eugster.colibri.report.settlement.feature/feature.xml -text
 ch.eugster.colibri.report.settlement/.classpath -text
 ch.eugster.colibri.report.settlement/.project -text
+ch.eugster.colibri.report.settlement/.settings/org.eclipse.core.resources.prefs -text
 ch.eugster.colibri.report.settlement/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.settlement/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.settlement/META-INF/MANIFEST.MF -text
@@ -1716,18 +1717,10 @@ ch.eugster.colibri.report.settlement/build.properties -text
 ch.eugster.colibri.report.settlement/icons/print.gif -text
 ch.eugster.colibri.report.settlement/icons/print_disabled.gif -text
 ch.eugster.colibri.report.settlement/plugin.xml -text
-ch.eugster.colibri.report.settlement/reports/SettlementDiffs.jasper -text
 ch.eugster.colibri.report.settlement/reports/SettlementDiffs.jrxml -text
-ch.eugster.colibri.report.settlement/reports/SettlementDiffs.properties -text
-ch.eugster.colibri.report.settlement/reports/SettlementDiscounts.jasper -text
 ch.eugster.colibri.report.settlement/reports/SettlementDiscounts.jrxml -text
-ch.eugster.colibri.report.settlement/reports/SettlementDiscounts.properties -text
-ch.eugster.colibri.report.settlement/reports/SettlementStatistics.jasper -text
 ch.eugster.colibri.report.settlement/reports/SettlementStatistics.jrxml -text
-ch.eugster.colibri.report.settlement/reports/SettlementStatistics.properties -text
-ch.eugster.colibri.report.settlement/reports/SingleSettlementReport.jasper -text
 ch.eugster.colibri.report.settlement/reports/SingleSettlementReport.jrxml -text
-ch.eugster.colibri.report.settlement/reports/SingleSettlementReport.properties -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/Activator.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/ReportSettlementPerspective.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/model/Section.java -text
