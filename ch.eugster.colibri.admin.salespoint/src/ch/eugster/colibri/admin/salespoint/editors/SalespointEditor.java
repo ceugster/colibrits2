@@ -108,7 +108,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 
 	private FormattedText price;
 
-	// private ComboViewer options;
+	private Button forceSettlement;
 
 	private ComboViewer taxes;
 
@@ -358,6 +358,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.host.setText(salespoint.getHost());
 		this.location.setText(salespoint.getLocation());
 		this.mappingId.setText(salespoint.valueOf(salespoint.getMapping()));
+		this.forceSettlement.setSelection(salespoint.isForceSettlement());
 		
 		this.loadProviderValues(salespoint);
 
@@ -421,6 +422,8 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		salespoint.setHost(this.host.getText());
 		salespoint.setLocation(this.location.getText());
 		salespoint.setMapping(this.mappingId.getText());
+		salespoint.setForceSettlement(forceSettlement.getSelection());
+		
 		final ProviderConfigurator providerConfigurator = (ProviderConfigurator) this.providerConfiguratorTracker
 				.getService();
 		if (providerConfigurator != null)
@@ -1723,6 +1726,29 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		{
 			@Override
 			public void modifyText(final ModifyEvent e)
+			{
+				SalespointEditor.this.setDirty(true);
+			}
+		});
+
+		label = this.formToolkit.createLabel(composite, "", SWT.NONE);
+		label.setLayoutData(new GridData());
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+
+		this.forceSettlement = this.formToolkit.createButton(composite, "Tagesabschluss erzwingen", SWT.CHECK);
+		this.forceSettlement.setLayoutData(gridData);
+		this.forceSettlement.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				SalespointEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
 			{
 				SalespointEditor.this.setDirty(true);
 			}
