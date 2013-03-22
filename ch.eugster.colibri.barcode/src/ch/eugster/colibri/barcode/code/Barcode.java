@@ -14,6 +14,8 @@ public interface Barcode
 	 * 
 	 * @return the code part of the detail
 	 */
+	boolean isEbook();
+	
 	String getDetail();
 
 	String getName();

@@ -12,6 +12,11 @@ public abstract class AbstractBarcode implements Barcode
 	{
 		this.code = code;
 	}
+	
+	public boolean isEbook()
+	{
+		return false;
+	}
 
 	@Override
 	public boolean equals(final Object other)
@@ -66,5 +71,6 @@ public abstract class AbstractBarcode implements Barcode
 	public void updatePosition(final Position position)
 	{
 		position.setSearchValue(this.getCode());
+		position.setEbook(this.isEbook());
 	}
 }
