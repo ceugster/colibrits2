@@ -31,6 +31,16 @@ public interface ProviderInterface extends ProviderService
 	enum Topic
 	{
 		ARTICLE_UPDATE, CUSTOMER_UPDATE, PROVIDER_TAX_NOT_SPECIFIED, PROVIDER_FAILOVER;
+
+		public static String[] topics()
+		{
+			String[] topics = new String[Topic.values().length];
+			for (int i = 0; i < Topic.values().length; i++)
+			{
+				topics[i] = Topic.values()[i].topic();
+			}
+			return topics;
+		}
 		
 		public String topic()
 		{
@@ -77,7 +87,7 @@ public interface ProviderInterface extends ProviderService
 			}
 			case PROVIDER_FAILOVER:
 			{
-				return "Keine Verbindung";
+				return "Keine Verbindung.";
 			}
 			default:
 			{
