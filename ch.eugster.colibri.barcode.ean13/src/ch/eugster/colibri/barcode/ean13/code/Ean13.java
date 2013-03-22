@@ -22,20 +22,36 @@ import ch.eugster.colibri.persistence.model.Position;
 public class Ean13 extends AbstractBarcode
 {
 	public static final int EAN13_LENGTH = 13;
+	
+	public static final int EAN13_EBOOK_LENGTH = 14;
 
 	public static final String PREFIX_ISBN = "978";
 
 	public static final String PREFIX_ORDER = "989";
 
 	public static final String PREFIX_CUSTOMER = "992";
+	
+	public static final String PREFIX_EBOOK = "E";
 
+	public boolean isEbook()
+	{
+		return ebookPrefix != null && ebookPrefix.equals(PREFIX_EBOOK);
+	}
+	
+	private String ebookPrefix = null;
 	/**
 	 * 
 	 */
 	protected Ean13(final String ean13)
 	{
-		super(ean13);
+		this(null, ean13);
 
+	}
+
+	protected Ean13(final String prefix, final String ean13)
+	{
+		super(ean13);
+		ebookPrefix = prefix;
 	}
 
 	public String getDescription()
@@ -86,15 +102,15 @@ public class Ean13 extends AbstractBarcode
 
 	public Ean13.SubType getSubType()
 	{
-		if (this.getCode().substring(0, 3).equals(Ean13.PREFIX_ISBN))
+		if (this.getCode().startsWith(Ean13.PREFIX_ISBN))
 		{
 			return Ean13.SubType.ISBN;
 		}
-		else if (this.getCode().substring(0, 3).equals(Ean13.PREFIX_CUSTOMER))
+		else if (this.getCode().startsWith(Ean13.PREFIX_CUSTOMER))
 		{
 			return Ean13.SubType.CUSTOMER;
 		}
-		else if (this.getCode().substring(0, 3).equals(Ean13.PREFIX_ORDER))
+		else if (this.getCode().startsWith(Ean13.PREFIX_ORDER))
 		{
 			return Ean13.SubType.ORDER;
 		}
@@ -142,10 +158,12 @@ public class Ean13 extends AbstractBarcode
 			{
 				position.setOrdered(true);
 				position.setOrder(this.getDetail());
+				break;
 			}
 			case CUSTOMER:
 			{
 				position.getReceipt().setCustomerCode(this.getDetail());
+				break;
 			}
 		}
 
@@ -166,26 +184,49 @@ public class Ean13 extends AbstractBarcode
 			return null;
 		}
 
-		if ((code.length() < Ean13.EAN13_LENGTH - 1) || (code.length() > Ean13.EAN13_LENGTH))
+		if ((code.length() < Ean13.EAN13_LENGTH - 1) || code.length() > Ean13.EAN13_EBOOK_LENGTH)
 		{
 			return null;
 		}
 
+		String prefix = null;
+		String articleCode = null;
+		if (code.startsWith(Ean13.PREFIX_EBOOK))
+		{
+			if ((code.length() < Ean13.EAN13_EBOOK_LENGTH - 1) || code.length() > Ean13.EAN13_EBOOK_LENGTH)
+			{
+				return null;
+			}
+			prefix = code.substring(0, 1);
+			articleCode = code.replaceFirst(Ean13.PREFIX_EBOOK, "");
+			if (articleCode.length() == Ean13.EAN13_EBOOK_LENGTH - 1)
+			{
+				articleCode = articleCode + Integer.valueOf(Ean13.computeChecksum(articleCode));
+			}
+		}
+		else
+		{
+			if ((code.length() < Ean13.EAN13_LENGTH - 1) || code.length() > Ean13.EAN13_LENGTH)
+			{
+				return null;
+			}
+			articleCode = code;
+			if (articleCode.length() == Ean13.EAN13_LENGTH - 1)
+			{
+				articleCode = articleCode + Integer.valueOf(Ean13.computeChecksum(articleCode));
+			}
+		}
+
 		try
 		{
-			new BigInteger(code);
+			new BigInteger(articleCode);
 		}
 		catch (final NumberFormatException e)
 		{
 			return null;
 		}
 
-		if (code.length() == Ean13.EAN13_LENGTH - 1)
-		{
-			code = code + Integer.valueOf(Ean13.computeChecksum(code));
-		}
-
-		return Ean13.validate(code);
+		return Ean13.validate(prefix, articleCode);
 	}
 
 	private static int computeChecksum(final String code)
@@ -210,13 +251,12 @@ public class Ean13 extends AbstractBarcode
 		return (10 - mod);
 	}
 
-	private static Ean13 validate(final String code)
+	private static Ean13 validate(final String prefix, final String code)
 	{
 		if (Ean13.computeChecksum(code.substring(0, code.length() - 1)) == Integer.parseInt(code.substring(code.length() - 1)))
 		{
-			return new Ean13(code);
+			return new Ean13(prefix, code);
 		}
-
 		return null;
 	}
 
