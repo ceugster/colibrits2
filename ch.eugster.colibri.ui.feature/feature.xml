@@ -5,7 +5,7 @@
       version="1.0.0.qualifier"
       provider-name="Christian Eugster">
 
-   <description url="http://eugster-informatik.dyndns.info/ColibriTS/ui-description">
+   <description>
       UI Module für ColibriTS Anwendungen.
    </description>
 
@@ -211,10 +211,6 @@ Agreement more than one year after the cause of action arose.
 Each party waives its rights to a jury trial in any resulting
 litigation.
    </license>
-
-   <url>
-      <update label="ColibriTS Update Site" url="http://eugster-informatik.dyndns.info/ColibriTS/updates"/>
-   </url>
 
    <requires>
       <import plugin="org.eclipse.equinox.common" version="3.2.0" match="compatible"/>
