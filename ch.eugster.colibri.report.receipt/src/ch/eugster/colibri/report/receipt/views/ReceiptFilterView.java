@@ -551,12 +551,15 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 
 		if (persistenceService == null)
 		{
-			this.salespointViewer.setInput(null);
-			this.salespointViewer.setSelection(new StructuredSelection(new Salespoint[0]));
-			this.settlementViewer.setInput(null);
-			this.settlementViewer.setSelection(new StructuredSelection(new Settlement[0]));
-			this.userViewer.setInput(null);
-			this.userViewer.setSelection(new StructuredSelection(new User[0]));
+			if (salespointViewer.getControl() != null && !this.salespointViewer.getControl().isDisposed())
+			{
+				this.salespointViewer.setInput(null);
+				this.salespointViewer.setSelection(new StructuredSelection(new Salespoint[0]));
+				this.settlementViewer.setInput(null);
+				this.settlementViewer.setSelection(new StructuredSelection(new Settlement[0]));
+				this.userViewer.setInput(null);
+				this.userViewer.setSelection(new StructuredSelection(new User[0]));
+			}
 		}
 		else
 		{

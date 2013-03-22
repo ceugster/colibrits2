@@ -155,7 +155,7 @@
                tooltip="Zur Perspktive Belegliste wechseln">
             <parameter
                   name="org.eclipse.ui.perspectives.showPerspective.perspectiveId"
-                  value="ch.eugster.colibri.admin.currency.perspective">
+                  value="ch.eugster.colibri.report.receipt.perspective">
             </parameter>
          </command>
       </menuContribution>

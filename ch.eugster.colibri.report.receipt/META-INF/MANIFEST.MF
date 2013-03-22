@@ -6,7 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.report.receipt.Activator
 Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
 Import-Package: ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.model.print,
  ch.eugster.colibri.persistence.queries,
@@ -28,3 +27,4 @@ Import-Package: ch.eugster.colibri.persistence.model,
  org.osgi.framework;version="1.6.0",
  org.osgi.service.event;version="1.3.0",
  org.osgi.util.tracker;version="1.5.0"
+Bundle-ActivationPolicy: lazy
