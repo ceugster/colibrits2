@@ -9,6 +9,7 @@ package ch.eugster.colibri.provider.galileo.galserve;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.text.NumberFormat;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -17,18 +18,28 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.code.Barcode;
+import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Product;
+import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
+import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
+import ch.eugster.colibri.persistence.model.TaxRate;
+import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.product.Customer;
+import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
+import ch.eugster.colibri.persistence.queries.TaxQuery;
+import ch.eugster.colibri.persistence.queries.TaxRateQuery;
+import ch.eugster.colibri.persistence.queries.TaxTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
@@ -95,6 +106,8 @@ public class ArticleServerCom4j implements IArticleServer
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
+		this.status = Status.OK_STATUS;
+		
 		String msg = null;
 
 		if (this.open())
@@ -119,19 +132,26 @@ public class ArticleServerCom4j implements IArticleServer
 			else
 			{
 				barcode.updatePosition(position);
-				if (this.galserve.do_NSearch(barcode.getProductCode()))
+				if (position.isEbook())
 				{
 					this.updatePosition(barcode, position);
-					barcode.updatePosition(position);
 				}
 				else
 				{
-					msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
-							+ barcode.getProductCode() + " konnte nicht gefunden werden.";
-					this.status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg);
-					if (log != null)
+					if (this.galserve.do_NSearch(barcode.getProductCode()))
 					{
-						log.log(LogService.LOG_INFO, (msg));
+						this.updatePosition(barcode, position);
+						barcode.updatePosition(position);
+					}
+					else
+					{
+						msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
+								+ barcode.getProductCode() + " konnte nicht gefunden werden.";
+						this.status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg);
+						if (log != null)
+						{
+							log.log(LogService.LOG_INFO, (msg));
+						}
 					}
 				}
 			}
@@ -465,9 +485,18 @@ public class ArticleServerCom4j implements IArticleServer
 		if (product == null)
 		{
 			product = Product.newInstance(position);
+			position.setProduct(product);
+		}
+		if (barcode.getType().equals(Barcode.Type.ORDER))
+		{
+			product.setCode(this.galserve.bestnummer().toString());
+			position.setOrder(barcode.getCode());
+		}
+		else
+		{
+			product.setCode(barcode.getProductCode());
 		}
 		product.setAuthor(this.galserve.autor().toString());
-		product.setCode(barcode.getProductCode());
 		product.setPublisher(this.galserve.verlag().toString());
 		product.setTitle(this.galserve.titel().toString());
 		return product;
@@ -489,7 +518,7 @@ public class ArticleServerCom4j implements IArticleServer
 					this.open = this.galserve.do_NOpen(this.database);
 					if (!this.open)
 					{
-						this.status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
+						this.status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden."));
 					}
 				}
 				catch (Exception e)
@@ -844,14 +873,71 @@ public class ArticleServerCom4j implements IArticleServer
 		}
 	}
 
+	private void setProduct(boolean ebook, Barcode barcode, Position position)
+	{
+		if (ebook)
+		{
+			setEbookProduct(barcode, position);
+		}
+		else
+		{
+			setProduct(barcode, position);
+		}
+	}
+
+	private void setEbookProduct(final Barcode barcode, final Position position)
+	{
+		Product product = Product.newInstance(position);
+		product.setCode(barcode.getProductCode());
+		position.setProduct(product);
+		position.setEbook(barcode.isEbook());
+		position.setBookProvider(!((Boolean)this.galserve.nichtbuchen()).booleanValue());
+		position.setFromStock(false);
+		position.setOrder("");
+		position.setProvider(this.configuration.getProviderId());
+		position.setProviderBooked(false);
+		position.setOrdered(false);
+		position.setPrice(position.getReceipt().getSettlement().getSalespoint().getProposalPrice());
+		position.setQuantity(position.getReceipt().getSettlement().getSalespoint().getProposalQuantity());
+
+		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			CommonSettingsQuery commonSettingsQuery = (CommonSettingsQuery) persistenceService.getCacheService().getQuery(CommonSettings.class);
+			CommonSettings commonSettings = commonSettingsQuery.findDefault();
+			ProductGroup productGroup = commonSettings.getDefaultProductGroup();
+			position.setProductGroup(productGroup);
+			Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(this.configuration.getProviderId());
+			if (!mappings.isEmpty())
+			{
+				product.setExternalProductGroup(mappings.iterator().next().getExternalProductGroup());
+			}
+
+			TaxTypeQuery taxTypeQuery = (TaxTypeQuery) persistenceService.getCacheService().getQuery(TaxType.class);
+			TaxType type = taxTypeQuery.selectByCode("U");
+			TaxRateQuery taxRateQuery = (TaxRateQuery) persistenceService.getCacheService().getQuery(TaxRate.class);
+			TaxRate rate = taxRateQuery.selectByCode("N");
+			TaxQuery taxQuery = (TaxQuery) persistenceService.getCacheService().getQuery(Tax.class);
+			Collection<Tax> taxes = taxQuery.selectByTaxTypeAndTaxRate(type, rate);
+			if (!taxes.isEmpty())
+			{
+				Tax tax = taxes.iterator().next();
+				position.setCurrentTax(tax.getCurrentTax());
+			}
+		}
+
+		position.setOption(Position.Option.ARTICLE);
+	}
+
 	private void setProduct(final Barcode barcode, final Position position)
 	{
+		position.setEbook(barcode.isEbook());
 		position.setProduct(this.getProduct(barcode, position));
 		position.setBookProvider(!((Boolean)this.galserve.nichtbuchen()).booleanValue());
 		position.setFromStock(((Boolean)this.galserve.lagerabholfach()).booleanValue());
 		position.setOrder(this.galserve.bestnummer().toString());
 		position.setProvider(this.configuration.getProviderId());
-//		position.setBookProvider(true);
+//			position.setBookProvider(true);
 		position.setProviderBooked(false);
 		position.setOrdered(((Boolean)this.galserve.bestellt()).booleanValue());
 
@@ -876,9 +962,19 @@ public class ArticleServerCom4j implements IArticleServer
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
+			String epgCode = this.galserve.wgruppe().toString();
+			if (epgCode.isEmpty())
+			{
+				CommonSettingsQuery commonSettingsQuery = (CommonSettingsQuery) persistenceService.getCacheService().getQuery(CommonSettings.class);
+				CommonSettings commonSettings = commonSettingsQuery.findDefault();
+				Collection<ProductGroupMapping> mappings = commonSettings.getDefaultProductGroup().getProductGroupMappings(this.configuration.getProviderId());
+				if (!mappings.isEmpty())
+				{
+					epgCode = mappings.iterator().next().getExternalProductGroup().getCode();
+				}
+			}
 			final ExternalProductGroupQuery query = (ExternalProductGroupQuery) persistenceService.getCacheService()
 					.getQuery(ExternalProductGroup.class);
-			final String epgCode = this.galserve.wgruppe().toString();
 			final ExternalProductGroup externalProductGroup = query.selectByProviderAndCode(
 					this.configuration.getProviderId(), epgCode);
 			position.getProduct().setExternalProductGroup(externalProductGroup);
@@ -914,6 +1010,7 @@ public class ArticleServerCom4j implements IArticleServer
 			this.galserve.vlagerabholfach(position.isFromStock());
 			this.galserve.vmenge(Math.abs(position.getQuantity()));
 			this.galserve.vpreis(Math.abs(position.getPrice()));
+			this.galserve.vebook(Boolean.valueOf(position.isEbook()));
 			this.galserve.vrabatt(-Math.abs(position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
 					Position.AmountType.DISCOUNT)));
 
@@ -1040,10 +1137,11 @@ public class ArticleServerCom4j implements IArticleServer
 			}
 			else
 			{
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen).");
+				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen).";
+				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
 				if (logService != null)
 				{
-					logService.log(LogService.LOG_INFO, status.getMessage());
+					logService.log(LogService.LOG_INFO, msg);
 				}
 			}
 		}
@@ -1055,7 +1153,7 @@ public class ArticleServerCom4j implements IArticleServer
 		if (status.getSeverity() == IStatus.OK)
 		{
 			final LogService logService = (LogService) this.logServiceTracker.getService();
-			if (this.galserve.do_delabholfach(position.getCode(), Math.abs(position.getQuantity())))
+			if (this.galserve.do_delabholfach(position.getSearchValue(), Math.abs(position.getQuantity())))
 			{
 				position.setProviderBooked(true);
 				this.updateCustomerAccount(position);
@@ -1068,10 +1166,11 @@ public class ArticleServerCom4j implements IArticleServer
 			else
 			{
 				String error = (String) this.galserve.crgerror();
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + error + ").");
+				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + error + ").";
+				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
 				if (logService != null)
 				{
-					logService.log(LogService.LOG_INFO, status.getMessage());
+					logService.log(LogService.LOG_INFO, msg);
 				}
 			}
 		}
@@ -1084,7 +1183,8 @@ public class ArticleServerCom4j implements IArticleServer
 		IStatus status = this.setProviderValues(position);
 		if (status.getSeverity() == IStatus.OK)
 		{
-			status = doVerkauf(position, status);
+			status = this.doVerkauf(position, status);
+			status = this.doDelAbholfach(position, status);
 		}
 		return status;
 	}
@@ -1113,8 +1213,15 @@ public class ArticleServerCom4j implements IArticleServer
 				{
 					log.log(LogService.LOG_INFO, "Aktualisiere Artikeldaten aus Warenbewirtschaftung.");
 				}
-				this.setProduct(barcode, position);
-				value = position.getProduct().getAuthorAndTitleShortForm();
+				if (barcode.isEbook())
+				{
+					this.setEbookProduct(barcode, position);
+				}
+				else
+				{
+					this.setProduct(barcode, position);
+					value = position.getProduct().getAuthorAndTitleShortForm();
+				}
 				break;
 			}
 			case ORDER:

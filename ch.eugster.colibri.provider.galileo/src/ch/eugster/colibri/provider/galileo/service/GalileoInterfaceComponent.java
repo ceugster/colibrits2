@@ -278,6 +278,12 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		properties.put(EventConstants.EVENT_TOPIC, topic);
 		properties.put(EventConstants.BUNDLE_ID, Activator.PLUGIN_ID);
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		if (status.getException() != null)
+		{
+			properties.put(EventConstants.EXCEPTION, status.getException());
+			properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage() == null ? "" : status.getException().getMessage());
+			properties.put("message", "Die Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
+		}
 		properties.put("status", status);
 		for (ProviderInterface.Topic t : ProviderInterface.Topic.values())
 		{
