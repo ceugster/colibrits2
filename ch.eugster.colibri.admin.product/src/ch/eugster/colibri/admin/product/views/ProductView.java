@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -305,6 +306,32 @@ public class ProductView extends AbstractEntityView implements IDoubleClickListe
 		treeColumn = treeViewerColumn.getColumn();
 		treeColumn.setResizable(true);
 		treeColumn.setText("Spezialkonto");
+
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				treeViewerColumn = new TreeViewerColumn(this.viewer, SWT.NONE);
+				treeViewerColumn.setLabelProvider(new CellLabelProvider()
+				{
+					@Override
+					public void update(final ViewerCell cell)
+					{
+						final Object object = cell.getElement();
+						if (object instanceof ProductGroup)
+						{
+							ProductGroup productGroup = (ProductGroup) object;
+							cell.setText(productGroup.getMappingId());
+						}
+					}
+				});
+				treeColumn = treeViewerColumn.getColumn();
+				treeColumn.setResizable(true);
+				treeColumn.setText("Export");
+				break;
+			}
+		}
 
 		final ProviderConfigurator providerConfigurator = (ProviderConfigurator) this.providerConfiguratorTracker
 				.getService();
