@@ -110,6 +110,9 @@ public class SettlementServiceComponent implements SettlementService
 					settlement.setTimestamp(settlement.getSettled());
 					settlement.setUser(settlement.getUser());
 					updateStocks(settlement);
+					ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+					int result = query.removeParked(settlement.getSalespoint());
+					System.out.println(result);
 				}
 				settlement = (Settlement) persistenceService.getCacheService().merge(settlement);
 			}
@@ -456,61 +459,4 @@ public class SettlementServiceComponent implements SettlementService
 		final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
 		return query.countSavedBySettlement(settlement);
 	}
-
-//	private Collection<Receipt> selectReceipts(final Settlement settlement)
-//	{
-//		final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
-//		return query.selectSavedBySettlement(settlement);
-//	}
-//
-//	private Element prepareExport(Settlement settlement)
-//	{
-//		Element root = new Element("transfer");
-//		root.setAttribute("salespoint", settlement.getSalespoint().getMapping()); //$NON-NLS-1$
-//		root.setAttribute("date", Long.valueOf(settlement.getTimestamp().getTimeInMillis()).toString());
-//		root.setAttribute("count", Long.valueOf(settlement.getReceiptCount()).toString()); //$NON-NLS-1$
-//		return root;
-//	}
-//	
-//	private void saveExport(Element root)
-//	{
-//		if (root instanceof Element)
-//		{
-//			File dir = new File(path);
-//			if (dir.exists() && dir.isDirectory())
-//			{
-//				String name = dir.getAbsolutePath() + File.separator + root.getAttributeValue("salespoint") + //$NON-NLS-1$
-//								root.getAttributeValue("date") + //$NON-NLS-1$
-//								".xml"; //$NON-NLS-1$
-//				try
-//				{
-//					File file = new File(name);
-//					if (!file.exists())
-//					{
-//						file.createNewFile();
-//					}
-//					OutputStream out = new FileOutputStream(file);
-//					Document doc = new Document(root);
-//					doc.setDocType(new DocType("transfer", "transfer.dtd")); //$NON-NLS-1$ //$NON-NLS-2$
-//					XMLOutputter xmlOut = new XMLOutputter();
-//					xmlOut.output(doc, out);
-//					out.close();
-//				}
-//				catch (FileNotFoundException e)
-//				{
-//					//					LogManager.getLogManager().getLogger("colibri").severe(e.getLocalizedMessage()); //$NON-NLS-1$
-//				}
-//				catch (IOException e)
-//				{
-//					//					LogManager.getLogManager().getLogger("colibri").severe(e.getLocalizedMessage()); //$NON-NLS-1$
-//				}
-//			}
-//		}
-//	}
-//	
-//	private void updateReceipt(Element root, Receipt receipt)
-//	{
-//		root.addContent(receipt.buildJDOMElement(true));
-//	}
-//	
 }

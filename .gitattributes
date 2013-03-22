@@ -1858,7 +1858,6 @@ ch.eugster.colibri.settlement/build.properties -text
 ch.eugster.colibri.settlement/lib/jdom-1.1.2.jar -text
 ch.eugster.colibri.settlement/src/ch/eugster/colibri/settlement/Activator.java -text
 ch.eugster.colibri.settlement/src/ch/eugster/colibri/settlement/SettlementServiceComponent.java -text
-ch.eugster.colibri.settlement/transfer.dtd -text
 ch.eugster.colibri.ui.feature/.project -text
 ch.eugster.colibri.ui.feature/build.properties -text
 ch.eugster.colibri.ui.feature/feature.xml -text

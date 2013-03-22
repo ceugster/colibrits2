@@ -5,5 +5,5 @@
    <service>
       <provide interface="ch.eugster.colibri.persistence.service.SettlementService"/>
    </service>
-   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>ervice"/>
 </scr:component>
