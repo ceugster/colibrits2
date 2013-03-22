@@ -114,67 +114,75 @@ public class ProviderUpdateSchedulerComponent implements ProviderUpdateScheduler
 				ProviderProperty property = properties.get(SchedulerProperty.SCHEDULER_RECEIPT_COUNT.key());
 				int count = Integer.valueOf(property.getValue()).intValue();
 				final Position[] positions = query.selectProviderUpdates(count).toArray(new Position[0]);
-				for (Position position : positions)
+				if (positions.length > 0)
 				{
-					if (monitor.isCanceled())
+					for (Position position : positions)
 					{
-						status = Status.CANCEL_STATUS;
-						break;
-					}
-					else
-					{
-						
-						status = Status.OK_STATUS;
-						final IStatus state = ProviderUpdateSchedulerComponent.this.providerInterface
-								.updateProvider(position);
-						if ((state.getSeverity() == IStatus.OK) || (state.getSeverity() == IStatus.ERROR))
+						if (monitor.isCanceled())
 						{
-							status = state;
-						}
-						if (status.getSeverity() == IStatus.OK)
-						{
-//							position = (Position) ProviderUpdateSchedulerComponent.this.persistenceService
-//									.getCacheService().refresh(position);
-							
-							position = (Position) ProviderUpdateSchedulerComponent.this.persistenceService
-									.getCacheService().merge(position);
-						}
-					}
-				}
-
-				if (ProviderUpdateSchedulerComponent.this.eventAdmin instanceof EventAdmin)
-				{
-					final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-					properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundleContext().getBundle());
-					properties.put(EventConstants.BUNDLE_ID,
-							Long.valueOf(Activator.getDefault().getBundleContext().getBundle().getBundleId()));
-					properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
-					properties.put(EventConstants.SERVICE,
-							ProviderUpdateSchedulerComponent.this.context.getServiceReference());
-					properties.put(EventConstants.SERVICE_ID, ProviderUpdateSchedulerComponent.this.context
-							.getProperties().get("component.id"));
-					properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-					properties.put(EventConstants.SERVICE_PID, ProviderUpdateSchedulerComponent.this.context
-							.getProperties().get("component.name"));
-					properties
-							.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
-					properties.put("status", status);
-					ProviderInterface.Topic topic = null;
-					for (ProviderInterface.Topic t : ProviderInterface.Topic.values())
-					{
-						if (status.getMessage().equals(t.topic()))
-						{
-							topic = t;
+							status = Status.CANCEL_STATUS;
 							break;
 						}
+						else
+						{
+							
+							status = Status.OK_STATUS;
+							final IStatus state = ProviderUpdateSchedulerComponent.this.providerInterface
+									.updateProvider(position);
+							if ((state.getSeverity() == IStatus.OK) || (state.getSeverity() == IStatus.ERROR))
+							{
+								status = state;
+							}
+							if (status.getSeverity() == IStatus.OK)
+							{
+//								position = (Position) ProviderUpdateSchedulerComponent.this.persistenceService
+//										.getCacheService().refresh(position);
+								
+								position = (Position) ProviderUpdateSchedulerComponent.this.persistenceService
+										.getCacheService().merge(position);
+							}
+						}
 					}
-					if (topic == null)
+
+					if (ProviderUpdateSchedulerComponent.this.eventAdmin instanceof EventAdmin)
 					{
-						topic = ProviderInterface.Topic.ARTICLE_UPDATE;
+						final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+						properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundleContext().getBundle());
+						properties.put(EventConstants.BUNDLE_ID,
+								Long.valueOf(Activator.getDefault().getBundleContext().getBundle().getBundleId()));
+						properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+						properties.put(EventConstants.SERVICE,
+								ProviderUpdateSchedulerComponent.this.context.getServiceReference());
+						properties.put(EventConstants.SERVICE_ID, ProviderUpdateSchedulerComponent.this.context
+								.getProperties().get("component.id"));
+						properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
+						properties.put(EventConstants.SERVICE_PID, ProviderUpdateSchedulerComponent.this.context
+								.getProperties().get("component.name"));
+						properties
+								.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+						if (status.getException() != null)
+						{
+							properties.put(EventConstants.EXCEPTION, status.getException());
+							properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage());
+						}
+						properties.put("status", status);
+						ProviderInterface.Topic topic = null;
+						for (ProviderInterface.Topic t : ProviderInterface.Topic.values())
+						{
+							if (status.getMessage().equals(t.topic()))
+							{
+								topic = t;
+								break;
+							}
+						}
+						if (topic == null)
+						{
+							topic = ProviderInterface.Topic.ARTICLE_UPDATE;
+						}
+						properties.put("topic", topic);
+						final Event event = new Event(topic.topic(), properties);
+						ProviderUpdateSchedulerComponent.this.eventAdmin.sendEvent(event);
 					}
-					properties.put("topic", topic);
-					final Event event = new Event(topic.topic(), properties);
-					ProviderUpdateSchedulerComponent.this.eventAdmin.sendEvent(event);
 				}
 			}
 			finally
