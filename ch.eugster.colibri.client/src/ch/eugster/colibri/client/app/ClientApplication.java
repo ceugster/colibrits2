@@ -62,7 +62,7 @@ public class ClientApplication implements IApplication
 			if (replicationService != null)
 			{
 				Shell shell = new Shell(display);
-				replicationService.replicate(shell);
+				replicationService.replicate(shell, false);
 			}
 		}
 		finally
