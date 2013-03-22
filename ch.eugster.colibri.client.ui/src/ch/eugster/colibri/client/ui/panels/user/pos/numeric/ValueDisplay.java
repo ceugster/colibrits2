@@ -171,7 +171,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 			return;
 		}
 
-		if ("0123456789.".indexOf(event.getKeyChar()) > -1)
+		if ("E0123456789.".indexOf(event.getKeyChar()) > -1)
 		{
 			this.addChar(event.getKeyChar());
 		}

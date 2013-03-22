@@ -97,18 +97,21 @@ public class TotalSalesAction extends ConfigurableAction
 
 	protected boolean getState(final StateChangeEvent event)
 	{
-		boolean enabled = false;
-		final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-				PersistenceService.class, null);
-		serviceTracker.open();
-		try
+		boolean enabled = super.getState(event);
+		if (enabled)
 		{
-			final PersistenceService service = (PersistenceService) serviceTracker.getService();
-			enabled = service != null && service.getServerService().isConnected();
-		}
-		finally
-		{
-			serviceTracker.close();
+			final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+					PersistenceService.class, null);
+			serviceTracker.open();
+			try
+			{
+				final PersistenceService service = (PersistenceService) serviceTracker.getService();
+				enabled = service != null && service.getServerService().isConnected();
+			}
+			finally
+			{
+				serviceTracker.close();
+			}
 		}
 		return enabled;
 	}

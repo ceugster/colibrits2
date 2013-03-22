@@ -53,8 +53,10 @@ import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Profile.PanelType;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.Role;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.User;
+import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.ui.actions.BasicAction;
 
 public class UserPanel extends MainPanel implements StateChangeProvider, StateChangeListener, PropertyChangeListener,
@@ -369,7 +371,8 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			((CardLayout) this.leftPanel.getLayout()).show(this.leftPanel, UserPanel.PANEL_PARKED_RECEIPTS);
 		}
 		else if (this.currentState.equals(UserPanel.State.PAYMENT_INPUT)
-				|| this.currentState.equals(UserPanel.State.POSITION_INPUT))
+				|| this.currentState.equals(UserPanel.State.POSITION_INPUT)
+						|| this.currentState.equals(UserPanel.State.MUST_SETTLE))
 		{
 			((CardLayout) this.leftPanel.getLayout()).show(this.leftPanel, UserPanel.PANEL_LEFT_POS);
 			((CardLayout) this.rightPanel.getLayout()).show(this.rightPanel, UserPanel.PANEL_RIGHT_POS);
@@ -434,6 +437,10 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			if (newState.equals(UserPanel.State.COIN_COUNTER))
 			{
 				this.showCoinCounterPanel();
+			}
+			else if (newState.equals(UserPanel.State.MUST_SETTLE))
+			{
+				this.showPositionPanels();
 			}
 			else if (newState.equals(UserPanel.State.PARKED_RECEIPTS_LIST))
 			{
@@ -605,12 +612,36 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 
 		this.addStateChangeListener(this);
 		this.addStateChangeListener(this.valueDisplay);
+
 		this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.POSITION_INPUT));
+		if (this.getSalespoint().settlementRequired())
+		{
+			this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.MUST_SETTLE));
+		}
 	}
 
 	public enum State
 	{
-		POSITION_INPUT, PAYMENT_INPUT, RECEIPTS_LIST, PARKED_RECEIPTS_LIST, COIN_COUNTER, LOCKED;
+		POSITION_INPUT, PAYMENT_INPUT, RECEIPTS_LIST, PARKED_RECEIPTS_LIST, COIN_COUNTER, LOCKED, MUST_SETTLE;
+
+		public boolean configurableActionState()
+		{
+			switch (this)
+			{
+			case POSITION_INPUT:
+			{
+				return true;
+			}
+			case PAYMENT_INPUT:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+			}
+		}
 	}
 
 }

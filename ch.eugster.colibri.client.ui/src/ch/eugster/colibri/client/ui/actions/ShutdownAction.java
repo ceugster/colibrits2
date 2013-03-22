@@ -14,8 +14,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
+import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
+import ch.eugster.colibri.persistence.model.key.FunctionType;
 
 public final class ShutdownAction extends ConfigurableAction
 {

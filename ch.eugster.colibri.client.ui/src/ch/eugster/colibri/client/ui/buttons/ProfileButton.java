@@ -17,6 +17,7 @@ import org.osgi.service.event.EventHandler;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.persistence.events.EntityMediator;
 import ch.eugster.colibri.persistence.model.Profile;
+import ch.eugster.colibri.provider.service.ProviderInterface;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 import ch.eugster.colibri.ui.buttons.AbstractProfileButton;
 
@@ -53,6 +54,10 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
 		}
+		else
+		{
+			this.update(false);
+		}
 	}
 
 	private void init()
@@ -61,7 +66,7 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = new String[] { "ch/eugster/colibri/provider/failover" };
+		final String[] topics = ProviderInterface.Topic.topics();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);

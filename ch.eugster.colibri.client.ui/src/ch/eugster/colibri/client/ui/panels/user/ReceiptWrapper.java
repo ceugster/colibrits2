@@ -253,18 +253,18 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				final PersistenceService persistenceService = (PersistenceService) ReceiptWrapper.this.persistenceServiceTracker.getService();
 				if (persistenceService != null)
 				{
-					Long receiptId = ReceiptWrapper.this.receipt.getId();
+//					Long receiptId = ReceiptWrapper.this.receipt.getId();
 					ReceiptWrapper.this.receipt = (Receipt) persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
 					ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
 					
-					if (receiptId == null)
-					{
+//					if (receiptId == null)
+//					{
 						ReceiptWrapper.this.prepareReceipt();
 						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
 						ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
 						ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
 								UserPanel.State.POSITION_INPUT));
-					}
+//					}
 				}
 				return Status.OK_STATUS;
 			}

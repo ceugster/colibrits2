@@ -12,11 +12,15 @@ import java.awt.Panel;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JRootPane;
 import javax.swing.event.ChangeEvent;
@@ -44,6 +48,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -59,12 +64,16 @@ import ch.eugster.colibri.client.ui.events.ShutdownListener;
 import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.persistence.events.EntityMediator;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
+import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
+import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
+import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -90,6 +99,10 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private StatusLineContributionItem customerInformation;
 
+	private StatusLineContributionItem timeInformation;
+
+	private Timer timer;
+	
 	private StatusLineContributionItem providerInformation;
 
 	private StatusLineContributionItem transferInformation;
@@ -98,6 +111,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
+	private boolean showFailoverMessage = true;
+	
 	public boolean addShutdownListener(final ShutdownListener listener)
 	{
 		return this.shutdownListeners.add(listener);
@@ -126,6 +141,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					errors = errors.append(this.checkReferenceCurrency(salespoint));
 					errors = errors.append(this.checkDefaultProductGroup(salespoint));
 					errors = errors.append(this.checkPayedInvoice(salespoint));
+					errors = errors.append(this.checkExport(salespoint));
 
 					final ServiceTracker<ProviderIdService, ProviderIdService> tracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle()
 							.getBundleContext(), ProviderIdService.class, null);
@@ -163,9 +179,43 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		}
 	}
 
+	private String checkExport(Salespoint salespoint) 
+	{
+		StringBuilder msg = new StringBuilder();
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (salespoint.getMapping() == null || salespoint.getMapping().isEmpty())
+				{
+					msg = msg.append("Es wurde noch keine ExportId für die aktuelle Kasse definiert\n");
+				}
+				PersistenceService service = persistenceServiceTracker.getService();
+				ProductGroupQuery productGroupQuery = (ProductGroupQuery) service.getCacheService().getQuery(ProductGroup.class);
+				long count = productGroupQuery.countWithoutMapping();
+				if (count > 0L)
+				{
+					msg = msg.append("Für " + count + " Warengruppe/n sind noch keine ExportId's definiert\n");
+				}
+				PaymentTypeQuery paymentTypeQuery = (PaymentTypeQuery) service.getCacheService().getQuery(PaymentType.class);
+				count = paymentTypeQuery.countWithoutMapping();
+				if (count > 0L)
+				{
+					msg = msg.append("Für " + count + " Zahlungsarten/n sind noch keine ExportId's definiert\n");
+				}
+			}
+		}
+		return msg.toString();
+	}
+
 	@Override
 	public void dispose()
 	{
+		if (this.timer != null)
+		{
+			this.timer.cancel();
+		}
 		this.eventHandlerServiceRegistration.unregister();
 		this.providerServiceTracker.close();
 		this.persistenceServiceTracker.close();
@@ -196,62 +246,86 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/print/error"))
+		if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
 		{
-			final IStatus status = (IStatus) event.getProperty("status");
-			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
-					: status.getMessage();
-			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
-					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
-		}
-		else if (event.getTopic().equals("ch/eugster/colibri/display/error"))
-		{
-			final IStatus status = (IStatus) event.getProperty("status");
-			final String message = status.getMessage() == null ? "Das Kundendisplay kann nicht angesprochen werden"
-					: status.getMessage();
-			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
-					.getProfile(), "Problem mit Kundendisplay", message, MessageDialog.TYPE_ERROR);
+			if (showFailoverMessage)
+			{
+				showFailoverMessage = false;
+				final IStatus status = (IStatus) event.getProperty("status");
+				if (status.getException() != null)
+				{
+					final String message = (String) event.getProperty("message");
+					if (message != null)
+					{
+						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
+						dialog.setMessage(message);
+						dialog.pack();
+						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
+						dialog.setVisible(true);
+					}
+				}
+				this.updateProviderMessage(event);
+			}
+//			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+//					.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
 		}
 		else
 		{
-			if (this.transferInformation != null)
+			showFailoverMessage = true;
+			if (event.getTopic().equals("ch/eugster/colibri/print/error"))
 			{
-				final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-						.getService();
-				if (persistenceService != null)
+				final IStatus status = (IStatus) event.getProperty("status");
+				final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
+						: status.getMessage();
+				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
+						.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
+			}
+			else if (event.getTopic().equals("ch/eugster/colibri/display/error"))
+			{
+				final IStatus status = (IStatus) event.getProperty("status");
+				final String message = status.getMessage() == null ? "Das Kundendisplay kann nicht angesprochen werden"
+						: status.getMessage();
+				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
+						.getProfile(), "Problem mit Kundendisplay", message, MessageDialog.TYPE_ERROR);
+			}
+			else
+			{
+				if (this.transferInformation != null)
 				{
-					if (!persistenceService.getServerService().isLocal())
+					final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
+							.getService();
+					if (persistenceService != null)
 					{
-						if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+						if (!persistenceService.getServerService().isLocal())
 						{
-							this.updateTransferMessage(event);
-						}
-						else if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
-						{
-							this.updateTransferMessage(event);
+							if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+							{
+								this.updateTransferMessage(event);
+							}
+							else if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+							{
+								this.updateTransferMessage(event);
+							}
 						}
 					}
 				}
-			}
-			if (this.providerInformation != null)
-			{
-				if (this.providerServiceTracker.getService() != null)
+				if (this.providerInformation != null)
 				{
-					if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+					if (this.providerServiceTracker.getService() != null)
 					{
-						this.updateProviderMessage(event);
-					}
-					else if (event.getTopic().equals(ProviderInterface.Topic.ARTICLE_UPDATE.topic()))
-					{
-						this.updateProviderMessage(event);
-					}
-					else if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic()))
-					{
-						this.updateProviderMessage(event);
-					}
-					else if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
-					{
-						this.updateProviderMessage(event);
+						if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+						{
+							this.updateProviderMessage(event);
+						}
+						else if (event.getTopic().equals(ProviderInterface.Topic.ARTICLE_UPDATE.topic()))
+						{
+							this.updateProviderMessage(event);
+						}
+						else if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic()))
+						{
+							this.updateProviderMessage(event);
+						}
 					}
 				}
 			}
@@ -457,6 +531,10 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 		EntityMediator.addListener(Salespoint.class, this.mainTabbedPane);
 
+		this.timeInformation = new StatusLineContributionItem("time.information", true, 48);
+		this.timeInformation.setText("");
+		this.getViewSite().getActionBars().getStatusLineManager().add(this.timeInformation);
+
 		this.customerInformation = new StatusLineContributionItem("customer.information", true, 48);
 		// this.customerInformation = new
 		// StatusLineContributionItem("customer.information", 48);
@@ -507,6 +585,29 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		}
 		this.getViewSite().getActionBars().getStatusLineManager().add(this.transferInformation);
 		this.sendEvent("ch/eugster/colibri/client/started");
+		
+		startTimer();
+	}
+	
+	private void startTimer()
+	{
+		timer = new Timer();
+		TimerTask task = new TimerTask() 
+		{
+			@Override
+			public void run() 
+			{
+				ClientView.this.getSite().getShell().getDisplay().asyncExec(new Runnable() 
+				{
+					@Override
+					public void run() 
+					{
+						timeInformation.setText(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+					}
+				});
+			}
+		};
+		timer.scheduleAtFixedRate(task, 0, 1000);
 	}
 
 	private void createErrorControl(final Composite parent, final String messages)

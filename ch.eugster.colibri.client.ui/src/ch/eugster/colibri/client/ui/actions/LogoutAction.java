@@ -8,9 +8,11 @@ package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
 
+import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
+import ch.eugster.colibri.persistence.model.key.FunctionType;
 
 public class LogoutAction extends ConfigurableAction
 {
@@ -26,4 +28,11 @@ public class LogoutAction extends ConfigurableAction
 	{
 		MainTabbedPane.getTabbedPane().removeUserPanel(userPanel);
 	}
+
+	protected boolean getState(final StateChangeEvent event)
+	{
+		boolean state = super.getState(event); 
+		return event.getNewState().equals(UserPanel.State.MUST_SETTLE) ? true : state;
+	}
 }
+

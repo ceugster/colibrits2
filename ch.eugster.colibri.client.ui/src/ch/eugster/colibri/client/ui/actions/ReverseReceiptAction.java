@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -26,6 +27,7 @@ import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.RoleProperty;
+import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
 
@@ -41,6 +43,8 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 
 	private final CurrentReceiptListSelectionModel selectionModel;
 
+	private PrintReceiptAction printReceiptAction;
+	
 	public ReverseReceiptAction(final UserPanel userPanel, final Profile profile,
 			final CurrentReceiptListModel tableModel, final CurrentReceiptListSelectionModel selectionModel)
 	{
@@ -73,10 +77,21 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 				receipt.setTransferred(false);
 				this.tableModel.setReceipt((Receipt) persistenceService.getCacheService().merge(receipt, false),
 						this.selectionModel.getMinSelectionIndex());
+
+				if (this.printReceiptAction != null)
+				{
+					this.printReceiptAction.actionPerformed(e);
+				}
+
 				this.tableModel.fireTableDataChanged();
 			}
 			serviceTracker.close();
 		}
+	}
+	
+	public void addPrintReceiptAction(PrintReceiptAction action)
+	{
+		this.printReceiptAction = action;
 	}
 
 	@Override

@@ -370,7 +370,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		if (providerInterface != null)
 		{
 			final IStatus status = providerInterface.findAndRead(barcode, this.position);
-			if (status.equals(Status.CANCEL_STATUS))
+			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
 						.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
@@ -425,6 +425,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 					barcode = ((BarcodeVerifier) barcodeVerifier).verify(code);
 					if (barcode != null)
 					{
+						barcode.updatePosition(position);
 						break;
 					}
 				}

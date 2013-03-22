@@ -27,6 +27,7 @@ import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
@@ -64,25 +65,32 @@ public class ShowCoinCounterPanelAction extends ConfigurableAction implements Ev
 
 	protected boolean getState(final StateChangeEvent event)
 	{
-		boolean enabled = false;
-		final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-				PersistenceService.class, null);
-		serviceTracker.open();
-		try
+		boolean enabled = super.getState(event);
+		if (event.getNewState().equals(UserPanel.State.MUST_SETTLE))
 		{
-			final PersistenceService service = (PersistenceService) serviceTracker.getService();
-			if (service.getServerService().isConnected())
-			{
-				enabled = countRemainingReceipts() == 0L;
-			}
-			else
-			{
-				enabled = false;
-			}
+			enabled = userPanel.getUser().getRole().getPropertyValue(FunctionType.FUNCTION_SHOW_COIN_COUNTER_PANEL.key());
 		}
-		finally
+		if (enabled)
 		{
-			serviceTracker.close();
+			final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+					PersistenceService.class, null);
+			serviceTracker.open();
+			try
+			{
+				final PersistenceService service = (PersistenceService) serviceTracker.getService();
+				if (service.getServerService().isConnected())
+				{
+					enabled = countRemainingReceipts() == 0L;
+				}
+				else
+				{
+					enabled = false;
+				}
+			}
+			finally
+			{
+				serviceTracker.close();
+			}
 		}
 		return enabled;
 	}

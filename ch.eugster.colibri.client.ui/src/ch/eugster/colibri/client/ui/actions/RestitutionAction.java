@@ -85,12 +85,15 @@ public class RestitutionAction extends ConfigurableAction implements PropertyCha
 	@Override
 	public boolean getState(final StateChangeEvent event)
 	{
-		if (event.getNewState().equals(UserPanel.State.POSITION_INPUT))
+		boolean enabled = super.getState(event);
+		if (enabled)
 		{
-			return this.shouldEnable();
+			if (event.getNewState().equals(UserPanel.State.POSITION_INPUT))
+			{
+				enabled = this.shouldEnable();
+			}
 		}
-
-		return false;
+		return enabled;
 	}
 
 	@Override

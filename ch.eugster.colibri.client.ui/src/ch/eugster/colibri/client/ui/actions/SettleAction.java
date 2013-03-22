@@ -94,7 +94,7 @@ public class SettleAction extends ProfileAction
 					{
 						Salespoint salespoint = service.updateSettlement(settlement.getSalespoint());
 						this.coinCounterPanel.getUserPanel().setSalespoint(salespoint);
-						this.coinCounterPanel.getUserPanel().setSalespoint(salespoint);
+//						this.coinCounterPanel.getUserPanel().setSalespoint(salespoint);
 						this.coinCounterPanel.clear();
 						this.coinCounterPanel.getUserPanel().fireStateChange(
 								new StateChangeEvent(coinCounterPanel.getUserPanel().getCurrentState(),

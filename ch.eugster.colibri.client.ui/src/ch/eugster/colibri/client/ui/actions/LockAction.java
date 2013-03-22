@@ -13,6 +13,8 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
+import ch.eugster.colibri.persistence.model.key.FunctionType;
+import ch.eugster.colibri.persistence.model.key.KeyType;
 
 public class LockAction extends ConfigurableAction
 {
@@ -45,4 +47,15 @@ public class LockAction extends ConfigurableAction
 			userPanel.fireStateChange(new StateChangeEvent(userPanel.getCurrentState(), UserPanel.State.LOCKED));
 		}
 	}
+
+	protected boolean getState(final StateChangeEvent event)
+	{
+		boolean state = super.getState(event); 
+		if (event.getNewState().equals(UserPanel.State.LOCKED))
+		{
+			state = true;
+		}
+		return event.getNewState().equals(UserPanel.State.MUST_SETTLE) ? false : state;
+	}
+
 }

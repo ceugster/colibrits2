@@ -42,28 +42,32 @@ public class OptionAction extends ConfigurableAction
 	@Override
 	protected boolean getState(final StateChangeEvent event)
 	{
-		final ProductGroup productGroup = this.userPanel.getPositionWrapper().getPosition().getProductGroup();
-		if (productGroup == null)
+		boolean enabled = super.getState(event);
+		if (enabled)
 		{
-			return true;
-		}
-		else
-		{
-			final ProductGroupType productGroupType = productGroup.getProductGroupType();
-			if (productGroup.equals(productGroup.getCommonSettings().getPayedInvoice()))
+			final ProductGroup productGroup = this.userPanel.getPositionWrapper().getPosition().getProductGroup();
+			if (productGroup == null)
 			{
-				return false;
+				return true;
 			}
-
-			final Option[] options = productGroupType.getOptions();
-			for (final Option option : options)
+			else
 			{
-				if (this.option.equals(option))
+				final ProductGroupType productGroupType = productGroup.getProductGroupType();
+				if (productGroup.equals(productGroup.getCommonSettings().getPayedInvoice()))
 				{
-					return true;
+					enabled = false;
+				}
+
+				final Option[] options = productGroupType.getOptions();
+				for (final Option option : options)
+				{
+					if (this.option.equals(option))
+					{
+						enabled = true;
+					}
 				}
 			}
-			return false;
 		}
+		return enabled;
 	}
 }

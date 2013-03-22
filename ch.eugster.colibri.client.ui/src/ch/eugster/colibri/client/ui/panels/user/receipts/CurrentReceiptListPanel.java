@@ -207,6 +207,7 @@ public class CurrentReceiptListPanel extends ProfilePanel implements TableModelL
 		final ReverseReceiptAction reverseAction = new ReverseReceiptAction(userPanel, profile,
 				(CurrentReceiptListModel) table.getModel(),
 				(CurrentReceiptListSelectionModel) table.getSelectionModel());
+		reverseAction.addPrintReceiptAction(printAction);
 		reverseButton = new ProfileButton(reverseAction, profile);
 		table.getSelectionModel().addListSelectionListener(reverseAction);
 		table.getModel().addTableModelListener(reverseAction);

@@ -80,12 +80,8 @@ public class StoreReceiptExpressAction extends ConfigurableAction implements Pro
 	@Override
 	public boolean getState(final StateChangeEvent event)
 	{
-		if (event.getNewState().equals(UserPanel.State.LOCKED))
-		{
-			return false;
-		}
-
-		return this.shouldEnable();
+		boolean enabled = super.getState(event);
+		return enabled ? this.shouldEnable() : false;
 	}
 
 	@Override

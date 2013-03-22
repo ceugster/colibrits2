@@ -47,53 +47,42 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 	@Override
 	public final void stateChange(final StateChangeEvent event)
 	{
-		boolean state = false;
-		if (key.getKeyType().equals(KeyType.FUNCTION))
+		if (this.key.getFunctionType() == FunctionType.FUNCTION_LOGOUT)
 		{
-			final FunctionType functionType = key.getFunctionType();
-			if (functionType.isFailOverEnabled() || !true) // TODO
-			{
-				state = userPanel.getUser().getRole().getPropertyValue(functionType.key());
-			}
-			else
-			{
-				state = false;
-			}
-		}
-		else
-		{
-			final KeyType keyType = key.getKeyType();
-			state = userPanel.getUser().getRole().getPropertyValue(keyType.getActionCommand());
-		}
-		if (state == false)
-		{
-			setEnabled(false);
-		}
-		else if (event.getNewState().equals(UserPanel.State.LOCKED))
-		{
-			setEnabled(key.getKeyType().equals(KeyType.FUNCTION) && key.getFunctionType().equals(FunctionType.FUNCTION_LOCK));
-		}
-		else if (event.getNewState().equals(UserPanel.State.RECEIPTS_LIST))
-		{
-			setEnabled(false);
-		}
-		else if (event.getNewState().equals(UserPanel.State.PARKED_RECEIPTS_LIST))
-		{
-			setEnabled(false);
-		}
-		else
-		{
-			setEnabled(getState(event));
+			System.out.println();
 		}
 
+		setEnabled(getState(event));
 		firePropertyChange("state", event.getOldState(), event.getNewState());
 	}
 
 	protected boolean getState(final StateChangeEvent event)
 	{
-		return true;
+		UserPanel.State newState = event.getNewState();
+		boolean state = newState.configurableActionState();
+		if (state)
+		{
+			if (key.getKeyType().equals(KeyType.FUNCTION))
+			{
+				final FunctionType functionType = key.getFunctionType();
+				if (functionType.isFailOverEnabled() || !true) // TODO
+				{
+					state = userPanel.getUser().getRole().getPropertyValue(functionType.key());
+				}
+				else
+				{
+					state = false;
+				}
+			}
+			else
+			{
+				final KeyType keyType = key.getKeyType();
+				state = userPanel.getUser().getRole().getPropertyValue(keyType.getActionCommand());
+			}
+		}
+		return state;
 	}
-
+	
 	@Override
 	public void handleEvent(Event event) 
 	{

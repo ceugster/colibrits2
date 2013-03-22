@@ -68,7 +68,7 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = new String[] { ProviderInterface.Topic.PROVIDER_FAILOVER.topic() };
+		final String[] topics = ProviderInterface.Topic.topics();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);
@@ -106,6 +106,10 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 		{
 			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
+		}
+		else
+		{
+			this.update(false);
 		}
 	}
 
