@@ -22,7 +22,7 @@ public class TaxTypeReplicator extends AbstractEntityReplicator<TaxType>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -40,7 +40,7 @@ public class TaxTypeReplicator extends AbstractEntityReplicator<TaxType>
 			for (final TaxType source : sources)
 			{
 				TaxType target = (TaxType) this.persistenceService.getCacheService().find(TaxType.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

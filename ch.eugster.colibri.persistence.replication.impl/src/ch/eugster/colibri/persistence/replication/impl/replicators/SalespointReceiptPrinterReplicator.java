@@ -24,7 +24,7 @@ public class SalespointReceiptPrinterReplicator extends AbstractEntityReplicator
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -43,7 +43,7 @@ public class SalespointReceiptPrinterReplicator extends AbstractEntityReplicator
 			{
 				SalespointReceiptPrinterSettings target = (SalespointReceiptPrinterSettings) this.persistenceService.getCacheService().find(
 						SalespointReceiptPrinterSettings.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

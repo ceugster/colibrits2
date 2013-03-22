@@ -22,7 +22,7 @@ public class ReceiptPrinterReplicator extends AbstractEntityReplicator<ReceiptPr
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -39,7 +39,7 @@ public class ReceiptPrinterReplicator extends AbstractEntityReplicator<ReceiptPr
 			for (final ReceiptPrinterSettings source : sources)
 			{
 				ReceiptPrinterSettings target = (ReceiptPrinterSettings) this.persistenceService.getCacheService().find(ReceiptPrinterSettings.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

@@ -24,7 +24,7 @@ public class ConfigurableReplicator extends AbstractEntityReplicator<Configurabl
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -41,7 +41,7 @@ public class ConfigurableReplicator extends AbstractEntityReplicator<Configurabl
 			for (final Configurable source : sources)
 			{
 				Configurable target = (Configurable) this.persistenceService.getCacheService().find(Configurable.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

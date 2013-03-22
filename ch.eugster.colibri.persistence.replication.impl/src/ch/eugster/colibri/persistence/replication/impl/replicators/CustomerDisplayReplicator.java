@@ -22,7 +22,7 @@ public class CustomerDisplayReplicator extends AbstractEntityReplicator<Customer
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -40,7 +40,7 @@ public class CustomerDisplayReplicator extends AbstractEntityReplicator<Customer
 			for (final CustomerDisplaySettings source : sources)
 			{
 				CustomerDisplaySettings target = (CustomerDisplaySettings) this.persistenceService.getCacheService().find(CustomerDisplaySettings.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

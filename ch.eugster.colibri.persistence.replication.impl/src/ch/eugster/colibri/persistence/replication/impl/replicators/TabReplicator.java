@@ -23,7 +23,7 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -41,7 +41,7 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 			for (final Tab source : sources)
 			{
 				Tab target = (Tab) this.persistenceService.getCacheService().find(Tab.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

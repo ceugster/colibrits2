@@ -23,7 +23,7 @@ public class RolePropertyReplicator extends AbstractEntityReplicator<RolePropert
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -41,7 +41,7 @@ public class RolePropertyReplicator extends AbstractEntityReplicator<RolePropert
 			for (final RoleProperty source : sources)
 			{
 				RoleProperty target = (RoleProperty) this.persistenceService.getCacheService().find(RoleProperty.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

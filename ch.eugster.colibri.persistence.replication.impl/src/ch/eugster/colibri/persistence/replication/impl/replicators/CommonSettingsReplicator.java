@@ -24,7 +24,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -43,7 +43,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 			{
 				CommonSettings target = (CommonSettings) this.persistenceService.getCacheService().find(
 						CommonSettings.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{
@@ -177,6 +177,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 		target.setTransferRepeatDelay(source.getTransferRepeatDelay());
 		target.setTransferReceiptCount(source.getTransferReceiptCount());
 		target.setMaximizedClientWindow(source.isMaximizedClientWindow());
+		target.setForceSettlement(source.isForceSettlement());
 		return target;
 	}
 }

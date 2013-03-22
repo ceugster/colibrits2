@@ -23,7 +23,7 @@ public class KeyReplicator extends AbstractEntityReplicator<Key>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -41,7 +41,7 @@ public class KeyReplicator extends AbstractEntityReplicator<Key>
 			for (final Key source : sources)
 			{
 				Key target = (Key) this.persistenceService.getCacheService().find(Key.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

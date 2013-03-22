@@ -69,7 +69,7 @@ public class ReplicationServiceImpl implements ReplicationService
 	}
 	
 	@Override
-	public IStatus replicate(final Shell shell)
+	public IStatus replicate(final Shell shell, final boolean force)
 	{
 		IStatus status = Status.OK_STATUS;
 		if (!this.persistenceService.getServerService().isLocal())
@@ -80,7 +80,7 @@ public class ReplicationServiceImpl implements ReplicationService
 			}
 			if (this.persistenceService.getServerService().isConnected())
 			{
-				if (checkReplicationValue())
+				if (force || checkReplicationValue())
 				{
 					final IRunnableWithProgress runnable = new IRunnableWithProgress()
 					{
@@ -93,57 +93,57 @@ public class ReplicationServiceImpl implements ReplicationService
 								manager.beginRule(LocalDatabaseRule.getRule(), monitor);
 								monitor.beginTask("Die lokalen Daten werden abgeglichen...", 38);
 								new VersionReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new CurrencyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new PaymentTypeReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new MoneyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new RoleReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new UserReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new RolePropertyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new TaxRateReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new TaxTypeReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new TaxReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new CurrentTaxReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new TaxCodeMappingReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new CurrentTaxCodeMappingReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new TaxReplicator(ReplicationServiceImpl.this.persistenceService)
 										.setCurrentTaxes(new SubProgressMonitor(monitor, 1));
 
 								new ProfileReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new TabReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new KeyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
 										.setDefaultTabs(new SubProgressMonitor(monitor, 1));
 
 								new CommonSettingsReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new ProductGroupReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new ExternalProductGroupReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new ProductGroupMappingReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new ExternalProductGroupReplicator(ReplicationServiceImpl.this.persistenceService)
 										.setProductGroupMapping(new SubProgressMonitor(monitor, 1));
 
@@ -151,37 +151,37 @@ public class ReplicationServiceImpl implements ReplicationService
 										.update(new SubProgressMonitor(monitor, 1));
 
 								new SalespointReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new StockReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new CustomerDisplayReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new ReceiptPrinterReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new SalespointCustomerDisplayReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new SalespointReceiptPrinterReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new SalespointReplicator(ReplicationServiceImpl.this.persistenceService)
 										.updatePeriphery(new SubProgressMonitor(monitor, 1));
 
 								new PrintoutReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new PrintoutAreaReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new DisplayReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new DisplayAreaReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new SalespointReplicator(ReplicationServiceImpl.this.persistenceService)
 										.setPrintoutAndDisplay(new SubProgressMonitor(monitor, 1));
 
 								new ProviderPropertyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), force);
 								
 							}
 							finally

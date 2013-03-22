@@ -22,7 +22,7 @@ public class ProfileReplicator extends AbstractEntityReplicator<Profile>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -40,7 +40,7 @@ public class ProfileReplicator extends AbstractEntityReplicator<Profile>
 			for (final Profile source : sources)
 			{
 				Profile target = (Profile) this.persistenceService.getCacheService().find(Profile.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

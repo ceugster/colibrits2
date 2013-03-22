@@ -43,7 +43,7 @@ public class ReplicateHandler extends AbstractHandler implements IHandler
 									"Sollen die Daten in der lokalen Datenbank mit denjenigen der Serverdatenbank abgeglichen werden?"))
 					{
 
-						status = service.replicate(shell);
+						status = service.replicate(shell, true);
 						if (status.getSeverity() == IStatus.OK)
 						{
 							MessageDialog.openInformation(shell, "Replikation beendet",

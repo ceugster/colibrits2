@@ -23,7 +23,7 @@ public class TaxCodeMappingReplicator extends AbstractEntityReplicator<TaxCodeMa
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -41,7 +41,7 @@ public class TaxCodeMappingReplicator extends AbstractEntityReplicator<TaxCodeMa
 			for (final TaxCodeMapping source : sources)
 			{
 				TaxCodeMapping target = (TaxCodeMapping) this.persistenceService.getCacheService().find(TaxCodeMapping.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

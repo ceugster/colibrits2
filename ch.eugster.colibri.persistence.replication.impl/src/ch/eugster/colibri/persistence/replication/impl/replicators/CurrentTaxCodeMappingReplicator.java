@@ -23,7 +23,7 @@ public class CurrentTaxCodeMappingReplicator extends AbstractEntityReplicator<Cu
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -40,7 +40,7 @@ public class CurrentTaxCodeMappingReplicator extends AbstractEntityReplicator<Cu
 			for (final CurrentTaxCodeMapping source : sources)
 			{
 				CurrentTaxCodeMapping target = (CurrentTaxCodeMapping) this.persistenceService.getCacheService().find(CurrentTaxCodeMapping.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

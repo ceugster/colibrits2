@@ -23,7 +23,7 @@ public class CurrentTaxReplicator extends AbstractEntityReplicator<CurrentTax>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -40,7 +40,7 @@ public class CurrentTaxReplicator extends AbstractEntityReplicator<CurrentTax>
 			for (final CurrentTax source : sources)
 			{
 				CurrentTax target = (CurrentTax) this.persistenceService.getCacheService().find(CurrentTax.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

@@ -24,7 +24,7 @@ public class SalespointCustomerDisplayReplicator extends AbstractEntityReplicato
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -43,7 +43,7 @@ public class SalespointCustomerDisplayReplicator extends AbstractEntityReplicato
 			{
 				SalespointCustomerDisplaySettings target = (SalespointCustomerDisplaySettings) this.persistenceService.getCacheService().find(
 						SalespointCustomerDisplaySettings.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

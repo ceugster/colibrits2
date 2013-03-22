@@ -24,7 +24,7 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -43,7 +43,7 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 			for (final Printout source : parents)
 			{
 				Printout target = (Printout) this.persistenceService.getCacheService().find(Printout.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{
@@ -65,7 +65,7 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 			for (final Printout source : children)
 			{
 				Printout target = (Printout) this.persistenceService.getCacheService().find(Printout.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

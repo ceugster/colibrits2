@@ -22,7 +22,7 @@ public class CurrencyReplicator extends AbstractEntityReplicator<Currency>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -39,7 +39,7 @@ public class CurrencyReplicator extends AbstractEntityReplicator<Currency>
 			for (final Currency source : sources)
 			{
 				Currency target = (Currency) this.persistenceService.getCacheService().find(Currency.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

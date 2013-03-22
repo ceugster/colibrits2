@@ -20,7 +20,7 @@ public abstract class AbstractEntityReplicator<T extends AbstractEntity> impleme
 		this.persistenceService = persistenceService;
 	}
 
-	public abstract void replicate(IProgressMonitor monitor);
+	public abstract void replicate(IProgressMonitor monitor, boolean force);
 
 	protected abstract T replicate(T source);
 

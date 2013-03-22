@@ -24,7 +24,7 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -42,7 +42,7 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 			for (final Stock source : sources)
 			{
 				Stock target = (Stock) this.persistenceService.getCacheService().find(Stock.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

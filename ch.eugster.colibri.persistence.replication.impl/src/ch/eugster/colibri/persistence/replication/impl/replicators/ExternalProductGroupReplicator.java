@@ -25,7 +25,7 @@ public class ExternalProductGroupReplicator extends AbstractEntityReplicator<Ext
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -42,7 +42,7 @@ public class ExternalProductGroupReplicator extends AbstractEntityReplicator<Ext
 			for (final ExternalProductGroup source : sources)
 			{
 				ExternalProductGroup target = (ExternalProductGroup) this.persistenceService.getCacheService().find(ExternalProductGroup.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

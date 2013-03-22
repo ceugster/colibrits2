@@ -24,7 +24,7 @@ public class UserReplicator extends AbstractEntityReplicator<User>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -42,7 +42,7 @@ public class UserReplicator extends AbstractEntityReplicator<User>
 			for (final User source : sources)
 			{
 				User target = (User) this.persistenceService.getCacheService().find(User.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

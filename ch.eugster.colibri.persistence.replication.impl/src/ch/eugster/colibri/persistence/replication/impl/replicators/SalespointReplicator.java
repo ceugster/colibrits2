@@ -33,7 +33,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -52,7 +52,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 			{
 				Salespoint target = (Salespoint) this.persistenceService.getCacheService().find(Salespoint.class,
 						source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{
@@ -277,6 +277,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 			target.setProposalTax((Tax) this.persistenceService.getCacheService().find(Tax.class,
 					source.getProposalTax().getId()));
 		}
+		target.setForceSettlement(source.isForceSettlement());
 		return target;
 	}
 

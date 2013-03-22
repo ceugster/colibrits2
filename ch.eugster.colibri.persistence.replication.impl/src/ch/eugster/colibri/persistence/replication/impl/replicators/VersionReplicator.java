@@ -22,7 +22,7 @@ public class VersionReplicator extends AbstractEntityReplicator<Version>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 		int i = 0;
 
@@ -39,7 +39,7 @@ public class VersionReplicator extends AbstractEntityReplicator<Version>
 			for (final Version source : sources)
 			{
 				Version target = (Version) this.persistenceService.getCacheService().find(Version.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if (target == null || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{

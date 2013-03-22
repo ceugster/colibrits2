@@ -23,7 +23,7 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 	}
 
 	@Override
-	public void replicate(final IProgressMonitor monitor)
+	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
 
 		int i = 0;
@@ -41,7 +41,7 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 			for (final PaymentType source : sources)
 			{
 				PaymentType target = (PaymentType) this.persistenceService.getCacheService().find(PaymentType.class, source.getId());
-				if ((target == null) || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
 				{
 					if (target == null)
 					{
