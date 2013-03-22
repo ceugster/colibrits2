@@ -1729,7 +1729,8 @@ public class DatabaseMigrator extends AbstractConfigurator
 		{
 			version = Version.newInstance();
 		}
-		version.setMigrate(false);
+		version.setMigrate(true);
+		version.setReplicationValue(version.getReplicationValue() + 1);
 		this.getEntityManager().getTransaction().begin();
 		this.getEntityManager().merge(version);
 		this.getEntityManager().getTransaction().commit();

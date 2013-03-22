@@ -54,7 +54,7 @@ import ch.eugster.colibri.persistence.model.CommonSettings.HostnameResolver;
 import ch.eugster.pos.db.Salespoint;
 import ch.eugster.pos.db.Version;
 
-public class MigrationWizardPage extends WizardPage
+public class DatabaseWizardMigrationPage extends WizardPage
 {
 	private Text colibriPropertiesPath;
 
@@ -72,7 +72,7 @@ public class MigrationWizardPage extends WizardPage
 
 	private static final String STANDARD_COLIBRI_XML_PATH = "C:/Programme/ColibriTS/properties/colibri.xml";
 
-	public MigrationWizardPage(final String name)
+	public DatabaseWizardMigrationPage(final String name)
 	{
 		super(name);
 	}
@@ -92,7 +92,7 @@ public class MigrationWizardPage extends WizardPage
 	public void createControl(final Composite parent)
 	{
 		this.setTitle("Daten übernehmen");
-		this.setMessage(MigrationWizardPage.MESSAGE);
+		this.setMessage(DatabaseWizardMigrationPage.MESSAGE);
 		this.setDescription("Übernehmen der Daten aus der ColibriTS Vorgängerversion.");
 
 		final Composite composite = new Composite(parent, SWT.NONE);
@@ -105,7 +105,7 @@ public class MigrationWizardPage extends WizardPage
 
 		this.colibriPropertiesPath = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		this.colibriPropertiesPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final File file = new File(MigrationWizardPage.STANDARD_COLIBRI_XML_PATH);
+		final File file = new File(DatabaseWizardMigrationPage.STANDARD_COLIBRI_XML_PATH);
 		if (file.exists())
 		{
 			this.colibriPropertiesPath.setText(file.getAbsolutePath());
@@ -115,10 +115,10 @@ public class MigrationWizardPage extends WizardPage
 			@Override
 			public void modifyText(final ModifyEvent e)
 			{
-				final File file = new File(MigrationWizardPage.this.colibriPropertiesPath.getText());
+				final File file = new File(DatabaseWizardMigrationPage.this.colibriPropertiesPath.getText());
 				if (file.exists())
 				{
-					MigrationWizardPage.this.setPageComplete(MigrationWizardPage.this.checkOldColibri(file));
+					DatabaseWizardMigrationPage.this.setPageComplete(DatabaseWizardMigrationPage.this.checkOldColibri(file));
 				}
 			}
 
@@ -138,10 +138,10 @@ public class MigrationWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
-				final FileDialog dialog = new FileDialog(MigrationWizardPage.this.getShell());
+				final FileDialog dialog = new FileDialog(DatabaseWizardMigrationPage.this.getShell());
 				dialog.setFileName("colibri.xml");
 				dialog.setFilterExtensions(new String[] { "*.xml" });
-				final java.io.File properties = new java.io.File(MigrationWizardPage.this.colibriPropertiesPath
+				final java.io.File properties = new java.io.File(DatabaseWizardMigrationPage.this.colibriPropertiesPath
 						.getText());
 				dialog.setFilterPath(!properties.getAbsolutePath().isEmpty() && properties.exists() ? properties
 						.getAbsolutePath() : "");
@@ -149,11 +149,11 @@ public class MigrationWizardPage extends WizardPage
 				final String value = dialog.open();
 				if (value != null)
 				{
-					MigrationWizardPage.this.colibriPropertiesPath.setText(value);
+					DatabaseWizardMigrationPage.this.colibriPropertiesPath.setText(value);
 					final File file = new File(value);
 					if (file.exists())
 					{
-						MigrationWizardPage.this.setPageComplete(MigrationWizardPage.this.checkOldColibri(file));
+						DatabaseWizardMigrationPage.this.setPageComplete(DatabaseWizardMigrationPage.this.checkOldColibri(file));
 					}
 				}
 			}
@@ -200,7 +200,7 @@ public class MigrationWizardPage extends WizardPage
 				{
 					((Salespoint) event.getElement()).migrate = event.getChecked();
 				}
-				MigrationWizardPage.this.setPageComplete(MigrationWizardPage.this.validatePage());
+				DatabaseWizardMigrationPage.this.setPageComplete(DatabaseWizardMigrationPage.this.validatePage());
 			}
 		});
 		this.salespointViewer.getTable().setLayoutData(gridData);
@@ -257,7 +257,7 @@ public class MigrationWizardPage extends WizardPage
 
 		this.setControl(composite);
 	}
-
+	
 	public Document getColibriXmlDocument()
 	{
 		return this.document;
@@ -308,22 +308,22 @@ public class MigrationWizardPage extends WizardPage
 					Activator.getDefault().log(
 							"Gewählte Datei mit Verbindungsdaten: " + colibriXML.getAbsolutePath() + ".");
 					monitor.beginTask("Die Verbindung wird geprüft...", 4);
-					if (MigrationWizardPage.this.loadDocument(colibriXML))
+					if (DatabaseWizardMigrationPage.this.loadDocument(colibriXML))
 					{
 						monitor.worked(1);
-						if (MigrationWizardPage.this.document != null)
+						if (DatabaseWizardMigrationPage.this.document != null)
 						{
 							Activator.getDefault().log("Verbindung mit der Datenbank herstellen.");
-							final PersistenceBroker broker = MigrationWizardPage.this.connect();
+							final PersistenceBroker broker = DatabaseWizardMigrationPage.this.connect();
 							monitor.worked(1);
 							if ((broker != null) && !broker.isClosed())
 							{
 								Activator.getDefault().log("Verbindung hergestellt.");
-								MigrationWizardPage.this.version = MigrationWizardPage.this.getOldVersion(broker);
+								DatabaseWizardMigrationPage.this.version = DatabaseWizardMigrationPage.this.getOldVersion(broker);
 								monitor.worked(1);
 								Activator.getDefault().log("Kassenstationen einlesen.");
-								final Salespoint[] salespoints = MigrationWizardPage.this.getOldSalespoints(broker);
-								final String id = MigrationWizardPage.this.document.getRootElement()
+								final Salespoint[] salespoints = DatabaseWizardMigrationPage.this.getOldSalespoints(broker);
+								final String id = DatabaseWizardMigrationPage.this.document.getRootElement()
 										.getChild("salespoint").getAttributeValue("id");
 								final Long salespointId = Long.valueOf(id);
 								for (final Salespoint salespoint : salespoints)
@@ -334,16 +334,16 @@ public class MigrationWizardPage extends WizardPage
 										salespoint.host = HostnameResolver.HOSTNAME.getHostname();
 									}
 								}
-								MigrationWizardPage.this.salespointViewer.setInput(salespoints);
-								final TableColumn[] tableColumns = MigrationWizardPage.this.salespointViewer.getTable()
+								DatabaseWizardMigrationPage.this.salespointViewer.setInput(salespoints);
+								final TableColumn[] tableColumns = DatabaseWizardMigrationPage.this.salespointViewer.getTable()
 										.getColumns();
 								for (final TableColumn tableColumn : tableColumns)
 								{
 									tableColumn.pack();
 								}
-								MigrationWizardPage.this.salespointViewer.setAllChecked(true);
+								DatabaseWizardMigrationPage.this.salespointViewer.setAllChecked(true);
 								monitor.worked(1);
-								MigrationWizardPage.this.disconnect(broker);
+								DatabaseWizardMigrationPage.this.disconnect(broker);
 							}
 						}
 					}
@@ -412,7 +412,7 @@ public class MigrationWizardPage extends WizardPage
 		try
 		{
 			Activator.getDefault().log("Datei einlesen.");
-			this.document = builder.build(MigrationWizardPage.this.colibriPropertiesPath.getText());
+			this.document = builder.build(DatabaseWizardMigrationPage.this.colibriPropertiesPath.getText());
 			Activator.getDefault().log("Datei gelesen.");
 			return true;
 		}

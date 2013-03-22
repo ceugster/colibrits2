@@ -1,9 +1,9 @@
 package ch.eugster.colibri.persistence.connection.service;
 
+import javax.persistence.spi.PersistenceProvider;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.persistence.config.QueryHints;
-import org.eclipse.persistence.jpa.osgi.PersistenceProvider;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
@@ -17,18 +17,15 @@ public class PersistenceServiceImpl implements PersistenceService
 {
 	private int timeout;
 	
-	private ComponentContext componentContext;
-
-	private PersistenceProvider persistenceProvider;
-
 	private CacheService cacheService;
 
 	private ServerService serverService;
 
-	private LogService logService;
-
-	private EventAdmin eventAdmin;
-
+	public PersistenceServiceImpl()
+	{
+		activate();
+	}
+	
 	@Override
 	public String encrypt(String message)
 	{
@@ -54,19 +51,13 @@ public class PersistenceServiceImpl implements PersistenceService
 	@Override
 	public LogService getLogService()
 	{
-		return this.logService;
-	}
-
-	@Override
-	public ComponentContext getComponentContext()
-	{
-		return this.componentContext;
+		return Activator.getDefault().getLogService();
 	}
 
 	@Override
 	public EventAdmin getEventAdmin()
 	{
-		return this.eventAdmin;
+		return Activator.getDefault().getEventAdmin();
 	}
 
 	@Override
@@ -82,13 +73,21 @@ public class PersistenceServiceImpl implements PersistenceService
 	@Override
 	public void postEvent(final Event event)
 	{
-		this.eventAdmin.postEvent(event);
+		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
+		if (eventAdmin != null)
+		{
+			eventAdmin.postEvent(event);
+		}
 	}
 
 	@Override
 	public void sendEvent(final Event event)
 	{
-		this.eventAdmin.sendEvent(event);
+		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
+		if (eventAdmin != null)
+		{
+			eventAdmin.sendEvent(event);
+		}
 	}
 	
 	public int getTimeout()
@@ -96,9 +95,13 @@ public class PersistenceServiceImpl implements PersistenceService
 		return this.timeout;
 	}
 
-	protected void activate(final ComponentContext componentContext)
+//	protected void activate(final ComponentContext componentContext)
+//	{
+//		this.activate();
+//	}
+
+	private void activate()
 	{
-		this.componentContext = componentContext;
 		String[] args = Platform.getApplicationArgs();
 		for (int i = 0; i < args.length; i++)
 		{
@@ -115,51 +118,50 @@ public class PersistenceServiceImpl implements PersistenceService
 				break;
 			}
 		}
-		Activator.getDefault().log("Service " + componentContext.getProperties().get("component.name") + " aktiviert.");
+		Activator.getDefault().log("Service " + this.getClass().getName() + " aktiviert.");
 		this.getCacheService().start();
 		this.getServerService().start();
 	}
-
-	protected void deactivate(final ComponentContext componentContext)
-	{
-		this.componentContext = null;
-		Activator.getDefault().log(
-				"Service " + componentContext.getProperties().get("component.name") + " deaktiviert.");
-	}
+	
+//	protected void deactivate(final ComponentContext componentContext)
+//	{
+//		Activator.getDefault().log(
+//				"Service " + componentContext.getProperties().get("component.name") + " deaktiviert.");
+//	}
 
 	@Override
 	public PersistenceProvider getPersistenceProvider()
 	{
-		return persistenceProvider;
+		return Activator.getDefault().getPersistenceProvider();
 	}
-
-	protected void setEventAdmin(final EventAdmin eventAdmin)
-	{
-		this.eventAdmin = eventAdmin;
-	}
-
-	protected void unsetEventAdmin(final EventAdmin eventAdmin)
-	{
-		this.eventAdmin = null;
-	}
-
-	protected void setPersistenceProvider(final PersistenceProvider persistenceProvider)
-	{
-		this.persistenceProvider = persistenceProvider;
-	}
-
-	protected void unsetPersistenceProvider(final PersistenceProvider persistenceProvider)
-	{
-		this.persistenceProvider = null;
-	}
-
-	protected void setLogService(final LogService logService)
-	{
-		this.logService = logService;
-	}
-
-	protected void unsetLogService(final LogService logService)
-	{
-		this.logService = null;
-	}
+//
+//	public void setEventAdmin(final EventAdmin eventAdmin)
+//	{
+//		this.eventAdmin = eventAdmin;
+//	}
+//
+//	public void unsetEventAdmin(final EventAdmin eventAdmin)
+//	{
+//		this.eventAdmin = null;
+//	}
+//
+//	public void setPersistenceProvider(final PersistenceProvider persistenceProvider)
+//	{
+//		this.persistenceProvider = persistenceProvider;
+//	}
+//
+//	public void unsetPersistenceProvider(final PersistenceProvider persistenceProvider)
+//	{
+//		this.persistenceProvider = null;
+//	}
+//
+//	public void setLogService(final LogService logService)
+//	{
+//		this.logService = logService;
+//	}
+//
+//	public void unsetLogService(final LogService logService)
+//	{
+//		this.logService = null;
+//	}
 }

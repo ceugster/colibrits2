@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.jdom.Document;
 import org.jdom.Element;
 
-public class SelectConnectionWizardPage extends WizardPage implements IWizardPage
+public class DatabaseWizardSelectConnectionPage extends WizardPage implements IWizardPage
 {
 	private TableViewer viewer;
 
@@ -41,7 +41,7 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 
 	private Element currentConnection;
 
-	public SelectConnectionWizardPage(final String name)
+	public DatabaseWizardSelectConnectionPage(final String name)
 	{
 		super(name);
 	}
@@ -92,8 +92,8 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 				final StructuredSelection ssel = (StructuredSelection) event.getSelection();
 				if (!ssel.isEmpty())
 				{
-					SelectConnectionWizardPage.this.selectedConnection = (Element) ssel.getFirstElement();
-					SelectConnectionWizardPage.this.setPageComplete(SelectConnectionWizardPage.this.validatePage());
+					DatabaseWizardSelectConnectionPage.this.selectedConnection = (Element) ssel.getFirstElement();
+					DatabaseWizardSelectConnectionPage.this.setPageComplete(DatabaseWizardSelectConnectionPage.this.validatePage());
 				}
 			}
 		});
@@ -107,8 +107,8 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 			{
 				final Element element = (Element) cell.getElement();
 				cell.setText(element.getText());
-				cell.setFont(element == SelectConnectionWizardPage.this.selectedConnection ? SelectConnectionWizardPage.this.bold
-						: SelectConnectionWizardPage.this.normal);
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
 
@@ -123,8 +123,8 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 				final String driverName = element.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);
 				final SupportedDriver driver = SupportedDriver.findDriver(driverName);
 				cell.setText(driver.getPlatform());
-				cell.setFont(element == SelectConnectionWizardPage.this.selectedConnection ? SelectConnectionWizardPage.this.bold
-						: SelectConnectionWizardPage.this.normal);
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
 
@@ -137,8 +137,8 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 			{
 				final Element element = (Element) cell.getElement();
 				cell.setText(element.getAttributeValue(PersistenceUnitProperties.JDBC_URL));
-				cell.setFont(element == SelectConnectionWizardPage.this.selectedConnection ? SelectConnectionWizardPage.this.bold
-						: SelectConnectionWizardPage.this.normal);
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
 
@@ -152,8 +152,8 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 				final Element element = (Element) cell.getElement();
 				final boolean active = element.getParentElement().getName().equals("current");
 				cell.setText(active ? "Ja" : "");
-				cell.setFont(element == SelectConnectionWizardPage.this.selectedConnection ? SelectConnectionWizardPage.this.bold
-						: SelectConnectionWizardPage.this.normal);
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
 
@@ -187,8 +187,8 @@ public class SelectConnectionWizardPage extends WizardPage implements IWizardPag
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
-				SelectConnectionWizardPage.this.viewer.setSelection(new StructuredSelection());
-				SelectConnectionWizardPage.this.setPageComplete(SelectConnectionWizardPage.this.validatePage());
+				DatabaseWizardSelectConnectionPage.this.viewer.setSelection(new StructuredSelection());
+				DatabaseWizardSelectConnectionPage.this.setPageComplete(DatabaseWizardSelectConnectionPage.this.validatePage());
 			}
 		});
 

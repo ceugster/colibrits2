@@ -74,7 +74,7 @@ import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.service.ConnectionService;
 
-public class ConnectionWizardPage extends WizardPage
+public class DatabaseWizardConnectionPage extends WizardPage
 {
 	private Text connectionName;
 
@@ -120,7 +120,7 @@ public class ConnectionWizardPage extends WizardPage
 
 	private Element newConnection;
 
-	public ConnectionWizardPage(final String name)
+	public DatabaseWizardConnectionPage(final String name)
 	{
 		super(name);
 	}
@@ -157,23 +157,23 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			public void modifyText(final ModifyEvent e)
 			{
-				final SelectConnectionWizardPage selectWizardPage = (SelectConnectionWizardPage) ConnectionWizardPage.this.getWizard().getPage(
+				final DatabaseWizardSelectConnectionPage selectWizardPage = (DatabaseWizardSelectConnectionPage) DatabaseWizardConnectionPage.this.getWizard().getPage(
 						"select.connection.wizard.page");
 				if (selectWizardPage != null)
 				{
-					if (selectWizardPage.exists(ConnectionWizardPage.this.connectionName.getText()))
+					if (selectWizardPage.exists(DatabaseWizardConnectionPage.this.connectionName.getText()))
 					{
-						ConnectionWizardPage.this.setMessage("Die Bezeichnung wird bereits verwendet.", IMessageProvider.WARNING);
-						ConnectionWizardPage.this.setPageComplete(ConnectionWizardPage.this.validatePage(Status.CANCEL_STATUS));
+						DatabaseWizardConnectionPage.this.setMessage("Die Bezeichnung wird bereits verwendet.", IMessageProvider.WARNING);
+						DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(Status.CANCEL_STATUS));
 					}
 				}
-				if (ConnectionWizardPage.this.embedded.getSelection())
+				if (DatabaseWizardConnectionPage.this.embedded.getSelection())
 				{
-					final StructuredSelection ssel = (StructuredSelection) ConnectionWizardPage.this.drivers
+					final StructuredSelection ssel = (StructuredSelection) DatabaseWizardConnectionPage.this.drivers
 							.getSelection();
 					final SupportedDriver driver = (SupportedDriver) ssel.getFirstElement();
-					final String url = driver.getBaseProtocol() + ConnectionWizardPage.this.connectionName.getText();
-					ConnectionWizardPage.this.url.setText(url);
+					final String url = driver.getBaseProtocol() + DatabaseWizardConnectionPage.this.connectionName.getText();
+					DatabaseWizardConnectionPage.this.url.setText(url);
 				}
 			}
 		});
@@ -195,9 +195,9 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
-				ConnectionWizardPage.this.drivers.refresh();
+				DatabaseWizardConnectionPage.this.drivers.refresh();
 				SupportedDriver selectedDriver = null;
-				if (ConnectionWizardPage.this.embedded.getSelection())
+				if (DatabaseWizardConnectionPage.this.embedded.getSelection())
 				{
 					selectedDriver = SupportedDriver.DERBY_EMBEDDED;
 					status = Status.OK_STATUS;
@@ -207,9 +207,9 @@ public class ConnectionWizardPage extends WizardPage
 					selectedDriver = SupportedDriver.MYSQL_51;
 					status = Status.CANCEL_STATUS;
 				}
-				ConnectionWizardPage.this.drivers.setSelection(new StructuredSelection(
+				DatabaseWizardConnectionPage.this.drivers.setSelection(new StructuredSelection(
 						new SupportedDriver[] { selectedDriver }));
-				ConnectionWizardPage.this.setPageComplete(ConnectionWizardPage.this.validatePage(status));
+				DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(status));
 			}
 
 		});
@@ -252,20 +252,20 @@ public class ConnectionWizardPage extends WizardPage
 				if (ssel.getFirstElement() instanceof SupportedDriver)
 				{
 					final SupportedDriver supportedDriver = (SupportedDriver) ssel.getFirstElement();
-					ConnectionWizardPage.this.protocol.setText(supportedDriver.getBaseProtocol());
-					ConnectionWizardPage.this.setDescription(supportedDriver.getDescription());
-					ConnectionWizardPage.this.helpLabel.setText(ConnectionWizardPage.this.getDescription());
-					ConnectionWizardPage.this.exampleUrl.setText(supportedDriver.getExampleURL());
-					ConnectionWizardPage.this.getShell().layout();
+					DatabaseWizardConnectionPage.this.protocol.setText(supportedDriver.getBaseProtocol());
+					DatabaseWizardConnectionPage.this.setDescription(supportedDriver.getDescription());
+					DatabaseWizardConnectionPage.this.helpLabel.setText(DatabaseWizardConnectionPage.this.getDescription());
+					DatabaseWizardConnectionPage.this.exampleUrl.setText(supportedDriver.getExampleURL());
+					DatabaseWizardConnectionPage.this.getShell().layout();
 				}
 				else
 				{
-					ConnectionWizardPage.this.url.setText("");
-					ConnectionWizardPage.this.setDescription("");
-					ConnectionWizardPage.this.helpLabel.setText(ConnectionWizardPage.this.getDescription());
-					ConnectionWizardPage.this.exampleUrl.setText("");
+					DatabaseWizardConnectionPage.this.url.setText("");
+					DatabaseWizardConnectionPage.this.setDescription("");
+					DatabaseWizardConnectionPage.this.helpLabel.setText(DatabaseWizardConnectionPage.this.getDescription());
+					DatabaseWizardConnectionPage.this.exampleUrl.setText("");
 				}
-				ConnectionWizardPage.this.setPageComplete(ConnectionWizardPage.this.validatePage(ConnectionWizardPage.this.embedded.getSelection() ? Status.OK_STATUS : Status.CANCEL_STATUS));
+				DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(DatabaseWizardConnectionPage.this.embedded.getSelection() ? Status.OK_STATUS : Status.CANCEL_STATUS));
 			}
 		});
 
@@ -367,7 +367,7 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			public void menuAboutToShow(final IMenuManager manager)
 			{
-				StructuredSelection ssel = (StructuredSelection) ConnectionWizardPage.this.propertyViewer
+				StructuredSelection ssel = (StructuredSelection) DatabaseWizardConnectionPage.this.propertyViewer
 						.getSelection();
 				int size = ssel.size();
 
@@ -375,10 +375,10 @@ public class ConnectionWizardPage extends WizardPage
 				{
 					if (ssel.size() == 1)
 					{
-						ConnectionWizardPage.this.addPropertyAction(manager);
+						DatabaseWizardConnectionPage.this.addPropertyAction(manager);
 						manager.add(new Separator());
 					}
-					ConnectionWizardPage.this.removePropertyAction(manager);
+					DatabaseWizardConnectionPage.this.removePropertyAction(manager);
 				}
 			}
 		});
@@ -412,7 +412,7 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			protected CellEditor getCellEditor(final Object element)
 			{
-				return new TextCellEditor(ConnectionWizardPage.this.propertyViewer.getTable());
+				return new TextCellEditor(DatabaseWizardConnectionPage.this.propertyViewer.getTable());
 			}
 
 			@Override
@@ -427,7 +427,7 @@ public class ConnectionWizardPage extends WizardPage
 			{
 				Property property = (Property) element;
 				property.setKey((String) value);
-				ConnectionWizardPage.this.propertyViewer.refresh(element);
+				DatabaseWizardConnectionPage.this.propertyViewer.refresh(element);
 			}
 
 		});
@@ -462,7 +462,7 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			protected CellEditor getCellEditor(final Object element)
 			{
-				return new TextCellEditor(ConnectionWizardPage.this.propertyViewer.getTable());
+				return new TextCellEditor(DatabaseWizardConnectionPage.this.propertyViewer.getTable());
 			}
 
 			@Override
@@ -477,7 +477,7 @@ public class ConnectionWizardPage extends WizardPage
 			{
 				Property property = (Property) element;
 				property.setValue((String) value);
-				ConnectionWizardPage.this.propertyViewer.refresh(element);
+				DatabaseWizardConnectionPage.this.propertyViewer.refresh(element);
 			}
 
 		});
@@ -604,7 +604,7 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			public void modifyText(final ModifyEvent e)
 			{
-				ConnectionWizardPage.this.setPageComplete(ConnectionWizardPage.this.validatePage(ConnectionWizardPage.this.embedded.getSelection() ? Status.OK_STATUS : Status.CANCEL_STATUS));
+				DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(DatabaseWizardConnectionPage.this.embedded.getSelection() ? Status.OK_STATUS : Status.CANCEL_STATUS));
 			}
 		});
 
@@ -623,7 +623,7 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			public void modifyText(final ModifyEvent e)
 			{
-				ConnectionWizardPage.this.setPageComplete(ConnectionWizardPage.this.validatePage(ConnectionWizardPage.this.embedded.getSelection() ? Status.OK_STATUS : Status.CANCEL_STATUS));
+				DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(DatabaseWizardConnectionPage.this.embedded.getSelection() ? Status.OK_STATUS : Status.CANCEL_STATUS));
 			}
 		});
 
@@ -637,14 +637,14 @@ public class ConnectionWizardPage extends WizardPage
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				ConnectionWizardPage.this.setPageComplete(ConnectionWizardPage.this.validatePage(ConnectionWizardPage.this.checkConnection()));
+				DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(DatabaseWizardConnectionPage.this.checkConnection()));
 				if (status.isOK())
 				{
-					MessageDialog.openConfirm(ConnectionWizardPage.this.getShell(), "Verbindung hergestellt.", "Die Verbindung wurde erfolgreich hergestellt.");
+					MessageDialog.openConfirm(DatabaseWizardConnectionPage.this.getShell(), "Verbindung hergestellt.", "Die Verbindung wurde erfolgreich hergestellt.");
 				}
 				else
 				{
-					ErrorDialog.openError(ConnectionWizardPage.this.getShell(), "Verbindungsproblem", "Es konnte keine Verbindung zur Datenbank hergestellt werden.", status);
+					ErrorDialog.openError(DatabaseWizardConnectionPage.this.getShell(), "Verbindungsproblem", "Es konnte keine Verbindung zur Datenbank hergestellt werden.", status);
 				}
 			}
 
@@ -763,18 +763,18 @@ public class ConnectionWizardPage extends WizardPage
 	private IStatus checkConnection()
 	{
 		IStatus status = Status.OK_STATUS;
-		final StructuredSelection ssel = (StructuredSelection) ConnectionWizardPage.this.drivers.getSelection();
+		final StructuredSelection ssel = (StructuredSelection) DatabaseWizardConnectionPage.this.drivers.getSelection();
 		final SupportedDriver selectedDriver = (SupportedDriver) ssel.getFirstElement();
 		final String driverName = selectedDriver.getDriver();
-		final String url = ConnectionWizardPage.this.url.getText();
-		final String username = ConnectionWizardPage.this.user.getText();
-		final String password = ConnectionWizardPage.this.password.getText();
+		final String url = DatabaseWizardConnectionPage.this.url.getText();
+		final String username = DatabaseWizardConnectionPage.this.user.getText();
+		final String password = DatabaseWizardConnectionPage.this.password.getText();
 
 		try
 		{
 			Class.forName(driverName);
 			Connection connection = null;
-			if (user.getText().isEmpty() && ConnectionWizardPage.this.password.getText().isEmpty())
+			if (user.getText().isEmpty() && DatabaseWizardConnectionPage.this.password.getText().isEmpty())
 			{
 				connection = DriverManager.getConnection(url);
 			}
@@ -784,7 +784,7 @@ public class ConnectionWizardPage extends WizardPage
 			}
 			if (connection != null)
 			{
-				this.version = ConnectionWizardPage.this.getVersion(connection);
+				this.version = DatabaseWizardConnectionPage.this.getVersion(connection);
 				connection.close();
 			}
 		}
@@ -891,7 +891,7 @@ public class ConnectionWizardPage extends WizardPage
 		this.connectionName.setText(element.getText());
 		final Boolean embedded = Boolean
 				.valueOf(element.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
-		ConnectionWizardPage.this.embedded.setSelection(embedded == null ? true : embedded);
+		DatabaseWizardConnectionPage.this.embedded.setSelection(embedded == null ? true : embedded);
 		this.drivers.setInput(SupportedDriver.values());
 		final String driverName = element.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);
 		final SupportedDriver driver = SupportedDriver.findDriver(driverName);
@@ -904,7 +904,7 @@ public class ConnectionWizardPage extends WizardPage
 		String password = element.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD);
 		password = password == null ? "" : password.isEmpty() ? "" : Activator.getDefault().decrypt(password);
 		this.password.setText(password);
-		this.helpLabel.setText(ConnectionWizardPage.this.getDescription());
+		this.helpLabel.setText(DatabaseWizardConnectionPage.this.getDescription());
 		StructuredSelection ssel = new StructuredSelection(SessionLog.INFO_LABEL);
 		this.logViewer.setSelection(ssel);
 		this.getShell().layout();

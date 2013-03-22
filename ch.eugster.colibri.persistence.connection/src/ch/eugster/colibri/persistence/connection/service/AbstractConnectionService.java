@@ -295,11 +295,8 @@ public abstract class AbstractConnectionService implements ConnectionService
 		if (entityManagerFactory == null)
 		{
 			final Properties properties = this.getProperties();
-			if (!properties.isEmpty())
-			{
-				this.updateDatabase(properties);
-			}
-			entityManagerFactory = createEntityManagerFactory();
+			IStatus status = this.updateDatabase(properties);
+			entityManagerFactory = createEntityManagerFactory(status, properties);
 		}
 		return entityManagerFactory;
 	}
@@ -342,7 +339,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		}
 	}
 
-	protected abstract EntityManagerFactory createEntityManagerFactory();
+	protected abstract EntityManagerFactory createEntityManagerFactory(IStatus status, Properties properties);
 
 	protected Event getEvent(final IStatus status)
 	{
@@ -350,24 +347,24 @@ public abstract class AbstractConnectionService implements ConnectionService
 		eventProps.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
 		eventProps.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
 		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
-		if (this.getPersistenceService().getComponentContext() != null)
-		{
-			if (this.getPersistenceService().getComponentContext().getServiceReference() != null)
-			{
-				eventProps.put(EventConstants.SERVICE, this.getPersistenceService().getComponentContext()
-						.getServiceReference());
-			}
-			if (this.getPersistenceService().getComponentContext().getProperties().get("component.id") != null)
-			{
-				eventProps.put(EventConstants.SERVICE_ID, this.getPersistenceService().getComponentContext()
-						.getProperties().get("component.id"));
-			}
-			if (this.getPersistenceService().getComponentContext().getProperties().get("component.name") != null)
-			{
-				eventProps.put(EventConstants.SERVICE_PID, this.getPersistenceService().getComponentContext()
-						.getProperties().get("component.name"));
-			}
-		}
+//		if (this.getPersistenceService().getComponentContext() != null)
+//		{
+//			if (this.getPersistenceService().getComponentContext().getServiceReference() != null)
+//			{
+//				eventProps.put(EventConstants.SERVICE, this.getPersistenceService().getComponentContext()
+//						.getServiceReference());
+//			}
+//			if (this.getPersistenceService().getComponentContext().getProperties().get("component.id") != null)
+//			{
+//				eventProps.put(EventConstants.SERVICE_ID, this.getPersistenceService().getComponentContext()
+//						.getProperties().get("component.id"));
+//			}
+//			if (this.getPersistenceService().getComponentContext().getProperties().get("component.name") != null)
+//			{
+//				eventProps.put(EventConstants.SERVICE_PID, this.getPersistenceService().getComponentContext()
+//						.getProperties().get("component.name"));
+//			}
+//		}
 		eventProps.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
 		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		eventProps.put("status", status);
@@ -579,6 +576,42 @@ public abstract class AbstractConnectionService implements ConnectionService
 				}
 //				entityManager.clear();
 				updateReplicationValue(entity);
+				closeEntityManager(entityManager);
+			}
+		}
+	}
+
+	public synchronized void remove(final AbstractEntity entity)
+			throws RuntimeException
+	{
+		EntityManager entityManager = this.getEntityManager();
+		if (entityManager != null)
+		{
+			EntityTransaction tx = entityManager.getTransaction();
+			boolean isActive = tx.isActive();
+			if (!isActive)
+			{
+				tx.begin();
+			}
+			try
+			{
+				entityManager.remove(entity);
+				if (!isActive)
+				{
+					tx.commit();
+				}
+				logStored(entity);
+			}
+			catch (Exception e)
+			{
+				resetEntityManager(e);
+			}
+			finally
+			{
+				if (!isActive && tx.isActive())
+				{
+					tx.rollback();
+				}
 				closeEntityManager(entityManager);
 			}
 		}

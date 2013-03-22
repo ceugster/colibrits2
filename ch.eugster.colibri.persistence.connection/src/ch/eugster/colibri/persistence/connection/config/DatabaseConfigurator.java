@@ -430,7 +430,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		IStatus status = Status.OK_STATUS;
 
 		CommonSettings settings = this.getEntityManager().find(CommonSettings.class, Long.valueOf(1L));
-		final Tax tax = this.getEntityManager().find(Tax.class, Long.valueOf(0L));
+		final Tax tax = this.getEntityManager().find(Tax.class, Long.valueOf(1L));
 
 		monitor.beginTask("Die Warengruppe für bezahlte Rechnungen wird eingerichtet...", 1);
 		try

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.derby.jdbc.ClientDriver;
 import org.apache.derby.jdbc.EmbeddedDriver;
 
-import ch.eugster.colibri.persistence.connection.wizard.ConnectionWizardPage.Property;
+import ch.eugster.colibri.persistence.connection.wizard.DatabaseWizardConnectionPage.Property;
 
 public enum SupportedDriver
 {

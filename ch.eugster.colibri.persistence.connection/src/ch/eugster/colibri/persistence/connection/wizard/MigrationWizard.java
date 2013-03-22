@@ -9,9 +9,9 @@ package ch.eugster.colibri.persistence.connection.wizard;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.persistence.logging.SessionLog;
@@ -20,27 +20,20 @@ import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.framework.BundleException;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseConfigurator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseMigrator;
-import ch.eugster.colibri.persistence.connection.service.PersistenceServiceImpl;
-import ch.eugster.colibri.persistence.replication.service.ReplicationService;
-import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.pos.db.Salespoint;
 
-public class DatabaseWizard extends Wizard
+public class MigrationWizard extends Wizard
 {
 	private Document document;
 
-	public DatabaseWizard()
+	public MigrationWizard()
 	{
 		this.document = Activator.getDefault().getDocument();
-		if (this.document == null)
-		{
-			this.document = this.initializeDocument();
-		}
 	}
 
 	@Override
@@ -179,9 +172,6 @@ public class DatabaseWizard extends Wizard
 						.getPage("connection.wizard.page");
 				if (connectionWizardPage.migrate())
 				{
-					PersistenceService persistenceService = new PersistenceServiceImpl();
-					Activator.getDefault().getBundle().getBundleContext().registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
-
 					final DatabaseWizardMigrationPage migrationWizardPage = (DatabaseWizardMigrationPage) this
 							.getPage("migration.wizard.page");
 					final Document oldDocument = migrationWizardPage.getDocument();
@@ -196,13 +186,15 @@ public class DatabaseWizard extends Wizard
 					final Long currencyId = currencyWizardPage.getSelectedCurrency();
 					this.startConfiguration(newSelection, currencyId);
 				}
-				ServiceTracker<ReplicationService, ReplicationService> tracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle().getBundleContext(), ReplicationService.class, null);
-				tracker.open();
-				ReplicationService service = tracker.getService();
-				if (service != null)
-				{
-					service.replicate(this.getShell(), true);
-				}
+			}
+
+			try
+			{
+				Platform.getBundle(Activator.PLUGIN_ID).stop();
+				Platform.getBundle(Activator.PLUGIN_ID).start();
+			}
+			catch (final BundleException e)
+			{
 			}
 		}
 

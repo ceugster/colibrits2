@@ -1,12 +1,9 @@
 package ch.eugster.colibri.persistence.connection.config;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
-import java.util.Properties;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.spi.PersistenceProvider;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -20,6 +17,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.queries.SequenceQuery;
 import ch.eugster.colibri.persistence.service.ConnectionService;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractConfigurator
 {
@@ -36,30 +34,23 @@ public abstract class AbstractConfigurator
 	{
 		if (this.entityManager == null || !entityManager.isOpen())
 		{
-			ServiceTracker<PersistenceProvider, PersistenceProvider> tracker = new ServiceTracker<PersistenceProvider, PersistenceProvider>(Activator.getDefault().getBundle().getBundleContext(),
-					PersistenceProvider.class, null);
+			ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+					PersistenceService.class, null);
 			tracker.open();
-			PersistenceProvider persistenceProvider = (PersistenceProvider) tracker.getService();
-			Map<String, Object> map = null;
+			PersistenceService persistenceService = (PersistenceService) tracker.getService();
 			EntityManagerFactory factory = null;
-			if (persistenceProvider != null)
+			if (persistenceService!= null)
 			{
 				Element current = Activator.getDefault().getCurrentConnectionElement();
 				boolean embedded = Boolean.parseBoolean(current
 						.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
 				if (embedded)
 				{
-					Properties properties = Activator.getDefault().getCacheConnectionProperties(current);
-					map = Activator.getDefault().getCacheEntityManagerProperties(properties);
-					factory = persistenceProvider.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_LOCAL,
-							map);
+					factory = persistenceService.getCacheService().getEntityManagerFactory();
 				}
 				else
 				{
-					Properties properties = Activator.getDefault().getServerConnectionProperties(current);
-					map = Activator.getDefault().getServerEntityManagerProperties(properties);
-					factory = persistenceProvider.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_SERVER,
-							map);
+					factory = persistenceService.getServerService().getEntityManagerFactory();
 				}
 				this.entityManager = factory.createEntityManager();
 			}

@@ -32,13 +32,13 @@ import org.eclipse.swt.widgets.Listener;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 
-public class CurrencyWizardPage extends WizardPage implements Listener
+public class DatabaseWizardCurrencyPage extends WizardPage implements Listener
 {
 	private ComboViewer currencyViewer;
 
 	private String[] selectedCurrency;
 
-	public CurrencyWizardPage(final String name)
+	public DatabaseWizardCurrencyPage(final String name)
 	{
 		super(name);
 		this.setTitle("Referenzwährung definieren");
@@ -86,7 +86,7 @@ public class CurrencyWizardPage extends WizardPage implements Listener
 			public void selectionChanged(final SelectionChangedEvent event)
 			{
 				final Event e = new Event();
-				CurrencyWizardPage.this.handleEvent(e);
+				DatabaseWizardCurrencyPage.this.handleEvent(e);
 			}
 		});
 		this.currencyViewer.setSelection(new StructuredSelection(new Object[] { this.selectedCurrency }));

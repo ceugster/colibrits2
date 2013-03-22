@@ -153,8 +153,15 @@ public class LoginDialog extends TitleAreaDialog implements EventHandler
 			String application = System.getProperty("eclipse.application");
 			if (application.contains("admin"))
 			{
-				RoleProperty role = user.getRole().getRoleProperty("login.admin");
-				valid = role != null && role.getValue().equals("true");
+				if (user.getRole().getId().equals(Long.valueOf(1L)))
+				{
+					valid = true;
+				}
+				else
+				{
+					RoleProperty property = user.getRole().getRoleProperty("login.admin");
+					valid = property != null && property.getValue().equals("true");
+				}
 			}
 			else if (application.contains("report"))
 			{

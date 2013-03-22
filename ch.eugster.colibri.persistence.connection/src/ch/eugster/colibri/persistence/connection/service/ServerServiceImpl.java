@@ -1,11 +1,16 @@
 package ch.eugster.colibri.persistence.connection.service;
 
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
 
+import org.apache.derby.jdbc.EmbeddedDriver;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.eclipse.persistence.logging.SessionLog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jdom.Element;
@@ -66,19 +71,77 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	}
 
 	@Override
-	public Properties getProperties()
-	{
-		final Element connection = Activator.getDefault().getCurrentConnectionElement();
-		return Activator.getDefault().getServerConnectionProperties(connection);
-	}
-
-	@Override
 	protected IStatus updateDatabase(final Properties properties)
 	{
 		final DatabaseUpdater databaseUpdater = DatabaseUpdater.newInstance(properties);
 		return databaseUpdater.updateDatabase();
 	}
+	
+	protected Properties getProperties()
+	{
+		final Element connection = Activator.getDefault().getCurrentConnectionElement();
+		final Boolean embedded = Boolean.valueOf(connection
+				.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
+		final String driverName = connection.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);
+		final String url = connection.getAttributeValue(PersistenceUnitProperties.JDBC_URL);
+		final String username = connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER);
+		final String password = connection.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD);
 
+		final Properties properties = new Properties();
+		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
+		properties.setProperty(ConnectionService.KEY_NAME, connection.getText());
+		properties.setProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE, embedded.toString());
+		properties.setProperty(ConnectionService.KEY_PERSISTENCE_UNIT, ConnectionService.PERSISTENCE_UNIT_SERVER);
+		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER,
+				embedded.booleanValue() ? EmbeddedDriver.class.getName() : driverName);
+		properties.setProperty(PersistenceUnitProperties.JDBC_URL,
+				embedded.booleanValue() ? "jdbc:derby:" + connection.getText() : url);
+		properties.setProperty(PersistenceUnitProperties.JDBC_USER, embedded.booleanValue() ? connection.getText() : username);
+		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, embedded.booleanValue() ? connection.getText() : password);
+		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Activator.getDefault().getLogLevel());
+
+		return properties;
+	}
+
+	private Map<String, Object> getEntityManagerProperties(IStatus status, final Properties properties)
+	{
+		final Map<String, Object> map = new HashMap<String, Object>();
+
+		@SuppressWarnings("unchecked")
+		final Enumeration<String> keys = (Enumeration<String>) properties.propertyNames();
+		while (keys.hasMoreElements())
+		{
+			final String key = keys.nextElement();
+			Object value = properties.getProperty(key);
+			if (key.equals(ConnectionService.KEY_USE_EMBEDDED_DATABASE))
+			{
+				value = value == null ? true : Boolean.valueOf((String) value);
+			}
+			else if (key.equals(PersistenceUnitProperties.JDBC_PASSWORD))
+			{
+				value = value == null ? "" : value.toString().isEmpty() ? "" : Activator.getDefault().decrypt(
+						value.toString());
+			}
+			map.put(key, value);
+		}
+
+		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
+		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
+		if (status.getSeverity() == IStatus.OK)
+		{
+			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.NONE);
+			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
+					PersistenceUnitProperties.DDL_SQL_SCRIPT_GENERATION);
+		}
+		else
+		{
+			map.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
+			map.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_BOTH_GENERATION);
+		}
+
+		return map;
+	}
+	
 	@Override
 	protected String getTopic()
 	{
@@ -86,10 +149,9 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	}
 
 	@Override
-	protected EntityManagerFactory createEntityManagerFactory()
+	protected EntityManagerFactory createEntityManagerFactory(IStatus status, Properties properties)
 	{
 		EntityManagerFactory factory = null;
-		Properties properties = this.getProperties();
 		Boolean embedded = Boolean.valueOf(properties.getProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
 		if (embedded.booleanValue())
 		{
@@ -97,7 +159,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		}
 		else
 		{
-			Map<String, Object> map = Activator.getDefault().getServerEntityManagerProperties(properties);
+			Map<String, Object> map = getEntityManagerProperties(status, properties);
 			factory = this.getPersistenceService().getPersistenceProvider()
 					.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_SERVER, map);
 		}

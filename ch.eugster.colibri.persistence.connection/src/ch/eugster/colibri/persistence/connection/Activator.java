@@ -5,26 +5,23 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
 import javax.persistence.EntityManager;
+import javax.persistence.spi.PersistenceProvider;
 
-import org.apache.derby.jdbc.EmbeddedDriver;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.eclipse.persistence.logging.SessionLog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -34,13 +31,16 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.encryption.service.EncryptionService;
+import ch.eugster.colibri.persistence.connection.service.PersistenceServiceImpl;
 import ch.eugster.colibri.persistence.connection.wizard.DatabaseWizard;
 import ch.eugster.colibri.persistence.connection.wizard.WizardDialog;
 import ch.eugster.colibri.persistence.service.ConnectionService;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -56,10 +56,16 @@ public class Activator extends AbstractUIPlugin
 
 	private ServiceTracker<EncryptionService, EncryptionService> encryptionServiceTracker;
 
+	private ServiceTracker<PersistenceProvider, PersistenceProvider> persistenceProviderTracker;
+
+	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;
+
 	private EntityManager cacheEntityManager;
 
 	private Document document;
 
+	private Document oldDocument;
+	
 	/**
 	 * The constructor
 	 */
@@ -124,6 +130,15 @@ public class Activator extends AbstractUIPlugin
 		return this.document;
 	}
 
+	public Document getMigrationDocument()
+	{
+		if (this.oldDocument == null)
+		{
+			this.oldDocument = this.loadOldDocument();
+		}
+		return this.oldDocument;
+	}
+
 	public File getFile()
 	{
 		File cfgFile = null;
@@ -149,6 +164,30 @@ public class Activator extends AbstractUIPlugin
 				}
 				cfgFile = new File(cfgFolder.getAbsolutePath() + File.separator
 						+ ConnectionService.CONFIGURATION_XML_FILE);
+			}
+		}
+		catch (final Exception e)
+		{
+			e.printStackTrace();
+		}
+		return cfgFile;
+	}
+
+	public File getOldFile()
+	{
+		File cfgFile = null;
+		try
+		{
+			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			final File root = workspace.getRoot().getRawLocation().toFile();
+			System.out.println(root.getAbsolutePath());
+
+			final File cfgFolder = new File(System.getProperty("user.home") + File.separator
+					+ ConnectionService.OJB_MIGRATION_DIR);
+			if (cfgFolder.exists())
+			{
+				cfgFile = new File(cfgFolder.getAbsolutePath()+ File.separator
+						+ ConnectionService.OJB_MIGRATION_COLIBRI_XML_FILE);
 			}
 		}
 		catch (final Exception e)
@@ -213,161 +252,12 @@ public class Activator extends AbstractUIPlugin
 		}
 	}
 
-	public Properties getCacheConnectionProperties(final Element connection)
+	public String getLogLevel()
 	{
-		final String embedded = connection.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE);
-
-		final Properties properties = new Properties();
-		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
-		properties.setProperty(ConnectionService.KEY_NAME, connection.getText());
-		properties.setProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE, embedded);
-		properties.setProperty(ConnectionService.KEY_PERSISTENCE_UNIT, ConnectionService.PERSISTENCE_UNIT_LOCAL);
-		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER, EmbeddedDriver.class.getName());
-		properties.setProperty(PersistenceUnitProperties.JDBC_URL, "jdbc:derby:" + connection.getText());
-		properties.setProperty(PersistenceUnitProperties.JDBC_USER, connection.getText());
-		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, connection.getText());
-		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, "Derby");
-		String level = this.document.getRootElement().getChild("current").getAttributeValue("log-level");
-		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, level);
-		
-		File file = Activator.getDefault().getDerbyHome().getAbsoluteFile();
-		FilenameFilter filter = new FilenameFilter()
-		{
-			@Override
-			public boolean accept(File dir, String name)
-			{
-				if (dir.getAbsolutePath().equals(Activator.getDefault().getDerbyHome().getAbsolutePath()))
-				{
-					return name.equals(connection.getText());
-				}
-				return false;
-			}
-		};
-		if (!file.exists() || file.list(filter).length == 0)
-		{
-			String url = properties.getProperty(PersistenceUnitProperties.JDBC_URL);
-			properties.setProperty(PersistenceUnitProperties.JDBC_URL, url.concat(";create=true"));
-			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
-			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
-					PersistenceUnitProperties.DDL_DATABASE_GENERATION);
-		}
-		else
-		{
-			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.NONE);
-			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
-					PersistenceUnitProperties.DDL_SQL_SCRIPT_GENERATION);
-		}
-		return properties;
+		return this.document.getRootElement().getChild("current").getAttributeValue("log-level");
 	}
 
-	public Properties getServerConnectionProperties(final Element connection)
-	{
-		final Boolean embedded = Boolean.valueOf(connection
-				.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
-		final String driverName = connection.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);
-		final String url = connection.getAttributeValue(PersistenceUnitProperties.JDBC_URL);
-		final String username = connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER);
-		final String password = connection.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD);
-
-		final Properties properties = new Properties();
-		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
-		properties.setProperty(ConnectionService.KEY_NAME, connection.getText());
-		properties.setProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE, embedded.toString());
-		properties.setProperty(ConnectionService.KEY_PERSISTENCE_UNIT, ConnectionService.PERSISTENCE_UNIT_SERVER);
-		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER,
-				embedded.booleanValue() ? EmbeddedDriver.class.getName() : driverName);
-		properties.setProperty(PersistenceUnitProperties.JDBC_URL,
-				embedded.booleanValue() ? "jdbc:derby:" + connection.getText() : url);
-		properties.setProperty(PersistenceUnitProperties.JDBC_USER, embedded.booleanValue() ? connection.getText() : username);
-		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, embedded.booleanValue() ? connection.getText() : password);
-		String level = this.document.getRootElement().getChild("current").getAttributeValue("log-level");
-		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, level);
-
-		return properties;
-	}
-
-	public Map<String, Object> getServerEntityManagerProperties(final Properties properties)
-	{
-		final Map<String, Object> map = new HashMap<String, Object>();
-
-		@SuppressWarnings("unchecked")
-		final Enumeration<String> keys = (Enumeration<String>) properties.propertyNames();
-		while (keys.hasMoreElements())
-		{
-			final String key = keys.nextElement();
-			Object value = properties.getProperty(key);
-			if (key.equals(ConnectionService.KEY_USE_EMBEDDED_DATABASE))
-			{
-				value = value == null ? true : Boolean.valueOf((String) value);
-			}
-			else if (key.equals(PersistenceUnitProperties.JDBC_PASSWORD))
-			{
-				value = value == null ? "" : value.toString().isEmpty() ? "" : Activator.getDefault().decrypt(
-						value.toString());
-			}
-			map.put(key, value);
-		}
-
-		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
-		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
-		map.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
-		map.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_BOTH_GENERATION);
-
-		return map;
-	}
-
-	public Map<String, Object> getCacheEntityManagerProperties(final Properties properties)
-	{
-		final Map<String, Object> map = new HashMap<String, Object>();
-
-		@SuppressWarnings("unchecked")
-		final Enumeration<String> keys = (Enumeration<String>) properties.propertyNames();
-		while (keys.hasMoreElements())
-		{
-			final String key = keys.nextElement();
-			Object value = properties.getProperty(key);
-			if (key.equals(ConnectionService.KEY_USE_EMBEDDED_DATABASE))
-			{
-				value = value == null ? true : Boolean.valueOf((String) value);
-			}
-			else if (key.equals(PersistenceUnitProperties.JDBC_PASSWORD))
-			{
-				value = value == null ? "" : value.toString().isEmpty() ? "" : Activator.getDefault().decrypt(
-						value.toString());
-			}
-			map.put(key, value);
-		}
-
-		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
-		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.ALL_LABEL);
-
-		final StringBuilder url = new StringBuilder(properties.getProperty(PersistenceUnitProperties.JDBC_URL));
-		final File[] files = Activator.getDefault().getDerbyHome().listFiles(new FilenameFilter()
-		{
-			@Override
-			public boolean accept(final File dir, final String name)
-			{
-				if (dir.getAbsolutePath().equals(Activator.getDefault().getDerbyHome().getAbsolutePath()))
-				{
-					return name.equals(properties.getProperty(ConnectionService.KEY_NAME));
-				}
-				return false;
-			}
-		});
-		if (files.length == 0)
-		{
-			url.append(";create=true");
-			map.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
-			map.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_DATABASE_GENERATION);
-		}
-		map.put(PersistenceUnitProperties.JDBC_URL, url.toString());
-
-		printProperties(map);
-
-		return map;
-	}
-
-	protected void printProperties(final Map<String, Object> properties)
+	public void printProperties(final Map<String, Object> properties)
 	{
 		final String persistenceUnit = (String) properties.get(ConnectionService.KEY_PERSISTENCE_UNIT);
 		final String driver = properties.get(PersistenceUnitProperties.JDBC_DRIVER).toString();
@@ -396,12 +286,23 @@ public class Activator extends AbstractUIPlugin
 		this.encryptionServiceTracker = new ServiceTracker<EncryptionService, EncryptionService>(context, EncryptionService.class, null);
 		this.encryptionServiceTracker.open();
 
+		this.persistenceProviderTracker = new ServiceTracker<PersistenceProvider, PersistenceProvider>(context, PersistenceProvider.class, null);
+		this.persistenceProviderTracker.open();
+		
+		this.eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(context, EventAdmin.class, null);
+		this.eventAdminTracker.open();
+		
 		this.setDerbyHome();
 
 		final File file = this.getFile();
 		if (!file.exists())
 		{
 			this.initializeConfiguration(file);
+		}
+		else
+		{
+			PersistenceService persistenceService = new PersistenceServiceImpl();
+			context.registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
 		}
 
 		this.log("Plugin " + Activator.PLUGIN_ID + " gestartet.");
@@ -419,14 +320,17 @@ public class Activator extends AbstractUIPlugin
 	{
 		this.log("Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 
+		this.eventAdminTracker.close();
+		this.persistenceProviderTracker.close();
 		this.encryptionServiceTracker.close();
-
 		this.logServiceTracker.close();
+		
+		this.saveDocument(document);
 
 		Activator.plugin = null;
 		super.stop(context);
 	}
-
+	
 	@Override
 	protected void initializeImageRegistry(final ImageRegistry imageRegistry)
 	{
@@ -447,14 +351,32 @@ public class Activator extends AbstractUIPlugin
 
 	private EncryptionService getEncryptionService()
 	{
-		return (EncryptionService) this.encryptionServiceTracker.getService();
+		EncryptionService service = this.encryptionServiceTracker.getService();
+		return service;
+	}
+
+	public PersistenceProvider getPersistenceProvider()
+	{
+		PersistenceProvider provider = this.persistenceProviderTracker.getService();
+		return provider;
+	}
+
+	public EventAdmin getEventAdmin()
+	{
+		EventAdmin admin = this.eventAdminTracker.getService();
+		return admin;
+	}
+
+	public LogService getLogService()
+	{
+		LogService service = this.logServiceTracker.getService();
+		return service;
 	}
 
 	private void initializeConfiguration(final File file)
 	{
 		Display.getDefault().syncExec(new Runnable()
 		{
-
 			@Override
 			public void run()
 			{
@@ -473,6 +395,24 @@ public class Activator extends AbstractUIPlugin
 	private Document loadDocument()
 	{
 		final File cfgFile = this.getFile();
+		if (cfgFile.exists())
+		{
+			try
+			{
+				final SAXBuilder builder = new SAXBuilder();
+				return builder.build(cfgFile);
+			}
+			catch (final Exception e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	private Document loadOldDocument()
+	{
+		final File cfgFile = this.getOldFile();
 		if (cfgFile.exists())
 		{
 			try

@@ -52,14 +52,19 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 	{
 		super(properties);
 	}
-
+	
 	public IStatus updateDatabase()
+	{
+		return updateDatabase(true);
+	}
+
+	public IStatus updateDatabase(boolean server)
 	{
 		IStatus status = Status.OK_STATUS;
 		final Connection connection = this.createConnection();
 		if (connection != null)
 		{
-			status = this.updateStructure(connection);
+			status = this.updateStructure(connection, server);
 			this.releaseConnection(connection);
 		}
 		return status;
@@ -153,7 +158,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 	 *         while updating the database or if the database version is newer
 	 *         than the program version
 	 */
-	private IStatus updateStructure(final Connection connection)
+	private IStatus updateStructure(final Connection connection, boolean server)
 	{
 		final Class<?> clazz = Version.class;
 		final Table table = clazz.getAnnotation(Table.class);
@@ -397,7 +402,80 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
+							else if (structureVersion == 7)
+							{
+								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_common_settings";
+								String columnName = "cs_force_settlement";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+									if (server)
+									{
+										sql = "UPDATE " + tableName + " set CS_VERSION = CS_VERSION + 1";
+										this.log("SQL: " + sql);
+										result = stm.executeUpdate(sql);
+										this.log("SQL STATE:" + result + " OK)");
+									}
+								}
+								tableName = "colibri_salespoint";
+								columnName = "sp_force_settlement";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", null, true);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
 
+									if (server)
+									{
+										sql = "UPDATE " + tableName + " set SP_VERSION = SP_VERSION + 1";
+										this.log("SQL: " + sql);
+										result = stm.executeUpdate(sql);
+										this.log("SQL STATE:" + result + " OK)");
+									}
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 8)
+							{
+								if (server)
+								{
+									sql = "UPDATE COLIBRI_PRODUCT_GROUP SET PG_TX_ID = 1, PG_VERSION = PG_VERSION + 1 WHERE PG_PRODUCT_GROUP_TYPE = 1";
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 9)
+							{
+								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_position";
+								String columnName = "po_ebook";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							
+							
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");
 							sql = "UPDATE colibri_version SET v_structure = " + structureVersion;
