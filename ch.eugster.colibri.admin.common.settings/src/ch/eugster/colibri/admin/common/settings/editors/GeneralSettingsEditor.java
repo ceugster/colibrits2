@@ -75,6 +75,8 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 
 	private Button maximizedClientWindow;
 
+	private Button forceSettlement;
+	
 	private ScrolledForm scrolledForm;
 
 	public GeneralSettingsEditor()
@@ -166,6 +168,7 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		this.allowTestSettlement.setSelection(commonSettings.isAllowTestSettlement());
 		
 		this.maximizedClientWindow.setSelection(commonSettings.isMaximizedClientWindow());
+		this.forceSettlement.setSelection(commonSettings.isForceSettlement());
 		
 		this.setDirty(false);
 	}
@@ -205,6 +208,7 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		commonSettings.setAllowTestSettlement(this.allowTestSettlement.getSelection());
 
 		commonSettings.setMaximizedClientWindow(this.maximizedClientWindow.getSelection());
+		commonSettings.setForceSettlement(this.forceSettlement.getSelection());
 	}
 
 	@Override
@@ -663,6 +667,7 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 				widgetSelected(e);
 			}
 		});
+		
 		this.formToolkit.paintBordersFor(composite);
 
 		return composite;
@@ -865,6 +870,23 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		composite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 		composite.setLayout(new GridLayout(3, false));
 
+		forceSettlement = formToolkit.createButton(composite, "Kassenabschluss erzwingen", SWT.CHECK);
+		forceSettlement.setLayoutData(new GridData());
+		forceSettlement.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				GeneralSettingsEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+				widgetSelected(e);
+			}
+		});
+		
 		this.allowTestSettlement = this.formToolkit.createButton(composite,
 				"Provisorischen Abschluss erlauben", SWT.CHECK);
 		this.allowTestSettlement.addSelectionListener(new SelectionListener()
