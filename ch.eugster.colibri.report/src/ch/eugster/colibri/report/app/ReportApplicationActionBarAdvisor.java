@@ -200,10 +200,10 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 
 	protected MenuManager createPerspectiveMenu()
 	{
-		final MenuManager perspective = new MenuManager("&Perspektiven", "ch.eugster.colibri.report.menu.perspectives");
-		perspective.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-		perspective.add(new PerspectiveSwitcherMenu("ch.eugster.colibri.report."));
-		return perspective;
+		final MenuManager perspectiveMenu = new MenuManager("&Perspektiven", "ch.eugster.colibri.report.menu.perspectives");
+		perspectiveMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		perspectiveMenu.add(new PerspectiveSwitcherMenu("ch.eugster.colibri.report."));
+		return perspectiveMenu;
 	}
 
 	protected MenuManager createViewMenu()

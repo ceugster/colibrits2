@@ -54,7 +54,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 		IContributionItem[] coolItems = configurer.getCoolBarManager().getItems();
 		for (int i = 0; i < coolItems.length; i++)
 		{
-			if (coolItems[i].getId() != null && !coolItems[i].getId().startsWith("ch.eugster.colibri.admin."))
+			if (coolItems[i].getId() != null && !coolItems[i].getId().startsWith("ch.eugster.colibri.report."))
 			{
 				configurer.getCoolBarManager().remove(coolItems[i]);
 			}
@@ -71,7 +71,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 					IContributionItem[] items = manager.getItems();
 					for (IContributionItem item : items)
 					{
-						if (!item.getId().startsWith("ch.eugster.colibri.admin."))
+						if (!item.getId().startsWith("ch.eugster.colibri.report."))
 						{
 							if (!item.getId().startsWith("ch.eugster.colibri.persistence."))
 							{
@@ -95,7 +95,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 					IContributionItem[] items = manager.getItems();
 					for (IContributionItem item : items)
 					{
-						if (!item.getId().startsWith("ch.eugster.colibri.admin."))
+						if (!item.getId().startsWith("ch.eugster.colibri.report."))
 						{
 							if (!item.getId().startsWith("additions"))
 							{
@@ -113,7 +113,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 					IContributionItem[] items = manager.getItems();
 					for (IContributionItem item : items)
 					{
-						if (!item.getId().startsWith("ch.eugster.colibri.admin."))
+						if (!item.getId().startsWith("ch.eugster.colibri.report."))
 						{
 							if (!item.getId().startsWith("additions"))
 							{
@@ -129,7 +129,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 			else if (menuItem.getId().equals(IWorkbenchActionConstants.MB_ADDITIONS))
 			{
 			}
-			else if (menuItem.getId().startsWith("ch.eugster.colibri.admin."))
+			else if (menuItem.getId().startsWith("ch.eugster.colibri.report."))
 			{
 			}
 			else
@@ -158,7 +158,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 		if (this.getWindowConfigurer().getWindow().getActivePage() != null)
 		{
 			String perspectiveId = this.getWindowConfigurer().getWindow().getActivePage().getPerspective().getId();
-			if (!perspectiveId.startsWith("ch.eugster.colibri.admin."))
+			if (!perspectiveId.startsWith("ch.eugster.colibri.report."))
 			{
 				perspectiveId = settings.get("current.perspective");
 				if (perspectiveId == null)
