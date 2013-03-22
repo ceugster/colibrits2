@@ -184,7 +184,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.ui.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.persistence.replication.impl.feature" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.equinox.p2.user.ui" version="2.1.2.R37x_v20110815-1155-6-Bk8pYWZz0qUTX5I15GZWwbXkrl"/>
-      <feature id="ch.eugster.colibri.export.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.log.feature" version="1.0.0.qualifier"/>
    </features>
 

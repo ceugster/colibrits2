@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="1.0.0.201302271100" useFeatures="true" includeLaunchers="true">
+<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.report.application" version="1.0.0.201206291330" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/ch.eugster.colibri.product/icons/kasse_128x128.png"/>
@@ -17,12 +17,11 @@
       <programArgs>-data
 @user.home/colibri
 -consoleLog
--console
--eclipselink.jdbc.timeout
-5</programArgs>
-      <vmArgs>-Declipse.p2.profile=profile
+-console</programArgs>
+      <vmArgs>-Dorg.eclipse.update.reconcile=false
+-Declipse.p2.profile=profile
 -Declipse.p2.data.area=@config.dir/../p2
--Declipse.application=ch.eugster.colibri.admin.application
+-Declipse.application=ch.eugster.colibri.report.application
 -Declipse.product=ch.eugster.colibri.product.product
 -Xms512m 
 -Xmx1024m</vmArgs>
@@ -48,6 +47,7 @@
             winLargeLow="/ch.eugster.colibri.product/icons/kasse_48x48.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
@@ -150,49 +150,39 @@ This Agreement is governed by the laws of the State of New York and the intellec
    </plugins>
 
    <features>
+      <feature id="ch.eugster.colibri.product.feature" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.equinox.executable" version="3.5.1.v20111216-1653-7P7NFUIFIbaUcU77s0KQWHw5HZTZ"/>
-      <feature id="ch.eugster.colibri.admin.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.admin.ui.feature" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.equinox.p2.user.ui" version="2.1.2.R37x_v20110815-1155-6-Bk8pYWZz0qUTX5I15GZWwbXkrl"/>
       <feature id="ch.eugster.colibri.barcode.bookcenter.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.barcode.code128.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.barcode.ean13.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.barcode.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.barcode.isbn.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.client.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.client.ui.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.display.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.display.simple.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.encryption.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.export.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.display.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.display.serial.scd122u.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.printer.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.printer.serial.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.persistence.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.persistence.replication.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.persistence.transfer.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.print.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.print.receipt.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.print.settlement.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.print.voucher.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.product.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.provider.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.provider.galileo.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.receipt.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.settlement.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.settlement.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.ui.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.persistence.replication.impl.feature" version="1.0.0.qualifier"/>
-      <feature id="org.eclipse.equinox.p2.user.ui" version="2.1.2.R37x_v20110815-1155-6-Bk8pYWZz0qUTX5I15GZWwbXkrl"/>
-      <feature id="ch.eugster.colibri.export.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.log.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>
-      <plugin id="ch.eugster.colibri.persistence.connection" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
-      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="1" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.persistence.jpa" autoStart="true" startLevel="3" />
    </configurations>

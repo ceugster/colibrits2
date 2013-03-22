@@ -1521,6 +1521,8 @@ ch.eugster.colibri.product/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.product/build.properties -text
 ch.eugster.colibri.product/colibri.full.product -text
 ch.eugster.colibri.product/colibri.product -text
+ch.eugster.colibri.product/colibri.report.product -text
+ch.eugster.colibri.product/colibri.wo.export.product -text
 ch.eugster.colibri.product/icons/kasse_128x128.bmp -text
 ch.eugster.colibri.product/icons/kasse_128x128.png -text
 ch.eugster.colibri.product/icons/kasse_128x128_32.bmp -text
