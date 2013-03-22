@@ -23,6 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
 
 import ch.eugster.colibri.report.destination.Activator;
+import ch.eugster.colibri.report.engine.ReportService;
 
 public class DestinationView extends ViewPart implements ISelectionProvider
 {
@@ -54,7 +55,7 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 
 		this.destinations = new ComboViewer(combo);
 		this.destinations.setContentProvider(new ArrayContentProvider());
-		this.destinations.setInput(Destination.values());
+		this.destinations.setInput(ReportService.Destination.values());
 		this.destinations.addSelectionChangedListener(new ISelectionChangedListener()
 		{
 			@Override
@@ -63,9 +64,9 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 				final StructuredSelection ssel = (StructuredSelection) event.getSelection();
 				if (!ssel.isEmpty())
 				{
-					final Destination destination = (Destination) ssel.getFirstElement();
+					final ReportService.Destination destination = (ReportService.Destination) ssel.getFirstElement();
 					DestinationView.this.settings.put("selected.destination", destination.ordinal());
-					DestinationView.this.formats.getCombo().setEnabled(destination.equals(Destination.FILE));
+					DestinationView.this.formats.getCombo().setEnabled(destination.equals(ReportService.Destination.EXPORT));
 					fireSelectionChanged();
 				}
 			}
@@ -80,7 +81,7 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 
 		this.formats = new ComboViewer(combo);
 		this.formats.setContentProvider(new ArrayContentProvider());
-		this.formats.setInput(Format.values());
+		this.formats.setInput(ReportService.Format.values());
 		this.formats.addSelectionChangedListener(new ISelectionChangedListener()
 		{
 			@Override
@@ -89,7 +90,7 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 				final StructuredSelection ssel = (StructuredSelection) event.getSelection();
 				if (!ssel.isEmpty())
 				{
-					final Format format = (Format) ssel.getFirstElement();
+					final ReportService.Format format = (ReportService.Format) ssel.getFirstElement();
 					DestinationView.this.settings.put("selected.format", format.ordinal());
 					fireSelectionChanged();
 				}
@@ -97,8 +98,8 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 
 		});
 
-		Destination destination = Destination.values()[this.settings.getInt("selected.destination")];
-		Format format = Format.values()[this.settings.getInt("selected.format")];
+		ReportService.Destination destination = ReportService.Destination.values()[this.settings.getInt("selected.destination")];
+		ReportService.Format format = ReportService.Format.values()[this.settings.getInt("selected.format")];
 		StructuredSelection ssel = new StructuredSelection(new Object[] { destination, format });
 		setSelection(ssel);
 
@@ -123,16 +124,16 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 		}
 	}
 
-	public Destination getSelectedDestination()
+	public ReportService.Destination getSelectedDestination()
 	{
 		final StructuredSelection ssel = (StructuredSelection) this.destinations.getSelection();
-		return (Destination) ssel.getFirstElement();
+		return (ReportService.Destination) ssel.getFirstElement();
 	}
 
-	public Format getSelectedFormat()
+	public ReportService.Format getSelectedFormat()
 	{
 		final StructuredSelection ssel = (StructuredSelection) this.formats.getSelection();
-		return (Format) ssel.getFirstElement();
+		return (ReportService.Format) ssel.getFirstElement();
 	}
 
 	@Override
@@ -146,14 +147,14 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 	{
 		Object[] selected = new Object[0];
 		StructuredSelection ssel = (StructuredSelection) this.destinations.getSelection();
-		Destination destination = (Destination) ssel.getFirstElement();
+		ReportService.Destination destination = (ReportService.Destination) ssel.getFirstElement();
 		if (destination != null)
 		{
-			Format format = null;
-			if (destination.equals(Destination.FILE))
+			ReportService.Format format = null;
+			if (destination.equals(ReportService.Destination.EXPORT))
 			{
 				ssel = (StructuredSelection) this.formats.getSelection();
-				format = (Format) ssel.getFirstElement();
+				format = (ReportService.Format) ssel.getFirstElement();
 			}
 			if (format == null)
 			{
@@ -186,11 +187,11 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 				if (object != null)
 				{
 					StructuredSelection sel = new StructuredSelection(new Object[] { object });
-					if (object instanceof Destination)
+					if (object instanceof ReportService.Destination)
 					{
 						this.destinations.setSelection(sel);
 					}
-					else if (object instanceof Format)
+					else if (object instanceof ReportService.Format)
 					{
 						this.formats.setSelection(sel);
 					}
@@ -212,7 +213,7 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 		try
 		{
 			int value = this.settings.getInt("selected.destination");
-			if (value >= Destination.values().length)
+			if (value >= ReportService.Destination.values().length)
 			{
 				this.settings.put("selected.destination", 0);
 			}
@@ -224,7 +225,7 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 		try
 		{
 			int value = this.settings.getInt("selected.format");
-			if (value >= Destination.values().length)
+			if (value >= ReportService.Destination.values().length)
 			{
 				this.settings.put("selected.format", 0);
 			}
@@ -241,65 +242,65 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 		this.destinations.getCombo().setFocus();
 	}
 
-	public enum Destination
-	{
-		SCREEN, PRINTER, RECEIPT_PRINTER, FILE;
+//	public enum Destination
+//	{
+//		SCREEN, PRINTER, RECEIPT_PRINTER, FILE;
+//
+//		@Override
+//		public String toString()
+//		{
+//			switch (this)
+//			{
+//				case SCREEN:
+//				{
+//					return "Bildschirm";
+//				}
+//				case PRINTER:
+//				{
+//					return "Drucker";
+//				}
+//				case RECEIPT_PRINTER:
+//				{
+//					return "Belegdrucker";
+//				}
+//				case FILE:
+//				{
+//					return "Datei";
+//				}
+//				default:
+//					throw new RuntimeException("Invalid destination selected");
+//			}
+//		}
+//	}
 
-		@Override
-		public String toString()
-		{
-			switch (this)
-			{
-				case SCREEN:
-				{
-					return "Bildschirm";
-				}
-				case PRINTER:
-				{
-					return "Drucker";
-				}
-				case RECEIPT_PRINTER:
-				{
-					return "Belegdrucker";
-				}
-				case FILE:
-				{
-					return "Datei";
-				}
-				default:
-					throw new RuntimeException("Invalid destination selected");
-			}
-		}
-	}
-
-	public enum Format
-	{
-		PDF, EXCEL, HTML, XML;
-
-		@Override
-		public String toString()
-		{
-			switch (this)
-			{
-				case PDF:
-				{
-					return "Portable Document Format (*.pdf)";
-				}
-				case EXCEL:
-				{
-					return "Excel-Arbeitsmappe (*.xls)";
-				}
-				case HTML:
-				{
-					return "HTML-Datei (*.html)";
-				}
-				case XML:
-				{
-					return "XML- Datei (*.xml)";
-				}
-				default:
-					throw new RuntimeException("Invalid destination selected");
-			}
-		}
-	}
+//	public enum Format
+//	{
+//		PDF, EXCEL, HTML, XML;
+//
+//		@Override
+//		public String toString()
+//		{
+//			switch (this)
+//			{
+//				case PDF:
+//				{
+//					return "Portable Document Format (*.pdf)";
+//				}
+//				case EXCEL:
+//				{
+//					return "Excel-Arbeitsmappe (*.xls)";
+//				}
+//				case HTML:
+//				{
+//					return "HTML-Datei (*.html)";
+//				}
+//				case XML:
+//				{
+//					return "XML- Datei (*.xml)";
+//				}
+//				default:
+//					throw new RuntimeException("Invalid destination selected");
+//			}
+//		}
+//	}
 }
