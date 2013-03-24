@@ -171,7 +171,7 @@ void refreshDifference () {
 }
 
 private Object[] findObjects(DeviceData info) {
-    java.util.List objects = new ArrayList();
+    java.util.List<Object> objects = new ArrayList<Object>();
     for (int i = 0; i < info.objects.length; i++) {
         objects.add(info.objects[i]);
     }
@@ -182,7 +182,7 @@ private Object[] findObjects(DeviceData info) {
     return objects.toArray();
 }
 
-private void findWidgets(java.util.List objects, Widget widget) {
+private void findWidgets(java.util.List<Object> objects, Widget widget) {
     objects.add(widget);
     if(widget instanceof Composite) {
         Composite comp = (Composite) widget;
@@ -303,7 +303,7 @@ void refreshAll () {
 
 void layout () {
 	Rectangle rect = shell.getClientArea ();
-	String [] strings = new String [objects.length];
+//	String [] strings = new String [objects.length];
 	int width = 0;
 	String [] items = list.getItems ();
 	GC gc = new GC (list);

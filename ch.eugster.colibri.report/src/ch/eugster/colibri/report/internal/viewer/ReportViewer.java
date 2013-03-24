@@ -29,7 +29,7 @@ import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.xml.JRPrintXmlLoader;
 import net.sf.jasperreports.view.JRHyperlinkListener;
 
-import org.eclipse.jface.util.Assert;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -67,7 +67,7 @@ public class ReportViewer implements IReportViewer {
 
 	private ViewerCanvas viewerComposite;
 
-	private List hyperlinkListeners;
+	private List<JRHyperlinkListener> hyperlinkListeners;
 
 	/**
 	 * Default constructor. The default style will be used for the SWT control
@@ -375,7 +375,7 @@ public class ReportViewer implements IReportViewer {
 		if (xml) {
 			jasperPrint = JRPrintXmlLoader.load(fileName);
 		} else {
-			jasperPrint = (JasperPrint) JRLoader.loadObject(fileName);
+			jasperPrint = (JasperPrint) JRLoader.loadObjectFromFile(fileName);
 		}
 
 		return jasperPrint;
@@ -483,7 +483,7 @@ public class ReportViewer implements IReportViewer {
 	 */
 	public void addHyperlinkListener(JRHyperlinkListener listener) {
 		if (hyperlinkListeners == null) {
-			hyperlinkListeners = new ArrayList();
+			hyperlinkListeners = new ArrayList<JRHyperlinkListener>();
 		} else {
 			hyperlinkListeners.remove(listener); // add once
 		}
