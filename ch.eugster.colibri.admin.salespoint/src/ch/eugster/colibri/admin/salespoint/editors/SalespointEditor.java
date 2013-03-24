@@ -6,6 +6,7 @@
  */
 package ch.eugster.colibri.admin.salespoint.editors;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -48,6 +50,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -61,6 +64,7 @@ import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.events.EntityMediator;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.CommonSettings.HostnameResolver;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Profile;
@@ -133,7 +137,15 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 	private Spinner customerDisplayRows;
 
 //	private Spinner customerDisplayDelay;
+	
+	private Button useIndividualExport;
+	
+	private Button export;
+	
+	private Text exportPath;
 
+	private Button exportSelector;
+	
 	private Button useSalespointSpecificProviderProperties;
 
 	private IProperty[] providerProperties;
@@ -279,7 +291,17 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.createProviderSection(scrolledForm);
 		this.createProfileAndCurrencySection(scrolledForm);
 		this.createProposalSection(scrolledForm);
-
+		
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				this.createExportSection(scrolledForm);
+				break;
+			}
+		}
+		
 		if ((this.receiptPrinterServiceTracker.getServices() != null)
 				&& (this.receiptPrinterServiceTracker.getServices().length > 0))
 		{
@@ -374,6 +396,33 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.quantity.setValue(new Integer(salespoint.getProposalQuantity()));
 		this.price.setValue(new Double(salespoint.getProposalPrice()));
 
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (this.useIndividualExport != null)
+				{
+					this.useIndividualExport.setSelection(salespoint.isUseIndividualExport());
+				}
+				if (this.export != null)
+				{
+					this.export.setSelection(salespoint.isExport());
+					this.export.setEnabled(this.useIndividualExport.getSelection());
+				}
+				if (this.exportPath != null)
+				{
+					this.exportPath.setText(salespoint.getExportPath());
+					this.exportPath.setEnabled(this.useIndividualExport.getSelection());
+				}
+				if (this.exportSelector != null)
+				{
+					this.exportSelector.setEnabled(this.useIndividualExport.getSelection());
+				}
+				break;
+			}
+		}
+		
 		if (salespoint.getProposalTax() != null)
 		{
 			this.taxes.setSelection(new StructuredSelection(salespoint.getProposalTax()));
@@ -423,7 +472,31 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		salespoint.setLocation(this.location.getText());
 		salespoint.setMapping(this.mappingId.getText());
 		salespoint.setForceSettlement(forceSettlement.getSelection());
-		
+
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (useIndividualExport != null)
+				{
+					if (useIndividualExport.getSelection())
+					{
+						salespoint.setUseIndividualExport(useIndividualExport.getSelection());
+						if (this.export != null)
+						{
+							salespoint.setExport(this.export.getSelection());
+						}
+						if (this.exportPath != null)
+						{
+							salespoint.setExportPath(this.exportPath.getText());
+						}
+					}
+				}
+				break;
+			}
+		}
+
 		final ProviderConfigurator providerConfigurator = (ProviderConfigurator) this.providerConfiguratorTracker
 				.getService();
 		if (providerConfigurator != null)
@@ -578,12 +651,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 
 		if (msg == null)
 		{
-			msg = this.getNoProfileSelectedMessage();
-		}
-
-		if (msg == null)
-		{
-			msg = this.getNoProfileSelectedMessage();
+			msg = this.validateExportPath();
 		}
 
 		if (msg != null)
@@ -592,6 +660,22 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		}
 
 		return msg == null;
+	}
+
+	private Message validateExportPath()
+	{
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (this.export.getSelection() && !new File(this.exportPath.getText()).exists())
+				{
+					return new Message(this.exportPath, "Ungültiger Export-Pfad", "Der eingegebene Export-Pfad ist ungültig. Wählen Sie ein vorhandenes Verzeichnis als Export-Pfad aus.");
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -663,6 +747,31 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		section.setLayout(sectionLayout);
 		section.setText("Vorschläge");
 		section.setClient(this.fillProposalSection(section));
+		section.addExpansionListener(new ExpansionAdapter()
+		{
+			@Override
+			public void expansionStateChanged(final ExpansionEvent e)
+			{
+				SalespointEditor.this.scrolledForm.reflow(true);
+			}
+		});
+
+		return section;
+	}
+
+	private Section createExportSection(final ScrolledForm scrolledForm)
+	{
+		final ColumnLayoutData layoutData = new ColumnLayoutData();
+		layoutData.widthHint = 200;
+		final TableWrapLayout sectionLayout = new TableWrapLayout();
+		sectionLayout.numColumns = 1;
+
+		final Section section = this.formToolkit.createSection(scrolledForm.getBody(), ExpandableComposite.EXPANDED
+				| ExpandableComposite.COMPACT | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
+		section.setLayoutData(layoutData);
+		section.setLayout(sectionLayout);
+		section.setText("Export");
+		section.setClient(this.fillExportSection(section));
 		section.addExpansionListener(new ExpansionAdapter()
 		{
 			@Override
@@ -1080,6 +1189,139 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.formToolkit.paintBordersFor(composite);
 
 		return composite;
+	}
+
+	private final Control fillExportSection(final Section parent)
+	{
+		final Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
+				.getAdapter(Salespoint.class);
+
+		final TableWrapData layoutData = new TableWrapData();
+		layoutData.grabHorizontal = true;
+
+		final Composite composite = this.formToolkit.createComposite(parent);
+		composite.setLayoutData(layoutData);
+		composite.setLayout(new GridLayout(3, false));
+
+		GridData gridData = new GridData();
+		gridData.horizontalSpan = 3;
+
+		this.useIndividualExport = this.formToolkit.createButton(composite,
+				"Kassenspezifische Einstellungen verwenden", SWT.CHECK);
+		this.useIndividualExport.setLayoutData(gridData);
+		this.useIndividualExport.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				this.widgetSelected(e);
+			}
+
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				export.setEnabled(useIndividualExport.getSelection());
+				export.setSelection(salespoint.isExport(useIndividualExport.getSelection()));
+				exportPath.setEnabled(useIndividualExport.getSelection());
+				exportPath.setText(salespoint.getExportPath(useIndividualExport.getSelection()));
+				exportSelector.setEnabled(useIndividualExport.getSelection());
+				SalespointEditor.this.setDirty(true);
+			}
+
+		});
+
+		gridData = new GridData();
+		gridData.horizontalSpan = 3;
+
+		this.export = this.formToolkit.createButton(composite,
+				"Belege exportieren", SWT.CHECK);
+		this.export.setLayoutData(gridData);
+		this.export.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				this.widgetSelected(e);
+			}
+
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				if (export.getSelection())
+				{
+					File file = new File(exportPath.getText());
+					if (!file.exists())
+					{
+						setExportPath(salespoint);
+					}
+				}
+				SalespointEditor.this.setDirty(true);
+			}
+		});
+
+		Label label = this.formToolkit.createLabel(composite, "Export-Pfad", SWT.None);
+		label.setLayoutData(new GridData());
+		
+		exportPath = this.formToolkit.createText(composite, "");
+		exportPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		this.exportSelector = this.formToolkit.createButton(composite,
+				"...", SWT.PUSH);
+		this.exportSelector.setLayoutData(new GridData());
+		this.exportSelector.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				this.widgetSelected(e);
+			}
+
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				setExportPath(salespoint);
+			}
+
+		});
+
+
+		this.formToolkit.paintBordersFor(composite);
+
+		return composite;
+	}
+
+	private void setExportPath(Salespoint salespoint)
+	{
+		Shell shell = SalespointEditor.this.getSite().getShell();
+		DirectoryDialog dialog = new DirectoryDialog(shell);
+		dialog.setMessage("Zielverzeichnis für den Beleg-Export");
+		dialog.setFilterPath(this.exportPath.getText());
+		dialog.setText("Beleg-Export");
+		String path = dialog.open();
+		File file = new File(path == null ? exportPath.getText() : path);
+		if (!file.exists() && export.getSelection())
+		{
+			String title = "Ungültiges Verzeichnis";
+			String msg = "Das gewählte Verzeichnis existiert nicht. Bitte wählen Sie ein gültiges Verzeichnis.";
+			MessageDialog messageDialog = new MessageDialog(shell, title, null, msg, MessageDialog.WARNING, new String[] { "OK" }, 0);
+			messageDialog.open();
+			export.setSelection(false);
+		}
+		else
+		{
+			exportPath.setText(path);
+			SalespointEditor.this.setDirty(true);
+
+			HostnameResolver resolver = salespoint.getCommonSettings().getHostnameResolver();
+			String hostname = resolver.getHostname();
+			if (salespoint.getHost() == null || !salespoint.getHost().equals(hostname))
+			{
+				String title = "Pfadangabe";
+				String msg = "Bitte beachten Sie, dass das Programm den gewählten Pfad nicht überprüfen kann, da er sich auf einem anderen Host befindet. Stellen Sie sicher, dass der Pfad auf der Kasse " + salespoint.getName() + " lokal verfügbar ist.";
+				MessageDialog messageDialog = new MessageDialog(shell, title, null, msg, MessageDialog.WARNING, new String[] { "OK" }, 0);
+				messageDialog.open();
+			}
+		}
 	}
 
 	private final Control fillProposalSection(final Section parent)
