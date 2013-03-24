@@ -112,6 +112,20 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 	@Convert("booleanConverter")
 	private Boolean forceSettlement;
 
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name="sp_use_individual_export")
+	private boolean useIndividualExport;
+	
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name="sp_export")
+	private boolean export;
+	
+	@Basic
+	@Column(name = "sp_export_path")
+	private String exportPath;
+
 	@OneToOne(optional = true)
 	@JoinColumn(name = "sp_di_id")
 	private Display display;
@@ -533,5 +547,45 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MILLISECOND, 0);
 		return this.settlement.getTimestamp().before(today);
+	}
+
+	public boolean isExport() 
+	{
+		return useIndividualExport ? export : this.commonSettings.isExport();
+	}
+
+	public boolean isExport(boolean useIndividualExport) 
+	{
+		return useIndividualExport ? export : this.commonSettings.isExport();
+	}
+
+	public void setExport(boolean export) 
+	{
+		this.propertyChangeSupport.firePropertyChange("export", this.export, this.export = export);
+	}
+
+	public String getExportPath() 
+	{
+		return useIndividualExport ? this.valueOf(exportPath) : commonSettings.getExportPath();
+	}
+
+	public String getExportPath(boolean useIndividualExport) 
+	{
+		return useIndividualExport ? this.valueOf(exportPath) : commonSettings.getExportPath();
+	}
+
+	public void setExportPath(String exportPath) 
+	{
+		this.propertyChangeSupport.firePropertyChange("exportPath", this.exportPath, this.exportPath = exportPath);
+	}
+
+	public boolean isUseIndividualExport() 
+	{
+		return useIndividualExport;
+	}
+
+	public void setUseIndividualExport(boolean useIndividualExport) 
+	{
+		this.propertyChangeSupport.firePropertyChange("useIndividualExport", this.useIndividualExport, this.useIndividualExport = useIndividualExport);
 	}
 }

@@ -128,6 +128,15 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 	@Column(name="cs_maximized_client_window")
 	private boolean maximizedClientWindow;
 	
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name="cs_export")
+	private boolean export;
+	
+	@Basic
+	@Column(name = "cs_export_path")
+	private String exportPath;
+
 	private CommonSettings()
 	{
 		super();
@@ -537,5 +546,24 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 		{
 			return Integer.valueOf(this.ordinal()).toString();
 		}
+	}
+
+	public boolean isExport() 
+	{
+		return this.export;
+	}
+
+	public void setExport(boolean export) 
+	{
+		this.propertyChangeSupport.firePropertyChange("export", this.export, this.export = export);
+	}
+
+	public String getExportPath() 
+	{
+		return this.valueOf(exportPath);
+	}
+
+	public void setExportPath(String exportPath) {
+		this.propertyChangeSupport.firePropertyChange("exportPath", this.exportPath, this.exportPath = exportPath);
 	}
 }
