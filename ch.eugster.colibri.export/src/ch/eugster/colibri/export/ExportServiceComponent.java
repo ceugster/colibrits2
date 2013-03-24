@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -26,11 +26,10 @@ import org.jdom.filter.Filter;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
@@ -44,6 +43,8 @@ import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
+import ch.eugster.colibri.persistence.queries.SalespointQuery;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class ExportServiceComponent implements ExportService, EventHandler
 {
@@ -59,15 +60,49 @@ public class ExportServiceComponent implements ExportService, EventHandler
 
 	private Document export;
 	
-	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
-
+	private Boolean doExport = null;
+	
+	private String exportPath;
+	
+	private LogService logService;
+	
+	private ComponentContext context;
+	
+	private PersistenceService persistenceService;
+	
 	private Collection<BarcodeVerifier> barcodeVerifiers = new ArrayList<BarcodeVerifier>();
 	
+	
+	public ExportServiceComponent()
+	{
+	}
+
+	public void setLogService(LogService logService)
+	{
+		this.logService = logService;
+	}
+	
+	public void unsetLogService(LogService logService)
+	{
+		this.logService = null;
+	}
+	
+	public void setPersistenceService(PersistenceService persistenceService)
+	{
+		this.persistenceService = persistenceService;
+	}
+
+	public void unsetPersistenceService(PersistenceService persistenceService)
+	{
+		this.persistenceService = null;
+	}
+	/*
+	 * Only use as dynamic service
+	 */
 	protected void activate(ComponentContext context)
 	{
-		load();
-		register();
-		
+		this.context = context;
+		log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " registriert.");
 	}
 	
 	public void addBarcodeVerifier(BarcodeVerifier barcodeVerifier)
@@ -80,48 +115,59 @@ public class ExportServiceComponent implements ExportService, EventHandler
 		barcodeVerifiers.remove(barcodeVerifier);
 	}
 	
-	private void register()
+	private void log(int level, String message)
 	{
-		final Collection<String> t = new ArrayList<String>();
-		t.add("ch/eugster/colibri/client/store/receipt");
-		t.add("ch/eugster/colibri/client/print/settlement");
-		final String[] topics = t.toArray(new String[t.size()]);
+		if (logService != null)
+		{
+			logService.log(context.getServiceReference(), level, message);
+		}
+	}
 
-		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.EVENT_TOPIC, topics);
-		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
-				.registerService(EventHandler.class, this, properties);
-	}
-	
-	private void unregister()
-	{
-		eventHandlerServiceRegistration.unregister();
-	}
-	
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+		if (doExport == null)
 		{
-			IPrintable receipt = (IPrintable) event.getProperty("ch.eugster.colibri.persistence.model.print.IPrintable");
-			if (receipt instanceof Receipt)
-			{
-				this.update((Receipt) receipt);
-			}
+			SalespointQuery query = (SalespointQuery) persistenceService.getCacheService().getQuery(Salespoint.class);
+			Salespoint salespoint = query.getCurrentSalespoint();
+			doExport = salespoint.isExport();
+			exportPath = salespoint.getExportPath();
+			load();
 		}
-		else if (event.getTopic().equals("ch/eugster/colibri/client/print/settlement"))
+		if (doExport.booleanValue())
 		{
-			IPrintable printable = (IPrintable) event.getProperty(IPrintable.class.getName());
-			if (printable instanceof Settlement)
+			if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
 			{
-				this.settle((Settlement) printable);
+				IPrintable printable = (IPrintable) event.getProperty("ch.eugster.colibri.persistence.model.print.IPrintable");
+				if (printable instanceof Receipt)
+				{
+					Receipt receipt = (Receipt) printable;
+					this.update(receipt);
+					log(LogService.LOG_INFO, "Beleg " + receipt.getNumber() + " exportiert.");
+				}
+			}
+			else if (event.getTopic().equals("ch/eugster/colibri/client/print/settlement"))
+			{
+				IPrintable printable = (IPrintable) event.getProperty(IPrintable.class.getName());
+				if (printable instanceof Settlement)
+				{
+					Settlement settlement = (Settlement) printable;
+					this.settle(settlement);
+					String settle = null;
+					if (settlement.getSettled() != null)
+					{
+						DateFormat format = SimpleDateFormat.getDateTimeInstance();
+						settle = format.format(settlement.getSettled().getTime()) + " ";
+					}
+					log(LogService.LOG_INFO, "Abschluss " + settle == null ? "" : settle + "exportiert.");
+				}
 			}
 		}
 	}
 
 	private void load()
 	{
-		File file = this.getFile();
+		File file = this.getFile(ExportServiceComponent.WORK_FILE);
 		if (file.exists())
 		{
 			SAXBuilder builder = new SAXBuilder();
@@ -143,6 +189,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 		{
 			export = initialize();
 		}
+		log(LogService.LOG_INFO, "Exportdokument geladen.");
 	}
 
 	private Document initialize()
@@ -158,84 +205,106 @@ public class ExportServiceComponent implements ExportService, EventHandler
 	
 	private void save(Settlement settlement)
 	{
-		final Format format = Format.getPrettyFormat();
-		final XMLOutputter outputter = new XMLOutputter();
-		outputter.setFormat(format);
-		try
+		String filename = null;
+		if (settlement == null)
 		{
-			String filename = ExportServiceComponent.WORK_FILE;
-			if (settlement instanceof Settlement)
+			filename = ExportServiceComponent.WORK_FILE;
+		}
+		else
+		{
+			export.getRootElement().setAttribute(new Attribute("salespoint", settlement.getSalespoint().getMapping() == null ? settlement.getSalespoint().getHost() : settlement.getSalespoint().getMapping()));
+			export.getRootElement().setAttribute(new Attribute("date", settlement.valueOf(Long.valueOf(settlement.getSettled().getTimeInMillis()).toString())));
+			export.getRootElement().setAttribute(new Attribute("count", Integer.valueOf(export.getRootElement().getChildren("receipt").size()).toString()));
+			String salespoint = export.getRootElement().getAttributeValue("salespoint");
+			String date = export.getRootElement().getAttributeValue("date");
+			filename = salespoint + date + EXPORT_FILE_EXTENSION;
+		}
+		save(filename);
+	}
+	
+	private void save(String filename)
+	{
+		boolean save = true;
+		if (filename.equals(ExportServiceComponent.WORK_FILE))
+		{
+			if (export == null || export.getRootElement().getChildren().size() == 0)
 			{
-				export.getRootElement().setAttribute(new Attribute("salespoint", settlement.getSalespoint().getMapping() == null ? settlement.getSalespoint().getHost() : settlement.getSalespoint().getMapping()));
-				export.getRootElement().setAttribute(new Attribute("date", settlement.valueOf(Long.valueOf(settlement.getSettled().getTimeInMillis()).toString())));
-				export.getRootElement().setAttribute(new Attribute("count", Integer.valueOf(export.getRootElement().getChildren("receipt").size()).toString()));
-				String salespoint = export.getRootElement().getAttributeValue("salespoint");
-				String date = export.getRootElement().getAttributeValue("date");
-				filename = salespoint + date + EXPORT_FILE_EXTENSION;
+				save = false;
 			}
-			FileOutputStream out = new FileOutputStream(this.getFile(filename));
-			outputter.output(export, out);
-			out.close();
 		}
-		catch (final FileNotFoundException e)
+		if (save)
 		{
-			e.printStackTrace();
-		}
-		catch (final IOException e)
-		{
-			e.printStackTrace();
+			try 
+			{
+				final Format format = Format.getPrettyFormat();
+				final XMLOutputter outputter = new XMLOutputter();
+				outputter.setFormat(format);
+				FileOutputStream out = new FileOutputStream(getFile(filename));
+				outputter.output(export, out);
+				out.close();
+				log(LogService.LOG_INFO, "Export ausgeführt.");
+			} 
+			catch (FileNotFoundException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+			catch (IOException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
-	private File getFile()
+	private File getExportFolder()
 	{
-		return getFile(ExportServiceComponent.WORK_FILE);
-	}
-
-	private File getFile(String name)
-	{
-		File file = null;
-		try
+		File exportFolder = new File(exportPath);
+		if (!exportFolder.exists())
 		{
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			final File root = workspace.getRoot().getRawLocation().toFile();
-
-			final File exportFolder = new File(root.getAbsolutePath() + File.separator
+			exportFolder = new File(root.getAbsolutePath() + File.separator
 					+ EXPORT_FOLDER);
 			if (!exportFolder.exists())
 			{
 				exportFolder.mkdir();
 			}
-			File workingFolder = new File(root.getAbsolutePath() + File.separator + WORK_FOLDER);
-			if (!workingFolder.exists())
-			{
-				workingFolder.mkdir();
-			}
-			if (workingFolder.exists())
-			{
-				File dtdFile = new File(workingFolder.getAbsolutePath() + File.separator
-						+ TRANSFER_DTD);
-				if (!dtdFile.exists())
-				{
-					createDTDFile(dtdFile);
-				}
-			}
-			if (name.equals(WORK_FILE))
-			{
-				file = new File(workingFolder.getAbsolutePath() + File.separator
-						+ name);
-			}
-			else
-			{
-				file = new File(exportFolder.getAbsolutePath() + File.separator
-						+ name);
-			}
 		}
-		catch (final Exception e)
+		return exportFolder;
+	}
+	
+	private File getWorkFolder()
+	{
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final File root = workspace.getRoot().getRawLocation().toFile();
+		File workFolder = new File(root.getAbsolutePath() + File.separator + WORK_FOLDER);
+		if (!workFolder.exists())
 		{
-			e.printStackTrace();
+			workFolder.mkdir();
 		}
-		return file;
+		if (workFolder.exists())
+		{
+			File dtdFile = new File(workFolder.getAbsolutePath() + File.separator
+					+ TRANSFER_DTD);
+			if (!dtdFile.exists())
+			{
+				createDTDFile(dtdFile);
+			}
+		}
+		return workFolder;
+	}
+	
+	private File getFile(String name)
+	{
+		if (name.equals(ExportServiceComponent.WORK_FILE))
+		{
+			return new File(this.getWorkFolder().getAbsolutePath() + File.separator + ExportServiceComponent.WORK_FILE);
+		}
+		else
+		{
+			return new File(this.getExportFolder().getAbsolutePath()+ File.separator + name);
+		}
 	}
 
 	private void createDTDFile(File dtdFile)
@@ -262,8 +331,9 @@ public class ExportServiceComponent implements ExportService, EventHandler
 
 	protected void deactivate(ComponentContext context)
 	{
-		this.save(null);
-		unregister();
+		this.save(WORK_FILE);
+		log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " registriert.");
+		this.context = null;
 	}
 
 	@Override
@@ -273,7 +343,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 		Element element = new Element("receipt");
 		convertToJdomElement(receipt, element);
 		root.addContent(element);
-		save(null);
+		save(WORK_FILE);
 	}
 
 	@Override
@@ -316,7 +386,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 			convertToJdomElement(receipt, element);
 			root.addContent(element);
 		}
-		save(null);
+		save(WORK_FILE);
 	}
 
 	@Override
@@ -324,7 +394,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 	{
 		save(settlement);
 		export = initialize();
-		save(null);
+		save(WORK_FILE);
 	}
 
 	public Element convertToJdomElement(Receipt receipt, Element element)
