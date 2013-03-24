@@ -278,6 +278,9 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 					source.getProposalTax().getId()));
 		}
 		target.setForceSettlement(source.isForceSettlement());
+		target.setUseIndividualExport(source.isUseIndividualExport());
+		target.setExport(source.isExport());
+		target.setExportPath(source.getExportPath());
 		return target;
 	}
 

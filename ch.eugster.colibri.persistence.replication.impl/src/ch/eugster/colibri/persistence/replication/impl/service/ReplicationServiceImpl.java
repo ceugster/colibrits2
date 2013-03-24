@@ -211,7 +211,6 @@ public class ReplicationServiceImpl implements ReplicationService
 						status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Fehler beim replizieren der Daten.", e);
 					}
 				}
-				return status;
 			}
 		}
 		return status;
@@ -225,7 +224,6 @@ public class ReplicationServiceImpl implements ReplicationService
 					+ " aktiviert");
 		}
 	}
-
 	protected void deactivate(final ComponentContext componentContext)
 	{
 		if (this.logService != null)

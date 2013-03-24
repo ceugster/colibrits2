@@ -159,25 +159,29 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 		}
 
 		target = super.replicate(source, target);
+		target.setAddress(source.getAddress());
+		target.setAllowTestSettlement(source.isAllowTestSettlement());
 		target.setDefaultProductGroup(productGroup);
-		target.setPayedInvoice(payedInvoice);
-		target.setReferenceCurrency(currency);
+		target.setExport(source.isExport());
+		target.setExportPath(source.getExportPath());
+		target.setForceSettlement(source.isForceSettlement());
 		target.setHostnameResolver(source.getHostnameResolver());
+		target.setMaximizedClientWindow(source.isMaximizedClientWindow());
 		target.setMaxPaymentAmount(source.getMaxPaymentAmount());
 		target.setMaxPaymentRange(source.getMaxPaymentRange());
 		target.setMaxPriceAmount(source.getMaxPriceAmount());
 		target.setMaxPriceRange(source.getMaxPriceRange());
 		target.setMaxQuantityAmount(source.getMaxQuantityAmount());
 		target.setMaxQuantityRange(source.getMaxQuantityRange());
+		target.setPayedInvoice(payedInvoice);
 		target.setProvider(source.getProvider());
-		target.setTaxInclusive(source.isTaxInclusive());
 		target.setReceiptNumberFormat(source.getReceiptNumberFormat());
-		target.setAllowTestSettlement(source.isAllowTestSettlement());
+		target.setReferenceCurrency(currency);
+		target.setTaxInclusive(source.isTaxInclusive());
+		target.setTaxNumber(source.getTaxNumber());
 		target.setTransferDelay(source.getTransferDelay());
 		target.setTransferRepeatDelay(source.getTransferRepeatDelay());
 		target.setTransferReceiptCount(source.getTransferReceiptCount());
-		target.setMaximizedClientWindow(source.isMaximizedClientWindow());
-		target.setForceSettlement(source.isForceSettlement());
 		return target;
 	}
 }
