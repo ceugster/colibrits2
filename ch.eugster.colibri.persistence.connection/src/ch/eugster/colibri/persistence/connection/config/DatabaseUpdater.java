@@ -474,6 +474,61 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
+							else if (structureVersion == 10)
+							{
+								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_common_settings";
+								String columnName = "cs_export";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								columnName = "cs_export_path";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "VARCHAR(255)", "", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+
+								tableName = "colibri_salespoint";
+								columnName = "sp_export";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								columnName = "sp_export_path";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "VARCHAR(255)", "", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								columnName = "sp_use_individual_export";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
 							
 							
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
