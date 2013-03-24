@@ -6,6 +6,9 @@
  */
 package ch.eugster.colibri.admin.common.settings.editors;
 
+import java.io.File;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.nebula.widgets.formattedtext.FormattedText;
 import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
 import org.eclipse.swt.SWT;
@@ -18,7 +21,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
@@ -31,7 +36,9 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.osgi.framework.Bundle;
 
+import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.admin.ui.dialogs.Message;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditor;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditorInput;
@@ -78,7 +85,13 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 	private Button forceSettlement;
 	
 	private ScrolledForm scrolledForm;
+	
+	private Button export;
+	
+	private Text exportPath;
 
+	private Button exportSelector;
+	
 	public GeneralSettingsEditor()
 	{
 		EntityMediator.addListener(CommonSettings.class, this);
@@ -118,6 +131,15 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		this.createTaxSection(scrolledForm);
 		this.createTransferSection(scrolledForm);
 		this.createSettlementSection(scrolledForm);
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				this.createExportSection(scrolledForm);
+				break;
+			}
+		}
 		this.createSettingSection(scrolledForm);
 	}
 
@@ -170,6 +192,23 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		this.maximizedClientWindow.setSelection(commonSettings.isMaximizedClientWindow());
 		this.forceSettlement.setSelection(commonSettings.isForceSettlement());
 		
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (this.export != null)
+				{
+					this.export.setSelection(commonSettings.isExport());
+				}
+				if (this.exportPath != null)
+				{
+					this.exportPath.setText(commonSettings.getExportPath());
+				}
+				break;
+			}
+		}
+
 		this.setDirty(false);
 	}
 
@@ -209,6 +248,24 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 
 		commonSettings.setMaximizedClientWindow(this.maximizedClientWindow.getSelection());
 		commonSettings.setForceSettlement(this.forceSettlement.getSelection());
+		
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (this.export != null)
+				{
+					commonSettings.setExport(export.getSelection());
+				}
+				if (this.exportPath != null)
+				{
+					String exportPath = this.exportPath.getText().endsWith("/") ? this.exportPath.getText() : this.exportPath.getText() + File.separator;
+					commonSettings.setExportPath(exportPath);
+				}
+				break;
+			}
+		}
 	}
 
 	@Override
@@ -220,8 +277,29 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 	@Override
 	protected boolean validate()
 	{
-		final Message msg = null;
+		Message msg = validateExportPath();
+
+		if (msg != null)
+		{
+			this.showWarningMessage(msg);
+		}
 		return msg == null;
+	}
+	
+	private Message validateExportPath()
+	{
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				if (this.export.getSelection() && !new File(this.exportPath.getText()).exists())
+				{
+					return new Message(this.exportPath, "Ungültiger Export-Pfad", "Der eingegebene Export-Pfad ist ungültig. Wählen Sie ein vorhandenes Verzeichnis als Export-Pfad aus.");
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -293,6 +371,31 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		section.setLayout(sectionLayout);
 		section.setText("Weitere Einstellungen");
 		section.setClient(this.fillSettingsSection(section));
+		section.addExpansionListener(new ExpansionAdapter()
+		{
+			@Override
+			public void expansionStateChanged(final ExpansionEvent e)
+			{
+				GeneralSettingsEditor.this.scrolledForm.reflow(true);
+			}
+		});
+
+		return section;
+	}
+
+	private Section createExportSection(final ScrolledForm scrolledForm)
+	{
+		final ColumnLayoutData layoutData = new ColumnLayoutData();
+		layoutData.widthHint = 200;
+		final TableWrapLayout sectionLayout = new TableWrapLayout();
+		sectionLayout.numColumns = 1;
+
+		final Section section = this.formToolkit.createSection(scrolledForm.getBody(), ExpandableComposite.EXPANDED
+				| ExpandableComposite.COMPACT | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
+		section.setLayoutData(layoutData);
+		section.setLayout(sectionLayout);
+		section.setText("Export");
+		section.setClient(this.fillExportSection(section));
 		section.addExpansionListener(new ExpansionAdapter()
 		{
 			@Override
@@ -671,6 +774,108 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		this.formToolkit.paintBordersFor(composite);
 
 		return composite;
+	}
+
+	private Control fillExportSection(final Section parent)
+	{
+		final CommonSettings settings = (CommonSettings) ((GeneralSettingsEditorInput) this.getEditorInput())
+				.getAdapter(CommonSettings.class);
+
+		final Composite composite = this.formToolkit.createComposite(parent);
+		composite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		composite.setLayout(new GridLayout(3, false));
+
+		GridData gridData = new GridData();
+		gridData.horizontalSpan = 3;
+		
+		export = formToolkit.createButton(composite, "Belege exportieren", SWT.CHECK);
+		export.setLayoutData(gridData);
+		export.addSelectionListener(new SelectionListener() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				if (export.getSelection())
+				{
+					File file = new File(exportPath.getText());
+					if (!file.exists())
+					{
+						setExportPath(settings);
+					}
+				}
+				GeneralSettingsEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+				widgetSelected(e);
+			}
+		});
+		
+		Label label = formToolkit.createLabel(composite, "Pfad");
+		label.setLayoutData(new GridData());
+
+		exportPath = formToolkit.createText(composite, "", SWT.MULTI | SWT.WRAP);
+		exportPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		exportPath.addModifyListener(new ModifyListener()
+		{
+			@Override
+			public void modifyText(ModifyEvent e)
+			{
+				setDirty(true);
+			}
+		});
+
+		exportSelector = formToolkit.createButton(composite, "...", SWT.PUSH);
+		exportSelector.setLayoutData(new GridData());
+		exportSelector.addSelectionListener(new SelectionListener() 
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				setExportPath(settings);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+				widgetSelected(e);
+			}
+		});
+		
+		this.formToolkit.paintBordersFor(composite);
+
+		return composite;
+	}
+	
+	private void setExportPath(CommonSettings settings)
+	{
+		Shell shell = GeneralSettingsEditor.this.getSite().getShell();
+		DirectoryDialog dialog = new DirectoryDialog(shell);
+		dialog.setMessage("Zielverzeichnis für den Beleg-Export");
+		dialog.setFilterPath(this.exportPath.getText());
+		dialog.setText("Beleg-Export");
+		String path = dialog.open();
+		File file = new File(path == null ? exportPath.getText() : path);
+		if (path == null || !file.exists() && export.getSelection())
+		{
+			String title = "Ungültiges Verzeichnis";
+			String msg = "Das gewählte Verzeichnis existiert nicht. Bitte wählen Sie ein gültiges Verzeichnis.";
+			MessageDialog messageDialog = new MessageDialog(shell, title, null, msg, MessageDialog.WARNING, new String[] { "OK" }, 0);
+			messageDialog.open();
+			export.setSelection(false);
+		}
+		else
+		{
+			exportPath.setText(path);
+			GeneralSettingsEditor.this.setDirty(true);
+
+			String title = "Pfadangabe";
+			String msg = "Bitte beachten Sie, dass der gewählte Pfad lokal ist. Für jede Kasse, die exportieren soll, muss der Pfad lokal verfügbar sein.";
+			MessageDialog messageDialog = new MessageDialog(shell, title, null, msg, MessageDialog.WARNING, new String[] { "OK" }, 0);
+			messageDialog.open();
+		}
 	}
 
 	private Control fillRegistrationSection(final Section parent)
