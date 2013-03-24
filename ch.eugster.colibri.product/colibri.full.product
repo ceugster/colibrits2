@@ -189,6 +189,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
    </features>
 
    <configurations>
+      <plugin id="ch.eugster.colibri.export" autoStart="true" startLevel="0" />
       <plugin id="ch.eugster.colibri.persistence.connection" autoStart="true" startLevel="0" />
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
