@@ -111,8 +111,6 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
-	private boolean showFailoverMessage = true;
-	
 	public boolean addShutdownListener(final ShutdownListener listener)
 	{
 		return this.shutdownListeners.add(listener);
@@ -187,22 +185,25 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		{
 			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
 			{
-				if (salespoint.getMapping() == null || salespoint.getMapping().isEmpty())
+				if (salespoint.isExport())
 				{
-					msg = msg.append("Es wurde noch keine ExportId für die aktuelle Kasse definiert\n");
-				}
-				PersistenceService service = persistenceServiceTracker.getService();
-				ProductGroupQuery productGroupQuery = (ProductGroupQuery) service.getCacheService().getQuery(ProductGroup.class);
-				long count = productGroupQuery.countWithoutMapping();
-				if (count > 0L)
-				{
-					msg = msg.append("Für " + count + " Warengruppe/n sind noch keine ExportId's definiert\n");
-				}
-				PaymentTypeQuery paymentTypeQuery = (PaymentTypeQuery) service.getCacheService().getQuery(PaymentType.class);
-				count = paymentTypeQuery.countWithoutMapping();
-				if (count > 0L)
-				{
-					msg = msg.append("Für " + count + " Zahlungsarten/n sind noch keine ExportId's definiert\n");
+					if (salespoint.getMapping() == null || salespoint.getMapping().isEmpty())
+					{
+						msg = msg.append("Es wurde noch keine ExportId für die aktuelle Kasse definiert\n");
+					}
+					PersistenceService service = persistenceServiceTracker.getService();
+					ProductGroupQuery productGroupQuery = (ProductGroupQuery) service.getCacheService().getQuery(ProductGroup.class);
+					long count = productGroupQuery.countWithoutMapping();
+					if (count > 0L)
+					{
+						msg = msg.append("Für " + count + " Warengruppe/n sind noch keine ExportId's definiert\n");
+					}
+					PaymentTypeQuery paymentTypeQuery = (PaymentTypeQuery) service.getCacheService().getQuery(PaymentType.class);
+					count = paymentTypeQuery.countWithoutMapping();
+					if (count > 0L)
+					{
+						msg = msg.append("Für " + count + " Zahlungsarten/n sind noch keine ExportId's definiert\n");
+					}
 				}
 			}
 		}
@@ -248,31 +249,27 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	{
 		if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
 		{
-			if (showFailoverMessage)
+			Boolean showFailoverMessage = (Boolean) event.getProperty("show.failover.message");
+			if (showFailoverMessage != null && showFailoverMessage.booleanValue())
 			{
 				showFailoverMessage = false;
-				final IStatus status = (IStatus) event.getProperty("status");
-				if (status.getException() != null)
+				final String message = (String) event.getProperty("message");
+				if (message != null)
 				{
-					final String message = (String) event.getProperty("message");
-					if (message != null)
-					{
-						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
-						dialog.setMessage(message);
-						dialog.pack();
-						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
-						dialog.setVisible(true);
-					}
+					MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+							.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
+					dialog.setMessage(message);
+					dialog.pack();
+					dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
+					dialog.setVisible(true);
 				}
-				this.updateProviderMessage(event);
 			}
+			this.updateProviderMessage(event);
 //			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
 //					.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
 		}
 		else
 		{
-			showFailoverMessage = true;
 			if (event.getTopic().equals("ch/eugster/colibri/print/error"))
 			{
 				final IStatus status = (IStatus) event.getProperty("status");
