@@ -43,6 +43,8 @@ public class GalileoInterfaceComponent implements ProviderInterface
 
 	private CustomerServer customerServer;
 
+	private boolean showFailoverMessage = true;
+	
 	private final Collection<BarcodeVerifier> barcodeVerifiers = new ArrayList<BarcodeVerifier>();
 
 	public GalileoInterfaceComponent()
@@ -275,6 +277,23 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	{
 		final String topic = status.getMessage();
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+
+		if (status.getException() != null)
+		{
+			if (this.showFailoverMessage)
+			{
+				properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
+				this.showFailoverMessage = false;
+			}
+		}
+		else
+		{
+			if (!this.showFailoverMessage)
+			{
+				this.showFailoverMessage = true;
+			}
+		}
+
 		properties.put(EventConstants.EVENT_TOPIC, topic);
 		properties.put(EventConstants.BUNDLE_ID, Activator.PLUGIN_ID);
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
