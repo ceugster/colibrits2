@@ -1150,7 +1150,6 @@ ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/con
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/SqlserverDatabaseUpdater.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/TaxUpdater.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/dialog/LoginDialog.java -text
-ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/handlers/ReceiptMigratorHandler.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/handlers/SelectConnectionHandler.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/handlers/StartDatabaseConnectionService.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/service/AbstractConnectionService.java -text
