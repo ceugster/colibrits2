@@ -58,7 +58,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 	@JoinColumn(name = "sp_tx_id", referencedColumnName = "tx_id")
 	private Tax proposalTax;
 
-	@ManyToOne(optional = false)
+	@ManyToOne(optional = false, cascade=CascadeType.ALL)
 	@JoinColumn(name = "sp_pr_id", referencedColumnName = "pr_id")
 	private Profile profile;
 
