@@ -105,7 +105,11 @@ public abstract class AbstractEntityEditor<T extends AbstractEntity> extends Edi
 			if (this.validate())
 			{
 				final AbstractEntityEditorInput<T> input = (AbstractEntityEditorInput<T>) this.getEditorInput();
-				input.setEntity((T) persistenceService.getServerService().refresh(input.getEntity()));
+				if (input.getEntity().getId() != null)
+				{
+					input.setEntity((T) persistenceService.getServerService().refresh(input.getEntity())); 
+				}
+//				input.setEntity((T) persistenceService.getServerService().refresh(input.getEntity()));
 				this.saveValues();
 				if (input.hasParent())
 				{
