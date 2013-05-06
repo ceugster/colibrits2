@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.eugster.colibri.persistence.model.AbstractEntity;
+import ch.eugster.colibri.persistence.model.CurrentTaxCodeMapping;
 import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
+import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
@@ -34,9 +36,9 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("CCCCCCCCCCCCCCCCCCCC EEEEEEE MM BBBBBBBB T\n");
-		builder = builder.append("              BBBBBB PPPPPPP    RRRRRRRR\n");
-		builder = builder.append("   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+		builder = builder.append("CCCCCCCCCCCCCCCCCCC EEEEEEE MM BBBBBBBB OO\n");
+		builder = builder.append("              BBBBB PPPPPPP    RRRRRRRR\n");
+		builder = builder.append("   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
 		return builder.toString();
 	}
 
@@ -45,7 +47,7 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Total       SSSSSSSS RRRRRRR MM TTTTTTTT\n");
+		builder = builder.append("Total      SSSSSSSS RRRRRRR MM TTTTTTTT\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -329,7 +331,7 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 
 	public enum DetailKey implements IKey
 	{
-		C, M, E, B, N, P, R, T, O, A;
+		C, M, E, B, N, P, R, T, G, O, A;
 
 		@Override
 		public String label()
@@ -368,9 +370,13 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 				{
 					return "Mehrwertsteuercode";
 				}
+				case G:
+				{
+					return "Mehrwertsteuercode (extern)";
+				}
 				case O:
 				{
-					return "Optionscode";
+					return "MWST (ext.) + Optionscode";
 				}
 				case A:
 				{
@@ -460,9 +466,16 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 						return layoutSection.replaceMarker(position.getCurrentTax().getTax().getTaxRate().getCode(),
 								marker, false);
 					}
+					case G:
+					{
+						String code = getExternalTaxCode(position);
+						return layoutSection.replaceMarker(code, marker, false);
+					}
 					case O:
 					{
-						return layoutSection.replaceMarker(position.getOption().toCode(), marker, false);
+						String option = position.getOption().toCode();
+						String tax = getExternalTaxCode(position);
+						return layoutSection.replaceMarker(tax + option, marker, false);
 					}
 					case A:
 					{
@@ -488,6 +501,28 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 				}
 			}
 			return marker;
+		}
+
+		public String getExternalTaxCode(Position position)
+		{
+			String code = position.getCurrentTax().getTax().getTaxRate().getCode();
+			if (position.getProvider() != null)
+			{
+				CurrentTaxCodeMapping currentTaxCodeMapping = position.getCurrentTax().getCurrentTaxCodeMapping(position.getProvider());
+				if (currentTaxCodeMapping == null)
+				{
+					TaxCodeMapping taxCodeMapping = position.getCurrentTax().getTax().getTaxCodeMapping(position.getProvider());
+					if (taxCodeMapping != null)
+					{
+						code = taxCodeMapping.getCode();
+					}
+				}
+				else
+				{
+					code = currentTaxCodeMapping.getCode();
+				}
+			}
+			return code;
 		}
 	}
 
