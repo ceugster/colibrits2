@@ -13,11 +13,16 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.nebula.widgets.formattedtext.FormattedText;
+import org.eclipse.nebula.widgets.formattedtext.NumberFormatter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -39,10 +44,13 @@ import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.User;
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.SettlementQuery;
@@ -68,6 +76,10 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 	private ComboViewer userViewer;
 
 	private ComboViewer stateViewer;
+	
+	private ComboViewer paymentTypeViewer;
+	
+	private FormattedText amount;
 
 	private final ListenerList listeners = new ListenerList();
 
@@ -211,7 +223,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		});
 
 		group = new Group(composite, SWT.NONE);
-		group.setText("Filter");
+		group.setText("Belegfilter");
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		group.setLayout(new GridLayout(2, false));
 
@@ -252,6 +264,86 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		this.userViewer.setLabelProvider(new UserLabelProvider());
 		this.userViewer.setSorter(new UserSorter());
 		this.userViewer.addSelectionChangedListener(this);
+
+		group = new Group(composite, SWT.NONE);
+		group.setText("Detailfilter");
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		group.setLayout(new GridLayout(3, false));
+
+		label = new Label(group, SWT.None);
+		label.setLayoutData(new GridData());
+		label.setText("Zahlungsart");
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		
+		combo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+		combo.setLayoutData(gridData);
+
+		this.paymentTypeViewer = new ComboViewer(combo);
+		this.paymentTypeViewer.setContentProvider(new PaymentTypeContentProvider());
+		this.paymentTypeViewer.setLabelProvider(new PaymentTypeLabelProvider());
+		this.paymentTypeViewer.setSorter(new PaymentTypeSorter());
+		this.paymentTypeViewer.addSelectionChangedListener(this);
+
+		label = new Label(group, SWT.None);
+		label.setLayoutData(new GridData());
+		label.setText("Betrag");
+
+		final Text text = new Text(group, SWT.BORDER | SWT.SINGLE);
+		text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		text.addFocusListener(new FocusAdapter() 
+		{
+			@Override
+			public void focusGained(FocusEvent e) 
+			{
+				text.selectAll();
+				
+			}
+		});
+		
+		this.amount = new FormattedText(text);
+		this.amount.setFormatter(new NumberFormatter("#,###,##0.00", "#,###,##0.00"));
+		this.amount.getControl().addModifyListener(new ModifyListener() 
+		{
+			@Override
+			public void modifyText(ModifyEvent e) 
+			{
+				Double amount = Double.valueOf(0D);
+				Object value = ReceiptFilterView.this.amount.getValue();
+				try
+				{
+					amount = Double.valueOf(value == null ? Double.valueOf(0D).toString() : value.toString());
+				}
+				catch (NumberFormatException nfe)
+				{
+					
+				}
+				IStructuredSelection ssel = new StructuredSelection(new Double[] { amount });
+				SelectionChangedEvent event = new SelectionChangedEvent(ReceiptFilterView.this, ssel);
+				ReceiptFilterView.this.fireSelectionChanged(event);
+			}
+		});
+		
+		clear = new Button(group, SWT.PUSH);
+		clear.setLayoutData(new GridData());
+		clear.setImage(Activator.getDefault().getImageRegistry().get("clear"));
+		clear.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event)
+			{
+				widgetSelected(event);
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event)
+			{
+				Double value = Double.valueOf(0D);
+				amount.setValue(value);
+				settings.put("amount.selection", value);
+			}
+		});
 
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null)
@@ -331,8 +423,8 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				StructuredSelection ssel = (StructuredSelection) salespointViewer.getSelection();
 				Salespoint salespoint = (Salespoint) ssel.getFirstElement();
 				{
-					receipts = query.selectBySalespointAndDate(salespoint, startDate.getTimeInMillis(),
-							endDate.getTimeInMillis());
+					receipts = query.selectBySalespointAndDate(salespoint, startDate,
+							endDate);
 				}
 			}
 			return new StructuredSelection(receipts.toArray(new Receipt[0]));
@@ -521,6 +613,22 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		{
 			this.settings.put("state.filter", 0);
 		}
+		try
+		{
+			this.settings.getLong("payment.type.filter");
+		}
+		catch (final NumberFormatException e)
+		{
+			this.settings.put("payment.type.filter", 0);
+		}
+		try
+		{
+			this.settings.getLong("amount.filter");
+		}
+		catch (final NumberFormatException e)
+		{
+			this.settings.put("amount.filter", 0D);
+		}
 	}
 
 	private void setDate(Calendar calendar)
@@ -559,6 +667,8 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				this.settlementViewer.setSelection(new StructuredSelection(new Settlement[0]));
 				this.userViewer.setInput(null);
 				this.userViewer.setSelection(new StructuredSelection(new User[0]));
+				this.paymentTypeViewer.setInput(null);
+				this.paymentTypeViewer.setSelection(new StructuredSelection(new PaymentType[0]));
 			}
 		}
 		else
@@ -657,6 +767,44 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 					this.userViewer.setSelection(new StructuredSelection(users[0]));
 				}
 			}
+
+			id = Long.valueOf(this.settings.getLong("payment.type.filter"));
+			final PaymentTypeQuery paymentTypeQuery = (PaymentTypeQuery) persistenceService.getServerService().getQuery(PaymentType.class);
+			Collection<PaymentType> allPaymentTypes = new ArrayList<PaymentType>();
+			PaymentType emptyPaymentType = PaymentType.newInstance(PaymentTypeGroup.CASH);
+			allPaymentTypes.add(emptyPaymentType);
+			allPaymentTypes.addAll(paymentTypeQuery.selectAll(false));
+			PaymentType[] paymentTypes = allPaymentTypes.toArray(new PaymentType[0]);
+			this.paymentTypeViewer.setInput(paymentTypes);
+			if (paymentTypes.length > 0)
+			{
+				for (final PaymentType paymentType : paymentTypes)
+				{
+					if (paymentType.getId() == null)
+					{
+						if (id.longValue() == 0L)
+						{
+							this.paymentTypeViewer.setSelection(new StructuredSelection(new PaymentType[] { paymentType }));
+							break;
+						}
+					}
+					else
+					{
+						if (paymentType.getId().equals(id))
+						{
+							this.paymentTypeViewer.setSelection(new StructuredSelection(new PaymentType[] { paymentType }));
+							break;
+						}
+					}
+				}
+				if (this.paymentTypeViewer.getSelection().isEmpty())
+				{
+					this.paymentTypeViewer.setSelection(new StructuredSelection(users[0]));
+				}
+			}
+			
+			double defaultAmount = this.settings.getDouble("amount.filter");
+			this.amount.setValue(Double.valueOf(defaultAmount));
 		}
 	}
 
@@ -780,7 +928,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				fireSelectionChanged(event);
 			}
 		}
-		if (event.getSource().equals(userViewer))
+		else if (event.getSource().equals(userViewer))
 		{
 			StructuredSelection ssel = (StructuredSelection) event.getSelection();
 			if (ssel.getFirstElement() instanceof User)
@@ -792,19 +940,44 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				fireSelectionChanged(event);
 			}
 		}
+		else if (event.getSource().equals(paymentTypeViewer))
+		{
+			StructuredSelection ssel = (StructuredSelection) event.getSelection();
+			if (ssel.getFirstElement() instanceof PaymentType)
+			{
+				final PaymentType paymentType = (PaymentType) ssel.getFirstElement();
+				ReceiptFilterView.this.settings
+						.put("payment.type.filter", paymentType.getId() == null ? 0l : paymentType.getId().longValue());
+				event = new SelectionChangedEvent(this, ssel);
+				fireSelectionChanged(event);
+			}
+		}
 		else if (event.getSource().equals(salespointViewer))
 		{
 			if (this.number.getText().isEmpty())
 			{
 				StructuredSelection ssel = (StructuredSelection) event.getSelection();
-				if (ssel.getFirstElement() instanceof Salespoint)
+				if (ssel.getFirstElement() instanceof PaymentType)
 				{
-					final Salespoint salespoint = (Salespoint) ssel.getFirstElement();
-					ReceiptFilterView.this.settings.put("salespoint.selection", salespoint.getId());
+					final PaymentType paymentType = (PaymentType) ssel.getFirstElement();
+					Long id = paymentType.getId();
+					ReceiptFilterView.this.settings.put("paymentType.selection", id == null ? Long.valueOf(0L) : id);
 					ssel = selectReceipts();
 					event = new SelectionChangedEvent(this, ssel);
 					fireSelectionChanged(event);
 				}
+			}
+		}
+		else if (event.getSelection() instanceof IStructuredSelection)
+		{
+			StructuredSelection ssel = (StructuredSelection) event.getSelection();
+			if (ssel.getFirstElement() instanceof Double)
+			{
+				final Double amount = (Double) ssel.getFirstElement();
+				ReceiptFilterView.this.settings
+						.put("amount.filter", amount == null ? 0D : amount.doubleValue());
+				event = new SelectionChangedEvent(this, ssel);
+				fireSelectionChanged(event);
 			}
 		}
 	}

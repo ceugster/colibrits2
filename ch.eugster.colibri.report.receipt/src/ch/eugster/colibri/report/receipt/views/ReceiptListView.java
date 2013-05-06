@@ -29,6 +29,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -54,6 +55,10 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 	private ReceiptStateViewerFilter stateFilter;
 
 	private UserViewerFilter userFilter;
+	
+	private PaymentTypeViewerFilter paymentTypeFilter;
+	
+	private AmountViewerFilter amountFilter;
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
@@ -117,8 +122,10 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 		settlementFilter = new SettlementViewerFilter();
 		userFilter = new UserViewerFilter();
 		stateFilter = new ReceiptStateViewerFilter();
-
-		ViewerFilter[] filters = new ViewerFilter[] { settlementFilter, userFilter, stateFilter,
+		paymentTypeFilter = new PaymentTypeViewerFilter();
+		amountFilter = new AmountViewerFilter();
+		
+		ViewerFilter[] filters = new ViewerFilter[] { settlementFilter, userFilter, stateFilter, paymentTypeFilter, amountFilter,
 				new DeletedEntityViewerFilter() };
 
 		this.viewer = new TableViewer(table);
@@ -357,6 +364,24 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 				else if (ssel.getFirstElement() instanceof User)
 				{
 					userFilter.setUser((User) ssel.getFirstElement());
+					this.viewer.refresh();
+					TableItem[] objects = this.viewer.getTable().getItems();
+					setSummary(objects);
+					viewer.setSelection(objects.length == 0 ? new StructuredSelection() : new StructuredSelection(
+							new Object[] { objects[0] }));
+				}
+				else if (ssel.getFirstElement() instanceof PaymentType)
+				{
+					paymentTypeFilter.setPaymentType((PaymentType) ssel.getFirstElement());
+					this.viewer.refresh();
+					TableItem[] objects = this.viewer.getTable().getItems();
+					setSummary(objects);
+					viewer.setSelection(objects.length == 0 ? new StructuredSelection() : new StructuredSelection(
+							new Object[] { objects[0] }));
+				}
+				else if (ssel.getFirstElement() instanceof Double)
+				{
+					amountFilter.setAmount((Double) ssel.getFirstElement());
 					this.viewer.refresh();
 					TableItem[] objects = this.viewer.getTable().getItems();
 					setSummary(objects);

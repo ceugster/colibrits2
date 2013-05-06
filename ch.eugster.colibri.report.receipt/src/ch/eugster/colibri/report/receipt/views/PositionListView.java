@@ -35,11 +35,11 @@ public class PositionListView extends ViewPart implements ISelectionListener, IS
 {
 	private TableViewer viewer;
 
-	private SettlementViewerFilter settlementFilter;
-
-	private ReceiptStateViewerFilter stateFilter;
-
-	private UserViewerFilter userFilter;
+//	private SettlementViewerFilter settlementFilter;
+//
+//	private ReceiptStateViewerFilter stateFilter;
+//
+//	private UserViewerFilter userFilter;
 
 	private final NumberFormat quantityFormatter = DecimalFormat.getIntegerInstance();
 
@@ -75,12 +75,11 @@ public class PositionListView extends ViewPart implements ISelectionListener, IS
 		table.setLayoutData(new GridData(GridData.FILL_BOTH));
 		table.setHeaderVisible(true);
 
-		settlementFilter = new SettlementViewerFilter();
-		userFilter = new UserViewerFilter();
-		stateFilter = new ReceiptStateViewerFilter();
+//		settlementFilter = new SettlementViewerFilter();
+//		userFilter = new UserViewerFilter();
+//		stateFilter = new ReceiptStateViewerFilter();
 
-		ViewerFilter[] filters = new ViewerFilter[] { settlementFilter, userFilter, stateFilter,
-				new DeletedEntityViewerFilter() };
+		ViewerFilter[] filters = new ViewerFilter[] { new DeletedEntityViewerFilter() };
 
 		this.viewer = new TableViewer(table);
 		this.viewer.setContentProvider(new PositionContentProvider());
@@ -176,7 +175,7 @@ public class PositionListView extends ViewPart implements ISelectionListener, IS
 				if (cell.getElement() instanceof Position)
 				{
 					final Position position = (Position) cell.getElement();
-					cell.setText(position.getOption().toString());
+					cell.setText(position.getOption() == null ? "" : position.getOption().toString());
 				}
 			}
 		});

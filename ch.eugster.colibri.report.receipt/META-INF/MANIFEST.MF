@@ -7,6 +7,7 @@ Bundle-Activator: ch.eugster.colibri.report.receipt.Activator
 Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.model.payment,
  ch.eugster.colibri.persistence.model.print,
  ch.eugster.colibri.persistence.queries,
  ch.eugster.colibri.persistence.service,
@@ -17,6 +18,7 @@ Import-Package: ch.eugster.colibri.persistence.model,
  org.eclipse.jface.dialogs,
  org.eclipse.jface.resource,
  org.eclipse.jface.viewers,
+ org.eclipse.nebula.widgets.formattedtext,
  org.eclipse.swt,
  org.eclipse.swt.events,
  org.eclipse.swt.layout,

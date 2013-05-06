@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -16,6 +17,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
@@ -31,25 +33,29 @@ public class PaymentListView extends ViewPart implements ISelectionListener
 {
 	private TableViewer viewer;
 
-	private SettlementViewerFilter settlementFilter;
+//	private SettlementViewerFilter settlementFilter;
+//
+//	private ReceiptStateViewerFilter stateFilter;
+//
+//	private UserViewerFilter userFilter;
 
-	private ReceiptStateViewerFilter stateFilter;
-
-	private UserViewerFilter userFilter;
-
+	private PaymentTypeViewerFilter paymentTypeFilter;
+	
+	private AmountViewerFilter amountFilter;
+	
 	private final NumberFormat currencyFormatter = DecimalFormat.getCurrencyInstance();
 
 	@Override
 	public void init(IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		site.getWorkbenchWindow().getSelectionService().addSelectionListener(this);
+		site.getWorkbenchWindow().getSelectionService().addPostSelectionListener(this);
 	}
 
 	@Override
 	public void dispose()
 	{
-		getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this);
+		getSite().getWorkbenchWindow().getSelectionService().removePostSelectionListener(this);
 	}
 
 	@Override
@@ -65,11 +71,13 @@ public class PaymentListView extends ViewPart implements ISelectionListener
 		table.setLayoutData(new GridData(GridData.FILL_BOTH));
 		table.setHeaderVisible(true);
 
-		settlementFilter = new SettlementViewerFilter();
-		userFilter = new UserViewerFilter();
-		stateFilter = new ReceiptStateViewerFilter();
+//		settlementFilter = new SettlementViewerFilter();
+//		userFilter = new UserViewerFilter();
+//		stateFilter = new ReceiptStateViewerFilter();
+		paymentTypeFilter = new PaymentTypeViewerFilter();
+		amountFilter = new AmountViewerFilter();
 
-		ViewerFilter[] filters = new ViewerFilter[] { settlementFilter, userFilter, stateFilter,
+		ViewerFilter[] filters = new ViewerFilter[] { paymentTypeFilter, amountFilter,
 				new DeletedEntityViewerFilter() };
 
 		this.viewer = new TableViewer(table);
@@ -139,9 +147,26 @@ public class PaymentListView extends ViewPart implements ISelectionListener
 	{
 		if (part instanceof ReceiptFilterView)
 		{
-			this.viewer.setInput(null);
+//			IStructuredSelection ssel = (IStructuredSelection) selection;
+//			if (ssel.getFirstElement() instanceof PaymentType)
+//			{
+//				paymentTypeFilter.setPaymentType((PaymentType) ssel.getFirstElement());
+//				this.viewer.refresh();
+//				TableItem[] objects = this.viewer.getTable().getItems();
+//				viewer.setSelection(objects.length == 0 ? new StructuredSelection() : new StructuredSelection(
+//						new Object[] { objects[0] }));
+//			}
+//			else if (ssel.getFirstElement() instanceof Double)
+//			{
+//				Double amount = (Double) ssel.getFirstElement();
+//				amountFilter.setAmount(amount);
+//				this.viewer.refresh();
+//				TableItem[] objects = this.viewer.getTable().getItems();
+//				viewer.setSelection(objects.length == 0 ? new StructuredSelection() : new StructuredSelection(
+//						new Object[] { objects[0] }));
+//			}
 		}
-		else if (part instanceof ReceiptListView || part instanceof ReceiptFilterView)
+		else if (part instanceof ReceiptListView)
 		{
 			StructuredSelection ssel = (StructuredSelection) selection;
 			if (ssel.isEmpty())
