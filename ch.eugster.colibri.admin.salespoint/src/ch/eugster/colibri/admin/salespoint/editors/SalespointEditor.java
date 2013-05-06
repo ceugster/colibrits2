@@ -512,9 +512,12 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		StructuredSelection ssel = (StructuredSelection) this.profiles.getSelection();
 		final Profile newProfile = (Profile) ssel.getFirstElement();
 		final Profile oldProfile = salespoint.getProfile();
-		if ((oldProfile != null) && !newProfile.getId().equals(oldProfile.getId()))
+		if (oldProfile != null)
 		{
 			oldProfile.removeSalespoint(salespoint);
+		}
+		if (oldProfile == null || !newProfile.getId().equals(oldProfile.getId()))
+		{
 			salespoint.setProfile(newProfile);
 			newProfile.addSalespoint(salespoint);
 		}

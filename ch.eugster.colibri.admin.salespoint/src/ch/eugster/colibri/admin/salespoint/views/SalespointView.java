@@ -330,7 +330,8 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 				return;
 			}
 
-			this.viewer.add(parent, entity);
+			
+			this.viewer.setInput(persistenceServiceTracker.getService());
 			this.viewer.expandToLevel(entity, AbstractTreeViewer.ALL_LEVELS);
 			this.packColumns();
 		}
