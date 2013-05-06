@@ -516,7 +516,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 		element.setAttribute("receipt-id", position.getReceipt().getId().toString());
 		element.setAttribute("product-group-id", position.getProductGroup().getMappingId());
 		element.setAttribute("tax-id", position.getCurrentTax().getTax().getCode().toString());
-		element.setAttribute("current-tax-id", position.getCurrentTax().toString());
+		element.setAttribute("current-tax-id", position.getCurrentTax().getValidFrom().toString());
 		element.setAttribute("quantity", Integer.toString(position.getQuantity()));
 		element.setAttribute("price", Double.toString(position.getPrice()));
 		element.setAttribute("discount", Double.toString(position.getDiscount()));
