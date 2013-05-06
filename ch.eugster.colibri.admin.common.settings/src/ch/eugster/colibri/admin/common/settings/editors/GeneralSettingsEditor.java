@@ -260,7 +260,7 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 				}
 				if (this.exportPath != null)
 				{
-					String exportPath = this.exportPath.getText().endsWith("/") ? this.exportPath.getText() : this.exportPath.getText() + File.separator;
+					String exportPath = this.exportPath.getText().endsWith(File.separator) ? this.exportPath.getText() : this.exportPath.getText() + File.separator;
 					commonSettings.setExportPath(exportPath);
 				}
 				break;
