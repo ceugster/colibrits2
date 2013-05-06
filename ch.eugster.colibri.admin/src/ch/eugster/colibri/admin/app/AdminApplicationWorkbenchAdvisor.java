@@ -32,7 +32,7 @@ public class AdminApplicationWorkbenchAdvisor extends WorkbenchAdvisor
 	public void initialize(final IWorkbenchConfigurer configurer)
 	{
 		super.initialize(configurer);
-		configurer.setSaveAndRestore(true);
+		configurer.setSaveAndRestore(false);
 	}
 
 }
