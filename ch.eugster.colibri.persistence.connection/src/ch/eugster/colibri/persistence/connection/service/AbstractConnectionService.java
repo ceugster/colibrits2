@@ -491,6 +491,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				}
 				catch (Exception e)
 				{
+					e.printStackTrace();
 					if (e instanceof RollbackException)
 					{
 						RollbackException re = (RollbackException) e;

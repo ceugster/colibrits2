@@ -301,8 +301,7 @@ public class Activator extends AbstractUIPlugin
 		}
 		else
 		{
-			PersistenceService persistenceService = new PersistenceServiceImpl();
-			context.registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
+			startPersistenceService();
 		}
 
 		this.log("Plugin " + Activator.PLUGIN_ID + " gestartet.");
@@ -329,6 +328,12 @@ public class Activator extends AbstractUIPlugin
 
 		Activator.plugin = null;
 		super.stop(context);
+	}
+	
+	public void startPersistenceService()
+	{
+		PersistenceService persistenceService = new PersistenceServiceImpl();
+		getBundle().getBundleContext().registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
 	}
 	
 	@Override

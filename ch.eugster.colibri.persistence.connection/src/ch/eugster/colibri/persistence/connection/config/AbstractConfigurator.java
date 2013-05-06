@@ -21,11 +21,20 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractConfigurator
 {
-	private final Shell shell;
+	private Shell shell;
 
 	private EntityManager entityManager;
 
-	public AbstractConfigurator(final Shell shell, final Element connection)
+	public AbstractConfigurator()
+	{
+	}
+
+	public void setShell(Shell shell)
+	{
+		this.shell = shell;
+	}
+	
+	public AbstractConfigurator(final Shell shell)
 	{
 		this.shell = shell;
 	}

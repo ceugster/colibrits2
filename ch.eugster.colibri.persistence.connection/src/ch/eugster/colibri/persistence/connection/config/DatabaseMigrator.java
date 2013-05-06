@@ -78,6 +78,7 @@ import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.pos.db.Block;
 import ch.eugster.pos.db.Coin;
 import ch.eugster.pos.db.CustomKey;
+import ch.eugster.pos.db.FixKey;
 import ch.eugster.pos.db.ForeignCurrency;
 import ch.eugster.pos.db.Setting;
 
@@ -92,7 +93,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 	public DatabaseMigrator(final Shell shell, final Element connection, final Document oldDocument,
 			final ch.eugster.pos.db.Salespoint[] salespoints)
 	{
-		super(shell, connection);
+		super(shell);
 		this.oldDocument = oldDocument;
 		this.salespoints = salespoints;
 	}
@@ -372,6 +373,20 @@ public class DatabaseMigrator extends AbstractConfigurator
 			{
 				newKey.setKeyType(KeyType.FUNCTION);
 				newKey.setFunctionType(FunctionType.FUNCTION_TOTAL_SALES);
+			}
+			else if (oldKey.className.equals("ch.eugster.pos.events.PrintLastReceiptAction"))
+			{
+				newKey.setKeyType(KeyType.FUNCTION);
+				newKey.setFunctionType(FunctionType.FUNCTION_PRINT_LAST_RECEIPT);
+			}
+			else if (oldKey.className.equals("ch.eugster.pos.events.StoreReceiptAction"))
+			{
+				newKey.setKeyType(KeyType.FUNCTION);
+				newKey.setFunctionType(FunctionType.FUNCTION_STORE_RECEIPT);
+			}
+			else
+			{
+				System.out.println();
 			}
 			monitor.worked(1);
 		}
@@ -908,7 +923,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		return status;
 	}
-
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private IStatus migratePaymentTypes(final IProgressMonitor monitor, final PersistenceBroker broker)
 	{
@@ -928,7 +943,9 @@ public class DatabaseMigrator extends AbstractConfigurator
 			final ch.eugster.pos.db.PaymentType paymentTypeCash = (ch.eugster.pos.db.PaymentType) broker
 					.getObjectByQuery(query);
 
-			query = new QueryByCriteria(ch.eugster.pos.db.PaymentType.class);
+			criteria = new Criteria();
+			criteria.addEqualTo("deleted", Boolean.FALSE);
+			query = new QueryByCriteria(ch.eugster.pos.db.PaymentType.class, criteria);
 			final Collection<ch.eugster.pos.db.PaymentType> paymentTypes = broker.getCollectionByQuery(query);
 
 			final long maxId = 0L;
@@ -979,7 +996,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 					target.setAccount(source.account);
 					target.setChange(source.back);
 					target.setCode(source.code);
-					final Currency cur = this.getEntityManager().find(Currency.class, source.foreignCurrencyId);
+					final Currency cur = this.getEntityManager().find(Currency.class, source.getForeignCurrencyId());
 					target.setCurrency(cur);
 					target.setDeleted(source.deleted);
 					target.setId(source.getId());
@@ -988,45 +1005,50 @@ public class DatabaseMigrator extends AbstractConfigurator
 					target.setUndeletable(!source.removeable);
 					target.setMappingId(source.exportId);
 
-					long maxMoneyId = 0L;
 					if (target.getId().equals(paymentTypeCash.getId()))
 					{
+						long maxMoneyId = 0L;
 						criteria = new Criteria();
-						criteria.addEqualTo("foreignCurrencyId", source.foreignCurrencyId);
+						criteria.addEqualTo("foreignCurrencyId", source.getForeignCurrencyId());
 						query = new QueryByCriteria(ch.eugster.pos.db.Coin.class, criteria);
 						final Collection coins = broker.getCollectionByQuery(query);
 						for (final Object o : coins)
 						{
 							final Coin coin = (Coin) o;
+							maxMoneyId = coin.getId().longValue() > maxMoneyId ? coin.getId().longValue(): maxMoneyId;
+						}
+
+						for (final Object o : coins)
+						{
+							final Coin coin = (Coin) o;
 							final Money money = Money.newInstance(target);
 							money.setDeleted(coin.deleted);
-							money.setId(coin.getId());
+							money.setId(coin.getId().equals(Long.valueOf(0L)) ? Long.valueOf(++maxMoneyId) : coin.getId());
 							money.setValue(coin.value);
 							target.addMoney(money);
-							if (money.getId().longValue() > maxMoneyId)
-							{
-								maxMoneyId = money.getId().longValue();
-							}
 						}
 					}
-					else if (source.foreignCurrency.code.equals("EUR"))
+					else if (source.getCurrencyCode().equals("EUR"))
 					{
+						long maxMoneyId = 0L;
 						criteria = new Criteria();
-						criteria.addEqualTo("foreignCurrencyId", source.foreignCurrencyId);
+						criteria.addEqualTo("foreignCurrencyId", source.getForeignCurrencyId());
 						query = new QueryByCriteria(ch.eugster.pos.db.Coin.class, criteria);
 						final Collection coins = broker.getCollectionByQuery(query);
 						for (final Object o : coins)
 						{
 							final Coin coin = (Coin) o;
+							maxMoneyId = coin.getId().longValue() > maxMoneyId ? coin.getId().longValue(): maxMoneyId;
+						}
+
+						for (final Object o : coins)
+						{
+							final Coin coin = (Coin) o;
 							final Money money = Money.newInstance(target);
 							money.setDeleted(coin.deleted);
-							money.setId(coin.getId());
+							money.setId(coin.getId().equals(Long.valueOf(0L)) ? Long.valueOf(++maxMoneyId) : coin.getId());
 							money.setValue(coin.value);
 							target.addMoney(money);
-							if (money.getId().longValue() > maxMoneyId)
-							{
-								maxMoneyId = money.getId().longValue();
-							}
 						}
 					}
 					this.updateSequence("mo_id", Long.valueOf(maxId + 1L));

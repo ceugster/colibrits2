@@ -102,7 +102,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 
 		return properties;
 	}
-
+	
 	private Map<String, Object> getEntityManagerProperties(IStatus status, final Properties properties)
 	{
 		final Map<String, Object> map = new HashMap<String, Object>();

@@ -175,13 +175,13 @@ public class DatabaseWizard extends Wizard
 					.getPage("select.connection.wizard.page");
 			if ((selectPage == null) || selectPage.addNewConnection())
 			{
+				Activator.getDefault().startPersistenceService();
 				final DatabaseWizardConnectionPage connectionWizardPage = (DatabaseWizardConnectionPage) this
 						.getPage("connection.wizard.page");
+
+				
 				if (connectionWizardPage.migrate())
 				{
-					PersistenceService persistenceService = new PersistenceServiceImpl();
-					Activator.getDefault().getBundle().getBundleContext().registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
-
 					final DatabaseWizardMigrationPage migrationWizardPage = (DatabaseWizardMigrationPage) this
 							.getPage("migration.wizard.page");
 					final Document oldDocument = migrationWizardPage.getDocument();

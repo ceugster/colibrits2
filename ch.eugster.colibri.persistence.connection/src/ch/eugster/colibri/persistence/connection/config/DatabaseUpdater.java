@@ -529,8 +529,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
-							
-							
+
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");
 							sql = "UPDATE colibri_version SET v_structure = " + structureVersion;

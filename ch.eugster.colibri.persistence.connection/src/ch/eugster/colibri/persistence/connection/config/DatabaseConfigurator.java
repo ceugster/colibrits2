@@ -53,7 +53,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 
 	public DatabaseConfigurator(final Shell shell, final Element connection, final Long currencyId)
 	{
-		super(shell, connection);
+		super(shell);
 		this.currencyId = currencyId;
 	}
 

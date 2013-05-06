@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.persistence.logging.SessionLog;
@@ -31,9 +32,16 @@ public class MigrationWizard extends Wizard
 {
 	private Document document;
 
+	private IDialogSettings settings;
+	
 	public MigrationWizard()
 	{
 		this.document = Activator.getDefault().getDocument();
+		this.settings = Activator.getDefault().getDialogSettings().getSection("migration.wizard");
+		if (this.settings == null)
+		{
+			this.settings = Activator.getDefault().getDialogSettings().addNewSection("migration.wizard");
+		}
 	}
 
 	@Override
