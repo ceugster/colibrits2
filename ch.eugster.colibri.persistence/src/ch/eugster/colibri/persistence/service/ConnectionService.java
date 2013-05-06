@@ -47,6 +47,8 @@ public interface ConnectionService
 	
 	void persist(AbstractEntity entity);
 
+	void persist(AbstractEntity entity, boolean updateTimestamp);
+
 	AbstractQuery<? extends AbstractEntity> getQuery(ConnectionService connectionService,
 			Class<? extends AbstractEntity> clazz);
 

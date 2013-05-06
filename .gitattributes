@@ -1421,6 +1421,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/CacheS
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/ConnectionService.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/EntityManagerWrapper.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/PersistenceService.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/ReceiptMigrationService.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/ServerService.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/service/SettlementService.java -text
 ch.eugster.colibri.print.feature/.project -text

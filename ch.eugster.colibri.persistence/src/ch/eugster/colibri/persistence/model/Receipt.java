@@ -274,8 +274,8 @@ public class Receipt extends AbstractEntity implements IPrintable
 
 	public double getDifference()
 	{
-		final double positionAmount = this.getPositionDefaultCurrencyAmount(AmountType.NETTO);
-		final double paymentAmount = this.getPaymentDefaultCurrencyAmount();
+		final double positionAmount = this.getPositionDefaultForeignCurrencyAmount(AmountType.NETTO);
+		final double paymentAmount = this.getPaymentDefaultForeignCurrencyAmount();
 		double difference = Math.abs(positionAmount - paymentAmount);
 		return difference < .000001 ? 0D : difference;
 	}

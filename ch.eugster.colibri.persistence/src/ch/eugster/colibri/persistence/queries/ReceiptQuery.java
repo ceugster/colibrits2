@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
 
@@ -131,7 +128,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return find(expression);
 	}
 
-	public Collection<Receipt> selectBySalespointAndDate(Salespoint salespoint, long from, long to)
+	public Collection<Receipt> selectBySalespointAndDate(Salespoint salespoint, Calendar from, Calendar to)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("settlement").get("salespoint")
 				.equal(salespoint);
@@ -141,11 +138,11 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 
 	}
 
-	public Receipt findBySalespointAndTimestamp(Salespoint salespoint, long timestamp)
+	public Receipt findBySalespointAndTimestamp(Salespoint salespoint, Calendar calendar)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("settlement").get("salespoint")
 				.equal(salespoint);
-		expression = expression.and(new ExpressionBuilder().get("timestamp").equal(timestamp));
+		expression = expression.and(new ExpressionBuilder().get("timestamp").equal(calendar));
 		final Receipt receipt = this.find(expression);
 		return receipt;
 
@@ -168,6 +165,33 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		final Collection<Receipt> receipts = this.select(expression);
 		return receipts;
 
+	}
+
+	public Collection<Receipt> selectBySettlement(final Settlement settlement, Receipt.State[] states)
+	{
+		Expression state = null;
+		if (states == null)
+		{
+			state = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
+			state = state.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
+		}
+		else
+		{
+			state = new ExpressionBuilder().get("state").equal(states[0]);
+			if (states.length > 1)
+			{
+				for (int i = 1; i < states.length; i++)
+				{
+					state = state.or(new ExpressionBuilder().get("state").equal(states[i]));
+				}
+			}
+		}
+
+		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		expression = expression.and(state);
+		final Collection<Receipt> receipts = this.select(expression);
+		return receipts;
 	}
 
 	public Collection<Receipt> selectBySettlementAndUser(final Settlement settlement, final User user,

@@ -3,6 +3,8 @@ package ch.eugster.colibri.persistence.queries;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.persistence.Query;
 
@@ -824,6 +826,79 @@ public class PositionQuery extends AbstractQuery<Position>
 		reportQuery.addGrouping(new ExpressionBuilder().get("currentTax").get("id"));
 
 		return super.selectReportQueryResults(reportQuery);
+	}
+
+	public Map<Integer, Double> selectDayHourStatisticsRange(final Salespoint[] salespoints,
+			Calendar[] dateRange, int[] weekdays)
+	{
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
+				.equal(Receipt.State.SAVED);
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		if (salespoints != null && salespoints.length > 0)
+		{
+			Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+					.equal(salespoints[0]);
+			for (int i = 1; i < salespoints.length; i++)
+			{
+				sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+						.equal(salespoints[1]));
+			}
+			expression.and(sps);
+		}
+
+		Expression dateRangeExpression = null;
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
+					.between(dateRange[0], dateRange[1]);
+		}
+		else if (dateRange[0] != null)
+		{
+			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
+					.greaterThanEqual(dateRange[0]);
+		}
+		else if (dateRange[1] != null)
+		{
+			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
+					.lessThanEqual(dateRange[1]);
+		}
+		if (dateRangeExpression != null)
+		{
+			expression = expression.and(dateRangeExpression);
+		}
+		if (weekdays.length > 0)
+		{
+			Expression weekdayExpression = new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[0]);
+			for (int i = 1; i < weekdays.length; i++)
+			{
+				weekdayExpression = weekdayExpression.or(new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[i]));
+			}
+			expression.and(weekdayExpression);
+		}
+
+		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("timestamp").datePart("hour"));
+		reportQuery.addSum("quantity", Integer.class);
+		reportQuery.addSum("baseAmount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
+
+		Map<Integer, Double> r = new HashMap<Integer, Double>();
+		Collection<ReportQueryResult> results =  super.selectReportQueryResults(reportQuery);
+		for (ReportQueryResult result : results)
+		{
+			Object o = result.get("hour");
+			Double value = r.get((Integer) o);
+			if (value == null)
+			{
+				value = new Double(0d);
+			}
+			else
+			{
+				value = new Double(value.doubleValue());
+			}
+			r.put(0, value);
+		}
+		return r;
 	}
 
 	private Expression taxFactor()

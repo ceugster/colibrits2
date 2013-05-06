@@ -18,6 +18,12 @@ public class UserQuery extends AbstractQuery<User>
 		return this.find(expression);
 	}
 
+	public User findByUsername(final String username)
+	{
+		Expression expression = new ExpressionBuilder().get("username").equal(username.toLowerCase());
+		return this.find(expression);
+	}
+
 	public User findByUsernameAndPassword(final String username, final String password)
 	{
 		Expression expression = new ExpressionBuilder().get("username").equal(username.toLowerCase());

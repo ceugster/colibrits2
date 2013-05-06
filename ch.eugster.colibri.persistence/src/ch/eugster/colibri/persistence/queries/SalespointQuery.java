@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
 
 import ch.eugster.colibri.persistence.model.CommonSettings;
@@ -72,6 +73,12 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 			}
 		}
 		return this.thisSalespoint;
+	}
+
+	public Collection<Salespoint> selectByMapping(String mapping)
+	{
+		Expression expression = new ExpressionBuilder(Salespoint.class).get("mapping").equal(mapping);
+		return this.select(expression);
 	}
 
 	public String getHostname(final HostnameResolver resolver)

@@ -30,6 +30,14 @@ public class CurrentTaxQuery extends AbstractQuery<CurrentTax>
 		return currentTaxes;
 	}
 	
+	public Collection<CurrentTax> selectByValidFrom(Tax tax, long date)
+	{
+		Expression expression = new ExpressionBuilder(CurrentTax.class).get("tax").equal(tax);
+		expression = expression.and(new ExpressionBuilder().get("validFrom").equal(date));
+		Collection<CurrentTax> currentTaxes = this.select(expression);
+		return currentTaxes;
+	}
+	
 	/**
 	 * Don't use this in normal environment, use selectNewerThan(tax, date) instead. Use only for initializing a database
 	 * @param entityManager

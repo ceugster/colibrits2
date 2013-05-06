@@ -27,6 +27,13 @@ public class ProductGroupQuery extends AbstractQuery<ProductGroup>
 		return this.find(expression);
 	}
 
+	public ProductGroup findByMappingId(final String code)
+	{
+		final ExpressionBuilder expressionBuilder = new ExpressionBuilder(ProductGroup.class);
+		final Expression expression = expressionBuilder.get("mappingId").equal(code);
+		return this.find(expression);
+	}
+
 	public boolean isCodeUnique(final String code, final Long id)
 	{
 		final Map<String, Object> params = new HashMap<String, Object>();

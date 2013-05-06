@@ -21,6 +21,13 @@ public class PaymentTypeQuery extends AbstractQuery<PaymentType>
 //		return this.select(change);
 //	}
 
+	public PaymentType findByMappingId(final String code)
+	{
+		final ExpressionBuilder expressionBuilder = new ExpressionBuilder(PaymentType.class);
+		final Expression expression = expressionBuilder.get("mappingId").equal(code);
+		return this.find(expression);
+	}
+
 	public Collection<PaymentType> selectByChange(final boolean isChange)
 	{
 		Expression expression = new ExpressionBuilder(PaymentType.class).get("changer").equal(isChange);
