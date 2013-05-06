@@ -91,7 +91,7 @@ class ViewerCanvas extends Canvas
 
 	private JRPrintPage page;
 
-	private List hyperlinkElements = new ArrayList();
+	private List<IHyperlinkContainer> hyperlinkElements = new ArrayList<IHyperlinkContainer>();
 
 	private Image reportImage;
 
@@ -376,8 +376,8 @@ class ViewerCanvas extends Canvas
 		}
 		else if (link.getHyperlinkTypeValue() == HyperlinkTypeEnum.LOCAL_ANCHOR)
 		{
-			Map anchorIndexes = viewer.getDocument().getAnchorIndexes();
-			JRPrintAnchorIndex anchorIndex = (JRPrintAnchorIndex) anchorIndexes.get(currentLink.getHyperlinkAnchor());
+			Map<String, JRPrintAnchorIndex> anchorIndexes = viewer.getDocument().getAnchorIndexes();
+			JRPrintAnchorIndex anchorIndex = anchorIndexes.get(currentLink.getHyperlinkAnchor());
 			if (anchorIndex != null)
 			{
 				if (anchorIndex.getPageIndex() != viewer.getPageIndex())
@@ -421,7 +421,7 @@ class ViewerCanvas extends Canvas
 
 		if (page != null)
 		{
-			List elements = page.getElements();
+			List<JRPrintElement> elements = page.getElements();
 			try
 			{
 				initializeHyperlinks(0, 0, elements);
@@ -433,17 +433,17 @@ class ViewerCanvas extends Canvas
 		}
 	}
 
-	private void initializeHyperlinks(final int originX, final int originY, final List elements) throws JRException
+	private void initializeHyperlinks(final int originX, final int originY, final List<JRPrintElement> elements) throws JRException
 	{
 		if (elements != null)
 		{
-			for (Iterator it = elements.iterator(); it.hasNext();)
+			for (Iterator<JRPrintElement> it = elements.iterator(); it.hasNext();)
 			{
 				JRPrintElement element = (JRPrintElement) it.next();
 
 				if (getImageMapRenderer(element) != null)
 				{
-					List hyperlinks = getImageMapRenderer(element).getImageAreaHyperlinks(
+					List<JRPrintImageAreaHyperlink> hyperlinks = getImageMapRenderer(element).getImageAreaHyperlinks(
 							new java.awt.Rectangle(0, 0, element.getWidth(), element.getHeight()));
 					if (hyperlinks != null)
 						hyperlinkElements.add(new ImageAreaHyperlink(originX + element.getX(),

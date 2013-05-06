@@ -1788,11 +1788,11 @@ ch.eugster.colibri.report/plugin.xml -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/Activator.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ApplicationInstanceListener.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ApplicationInstanceManager.java -text
-ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/PerspectiveSwitcherMenu.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplication.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationActionBarAdvisor.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationWorkbenchAdvisor.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationWorkbenchWindowAdvisor.java -text
+ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationWorkbenchWindowAdvisor_old.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/engine/ReportService.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/engine/ReportServiceComponent.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/viewer/DefaultHyperlinkHandler.java -text

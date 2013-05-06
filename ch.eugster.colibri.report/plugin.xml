@@ -14,6 +14,7 @@
          </run>
       </application>
    </extension>
+
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
@@ -24,5 +25,4 @@
          </toolbar>
       </menuContribution>
    </extension>
-
 </plugin>

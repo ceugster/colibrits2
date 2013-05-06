@@ -7,6 +7,7 @@ import org.eclipse.jface.preference.IPreferenceNode;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -18,20 +19,20 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import ch.eugster.colibri.report.Activator;
 
-public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor
+public class ReportApplicationWorkbenchWindowAdvisor_old extends WorkbenchWindowAdvisor implements IPerspectiveListener
 {
-	public static final String TITLE = "ColibriTS II";
+	private static final String TITLE = "ColibriTS II";
 
 	private IDialogSettings settings;
 
-	public ReportApplicationWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer)
+	public ReportApplicationWorkbenchWindowAdvisor_old(final IWorkbenchWindowConfigurer configurer)
 	{
 		super(configurer);
-//		configurer.getWindow().addPerspectiveListener(this);
-		settings = Activator.getDefault().getDialogSettings().getSection("report.start");
+		configurer.getWindow().addPerspectiveListener(this);
+		settings = Activator.getDefault().getDialogSettings().getSection("startup.report");
 		if (settings == null)
 		{
-			settings = Activator.getDefault().getDialogSettings().addNewSection("report.start");
+			settings = Activator.getDefault().getDialogSettings().addNewSection("startup.report");
 		}
 	}
 
@@ -39,12 +40,6 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 	public ActionBarAdvisor createActionBarAdvisor(final IActionBarConfigurer configurer)
 	{
 		return new ReportApplicationActionBarAdvisor(configurer);
-	}
-
-	@Override
-	public void preWindowOpen()
-	{
-		this.getWindowConfigurer().setShowCoolBar(true);
 	}
 
 	@Override
@@ -104,10 +99,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 						{
 							if (!item.getId().startsWith("additions"))
 							{
-								if (!item.getId().startsWith("preferences"))
-								{
-									manager.remove(item);
-								}
+								manager.remove(item);
 							}
 						}
 					}
@@ -127,10 +119,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 							{
 								if (!item.getId().startsWith("org.eclipse.equinox.p2."))
 								{
-									if (!item.getId().equals("about"))
-									{
-										manager.remove(item);
-									}
+									manager.remove(item);
 								}
 							}
 						}
@@ -190,16 +179,24 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 			}
 		}
 	}
-
+	
+	@Override
 	public void perspectiveActivated(final IWorkbenchPage page, final IPerspectiveDescriptor perspective)
 	{
 		configure(perspective.getId());
 	}
 
+	@Override
 	public void perspectiveChanged(final IWorkbenchPage page, final IPerspectiveDescriptor perspective,
 			final String changeId)
 	{
 		this.configure(perspective.getId());
+	}
+
+	@Override
+	public void preWindowOpen()
+	{
+		this.getWindowConfigurer().setShowPerspectiveBar(true);
 	}
 
 	private void configure(final String perspectiveId)

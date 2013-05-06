@@ -198,13 +198,13 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 		return helpMenu;
 	}
 
-	protected MenuManager createPerspectiveMenu()
-	{
-		final MenuManager perspectiveMenu = new MenuManager("&Perspektiven", "ch.eugster.colibri.report.menu.perspectives");
-		perspectiveMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-		perspectiveMenu.add(new PerspectiveSwitcherMenu("ch.eugster.colibri.report."));
-		return perspectiveMenu;
-	}
+//	protected MenuManager createPerspectiveMenu()
+//	{
+//		final MenuManager perspectiveMenu = new MenuManager("&Perspektiven", "ch.eugster.colibri.report.menu.perspectives");
+//		perspectiveMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+////		perspectiveMenu.add(new PerspectiveSwitcherMenu("ch.eugster.colibri.report."));
+//		return perspectiveMenu;
+//	}
 
 	protected MenuManager createViewMenu()
 	{
@@ -235,7 +235,7 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 		menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 		menuBar.add(this.createActionMenu());
 		menuBar.add(this.createViewMenu());
-		menuBar.add(this.createPerspectiveMenu());
+//		menuBar.add(this.createPerspectiveMenu());
 		menuBar.add(this.createWindowMenu());
 		menuBar.add(this.createHelpMenu());
 	}
