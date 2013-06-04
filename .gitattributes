@@ -1,7 +1,6 @@
 * text=auto !eol
 ch.eugster.colibri.admin.common.settings/.classpath -text
 ch.eugster.colibri.admin.common.settings/.project -text
-ch.eugster.colibri.admin.common.settings/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin.common.settings/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.common.settings/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.common.settings/build.properties -text
@@ -24,7 +23,6 @@ ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/set
 ch.eugster.colibri.admin.common.settings/src/ch/eugster/colibri/admin/common/settings/views/CommonSettingsView.java -text
 ch.eugster.colibri.admin.currency/.classpath -text
 ch.eugster.colibri.admin.currency/.project -text
-ch.eugster.colibri.admin.currency/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin.currency/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.currency/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.currency/OSGI-INF/l10n/bundle.properties -text
@@ -68,7 +66,6 @@ ch.eugster.colibri.admin.feature/build.properties -text
 ch.eugster.colibri.admin.feature/feature.xml -text
 ch.eugster.colibri.admin.layout.display/.classpath -text
 ch.eugster.colibri.admin.layout.display/.project -text
-ch.eugster.colibri.admin.layout.display/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin.layout.display/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.layout.display/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.layout.display/build.properties -text
@@ -83,7 +80,6 @@ ch.eugster.colibri.admin.layout.display/src/ch/eugster/colibri/admin/layout/disp
 ch.eugster.colibri.admin.layout.feature/.project -text
 ch.eugster.colibri.admin.layout.printer/.classpath -text
 ch.eugster.colibri.admin.layout.printer/.project -text
-ch.eugster.colibri.admin.layout.printer/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin.layout.printer/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.layout.printer/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.layout.printer/build.properties -text
@@ -156,7 +152,6 @@ ch.eugster.colibri.admin.payment/src/ch/eugster/colibri/admin/payment/views/Paym
 ch.eugster.colibri.admin.payment/src/ch/eugster/colibri/admin/payment/views/PaymentViewerSorter.java -text
 ch.eugster.colibri.admin.periphery/.classpath -text
 ch.eugster.colibri.admin.periphery/.project -text
-ch.eugster.colibri.admin.periphery/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin.periphery/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.periphery/build.properties -text
@@ -383,7 +378,6 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/views/Prof
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/views/ProfileView.java -text
 ch.eugster.colibri.admin.provider/.classpath -text
 ch.eugster.colibri.admin.provider/.project -text
-ch.eugster.colibri.admin.provider/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin.provider/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.provider/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.provider/build.properties -text
@@ -625,7 +619,6 @@ ch.eugster.colibri.admin.user/src/ch/eugster/colibri/admin/user/views/UserConten
 ch.eugster.colibri.admin.user/src/ch/eugster/colibri/admin/user/views/UserView.java -text
 ch.eugster.colibri.admin/.classpath -text
 ch.eugster.colibri.admin/.project -text
-ch.eugster.colibri.admin/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.admin/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin/build.properties -text
