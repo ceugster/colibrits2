@@ -1829,7 +1829,6 @@ ch.eugster.colibri.settlement.feature/build.properties -text
 ch.eugster.colibri.settlement.feature/feature.xml -text
 ch.eugster.colibri.settlement/.classpath -text
 ch.eugster.colibri.settlement/.project -text
-ch.eugster.colibri.settlement/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.settlement/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.settlement/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.settlement/OSGI-INF/service-component.xml -text
@@ -1842,7 +1841,6 @@ ch.eugster.colibri.ui.feature/build.properties -text
 ch.eugster.colibri.ui.feature/feature.xml -text
 ch.eugster.colibri.ui/.classpath -text
 ch.eugster.colibri.ui/.project -text
-ch.eugster.colibri.ui/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.ui/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.ui/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.ui/build.properties -text
@@ -1870,7 +1868,6 @@ ch.eugster.colibri.ui/src/ch/eugster/colibri/ui/panels/ProfilePanel.java -text
 ch.eugster.colibri.ui/src/ch/eugster/colibri/ui/swt/actions/StatusLineContributionItem.java -text
 ch.eugster.log.console/.classpath -text
 ch.eugster.log.console/.project -text
-ch.eugster.log.console/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.log.console/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.log.console/META-INF/MANIFEST.MF -text
 ch.eugster.log.console/OSGI-INF/console-logger-component.xml -text
@@ -1881,7 +1878,6 @@ ch.eugster.log.feature/build.properties -text
 ch.eugster.log.feature/feature.xml -text
 ch.eugster.log.file/.classpath -text
 ch.eugster.log.file/.project -text
-ch.eugster.log.file/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.log.file/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.log.file/META-INF/MANIFEST.MF -text
 ch.eugster.log.file/OSGI-INF/component.xml -text
@@ -1889,7 +1885,6 @@ ch.eugster.log.file/build.properties -text
 ch.eugster.log.file/src/ch/eugster/log/file/FileLoggerComponent.java -text
 ch.eugster.log.writer/.classpath -text
 ch.eugster.log.writer/.project -text
-ch.eugster.log.writer/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.log.writer/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.log.writer/META-INF/MANIFEST.MF -text
 ch.eugster.log.writer/OSGI-INF/writer-component.xml -text
