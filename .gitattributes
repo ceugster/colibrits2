@@ -1067,7 +1067,6 @@ ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/Activator.java -te
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/converters/Converter.java -text
 ch.eugster.colibri.persistence.connection/.classpath -text
 ch.eugster.colibri.persistence.connection/.project -text
-ch.eugster.colibri.persistence.connection/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence.connection/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence.connection/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.connection/META-INF/OJB.properties -text
@@ -1197,7 +1196,6 @@ ch.eugster.colibri.persistence.replication.impl.feature/build.properties -text
 ch.eugster.colibri.persistence.replication.impl.feature/feature.xml -text
 ch.eugster.colibri.persistence.replication.impl/.classpath -text
 ch.eugster.colibri.persistence.replication.impl/.project -text
-ch.eugster.colibri.persistence.replication.impl/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence.replication.impl/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence.replication.impl/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.replication.impl/OSGI-INF/service-component.xml -text
@@ -1242,7 +1240,6 @@ ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persisten
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/service/ReplicationServiceImpl.java -text
 ch.eugster.colibri.persistence.replication/.classpath -text
 ch.eugster.colibri.persistence.replication/.project -text
-ch.eugster.colibri.persistence.replication/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence.replication/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence.replication/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.replication/build.properties -text
@@ -1252,7 +1249,6 @@ ch.eugster.colibri.persistence.transfer.feature/build.properties -text
 ch.eugster.colibri.persistence.transfer.feature/feature.xml -text
 ch.eugster.colibri.persistence.transfer.impl/.classpath -text
 ch.eugster.colibri.persistence.transfer.impl/.project -text
-ch.eugster.colibri.persistence.transfer.impl/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence.transfer.impl/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence.transfer.impl/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.transfer.impl/OSGI-INF/transfer-component.xml -text
@@ -1263,7 +1259,6 @@ ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/
 ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/TransferSchedulerImpl.java -text
 ch.eugster.colibri.persistence.transfer/.classpath -text
 ch.eugster.colibri.persistence.transfer/.project -text
-ch.eugster.colibri.persistence.transfer/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence.transfer/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence.transfer/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.transfer/build.properties -text
@@ -1272,7 +1267,6 @@ ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/trans
 ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/transfer/services/TransferScheduler.java -text
 ch.eugster.colibri.persistence/.classpath -text
 ch.eugster.colibri.persistence/.project -text
-ch.eugster.colibri.persistence/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.jpt.core.prefs -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.wst.common.component -text
@@ -1406,7 +1400,6 @@ ch.eugster.colibri.print.receipt.feature/build.properties -text
 ch.eugster.colibri.print.receipt.feature/feature.xml -text
 ch.eugster.colibri.print.receipt/.classpath -text
 ch.eugster.colibri.print.receipt/.project -text
-ch.eugster.colibri.print.receipt/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.print.receipt/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.print.receipt/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.print.receipt/OSGI-INF/service-component.xml -text
@@ -1426,7 +1419,6 @@ ch.eugster.colibri.print.settlement.feature/build.properties -text
 ch.eugster.colibri.print.settlement.feature/feature.xml -text
 ch.eugster.colibri.print.settlement/.classpath -text
 ch.eugster.colibri.print.settlement/.project -text
-ch.eugster.colibri.print.settlement/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.print.settlement/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.print.settlement/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.print.settlement/OSGI-INF/service-component.xml -text
@@ -1470,7 +1462,6 @@ ch.eugster.colibri.print.voucher/src/ch/eugster/colibri/print/voucher/sections/V
 ch.eugster.colibri.print.voucher/src/ch/eugster/colibri/print/voucher/service/VoucherPrintService.java -text
 ch.eugster.colibri.print/.classpath -text
 ch.eugster.colibri.print/.project -text
-ch.eugster.colibri.print/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.print/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.print/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.print/build.properties -text
