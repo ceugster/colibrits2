@@ -940,7 +940,6 @@ ch.eugster.colibri.display.simple.feature/build.properties -text
 ch.eugster.colibri.display.simple.feature/feature.xml -text
 ch.eugster.colibri.display.simple/.classpath -text
 ch.eugster.colibri.display.simple/.project -text
-ch.eugster.colibri.display.simple/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.display.simple/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.display.simple/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.display.simple/OSGI-INF/service-component.xml -text
@@ -957,7 +956,6 @@ ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/Wel
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/service/DefaultDisplayService.java -text
 ch.eugster.colibri.display/.classpath -text
 ch.eugster.colibri.display/.project -text
-ch.eugster.colibri.display/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.display/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.display/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.display/build.properties -text
@@ -975,7 +973,6 @@ ch.eugster.colibri.encryption.feature/build.properties -text
 ch.eugster.colibri.encryption.feature/feature.xml -text
 ch.eugster.colibri.encryption.simple/.classpath -text
 ch.eugster.colibri.encryption.simple/.project -text
-ch.eugster.colibri.encryption.simple/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.encryption.simple/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.encryption.simple/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.encryption.simple/OSGI-INF/service-component.xml -text
@@ -986,7 +983,6 @@ ch.eugster.colibri.encryption.simple/src/ch/eugster/colibri/encryption/simple/Ac
 ch.eugster.colibri.encryption.simple/src/ch/eugster/colibri/encryption/simple/service/SimpleEncryptionService.java -text
 ch.eugster.colibri.encryption/.classpath -text
 ch.eugster.colibri.encryption/.project -text
-ch.eugster.colibri.encryption/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.encryption/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.encryption/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.encryption/build.properties -text
@@ -998,7 +994,6 @@ ch.eugster.colibri.export.feature/category.xml -text
 ch.eugster.colibri.export.feature/feature.xml -text
 ch.eugster.colibri.export/.classpath -text
 ch.eugster.colibri.export/.project -text
-ch.eugster.colibri.export/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.export/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.export/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.export/OSGI-INF/export-component.xml -text
@@ -1010,7 +1005,6 @@ ch.eugster.colibri.export/src/ch/eugster/colibri/export/service/ExportService.ja
 ch.eugster.colibri.export/transfer.dtd -text
 ch.eugster.colibri.insert.receipt.app/.classpath -text
 ch.eugster.colibri.insert.receipt.app/.project -text
-ch.eugster.colibri.insert.receipt.app/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.insert.receipt.app/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.insert.receipt.app/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.insert.receipt.app/OSGI-INF/permission.perm -text
@@ -1028,7 +1022,6 @@ ch.eugster.colibri.periphery.display.serial.scd122u.feature/build.properties -te
 ch.eugster.colibri.periphery.display.serial.scd122u.feature/feature.xml -text
 ch.eugster.colibri.periphery.display.serial.scd122u/.classpath -text
 ch.eugster.colibri.periphery.display.serial.scd122u/.project -text
-ch.eugster.colibri.periphery.display.serial.scd122u/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery.display.serial.scd122u/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery.display.serial.scd122u/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.display.serial.scd122u/OSGI-INF/service-component.xml -text
@@ -1037,7 +1030,6 @@ ch.eugster.colibri.periphery.display.serial.scd122u/src/ch/eugster/colibri/perip
 ch.eugster.colibri.periphery.display.serial.scd122u/src/ch/eugster/colibri/periphery/display/serial/scd122u/service/Scd122uCustomerDisplayService.java -text
 ch.eugster.colibri.periphery.display/.classpath -text
 ch.eugster.colibri.periphery.display/.project -text
-ch.eugster.colibri.periphery.display/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery.display/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery.display/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.display/build.properties -text
@@ -1052,7 +1044,6 @@ ch.eugster.colibri.periphery.printer.serial.feature/build.properties -text
 ch.eugster.colibri.periphery.printer.serial.feature/feature.xml -text
 ch.eugster.colibri.periphery.printer.serial/.classpath -text
 ch.eugster.colibri.periphery.printer.serial/.project -text
-ch.eugster.colibri.periphery.printer.serial/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery.printer.serial/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery.printer.serial/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.printer.serial/OSGI-INF/service-component.xml -text
@@ -1061,7 +1052,6 @@ ch.eugster.colibri.periphery.printer.serial/src/ch/eugster/colibri/periphery/pri
 ch.eugster.colibri.periphery.printer.serial/src/ch/eugster/colibri/periphery/printer/serial/service/SerialReceiptPrinterService.java -text
 ch.eugster.colibri.periphery.printer/.classpath -text
 ch.eugster.colibri.periphery.printer/.project -text
-ch.eugster.colibri.periphery.printer/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery.printer/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery.printer/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.printer/build.properties -text
@@ -1070,7 +1060,6 @@ ch.eugster.colibri.periphery.printer/src/ch/eugster/colibri/periphery/printer/se
 ch.eugster.colibri.periphery.printer/src/ch/eugster/colibri/periphery/printer/service/ReceiptPrinterService.java -text
 ch.eugster.colibri.periphery/.classpath -text
 ch.eugster.colibri.periphery/.project -text
-ch.eugster.colibri.periphery/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery/build.properties -text
