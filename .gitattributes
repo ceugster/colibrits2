@@ -1447,7 +1447,6 @@ ch.eugster.colibri.print.voucher.feature/build.properties -text
 ch.eugster.colibri.print.voucher.feature/feature.xml -text
 ch.eugster.colibri.print.voucher/.classpath -text
 ch.eugster.colibri.print.voucher/.project -text
-ch.eugster.colibri.print.voucher/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.print.voucher/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.print.voucher/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.print.voucher/OSGI-INF/service-component.xml -text
@@ -1516,7 +1515,6 @@ ch.eugster.colibri.provider.galileo.feature/build.properties -text
 ch.eugster.colibri.provider.galileo.feature/feature.xml -text
 ch.eugster.colibri.provider.galileo/.classpath -text
 ch.eugster.colibri.provider.galileo/.project -text
-ch.eugster.colibri.provider.galileo/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.provider.galileo/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.provider.galileo/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/configurator-component.xml -text
@@ -1558,7 +1556,6 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/wgse
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/wgserve/package.html -text
 ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
-ch.eugster.colibri.provider.scheduler/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.provider.scheduler/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.provider.scheduler/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.provider.scheduler/OSGI-INF/provider-scheduler-component.xml -text
@@ -1568,7 +1565,6 @@ ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/provider/scheduler/
 ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/provider/scheduler/service/ProviderUpdateScheduler.java -text
 ch.eugster.colibri.provider/.classpath -text
 ch.eugster.colibri.provider/.project -text
-ch.eugster.colibri.provider/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.provider/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.provider/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.provider/build.properties -text
@@ -1588,7 +1584,6 @@ ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderProp
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderService.java -text
 ch.eugster.colibri.report.daterange/.classpath -text
 ch.eugster.colibri.report.daterange/.project -text
-ch.eugster.colibri.report.daterange/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.daterange/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.daterange/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.daterange/build.properties -text
@@ -1597,7 +1592,6 @@ ch.eugster.colibri.report.daterange/src/ch/eugster/colibri/report/daterange/Acti
 ch.eugster.colibri.report.daterange/src/ch/eugster/colibri/report/daterange/views/DateView.java -text
 ch.eugster.colibri.report.destination/.classpath -text
 ch.eugster.colibri.report.destination/.project -text
-ch.eugster.colibri.report.destination/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.destination/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.destination/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.destination/build.properties -text
@@ -1609,7 +1603,6 @@ ch.eugster.colibri.report.export.feature/build.properties -text
 ch.eugster.colibri.report.export.feature/feature.xml -text
 ch.eugster.colibri.report.export/.classpath -text
 ch.eugster.colibri.report.export/.project -text
-ch.eugster.colibri.report.export/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.export/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.export/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.export/build.properties -text
@@ -1631,7 +1624,6 @@ ch.eugster.colibri.report.feature/build.properties -text
 ch.eugster.colibri.report.feature/feature.xml -text
 ch.eugster.colibri.report.list/.classpath -text
 ch.eugster.colibri.report.list/.project -text
-ch.eugster.colibri.report.list/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.list/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.list/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.list/build.properties -text
@@ -1643,7 +1635,6 @@ ch.eugster.colibri.report.receipt.feature/build.properties -text
 ch.eugster.colibri.report.receipt.feature/feature.xml -text
 ch.eugster.colibri.report.receipt/.classpath -text
 ch.eugster.colibri.report.receipt/.project -text
-ch.eugster.colibri.report.receipt/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.receipt/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.receipt/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.receipt/build.properties -text
@@ -1686,7 +1677,6 @@ ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/Us
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/UserViewerFilter.java -text
 ch.eugster.colibri.report.salespoint/.classpath -text
 ch.eugster.colibri.report.salespoint/.project -text
-ch.eugster.colibri.report.salespoint/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.salespoint/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.salespoint/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.salespoint/build.properties -text
@@ -1701,7 +1691,6 @@ ch.eugster.colibri.report.settlement.feature/feature.xml -text
 ch.eugster.colibri.report.settlement/.classpath -text
 ch.eugster.colibri.report.settlement/.project -text
 ch.eugster.colibri.report.settlement/.settings/org.eclipse.core.resources.prefs -text
-ch.eugster.colibri.report.settlement/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.settlement/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.settlement/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.settlement/build.properties -text
@@ -1727,7 +1716,6 @@ ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/vi
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementView.java -text
 ch.eugster.colibri.report/.classpath -text
 ch.eugster.colibri.report/.project -text
-ch.eugster.colibri.report/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report/build.properties -text

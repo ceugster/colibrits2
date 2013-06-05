@@ -13,8 +13,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -29,7 +27,6 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -823,7 +820,6 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(write));
 				log(printer, "Vorhanden: " + DecimalFormat.getIntegerInstance().format(exist));
 				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(error));
-				closeLog(printer);
 			}
 			if (deleteFile)
 			{
@@ -837,23 +833,39 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 					save = save.append(File.separator);
 				}
 				save = save.append(file.getName());
-				try 
-				{
-					Files.move(file.toPath(), new File(save.toString()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-				} 
-				catch (final IOException e) 
-				{
-					e.printStackTrace();
-					Display.getDefault().syncExec(new Runnable()
+//				try 
+//				{
+					if (file.renameTo(new File(save.toString())))
 					{
-						@Override
-						public void run() 
+						if (printer != null)
 						{
-							IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
-							ErrorDialog.openError(ImportExportView.this.getSite().getShell(), "Fehler", "Die Quelldatei konnte nicht gesichert werden.", status);
+							log(printer, "");
+							log(printer, "Datei gesichert in: " + save.toString());
 						}
-					});
-				}
+					}
+					else
+					{
+						if (printer != null)
+						{
+							log(printer, "");
+							log(printer, "Sicherung der Datei konnte nicht durchgeführt werden.");
+						}
+					}
+//					Files.move(file.toPath(), new File(save.toString()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+//				} 
+//				catch (final IOException e) 
+//				{
+//					e.printStackTrace();
+//					Display.getDefault().syncExec(new Runnable()
+//					{
+//						@Override
+//						public void run() 
+//						{
+//							IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
+//							ErrorDialog.openError(ImportExportView.this.getSite().getShell(), "Fehler", "Die Quelldatei konnte nicht gesichert werden.", status);
+//						}
+//					});
+//				}
 			}
 		}
 		finally
