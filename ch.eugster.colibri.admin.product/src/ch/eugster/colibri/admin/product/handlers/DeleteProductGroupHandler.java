@@ -11,6 +11,7 @@ import java.util.Iterator;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -32,6 +33,7 @@ public class DeleteProductGroupHandler extends AbstractPersistenceClientHandler
 		{
 			final EvaluationContext ctx = (EvaluationContext) event.getApplicationContext();
 			final Object object = ctx.getParent().getVariable("activeMenuSelection");
+			final Shell shell = (Shell) ctx.getParent().getVariable("activeShell");
 
 			if (object instanceof StructuredSelection)
 			{
@@ -45,6 +47,11 @@ public class DeleteProductGroupHandler extends AbstractPersistenceClientHandler
 						if (element instanceof ProductGroup)
 						{
 							final ProductGroup productGroup = (ProductGroup) element;
+							if (!productGroup.isDeletable())
+							{
+								MessageDialog.openWarning(new Shell(), "Fehler", productGroup.getName() + " darf nicht gelöscht werden.");
+								return Status.OK_STATUS;
+							}
 							if (sb.length() > 0)
 							{
 								sb.append("\n");
@@ -63,7 +70,6 @@ public class DeleteProductGroupHandler extends AbstractPersistenceClientHandler
 						msg = "Sollen die ausgewählten Warengruppen:\n" + sb.toString() + "\nentfernt werden?";
 					}
 
-					final Shell shell = (Shell) ctx.getParent().getVariable("activeShell");
 					final MessageDialog dialog = new MessageDialog(shell, "Warengruppe entfernen", null, msg, MessageDialog.QUESTION, new String[] {
 							"Ja", "Nein" }, 0);
 					if (dialog.open() == Window.OK)
@@ -88,49 +94,28 @@ public class DeleteProductGroupHandler extends AbstractPersistenceClientHandler
 	@Override
 	public void setEnabled(Object evaluationContext) 
 	{
-		if (persistenceService == null)
+		boolean enabled = true;
+		EvaluationContext context = (EvaluationContext) evaluationContext;
+		if (context.getVariable("selection") instanceof StructuredSelection)
 		{
-			super.setBaseEnabled(false);
-		}
-		else
-		{
-			CommonSettingsQuery query = (CommonSettingsQuery) persistenceService.getServerService().getQuery(CommonSettings.class);
-			CommonSettings settings = query.findDefault();
-			ProductGroup defaultProductGroup = settings.getDefaultProductGroup();
-
-			EvaluationContext context = (EvaluationContext) evaluationContext;
-			if (context.getVariable("selection") instanceof StructuredSelection)
+			StructuredSelection ssel = (StructuredSelection) context.getVariable("selection");
+			@SuppressWarnings("unchecked")
+			Iterator<Object> iterator = ssel.iterator();
+			while (iterator.hasNext())
 			{
-				StructuredSelection ssel = (StructuredSelection) context.getVariable("selection");
-				if (!ssel.isEmpty())
+				Object element = iterator.next();
+				if (element instanceof ProductGroup)
 				{
-					@SuppressWarnings("unchecked")
-					Iterator<Object> iterator = ssel.iterator();
-					while (iterator.hasNext())
+					ProductGroup productGroup = (ProductGroup) element;
+					if (!productGroup.isDeletable())
 					{
-						Object element = iterator.next();
-						if (element instanceof ProductGroup)
-						{
-							if (defaultProductGroup != null)
-							{
-								ProductGroup productGroup = (ProductGroup) element;
-								if (productGroup.getId().equals(defaultProductGroup.getId()))
-								{
-									setBaseEnabled(false);
-									return;
-								}
-							}
-						}
-						else
-						{
-							setBaseEnabled(false);
-							return;
-						}
+						enabled = false;
+						break;
 					}
 				}
 			}
-			super.setBaseEnabled(true);
 		}
+		super.setBaseEnabled(enabled);
 	}
 
 	@Override
