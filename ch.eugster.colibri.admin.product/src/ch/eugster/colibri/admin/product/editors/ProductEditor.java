@@ -349,7 +349,7 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		}
 		this.createFinanceSection(scrolledForm);
 
-		if (productGroup.getProductGroupType().equals(ProductGroupType.SALES_RELATED))
+		if (productGroup.getProductGroupType().isMapping())
 		{
 			final ProviderIdService providerService = (ProviderIdService) this.providerTracker.getService();
 			if (providerService != null)
