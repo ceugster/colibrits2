@@ -58,11 +58,11 @@ public class ReceiptSorter extends ViewerSorter
 				{
 					if (this.desc)
 					{
-						return r2.getTimestamp().getTime().compareTo(r1.getTimestamp().getTime());
+						return r2.getTimestamp().compareTo(r1.getTimestamp());
 					}
 					else
 					{
-						return r1.getTimestamp().getTime().compareTo(r2.getTimestamp().getTime());
+						return r1.getTimestamp().compareTo(r2.getTimestamp());
 					}
 				}
 				case 2:
@@ -130,7 +130,7 @@ public class ReceiptSorter extends ViewerSorter
 						}
 						else
 						{
-							return r1.getTimestamp().getTime().compareTo(r2.getTimestamp().getTime());
+							return r1.getTimestamp().compareTo(r2.getTimestamp());
 						}
 					}
 				}
