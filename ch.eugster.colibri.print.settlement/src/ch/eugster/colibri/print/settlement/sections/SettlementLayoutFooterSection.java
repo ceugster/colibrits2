@@ -149,13 +149,13 @@ public class SettlementLayoutFooterSection extends AbstractLayoutSection
 					case D:
 					{
 						Calendar calendar = Calendar.getInstance();
-						calendar = settlement.getTimestamp();
+						calendar.setTime(settlement.getTimestamp());
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case T:
 					{
 						Calendar calendar = Calendar.getInstance();
-						calendar = settlement.getTimestamp();
+						calendar.setTime(settlement.getTimestamp());
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case U:

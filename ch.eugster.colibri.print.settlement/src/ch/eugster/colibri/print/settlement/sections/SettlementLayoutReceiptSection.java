@@ -199,14 +199,14 @@ public class SettlementLayoutReceiptSection extends AbstractLayoutSection
 					case D:
 					{
 						Calendar calendar = Calendar.getInstance();
-						calendar = receipt.getTime();
+						calendar.setTime(receipt.getTime());
 						return layoutArea.replaceMarker(
 								SettlementLayoutReceiptSection.dateFormatter.format(calendar.getTime()), marker, false);
 					}
 					case T:
 					{
 						Calendar calendar = Calendar.getInstance();
-						calendar = receipt.getTime();
+						calendar.setTime(receipt.getTime());
 						return layoutArea.replaceMarker(
 								SettlementLayoutReceiptSection.timeFormatter.format(calendar.getTime()), marker, false);
 					}

@@ -134,13 +134,13 @@ public class VoucherLayoutHeaderSection extends AbstractLayoutSection
 					case D:
 					{
 						Calendar calendar = Calendar.getInstance();
-						calendar = receipt.getTimestamp();
+						calendar.setTime(receipt.getTimestamp());
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case T:
 					{
 						Calendar calendar = Calendar.getInstance();
-						calendar = receipt.getTimestamp();
+						calendar.setTime(receipt.getTimestamp());
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case U:
