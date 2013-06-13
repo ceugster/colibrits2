@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="ch.eugster.colibri.report.application"
+         name="ColibriTS II Berichte"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="ch.eugster.colibri.report.app.ReportApplication">
+         </run>
+      </application>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar">
+         <toolbar
+               id="ch.eugster.colibri.report.perspective.toolbar">
+         </toolbar>
+      </menuContribution>
+   </extension>
+</plugin>
