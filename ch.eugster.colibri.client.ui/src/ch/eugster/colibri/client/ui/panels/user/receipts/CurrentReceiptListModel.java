@@ -227,22 +227,32 @@ public class CurrentReceiptListModel extends AbstractTableModel implements Actio
 			switch (columnIndex)
 			{
 				case CurrentReceiptListModel.COL_NUMBER:
+				{
 					return this.receipts[rowIndex].getNumber().toString();
+				}
 				case COL_DATE:
-					this.calendar = this.receipts[rowIndex].getTimestamp();
+				{
+					this.calendar.setTime(this.receipts[rowIndex].getTimestamp());
 					return this.dateFormatter.format(this.calendar.getTime());
+				}
 				case COL_TIME:
-					this.calendar = this.receipts[rowIndex].getTimestamp();
+				{
+					this.calendar.setTime(this.receipts[rowIndex].getTimestamp());
 					return this.timeFormatter.format(this.calendar.getTime());
+				}
 				case COL_AMOUNT:
+				{
 					final java.util.Currency cur = java.util.Currency.getInstance(this.receipts[rowIndex]
 							.getDefaultCurrency().getCode());
 					this.numberFormatter.setMinimumFractionDigits(cur.getDefaultFractionDigits());
 					this.numberFormatter.setMaximumFractionDigits(cur.getDefaultFractionDigits());
 					return this.numberFormatter.format(this.receipts[rowIndex]
 							.getPositionDefaultCurrencyAmount(AmountType.NETTO));
+				}
 				case COL_STATE:
+				{
 					return this.receipts[rowIndex].getState().code();
+				}
 			}
 		}
 		return null;
