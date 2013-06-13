@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Query;
@@ -12,8 +13,10 @@ import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
 import org.eclipse.persistence.expressions.ExpressionMath;
 import org.eclipse.persistence.jpa.JpaHelper;
+import org.eclipse.persistence.queries.Call;
 import org.eclipse.persistence.queries.ReportQuery;
 import org.eclipse.persistence.queries.ReportQueryResult;
+import org.eclipse.persistence.queries.SQLCall;
 
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.CommonSettings;
@@ -831,59 +834,61 @@ public class PositionQuery extends AbstractQuery<Position>
 	public Map<Integer, Double> selectDayHourStatisticsRange(final Salespoint[] salespoints,
 			Calendar[] dateRange, int[] weekdays)
 	{
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
-				.equal(Receipt.State.SAVED);
+		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED));
 
-		if (salespoints != null && salespoints.length > 0)
-		{
-			Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
-					.equal(salespoints[0]);
-			for (int i = 1; i < salespoints.length; i++)
-			{
-				sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
-						.equal(salespoints[1]));
-			}
-			expression.and(sps);
-		}
+//		if (salespoints != null && salespoints.length > 0)
+//		{
+//			Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+//					.equal(salespoints[0]);
+//			for (int i = 1; i < salespoints.length; i++)
+//			{
+//				sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+//						.equal(salespoints[1]));
+//			}
+//			expression.and(sps);
+//		}
+//
+//		Expression dateRangeExpression = null;
+//		if (dateRange[0] != null && dateRange[1] != null)
+//		{
+//			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
+//					.between(dateRange[0], dateRange[1]);
+//		}
+//		else if (dateRange[0] != null)
+//		{
+//			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
+//					.greaterThanEqual(dateRange[0]);
+//		}
+//		else if (dateRange[1] != null)
+//		{
+//			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
+//					.lessThanEqual(dateRange[1]);
+//		}
+//		if (dateRangeExpression != null)
+//		{
+//			expression = expression.and(dateRangeExpression);
+//		}
+//		if (weekdays.length > 0)
+//		{
+//			Expression weekdayExpression = new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[0]);
+//			for (int i = 1; i < weekdays.length; i++)
+//			{
+//				weekdayExpression = weekdayExpression.or(new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[i]));
+//			}
+//			expression.and(weekdayExpression);
+//		}
 
-		Expression dateRangeExpression = null;
-		if (dateRange[0] != null && dateRange[1] != null)
-		{
-			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
-					.between(dateRange[0], dateRange[1]);
-		}
-		else if (dateRange[0] != null)
-		{
-			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
-					.greaterThanEqual(dateRange[0]);
-		}
-		else if (dateRange[1] != null)
-		{
-			dateRangeExpression = new ExpressionBuilder().get("receipt").get("timestamp")
-					.lessThanEqual(dateRange[1]);
-		}
-		if (dateRangeExpression != null)
-		{
-			expression = expression.and(dateRangeExpression);
-		}
-		if (weekdays.length > 0)
-		{
-			Expression weekdayExpression = new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[0]);
-			for (int i = 1; i < weekdays.length; i++)
-			{
-				weekdayExpression = weekdayExpression.or(new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[i]));
-			}
-			expression.and(weekdayExpression);
-		}
-
-		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
-		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("timestamp").datePart("hour"));
-		reportQuery.addSum("quantity", Integer.class);
-		reportQuery.addSum("baseAmount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
-
+//		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+//		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("timestamp").datePart("hour"));
+//		reportQuery.addSum("quantity", Integer.class);
+//		reportQuery.addSum("baseAmount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
+		Call call = new SQLCall("SELECT DATEPART(t0.re_timestamp, 'hour'), SUM(t1.po_quantity), SUM((FLOOR((((((t1.po_quantity * t1.po_price) * (? + t1.po_discount)) * (t1.po_fc_quotation / t0.re_dc_quotation)) / t0.re_dc_round_factor) + ?)) * t0.re_dc_round_factor)) FROM colibri_receipt t0, colibri_product_group t2, colibri_position t1 WHERE (t0.re_id = t1.po_re_id) AND (t2.pg_id = t1.po_pg_id)");
+		ReportQuery rq = new ReportQuery(Position.class, new ExpressionBuilder());
+		rq.setCall(call);
 		Map<Integer, Double> r = new HashMap<Integer, Double>();
-		Collection<ReportQueryResult> results =  super.selectReportQueryResults(reportQuery);
+		Collection<ReportQueryResult> results =  super.selectReportQueryResults(rq);
 		for (ReportQueryResult result : results)
 		{
 			Object o = result.get("hour");

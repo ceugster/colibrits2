@@ -7,6 +7,7 @@
 package ch.eugster.colibri.persistence.model;
 
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -38,7 +39,7 @@ public class SettlementInternal extends SettlementAbstractSinglePosition impleme
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "sepo_date")
-	private Calendar date;
+	private Date date;
 
 	@JoinColumn(name = "sepo_fcu_id", referencedColumnName = "cu_id")
 	@OneToOne(optional = true)
@@ -73,12 +74,12 @@ public class SettlementInternal extends SettlementAbstractSinglePosition impleme
 		return (SettlementInternal) AbstractEntity.newInstance(new SettlementInternal(settlement, position));
 	}
 
-	public void setDate(Calendar date)
+	public void setDate(Date date)
 	{
 		this.date = date;
 	}
 
-	public Calendar getDate()
+	public Date getDate()
 	{
 		return date;
 	}

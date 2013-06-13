@@ -546,7 +546,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.SECOND, 0);
 		today.set(Calendar.MILLISECOND, 0);
-		return this.settlement.getTimestamp().before(today);
+		return this.settlement.getTimestamp().before(today.getTime());
 	}
 
 	public boolean isExport() 

@@ -276,6 +276,7 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			this.getConnectionService().resetEntityManager(e);
 		}
 		return results;

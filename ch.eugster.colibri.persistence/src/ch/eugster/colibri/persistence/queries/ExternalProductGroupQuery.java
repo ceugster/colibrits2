@@ -38,6 +38,7 @@ public class ExternalProductGroupQuery extends AbstractQuery<ExternalProductGrou
 	public Collection<ExternalProductGroup> selectUnmapped(final String providerId)
 	{
 		Expression expression = new ExpressionBuilder(ExternalProductGroup.class).get("provider").equal(providerId);
+		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
 		Expression type = new ExpressionBuilder().get("productGroupMapping").isNull();
 		type = type.or(new ExpressionBuilder().get("productGroupMapping").get("deleted").equal(true));
 		expression = expression.and(type);

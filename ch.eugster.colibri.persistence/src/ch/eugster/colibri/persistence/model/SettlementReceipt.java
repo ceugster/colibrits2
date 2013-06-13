@@ -6,7 +6,7 @@
  */
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -67,7 +67,7 @@ public class SettlementReceipt extends AbstractEntity implements Comparable<Sett
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "serr_time")
-	private Calendar time;
+	private Date time;
 
 	private SettlementReceipt()
 	{
@@ -135,12 +135,12 @@ public class SettlementReceipt extends AbstractEntity implements Comparable<Sett
 		this.number = number;
 	}
 
-	public Calendar getTime()
+	public Date getTime()
 	{
 		return this.time;
 	}
 
-	public void setTime(Calendar time)
+	public void setTime(Date time)
 	{
 		this.time = time;
 	}
