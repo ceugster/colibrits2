@@ -183,12 +183,12 @@ public enum ProductGroupType implements IProductGroupType
 	@Override
 	public boolean isAsDefaultProductGroupAvailable()
 	{
-		if (this.equals(SALES_RELATED))
-		{
-			return true;
-		}
-
-		return false;
+		return this.equals(SALES_RELATED);
+	}
+	
+	public boolean isMapping()
+	{
+		return (this.equals(SALES_RELATED) || this.equals(NON_SALES_RELATED));
 	}
 
 	public void setChildren(final Collection<ProductGroup> productGroups)
