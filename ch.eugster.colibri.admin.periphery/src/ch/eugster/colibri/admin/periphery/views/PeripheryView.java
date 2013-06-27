@@ -57,6 +57,8 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 		this.createContextMenu();
 
 		this.getSite().setSelectionProvider(this.viewer);
+		EntityMediator.addListener(CustomerDisplaySettings.class, this);
+		EntityMediator.addListener(ReceiptPrinterSettings.class, this);
 	}
 
 	@Override
@@ -106,8 +108,6 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 	@Override
 	public void init(final IViewSite site) throws PartInitException
 	{
-		EntityMediator.addListener(CustomerDisplaySettings.class, this);
-		EntityMediator.addListener(ReceiptPrinterSettings.class, this);
 		super.init(site);
 	}
 

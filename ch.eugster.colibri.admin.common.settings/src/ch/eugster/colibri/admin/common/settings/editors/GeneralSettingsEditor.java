@@ -94,7 +94,6 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 	
 	public GeneralSettingsEditor()
 	{
-		EntityMediator.addListener(CommonSettings.class, this);
 	}
 
 	@Override
@@ -141,6 +140,8 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 			}
 		}
 		this.createSettingSection(scrolledForm);
+
+		EntityMediator.addListener(CommonSettings.class, this);
 	}
 
 	@Override

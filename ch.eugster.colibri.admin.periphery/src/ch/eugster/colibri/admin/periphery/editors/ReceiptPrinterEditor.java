@@ -121,8 +121,6 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 	public void init(final IEditorSite site, final IEditorInput input) throws PartInitException
 	{
 		super.init(site, input);
-
-		EntityMediator.addListener(Salespoint.class, this);
 		this.settings = Activator.getDefault().getDialogSettings().getSection(ReceiptPrinterEditor.ID);
 		if (this.settings == null)
 		{
@@ -175,6 +173,7 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 	{
 		this.createPeripherySection(scrolledForm);
 		this.createTestSection(scrolledForm);
+		EntityMediator.addListener(Salespoint.class, this);
 	}
 
 	@Override

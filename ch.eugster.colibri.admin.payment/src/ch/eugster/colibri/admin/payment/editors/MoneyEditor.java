@@ -41,7 +41,6 @@ public class MoneyEditor extends AbstractEntityEditor<Money>
 
 	public MoneyEditor()
 	{
-		EntityMediator.addListener(Money.class, this);
 	}
 
 	@Override
@@ -91,6 +90,7 @@ public class MoneyEditor extends AbstractEntityEditor<Money>
 	protected void createSections(final ScrolledForm scrolledForm)
 	{
 		createDescriptionSection(scrolledForm);
+		EntityMediator.addListener(Money.class, this);
 	}
 
 	@Override

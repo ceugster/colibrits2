@@ -427,6 +427,9 @@ public class ProductView extends AbstractEntityView implements IDoubleClickListe
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(ProductGroup.class, this);
+		EntityMediator.addListener(ProductGroupMapping.class, this);
+		EntityMediator.addListener(CommonSettings.class, this);
 	}
 
 	@Override
@@ -481,10 +484,6 @@ public class ProductView extends AbstractEntityView implements IDoubleClickListe
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		EntityMediator.addListener(ProductGroup.class, this);
-		EntityMediator.addListener(ProductGroupMapping.class, this);
-		EntityMediator.addListener(CommonSettings.class, this);
-
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
 		this.persistenceServiceTracker.open();

@@ -70,8 +70,6 @@ public class ConfigurableEditor extends AbstractEntityEditor<Configurable>
 
 	public ConfigurableEditor()
 	{
-		EntityMediator.addListener(Profile.class, this);
-		EntityMediator.addListener(Configurable.class, this);
 	}
 
 	@Override
@@ -128,6 +126,8 @@ public class ConfigurableEditor extends AbstractEntityEditor<Configurable>
 	{
 		this.scrolledForm = scrolledForm;
 		createDesignSection(scrolledForm);
+		EntityMediator.addListener(Profile.class, this);
+		EntityMediator.addListener(Configurable.class, this);
 	}
 
 	@Override

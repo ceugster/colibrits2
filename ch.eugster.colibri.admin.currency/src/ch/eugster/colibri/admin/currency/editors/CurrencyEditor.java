@@ -51,7 +51,6 @@ public class CurrencyEditor extends AbstractEntityEditor<Currency>
 
 	public CurrencyEditor()
 	{
-		EntityMediator.addListener(Currency.class, this);
 	}
 
 	@Override
@@ -95,6 +94,7 @@ public class CurrencyEditor extends AbstractEntityEditor<Currency>
 	{
 		this.createDescriptionSection(scrolledForm);
 		this.createFinanceSection(scrolledForm);
+		EntityMediator.addListener(Currency.class, this);
 	}
 
 	@Override

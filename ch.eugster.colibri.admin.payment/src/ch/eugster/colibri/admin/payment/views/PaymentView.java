@@ -121,6 +121,8 @@ public class PaymentView extends AbstractEntityView implements IDoubleClickListe
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(PaymentType.class, this);
+		EntityMediator.addListener(Money.class, this);
 	}
 
 	@Override
@@ -161,8 +163,6 @@ public class PaymentView extends AbstractEntityView implements IDoubleClickListe
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		EntityMediator.addListener(PaymentType.class, this);
-		EntityMediator.addListener(Money.class, this);
 	}
 
 	@Override

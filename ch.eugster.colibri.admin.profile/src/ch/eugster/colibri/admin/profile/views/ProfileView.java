@@ -46,10 +46,6 @@ public class ProfileView extends AbstractEntityView implements IDoubleClickListe
 
 	public ProfileView()
 	{
-		EntityMediator.addListener(Profile.class, this);
-		EntityMediator.addListener(Configurable.class, this);
-		EntityMediator.addListener(Tab.class, this);
-		EntityMediator.addListener(Key.class, this);
 	}
 
 	@Override
@@ -131,6 +127,10 @@ public class ProfileView extends AbstractEntityView implements IDoubleClickListe
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(Profile.class, this);
+		EntityMediator.addListener(Configurable.class, this);
+		EntityMediator.addListener(Tab.class, this);
+		EntityMediator.addListener(Key.class, this);
 	}
 
 	@Override

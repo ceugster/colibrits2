@@ -68,7 +68,6 @@ public class ExternalProductGroupEditor extends AbstractEntityEditor<ExternalPro
 
 	public ExternalProductGroupEditor()
 	{
-		EntityMediator.addListener(ExternalProductGroup.class, this);
 	}
 
 	@Override
@@ -118,6 +117,7 @@ public class ExternalProductGroupEditor extends AbstractEntityEditor<ExternalPro
 	protected void createSections(final ScrolledForm scrolledForm)
 	{
 		this.createSection(scrolledForm);
+		EntityMediator.addListener(ExternalProductGroup.class, this);
 	}
 
 	@Override

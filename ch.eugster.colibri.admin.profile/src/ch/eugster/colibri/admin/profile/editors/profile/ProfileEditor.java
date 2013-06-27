@@ -234,7 +234,6 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 
 	public ProfileEditor()
 	{
-		EntityMediator.addListener(Profile.class, this);
 	}
 
 	@Override
@@ -287,6 +286,7 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		this.createButtonSection(scrolledForm);
 		this.createLabelSection(scrolledForm);
 		this.createListSection(scrolledForm);
+		EntityMediator.addListener(Profile.class, this);
 	}
 
 	@Override

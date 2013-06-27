@@ -86,8 +86,6 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 	public void init(final IEditorSite site, final IEditorInput input) throws PartInitException
 	{
 		super.init(site, input);
-
-		EntityMediator.addListener(Salespoint.class, this);
 		this.settings = Activator.getDefault().getDialogSettings().getSection(CustomerDisplayEditor.ID);
 		if (this.settings == null)
 		{
@@ -134,6 +132,7 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 	{
 		this.createPeripherySection(scrolledForm);
 		this.createTestSection(scrolledForm);
+		EntityMediator.addListener(Salespoint.class, this);
 	}
 
 	@Override

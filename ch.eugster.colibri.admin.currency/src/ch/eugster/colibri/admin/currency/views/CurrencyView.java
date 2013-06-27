@@ -244,6 +244,10 @@ public class CurrencyView extends AbstractEntityView implements IDoubleClickList
 			}
 		};
 		this.persistenceServiceTracker.open();
+
+		EntityMediator.addListener(Currency.class, this);
+		EntityMediator.addListener(CommonSettings.class, this);
+
 	}
 
 	@Override
@@ -292,10 +296,6 @@ public class CurrencyView extends AbstractEntityView implements IDoubleClickList
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-
-		EntityMediator.addListener(Currency.class, this);
-		EntityMediator.addListener(CommonSettings.class, this);
-
 		this.settings = Activator.getDefault().getDialogSettings().getSection(CurrencyView.ID);
 		if (this.settings == null)
 		{

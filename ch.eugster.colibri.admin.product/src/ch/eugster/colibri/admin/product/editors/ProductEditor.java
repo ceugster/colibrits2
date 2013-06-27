@@ -64,7 +64,6 @@ import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxRate;
 import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
-import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
@@ -349,7 +348,7 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		}
 		this.createFinanceSection(scrolledForm);
 
-		if (productGroup.getProductGroupType().isMapping())
+		if (productGroup.getProductGroupType().isMappable())
 		{
 			final ProviderIdService providerService = (ProviderIdService) this.providerTracker.getService();
 			if (providerService != null)

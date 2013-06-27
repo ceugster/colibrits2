@@ -120,14 +120,6 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 
 	public TabEditor()
 	{
-		EntityMediator.addListener(Profile.class, this);
-		EntityMediator.addListener(Configurable.class, this);
-		EntityMediator.addListener(Tab.class, this);
-		EntityMediator.addListener(ProductGroup.class, this);
-		EntityMediator.addListener(PaymentType.class, this);
-		EntityMediator.addListener(TaxRate.class, this);
-		EntityMediator.addListener(Tax.class, this);
-		
 		settings = Activator.getDefault().getDialogSettings().getSection("tab.editor");
 		if (settings == null)
 		{
@@ -305,90 +297,6 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		}
 	}
 
-//	@Override
-//	public void postPersist(final AbstractEntity entity)
-//	{
-//		if (entity instanceof ProductGroup)
-//		{
-//			UIJob job = new UIJob("Updating viewer...") 
-//			{
-//				@Override
-//				public IStatus runInUIThread(IProgressMonitor monitor) 
-//				{
-//					ProductGroup productGroup = (ProductGroup) entity;
-//					viewer.add(productGroup.getProductGroupType(), productGroup);
-//					return Status.OK_STATUS;
-//				}
-//			};
-//			job.setUser(true);
-//			job.schedule();
-//		}
-//		else if (entity instanceof PaymentType)
-//		{
-//			UIJob job = new UIJob("Updating viewer...") 
-//			{
-//				@Override
-//				public IStatus runInUIThread(IProgressMonitor monitor) 
-//				{
-//					PaymentType paymentType = (PaymentType) entity;
-//					viewer.add(paymentType.getPaymentTypeGroup(), paymentType);
-//					return Status.OK_STATUS;
-//				}
-//			};
-//			job.setUser(true);
-//			job.schedule();
-//		}
-//		else if (entity instanceof TaxRate)
-//		{
-//			UIJob job = new UIJob("Updating viewer...") 
-//			{
-//				@Override
-//				public IStatus runInUIThread(IProgressMonitor monitor) 
-//				{
-//					viewer.add(KeyType.TAX_RATE, entity);
-//					return Status.OK_STATUS;
-//				}
-//			};
-//			job.setUser(true);
-//			job.schedule();
-//		}
-//	}
-
-//	@Override
-//	public void postUpdate(final AbstractEntity entity)
-//	{
-//		final TabEditorInput input = (TabEditorInput) this.getEditorInput();
-//		final Tab tab = (Tab) input.getAdapter(Tab.class);
-//		if (entity instanceof Profile)
-//		{
-//			if (entity.equals(tab.getConfigurable().getProfile()))
-//			{
-////				tab.getConfigurable().setProfile((Profile) entity);
-//				updateButtons();
-//			}
-//		}
-//		else if (entity instanceof Configurable)
-//		{
-//			if (entity.equals(tab.getConfigurable()))
-//			{
-////				tab.setConfigurable((Configurable) entity);
-//				updateButtons();
-//			}
-//		}
-//		else if (entity instanceof Tab)
-//		{
-//			if (entity.equals(tab))
-//			{
-////				input.setEntity((Tab) entity);
-//				updateButtons();
-//			}
-//		}
-//		else
-//		{
-//			this.viewer.refresh(entity);
-//		}
-//	}
-
 	@Override
 	public void propertyChange(final PropertyChangeEvent event)
 	{
@@ -433,6 +341,13 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		this.createGeneralSection(scrolledForm);
 		this.createSizeSection(scrolledForm);
 		this.createButtonSection(scrolledForm);
+		EntityMediator.addListener(Profile.class, this);
+		EntityMediator.addListener(Configurable.class, this);
+		EntityMediator.addListener(Tab.class, this);
+		EntityMediator.addListener(ProductGroup.class, this);
+		EntityMediator.addListener(PaymentType.class, this);
+		EntityMediator.addListener(TaxRate.class, this);
+		EntityMediator.addListener(Tax.class, this);
 	}
 
 	@Override

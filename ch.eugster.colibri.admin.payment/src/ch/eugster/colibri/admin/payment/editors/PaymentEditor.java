@@ -87,7 +87,6 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 	
 	public PaymentEditor()
 	{
-		EntityMediator.addListener(PaymentType.class, this);
 	}
 
 	@Override
@@ -135,6 +134,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 		{
 			this.createCreditCardSection(scrolledForm);
 		}
+		EntityMediator.addListener(PaymentType.class, this);
 	}
 
 	@Override

@@ -216,6 +216,8 @@ public class ExternalProductGroupView extends AbstractEntityView implements IDou
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(ExternalProductGroup.class, this);
+		EntityMediator.addListener(ProductGroupMapping.class, this);
 	}
 
 	@Override
@@ -261,9 +263,6 @@ public class ExternalProductGroupView extends AbstractEntityView implements IDou
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		EntityMediator.addListener(ExternalProductGroup.class, this);
-		EntityMediator.addListener(ProductGroupMapping.class, this);
-
 		this.providerTracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle().getBundleContext(),
 				ProviderIdService.class, null);
 		this.providerTracker.open();
