@@ -55,7 +55,6 @@ public class RoleEditor extends AbstractEntityEditor<Role>
 
 	public RoleEditor()
 	{
-		EntityMediator.addListener(Role.class, this);
 	}
 
 	@Override
@@ -96,6 +95,7 @@ public class RoleEditor extends AbstractEntityEditor<Role>
 		this.createLoginSection(scrolledForm);
 		this.createFunctionSection(scrolledForm);
 		this.createDataSection(scrolledForm);
+		EntityMediator.addListener(Role.class, this);
 	}
 
 	@Override

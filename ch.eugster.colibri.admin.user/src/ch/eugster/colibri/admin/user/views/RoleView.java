@@ -160,6 +160,7 @@ public class RoleView extends AbstractEntityView implements IDoubleClickListener
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(Role.class, this);
 	}
 
 	@Override
@@ -193,8 +194,6 @@ public class RoleView extends AbstractEntityView implements IDoubleClickListener
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-
-		EntityMediator.addListener(Role.class, this);
 	};
 
 	@Override

@@ -537,10 +537,13 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			final Collection<Configurable> configurables = profile.getConfigurables();
 			for (final Configurable configurable : configurables)
 			{
-				if (configurable.getType().equals(Configurable.ConfigurableType.FUNCTION))
+				if (!configurable.isDeleted())
 				{
-					functionPanel = new FunctionPanel(this, configurable);
-					this.addStateChangeListener(functionPanel);
+					if (configurable.getType().equals(Configurable.ConfigurableType.FUNCTION))
+					{
+						functionPanel = new FunctionPanel(this, configurable);
+						this.addStateChangeListener(functionPanel);
+					}
 				}
 			}
 			return functionPanel;

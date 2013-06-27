@@ -178,6 +178,7 @@ public class UserView extends AbstractEntityView implements IDoubleClickListener
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(User.class, this);
 	}
 
 	@Override
@@ -216,8 +217,6 @@ public class UserView extends AbstractEntityView implements IDoubleClickListener
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-
-		EntityMediator.addListener(User.class, this);
 	};
 
 	@Override

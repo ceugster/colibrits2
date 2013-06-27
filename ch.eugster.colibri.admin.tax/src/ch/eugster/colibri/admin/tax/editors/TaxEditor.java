@@ -66,8 +66,6 @@ public class TaxEditor extends AbstractEntityEditor<Tax>
 
 	public TaxEditor()
 	{
-		EntityMediator.addListener(Tax.class, this);
-
 		this.providerConfiguratorTracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(TaxActivator.getDefault().getBundle().getBundleContext(),
 				ProviderConfigurator.class, null);
 		this.providerConfiguratorTracker.open();
@@ -127,7 +125,7 @@ public class TaxEditor extends AbstractEntityEditor<Tax>
 				this.createMappingSection(scrolledForm);
 			}
 		}
-
+		EntityMediator.addListener(Tax.class, this);
 	}
 
 	@Override

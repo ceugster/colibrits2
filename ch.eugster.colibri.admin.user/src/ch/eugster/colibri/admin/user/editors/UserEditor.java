@@ -59,8 +59,6 @@ public class UserEditor extends AbstractEntityEditor<User>
 
 	public UserEditor()
 	{
-		EntityMediator.addListener(User.class, this);
-		EntityMediator.addListener(Role.class, this);
 	}
 
 	// @Override
@@ -149,6 +147,8 @@ public class UserEditor extends AbstractEntityEditor<User>
 		this.createUserSection(scrolledForm);
 		this.createLoginSection(scrolledForm);
 		this.createStatusSection(scrolledForm);
+		EntityMediator.addListener(User.class, this);
+		EntityMediator.addListener(Role.class, this);
 	}
 
 	@Override

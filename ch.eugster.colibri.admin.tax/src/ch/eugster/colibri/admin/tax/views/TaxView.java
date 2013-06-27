@@ -316,6 +316,12 @@ public class TaxView extends AbstractEntityView implements IDoubleClickListener,
 			}
 		};
 		this.persistenceServiceTracker.open();
+		EntityMediator.addListener(TaxRate.class, this);
+		EntityMediator.addListener(TaxType.class, this);
+		EntityMediator.addListener(Tax.class, this);
+		EntityMediator.addListener(TaxCodeMapping.class, this);
+		EntityMediator.addListener(CurrentTax.class, this);
+		EntityMediator.addListener(CurrentTaxCodeMapping.class, this);
 	}
 
 	@Override
@@ -376,13 +382,6 @@ public class TaxView extends AbstractEntityView implements IDoubleClickListener,
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		EntityMediator.addListener(TaxRate.class, this);
-		EntityMediator.addListener(TaxType.class, this);
-		EntityMediator.addListener(Tax.class, this);
-		EntityMediator.addListener(TaxCodeMapping.class, this);
-		EntityMediator.addListener(CurrentTax.class, this);
-		EntityMediator.addListener(CurrentTaxCodeMapping.class, this);
-
 		this.providerConfiguratorTracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(TaxActivator.getDefault().getBundle().getBundleContext(),
 				ProviderConfigurator.class, null);
 		this.providerConfiguratorTracker.open();

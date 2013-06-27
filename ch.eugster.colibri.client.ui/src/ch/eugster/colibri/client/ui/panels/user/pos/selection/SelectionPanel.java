@@ -43,17 +43,20 @@ public class SelectionPanel extends JPanel implements StateChangeListener
 		final Collection<Configurable> configurables = profile.getConfigurables();
 		for (final Configurable configurable : configurables)
 		{
-			if (configurable.getType().equals(Configurable.ConfigurableType.PRODUCT_GROUP))
+			if (!configurable.isDeleted())
 			{
-				productGroupPanel = new ProductGroupPanel(this.userPanel, configurable);
-				this.userPanel.addStateChangeListener(productGroupPanel);
-				this.add(SelectionPanel.PRODUCT_GROUP_PANEL, productGroupPanel);
-			}
-			else if (configurable.getType().equals(Configurable.ConfigurableType.PAYMENT_TYPE))
-			{
-				paymentTypePanel = new PaymentTypePanel(this.userPanel, configurable);
-				this.userPanel.addStateChangeListener(paymentTypePanel);
-				this.add(SelectionPanel.PAYMENT_TYPE_PANEL, paymentTypePanel);
+				if (configurable.getType().equals(Configurable.ConfigurableType.PRODUCT_GROUP))
+				{
+					productGroupPanel = new ProductGroupPanel(this.userPanel, configurable);
+					this.userPanel.addStateChangeListener(productGroupPanel);
+					this.add(SelectionPanel.PRODUCT_GROUP_PANEL, productGroupPanel);
+				}
+				else if (configurable.getType().equals(Configurable.ConfigurableType.PAYMENT_TYPE))
+				{
+					paymentTypePanel = new PaymentTypePanel(this.userPanel, configurable);
+					this.userPanel.addStateChangeListener(paymentTypePanel);
+					this.add(SelectionPanel.PAYMENT_TYPE_PANEL, paymentTypePanel);
+				}
 			}
 		}
 	}

@@ -434,7 +434,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 			{
 				continue;
 			}
-			if (!position.getOption().equals(newPosition.getOption()))
+			if (position.getOption() != newPosition.getOption())
 			{
 				continue;
 			}

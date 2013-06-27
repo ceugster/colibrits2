@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 

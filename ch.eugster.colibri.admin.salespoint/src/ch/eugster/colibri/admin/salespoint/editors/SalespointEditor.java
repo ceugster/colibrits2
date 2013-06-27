@@ -572,17 +572,13 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 			{
 				final ReceiptPrinterSettings selectedPrinter = (ReceiptPrinterSettings) ssel.getFirstElement();
 				SalespointReceiptPrinterSettings currentPrinterSettings = salespoint.getReceiptPrinterSettings();
-				if (currentPrinterSettings == null)
-				{
-					currentPrinterSettings = SalespointReceiptPrinterSettings.newInstance(selectedPrinter, salespoint);
-					salespoint.setReceiptPrinterSettings(currentPrinterSettings);
-					
-				}
+				currentPrinterSettings = SalespointReceiptPrinterSettings.newInstance(selectedPrinter, salespoint);
 				currentPrinterSettings.setDeleted(selectedPrinter.getId() == null ? true : false);
 				currentPrinterSettings.setCols(this.receiptPrinterCols.getSelection());
 				currentPrinterSettings.setConverter(this.receiptPrinterConverter.getText().isEmpty() ? null : this.receiptPrinterConverter.getText());
 				currentPrinterSettings.setLinesBeforeCut(this.receiptPrinterLinesBeforeCut.getSelection());
 				currentPrinterSettings.setPort(this.receiptPrinterPort.getText().isEmpty() ? null : receiptPrinterPort.getText());
+				salespoint.setReceiptPrinterSettings(currentPrinterSettings);
 			}
 		}
 

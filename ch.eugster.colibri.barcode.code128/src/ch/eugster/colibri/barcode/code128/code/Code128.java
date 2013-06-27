@@ -200,7 +200,25 @@ public class Code128 extends AbstractBarcode
 	 */
 	public String getTaxCode()
 	{
-		return this.getCode().substring(8, 9);
+		String taxCode = "0";
+		String code = this.getCode().substring(8, 9);
+		if (code.equals("0"))
+		{
+			taxCode = "1";
+		}
+		else if (code.equals("5"))
+		{
+			taxCode = "2";
+		}
+		else if (code.equals("7"))
+		{
+			taxCode = "3";
+		}
+		else if (code.equals("8"))
+		{
+			taxCode = "0";
+		}
+		return taxCode;
 	}
 
 	@Override

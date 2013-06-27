@@ -79,8 +79,6 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 		nf.setMaximumFractionDigits(3);
 		nf.setMinimumFractionDigits(0);
 
-		EntityMediator.addListener(CurrentTax.class, this);
-
 		this.providerConfiguratorTracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(TaxActivator.getDefault().getBundle().getBundleContext(),
 				ProviderConfigurator.class, null);
 		this.providerConfiguratorTracker.open();
@@ -139,6 +137,7 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 				this.createMappingSection(providerConfigurator.getProviderId(), scrolledForm);
 			}
 		}
+		EntityMediator.addListener(CurrentTax.class, this);
 	}
 
 	// @Override

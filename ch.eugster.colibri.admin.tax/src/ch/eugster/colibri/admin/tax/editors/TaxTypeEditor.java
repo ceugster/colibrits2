@@ -42,7 +42,6 @@ public class TaxTypeEditor extends AbstractEntityEditor<TaxType>
 
 	public TaxTypeEditor()
 	{
-		EntityMediator.addListener(TaxType.class, this);
 	}
 
 	@Override
@@ -81,6 +80,7 @@ public class TaxTypeEditor extends AbstractEntityEditor<TaxType>
 	protected void createSections(final ScrolledForm scrolledForm)
 	{
 		this.createSection(scrolledForm);
+		EntityMediator.addListener(TaxType.class, this);
 	}
 
 	@Override

@@ -7,6 +7,7 @@
 package ch.eugster.colibri.client.ui.panels.user.pos.info.display;
 
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
@@ -26,8 +27,11 @@ public class TotalPanel extends DisplayPanel
 	@Override
 	public void setData(final Receipt receipt)
 	{
-		defaultCurrencyAmount = receipt.getPositionDefaultCurrencyAmount(AmountType.NETTO);
-		foreignCurrencyAmount = receipt.getPositionDefaultForeignCurrencyAmount(AmountType.NETTO);
+		if (receipt.getPositionAmount(Receipt.QuotationType.REFERENCE_CURRENCY, Position.AmountType.NETTO) != 0D)
+		{
+			defaultCurrencyAmount = receipt.getPositionDefaultCurrencyAmount(AmountType.NETTO);
+			foreignCurrencyAmount = receipt.getPositionDefaultForeignCurrencyAmount(AmountType.NETTO);
+		}
 	}
 
 	@Override

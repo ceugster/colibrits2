@@ -170,7 +170,8 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 			{
 				if (persistenceService != null)
 				{
-					return persistenceService.getCacheService().find(PaymentType.class, parentId) != null;
+					PaymentType paymentType = (PaymentType) persistenceService.getCacheService().find(PaymentType.class, parentId);
+					return paymentType == null ? false : !paymentType.isDeleted();
 				}
 				return false;
 			}
@@ -178,7 +179,8 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 			{
 				if (persistenceService != null)
 				{
-					return persistenceService.getCacheService().find(ProductGroup.class, parentId) != null;
+					ProductGroup productGroup = (ProductGroup) persistenceService.getCacheService().find(ProductGroup.class, parentId);
+					return productGroup == null ? false : !productGroup.isDeleted();
 				}
 				return false;
 			}
@@ -186,7 +188,8 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 			{
 				if (persistenceService != null)
 				{
-					return persistenceService.getCacheService().find(TaxRate.class, parentId) != null;
+					TaxRate taxRate = (TaxRate) persistenceService.getCacheService().find(TaxRate.class, parentId);
+					return taxRate == null ? false : !taxRate.isDeleted();
 				}
 				return false;
 			}
@@ -290,7 +293,8 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 
 	private void init()
 	{
-		final Tab[] tabs = this.configurable.getTabs().toArray(new Tab[0]);
+		
+		final Tab[] tabs = this.configurable.getActiveTabs().toArray(new Tab[0]);
 		if ((tabs == null) || (tabs.length == 0))
 		{
 			return;
@@ -298,7 +302,10 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 
 		if (tabs.length == 1)
 		{
-			this.fillPanel(this, tabs[0]);
+			if (!tabs[0].isDeleted())
+			{
+				this.fillPanel(this, tabs[0]);
+			}
 		}
 		else
 		{

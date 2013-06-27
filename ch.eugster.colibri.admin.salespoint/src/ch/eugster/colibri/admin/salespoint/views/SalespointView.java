@@ -252,6 +252,10 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 			}
 		};
 		this.persistenceServiceTracker.open();
+
+		EntityMediator.addListener(Profile.class, this);
+		EntityMediator.addListener(Salespoint.class, this);
+		EntityMediator.addListener(Stock.class, this);
 	}
 
 	@Override
@@ -296,10 +300,6 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 	public void init(final IViewSite site) throws PartInitException
 	{
 		super.init(site);
-
-		EntityMediator.addListener(Profile.class, this);
-		EntityMediator.addListener(Salespoint.class, this);
-		EntityMediator.addListener(Stock.class, this);
 	}
 
 	@Override
@@ -314,27 +314,35 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 	@Override
 	public void postPersist(final AbstractEntity entity)
 	{
-		if (!this.viewer.getTree().isDisposed())
+		UIJob job = new UIJob("Updating...") 
 		{
-			Object parent = null;
-			if (entity instanceof Salespoint)
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) 
 			{
-				parent = this;
-			}
-			else if (entity instanceof Stock)
-			{
-				parent = ((Stock) entity).getSalespoint();
-			}
-			else
-			{
-				return;
-			}
+				if (!viewer.getTree().isDisposed())
+				{
+					Object parent = null;
+					if (entity instanceof Salespoint)
+					{
+						parent = this;
+					}
+					else if (entity instanceof Stock)
+					{
+						parent = ((Stock) entity).getSalespoint();
+					}
+					else
+					{
+						return Status.OK_STATUS;
+					}
 
-			
-			this.viewer.setInput(persistenceServiceTracker.getService());
-			this.viewer.expandToLevel(entity, AbstractTreeViewer.ALL_LEVELS);
-			this.packColumns();
-		}
+					viewer.setInput(persistenceServiceTracker.getService());
+					viewer.expandToLevel(entity, AbstractTreeViewer.ALL_LEVELS);
+					packColumns();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 
 	@Override
