@@ -1036,6 +1036,9 @@ ch.eugster.colibri.periphery.display/build.properties -text
 ch.eugster.colibri.periphery.display/src/ch/eugster/colibri/periphery/display/Activator.java -text
 ch.eugster.colibri.periphery.display/src/ch/eugster/colibri/periphery/display/service/AbstractCustomerDisplayService.java -text
 ch.eugster.colibri.periphery.display/src/ch/eugster/colibri/periphery/display/service/CustomerDisplayService.java -text
+ch.eugster.colibri.periphery.printer.dummy.feature/.project -text
+ch.eugster.colibri.periphery.printer.dummy.feature/build.properties -text
+ch.eugster.colibri.periphery.printer.dummy.feature/feature.xml -text
 ch.eugster.colibri.periphery.printer.feature/.project -text
 ch.eugster.colibri.periphery.printer.feature/build.properties -text
 ch.eugster.colibri.periphery.printer.feature/feature.xml -text
