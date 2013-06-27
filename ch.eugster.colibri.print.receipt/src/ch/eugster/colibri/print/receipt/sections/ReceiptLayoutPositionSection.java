@@ -36,9 +36,9 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("CCCCCCCCCCCCCCCCCCC EEEEEEE MM BBBBBBBB OO\n");
+		builder = builder.append("WWWWWWWWWWWWWWWWWWW EEEEEEE MM BBBBBBBB OO\n");
 		builder = builder.append("              BBBBB PPPPPPP    RRRRRRRR\n");
-		builder = builder.append("   AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+		builder = builder.append("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU\n");
 		return builder.toString();
 	}
 
@@ -331,7 +331,7 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 
 	public enum DetailKey implements IKey
 	{
-		C, M, E, B, N, P, R, T, G, O, A;
+		A, B, C, E, G, M, N, O, P, R, T, U, W;
 
 		@Override
 		public String label()
@@ -340,7 +340,11 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 			{
 				case C:
 				{
-					return "Warengruppe/Barcode";
+					return "Barcode";
+				}
+				case W:
+				{
+					return "Warengruppe";
 				}
 				case M:
 				{
@@ -380,7 +384,11 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 				}
 				case A:
 				{
-					return "Artikelbezeichnung";
+					return "Autor, Titel";
+				}
+				case U:
+				{
+					return "Titel, Autor";
 				}
 				default:
 				{
@@ -402,12 +410,16 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 					{
 						if (position.getProduct() == null)
 						{
-							return layoutSection.replaceMarker(position.getProductGroup().getName(), marker, true);
+							return layoutSection.replaceMarker(position.getProductGroup().getCode(), marker, true);
 						}
 						else
 						{
 							return layoutSection.replaceMarker(position.getProduct().getCode(), marker, true);
 						}
+					}
+					case W:
+					{
+						return layoutSection.replaceMarker(position.getProductGroup().getName(), marker, true);
 					}
 					case M:
 					{
@@ -479,20 +491,11 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 					}
 					case A:
 					{
-						if (position.getProduct() != null)
-						{
-							Collection<ProductGroupMapping> mappings = position.getProductGroup().getProductGroupMappings(position.getProvider());
-							for (ProductGroupMapping mapping : mappings)
-							{
-								if (!mapping.isDeleted())
-								{
-									final String code = mapping.getExternalProductGroup().getCode();
-									return layoutSection.replaceMarker(code + " "
-											+ position.getProduct().getAuthorAndTitleShortForm(), marker, true);
-								}
-							}
-						}
-						return layoutSection.replaceMarker("", marker, true);
+						return layoutSection.replaceMarker(position.getProduct().getAuthorAndTitleShortForm(), marker, true);
+					}
+					case U:
+					{
+						return layoutSection.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
 					}
 					default:
 					{

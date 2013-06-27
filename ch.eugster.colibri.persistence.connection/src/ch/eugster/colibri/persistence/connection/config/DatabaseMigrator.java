@@ -78,7 +78,6 @@ import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.pos.db.Block;
 import ch.eugster.pos.db.Coin;
 import ch.eugster.pos.db.CustomKey;
-import ch.eugster.pos.db.FixKey;
 import ch.eugster.pos.db.ForeignCurrency;
 import ch.eugster.pos.db.Setting;
 

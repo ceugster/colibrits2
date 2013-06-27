@@ -41,7 +41,7 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 			for (final Tab source : sources)
 			{
 				Tab target = (Tab) this.persistenceService.getCacheService().find(Tab.class, source.getId());
-				if ((target == null) || force || (target.getUpdate() != source.getVersion()))
+				if ((target == null) || force || (target.getUpdate() < source.getVersion()))
 				{
 					if (target == null)
 					{
@@ -51,6 +51,7 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 					{
 						if (!target.getConfigurable().getId().equals(source.getConfigurable().getId()))
 						{
+							target.getConfigurable().removeTab(target);
 							final Configurable configurable = (Configurable) this.persistenceService.getCacheService().find(Configurable.class, source.getConfigurable()
 									.getId());
 							target.setConfigurable(configurable);

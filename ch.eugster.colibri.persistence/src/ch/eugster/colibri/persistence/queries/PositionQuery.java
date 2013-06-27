@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Query;
@@ -178,7 +177,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		final Expression settled = new ExpressionBuilder().get("receipt").get("settlement").get("settled").isNull();
 		expression = expression.and(settled);
 
-		Collection<Position> positions = this.select(expression);
+//		Collection<Position> positions = this.select(expression);
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
 		reportQuery.setShouldReturnSingleResult(true);
@@ -198,7 +197,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		final Expression settled = new ExpressionBuilder().get("receipt").get("settlement").get("settled").isNull();
 		expression = expression.and(settled);
 
-		Collection<Position> positions = this.select(expression);
+//		Collection<Position> positions = this.select(expression);
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
 		reportQuery.setShouldReturnSingleResult(true);

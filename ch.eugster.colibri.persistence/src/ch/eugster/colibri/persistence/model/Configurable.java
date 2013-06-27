@@ -8,6 +8,7 @@ package ch.eugster.colibri.persistence.model;
 
 import static javax.persistence.FetchType.EAGER;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -153,6 +154,19 @@ public class Configurable extends AbstractEntity implements IReplicationRelevant
 	public Collection<Tab> getTabs()
 	{
 		return this.tabs;
+	}
+
+	public Collection<Tab> getActiveTabs()
+	{
+		Collection<Tab> activeTabs = new ArrayList<Tab>();
+		for (Tab tab : this.tabs)
+		{
+			if (!tab.isDeleted())
+			{
+				activeTabs.add(tab);
+			}
+		}
+		return activeTabs;
 	}
 
 	public ConfigurableType getType()

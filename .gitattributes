@@ -1039,6 +1039,14 @@ ch.eugster.colibri.periphery.display/src/ch/eugster/colibri/periphery/display/se
 ch.eugster.colibri.periphery.printer.dummy.feature/.project -text
 ch.eugster.colibri.periphery.printer.dummy.feature/build.properties -text
 ch.eugster.colibri.periphery.printer.dummy.feature/feature.xml -text
+ch.eugster.colibri.periphery.printer.dummy/.classpath -text
+ch.eugster.colibri.periphery.printer.dummy/.project -text
+ch.eugster.colibri.periphery.printer.dummy/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.periphery.printer.dummy/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.periphery.printer.dummy/OSGI-INF/service-component.xml -text
+ch.eugster.colibri.periphery.printer.dummy/build.properties -text
+ch.eugster.colibri.periphery.printer.dummy/src/ch/eugster/colibri/periphery/printer/dummy/Activator.java -text
+ch.eugster.colibri.periphery.printer.dummy/src/ch/eugster/colibri/periphery/printer/dummy/service/DummyReceiptPrinterService.java -text
 ch.eugster.colibri.periphery.printer.feature/.project -text
 ch.eugster.colibri.periphery.printer.feature/build.properties -text
 ch.eugster.colibri.periphery.printer.feature/feature.xml -text

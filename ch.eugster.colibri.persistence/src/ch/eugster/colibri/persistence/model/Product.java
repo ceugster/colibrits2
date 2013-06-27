@@ -105,6 +105,24 @@ public class Product extends AbstractEntity
 		return title.toString().trim();
 	}
 
+	public String getTitleAndAuthorShortForm()
+	{
+		StringBuilder title = new StringBuilder();
+		if (this.getTitle() != null && !this.getTitle().isEmpty())
+		{
+			title = title.append(this.getTitle());
+			if (this.getTitle() != null && !this.getTitle().isEmpty())
+			{
+				title = title.append(", ");
+			}
+		}
+		if (this.getAuthor() != null && !this.getAuthor().isEmpty())
+		{
+			title = title.append(this.getAuthorShortform());
+		}
+		return title.toString().trim();
+	}
+
 	public String getCode()
 	{
 		return this.valueOf(this.code);

@@ -186,9 +186,9 @@ public enum ProductGroupType implements IProductGroupType
 		return this.equals(SALES_RELATED);
 	}
 	
-	public boolean isMapping()
+	public boolean isMappable()
 	{
-		return (this.equals(SALES_RELATED) || this.equals(NON_SALES_RELATED));
+		return true;
 	}
 
 	public void setChildren(final Collection<ProductGroup> productGroups)

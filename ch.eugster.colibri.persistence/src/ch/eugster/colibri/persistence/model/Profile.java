@@ -333,6 +333,19 @@ public class Profile extends AbstractEntity implements IReplicationRelevant
 		return this.configurables;
 	}
 
+	public Collection<Configurable> getActiveConfigurables()
+	{
+		Collection<Configurable> activeConfigurables = new ArrayList<Configurable>();
+		for (Configurable configurable : this.configurables)
+		{
+			if (!configurable.isDeleted())
+			{
+				activeConfigurables.add(configurable);
+			}
+		}
+		return activeConfigurables;
+	}
+
 	public int getDisplayBg()
 	{
 		return this.displayBg;
