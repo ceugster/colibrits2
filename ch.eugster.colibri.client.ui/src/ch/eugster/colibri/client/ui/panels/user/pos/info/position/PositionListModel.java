@@ -13,10 +13,12 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -106,11 +108,13 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 				{
 					if (this.selectionListModel.getMinSelectionIndex() == -1)
 					{
+						System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": perform table update.");
 						this.fireTableDataChanged();
 					}
 				}
 				else
 				{
+					System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": perform test table update.");
 					this.testForTableUpdate();
 				}
 			}
@@ -517,6 +521,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 	{
 		if (this.userPanel.getPositionWrapper().isPositionComplete())
 		{
+			System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": perform position add/replace.");
 			final Position newPosition = this.userPanel.getPositionWrapper().getPosition();
 			if (this.selectionListModel.getMinSelectionIndex() > -1)
 			{
@@ -526,6 +531,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 			{
 				this.addPosition(newPosition);
 			}
+			System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": position add/replace performed.");
 		}
 	}
 

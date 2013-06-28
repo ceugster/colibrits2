@@ -1586,6 +1586,7 @@ ch.eugster.colibri.provider/icons/undo_edit.png -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/Activator.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IProperty.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderConfiguration.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderTaxCode.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/SchedulerProperty.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderConfigurator.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderFailoverService.java -text

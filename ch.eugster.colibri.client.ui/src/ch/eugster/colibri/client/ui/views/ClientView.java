@@ -139,6 +139,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					errors = errors.append(this.checkReferenceCurrency(salespoint));
 					errors = errors.append(this.checkDefaultProductGroup(salespoint));
 					errors = errors.append(this.checkPayedInvoice(salespoint));
+					errors = errors.append(this.checkProviderTaxMapped());
 					errors = errors.append(this.checkExport(salespoint));
 
 					final ServiceTracker<ProviderIdService, ProviderIdService> tracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle()
@@ -167,7 +168,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 			}
 		}
-		if (errors.toString().isEmpty())
+		if (errors.toString().trim().isEmpty())
 		{
 			this.createControl(parent);
 		}
@@ -492,6 +493,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	{
 		String msg = "Es wurde noch keine Warengruppe für das Bezahlen von Rechnungen definiert.\n";
 		return salespoint.getCommonSettings().getPayedInvoice() == null ? msg : "";
+	}
+
+	private String checkProviderTaxMapped()
+	{
+		ProviderInterface providerInterface = providerServiceTracker.getService();
+		return providerInterface.checkTaxCodes(persistenceServiceTracker.getService()).getMessage();
 	}
 
 	private String checkDefaultProductGroup(Salespoint salespoint)

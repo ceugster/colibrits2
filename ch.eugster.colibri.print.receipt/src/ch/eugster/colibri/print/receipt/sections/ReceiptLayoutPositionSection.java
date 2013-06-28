@@ -485,17 +485,31 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 					}
 					case O:
 					{
-						String option = position.getOption().toCode();
+						String option = position.getOption() == null ? "" : position.getOption().toCode();
 						String tax = getExternalTaxCode(position);
 						return layoutSection.replaceMarker(tax + option, marker, false);
 					}
 					case A:
 					{
-						return layoutSection.replaceMarker(position.getProduct().getAuthorAndTitleShortForm(), marker, true);
+						if (position.getProduct() == null)
+						{
+							return layoutSection.replaceMarker("", marker, true);
+						}
+						else
+						{
+							return layoutSection.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
+						}
 					}
 					case U:
 					{
-						return layoutSection.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
+						if (position.getProduct() == null)
+						{
+							return layoutSection.replaceMarker("", marker, true);
+						}
+						else
+						{
+							return layoutSection.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
+						}
 					}
 					default:
 					{

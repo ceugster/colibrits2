@@ -127,29 +127,4 @@ public class TaxRate extends AbstractEntity implements IReplicationRelevant
 	{
 		return (TaxRate) AbstractEntity.newInstance(new TaxRate());
 	}
-	
-	public enum GalileoCode
-	{
-		F, R, N;
-		
-		public static String getCode(String rate)
-		{
-			if (rate.equals("F"))
-			{
-				return "0";
-			}
-			else if (rate.equals("R"))
-			{
-				return "1";
-			}
-			else if (rate.equals("N"))
-			{
-				return "2";
-			}
-			else
-			{
-				return "";
-			}
-		}
-	}
 }

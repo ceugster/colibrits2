@@ -23,7 +23,6 @@ import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
-import ch.eugster.colibri.persistence.model.TaxRate;
 import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
@@ -33,6 +32,7 @@ import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.TaxTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
+import ch.eugster.colibri.provider.configuration.ProviderTaxCode;
 import ch.eugster.colibri.provider.configuration.SchedulerProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
@@ -700,14 +700,16 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			Collection<Tax> taxes = taxType.getTaxes();
 			for (Tax tax : taxes)
 			{
-				if (tax.getTaxCodeMapping(this.getProviderId()) == null)
+				TaxCodeMapping mapping = tax.getTaxCodeMapping(this.getProviderId());
+				if (mapping == null)
 				{
-					String code = TaxRate.GalileoCode.getCode(tax.getTaxRate().getCode());
-					TaxCodeMapping mapping = TaxCodeMapping.newInstance(tax);
+					String code = GalileoTaxCode.getCode(tax.getTaxRate().getCode());
+					mapping = TaxCodeMapping.newInstance(tax);
 					mapping.setCode(code);
 					mapping.setProvider(this.getProviderId());
 					mapping.setTax(tax);
-					service.getServerService().persist(mapping);
+					tax.addTaxCodeMapping(mapping);
+					service.getServerService().merge(mapping.getTax());
 					newCodes++;
 				}
 				count++;
@@ -719,5 +721,35 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Die Zuordnung konnte nicht durchgeführt werden, da keine Verbindung zur Datenbank hergestellt werden konnte.");
 		}
 		return status;
+	}
+
+	public static ProviderTaxCode[] getProviderTaxCodes() 
+	{
+		return GalileoTaxCode.values();
+	}
+
+	public enum GalileoTaxCode implements ProviderTaxCode
+	{
+		F, R, N;
+		
+		public static String getCode(String rate)
+		{
+			if (rate.equals("F"))
+			{
+				return "0";
+			}
+			else if (rate.equals("R"))
+			{
+				return "1";
+			}
+			else if (rate.equals("N"))
+			{
+				return "2";
+			}
+			else
+			{
+				return "";
+			}
+		}
 	}
 }

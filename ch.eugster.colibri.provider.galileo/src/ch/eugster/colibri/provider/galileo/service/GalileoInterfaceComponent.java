@@ -21,12 +21,16 @@ import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Tax;
+import ch.eugster.colibri.persistence.model.TaxCodeMapping;
+import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.galserve.ArticleServerCom4j;
 import ch.eugster.colibri.provider.galileo.galserve.IArticleServer;
 import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
+import ch.eugster.colibri.provider.galileo.service.GalileoConfiguratorComponent.GalileoTaxCode;
 import ch.eugster.colibri.provider.service.ProviderInterface;
 
 public class GalileoInterfaceComponent implements ProviderInterface
@@ -349,5 +353,27 @@ public class GalileoInterfaceComponent implements ProviderInterface
 			this.customerServer.stop();
 			this.customerServer = null;
 		}
+	}
+
+	@Override
+	public IStatus checkTaxCodes(PersistenceService service)
+	{
+		if (service != null)
+		{
+			TaxCodeMappingQuery query = (TaxCodeMappingQuery) service.getCacheService().getQuery(TaxCodeMapping.class);
+			GalileoTaxCode[] taxCodes = GalileoConfiguratorComponent.GalileoTaxCode.values();
+			for (GalileoTaxCode taxCode : taxCodes)
+			{
+				String providerId = this.getProviderId();
+				String code = GalileoTaxCode.getCode(taxCode.name());
+				TaxCodeMapping mapping = query.selectTaxCodeMappingByProviderAndCode(providerId, code);
+				if (mapping == null || mapping.isDeleted())
+				{
+					return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Mehrwertsteuer für " + taxCode.name() + " in " + this.getName() + " nicht gemappt.");
+				}
+			}
+		}
+		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID, "");
+		return status;
 	}
 }
