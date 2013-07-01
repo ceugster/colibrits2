@@ -1442,10 +1442,6 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	{
 		Position position = Position.newInstance(receipt);
 		position.setBookProvider(Boolean.getBoolean(element.getAttributeValue("galileo-book")));
-		String code = element.getAttributeValue("tax-id");
-		Tax tax = getTax(code);
-		CurrentTax currentTax = getCurrentTax(tax, element.getAttributeValue("current-tax-id"));
-		position.setCurrentTax(currentTax);
 		position.setDeleted(false);
 		position.setDiscount(Double.valueOf(element.getAttributeValue("discount")));
 		position.setEbook(false);
@@ -1476,6 +1472,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		position.setProviderBooked(Boolean.getBoolean(element.getAttributeValue("galileo-booked")));
 		position.setQuantity(Integer.valueOf(element.getAttributeValue("quantity")).intValue());
 		position.setSearchValue(element.getAttributeValue("product-number"));
+		String code = element.getAttributeValue("tax-id");
+		Tax tax = getTax(code);
+		CurrentTax currentTax = getCurrentTax(tax, element.getAttributeValue("current-tax-id"));
+		position.setCurrentTax(currentTax);
 		position.setTaxPercents(position.getCurrentTax().getPercentage());
 		position.setTimestamp(receipt.getTimestamp());
 		if (element.getAttributeValue("payed-invoice").equals(Boolean.TRUE.toString()))

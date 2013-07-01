@@ -933,11 +933,17 @@ public class ArticleServerCom4j implements IArticleServer
 	{
 		position.setEbook(barcode.isEbook());
 		position.setProduct(this.getProduct(barcode, position));
-		position.setBookProvider(!((Boolean)this.galserve.nichtbuchen()).booleanValue());
 		position.setFromStock(((Boolean)this.galserve.lagerabholfach()).booleanValue());
-		position.setOrder(this.galserve.bestnummer().toString());
+		if (barcode.getType().equals(Barcode.Type.ORDER))
+		{
+			position.setOrder(barcode.getCode());
+		}
+		else
+		{
+			position.setOrder(null);
+		}
 		position.setProvider(this.configuration.getProviderId());
-//			position.setBookProvider(true);
+		position.setBookProvider(!((Boolean)this.galserve.nichtbuchen()).booleanValue());
 		position.setProviderBooked(false);
 		position.setOrdered(((Boolean)this.galserve.bestellt()).booleanValue());
 

@@ -460,7 +460,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 		{
 			for (final Option option : options)
 			{
-				if (position.getOption().equals(option))
+				if (position.getOption() == option)
 				{
 					quantity += position.getQuantity();
 				}

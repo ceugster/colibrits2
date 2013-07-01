@@ -143,7 +143,7 @@ public enum FunctionType
 			}
 			case FUNCTION_RESTITUTION:
 			{
-				return "Rückname";
+				return "Rücknahme";
 			}
 			case FUNCTION_TOTAL_SALES:
 			{
