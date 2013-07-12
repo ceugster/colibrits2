@@ -40,13 +40,14 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 		{
 			for (final Tab source : sources)
 			{
+				boolean add = false;
 				Tab target = (Tab) this.persistenceService.getCacheService().find(Tab.class, source.getId());
 				if ((target == null) || force || (target.getUpdate() < source.getVersion()))
 				{
 					if (target == null)
 					{
 						target = this.replicate(source);
-						target.getConfigurable().addTab(target);
+						add = true;
 					}
 					else
 					{
@@ -56,11 +57,15 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 							final Configurable configurable = (Configurable) this.persistenceService.getCacheService().find(Configurable.class, source.getConfigurable()
 									.getId());
 							target.setConfigurable(configurable);
-							target.getConfigurable().addTab(target);
+							add = true;
 						}
 						target = this.replicate(source, target);
 					}
 					target = (Tab) this.persistenceService.getCacheService().merge(target);
+					if (add)
+					{
+						target.getConfigurable().addTab(target);
+					}
 				}
 				if (monitor != null)
 				{

@@ -26,6 +26,8 @@ public class Activator extends AbstractUIPlugin
 
 	public static final String IMAGE_BULP = "image.bulp";
 
+	public static final String IMAGE_GEARWHEEL = "image.gearwheel";
+
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
 	// The shared instance
@@ -47,6 +49,7 @@ public class Activator extends AbstractUIPlugin
 		imageRegistry.put(Activator.IMAGE_STOCK, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/books.gif")));
 		imageRegistry.put(Activator.IMAGE_REGISTER, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/register_16.png")));
 		imageRegistry.put(Activator.IMAGE_BULP, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gluehbirne_16.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gearwheel_16.png")));
 	}
 
 	/*

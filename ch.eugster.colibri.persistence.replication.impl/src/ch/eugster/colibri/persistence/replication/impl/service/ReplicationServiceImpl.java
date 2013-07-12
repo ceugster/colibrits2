@@ -15,6 +15,7 @@ import org.osgi.service.log.LogService;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.VersionQuery;
 import ch.eugster.colibri.persistence.replication.impl.Activator;
+import ch.eugster.colibri.persistence.replication.impl.replicators.CommonSettingsPropertyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CommonSettingsReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ConfigurableReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CurrencyReplicator;
@@ -137,6 +138,9 @@ public class ReplicationServiceImpl implements ReplicationService
 
 								new CommonSettingsReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
+
+								new CommonSettingsPropertyReplicator(ReplicationServiceImpl.this.persistenceService)
+								.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new ProductGroupReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);

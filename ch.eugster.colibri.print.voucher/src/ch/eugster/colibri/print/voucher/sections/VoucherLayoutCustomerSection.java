@@ -134,7 +134,8 @@ public class VoucherLayoutCustomerSection extends AbstractLayoutSection
 	{
 		if (printable instanceof Receipt)
 		{
-			return ((Receipt) printable).getCustomerCode() != null;
+			String code = ((Receipt) printable).getCustomerCode();
+			return code != null && !code.isEmpty();
 		}
 		return false;
 	}

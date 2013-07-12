@@ -6,12 +6,19 @@
  */
 package ch.eugster.colibri.persistence.model;
 
+import static javax.persistence.FetchType.EAGER;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
@@ -19,6 +26,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
@@ -137,6 +145,9 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 	@Column(name = "cs_export_path")
 	private String exportPath;
 
+	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "commonSettings")
+	private List<CommonSettingsProperty> properties = new Vector<CommonSettingsProperty>();
+	
 	private CommonSettings()
 	{
 		super();
@@ -565,5 +576,48 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 
 	public void setExportPath(String exportPath) {
 		this.propertyChangeSupport.firePropertyChange("exportPath", this.exportPath, this.exportPath = exportPath);
+	}
+	
+	public List<CommonSettingsProperty> getProperties()
+	{
+		return this.properties;
+	}
+
+	public void addProperties(CommonSettingsProperty property)
+	{
+		this.properties.add(property);
+	}
+
+	public void removeProperties(CommonSettingsProperty property)
+	{
+		this.properties.remove(property);
+	}
+	
+	public Map<String, CommonSettingsProperty> getProperties(String discriminator)
+	{
+		return getProperties(null, discriminator);
+	}
+	
+	public Map<String, CommonSettingsProperty> getProperties(Salespoint salespoint, String discriminator)
+	{
+		Map<String, CommonSettingsProperty> selectedProperties = new HashMap<String, CommonSettingsProperty>();
+		for (CommonSettingsProperty property : this.properties)
+		{
+			if (property.getDiscriminator().equals(discriminator))
+			{
+				if (salespoint == null)
+				{
+					if (property.getSalespoint() == null)
+					{
+						selectedProperties.put(property.getKey(), property);
+					}
+				}
+				else if (property.getSalespoint() != null && property.getSalespoint().getId().equals(salespoint.getId()))
+				{
+					selectedProperties.put(property.getKey(), property);
+				}
+			}
+		}
+		return selectedProperties;
 	}
 }

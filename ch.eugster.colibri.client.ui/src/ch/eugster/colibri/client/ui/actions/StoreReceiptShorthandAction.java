@@ -70,11 +70,6 @@ public class StoreReceiptShorthandAction extends ConfigurableAction implements P
 		if (this.userPanel.getReceiptWrapper().isReceiptBalanced())
 		{
 			this.userPanel.getReceiptWrapper().storeReceipt();
-//			this.userPanel.getReceiptWrapper().prepareReceipt();
-//			this.userPanel.getPositionWrapper().preparePosition(this.userPanel.getReceiptWrapper().getReceipt());
-//			this.userPanel.getPaymentWrapper().preparePayment(this.userPanel.getReceiptWrapper().getReceipt());
-//			this.userPanel.fireStateChange(new StateChangeEvent(this.userPanel.getCurrentState(),
-//					UserPanel.State.POSITION_INPUT));
 		}
 	}
 

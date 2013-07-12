@@ -163,11 +163,11 @@ public enum FunctionType
 			}
 			case FUNCTION_STORE_RECEIPT_EXPRESS_ACTION:
 			{
-				return "Beleg speichern";
+				return "Beleg abschliessen";
 			}
 			case FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION:
 			{
-				return "Beleg speichern";
+				return "Express speichern";
 			}
 			case FUNCTION_PRINT_LAST_RECEIPT:
 			{

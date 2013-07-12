@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -35,6 +36,7 @@ import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderIdService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.voucher.client.VoucherService;
 
 public class PositionWrapper implements PropertyChangeListener, DisposeListener
 {
@@ -270,38 +272,44 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			final String input = this.valueDisplay.readAndInitDisplay();
 			if ((input != null) && (input.length() > 0))
 			{
-				final Barcode barcode = this.verifyInput(input);
-				if (barcode instanceof Barcode)
+				if (input.startsWith("GCD"))
 				{
-					if (this.verifyOrderedNotYetScanned(barcode))
-					{
-						this.setProviderId(barcode);
-						this.findAndRead(barcode);
-					}
+					checkBalance(input);
 				}
 				else
 				{
-					final String[] descs = this.getAvailableBarcodeNames();
-					StringBuilder text = new StringBuilder("<html>\n");
-					text = text.append("Die Eingabe '" + input + "' kann nicht verarbeitet werden.");
-					if (descs.length > 0)
+					final Barcode barcode = this.verifyInput(input);
+					if (barcode instanceof Barcode)
 					{
-						text = text.append(" Folgende Barcodes werden erkannt:\n<ul>\n");
-						for (final String desc : descs)
+						if (this.verifyOrderedNotYetScanned(barcode))
 						{
-							text = text.append("<li>" + desc + "\n");
+							this.setProviderId(barcode);
+							this.findAndRead(barcode);
 						}
-						text.append("</ul>\n");
 					}
-					final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-							.getReceipt().getSettlement().getSalespoint().getProfile(), "Barcode ungültig",
-							new int[] { MessageDialog.BUTTON_OK }, 0);
-					dialog.setMessage(text.toString());
-					// dialog.setPreferredSize(new Dimension(480, 240 +
-					// descs.length * 80));
-					dialog.pack();
-					dialog.setVisible(true);
-
+					else
+					{
+						final String[] descs = this.getAvailableBarcodeNames();
+						StringBuilder text = new StringBuilder("<html>\n");
+						text = text.append("Die Eingabe '" + input + "' kann nicht verarbeitet werden.");
+						if (descs.length > 0)
+						{
+							text = text.append(" Folgende Barcodes werden erkannt:\n<ul>\n");
+							for (final String desc : descs)
+							{
+								text = text.append("<li>" + desc + "\n");
+							}
+							text.append("</ul>\n");
+						}
+						final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+								.getReceipt().getSettlement().getSalespoint().getProfile(), "Barcode ungültig",
+								new int[] { MessageDialog.BUTTON_OK }, 0);
+						dialog.setMessage(text.toString());
+						// dialog.setPreferredSize(new Dimension(480, 240 +
+						// descs.length * 80));
+						dialog.pack();
+						dialog.setVisible(true);
+					}
 				}
 				if (this.keyListener != null)
 				{
@@ -311,6 +319,45 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		}
 	}
 
+	private void checkBalance(String code)
+	{
+		ServiceTracker<VoucherService, VoucherService> tracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(), VoucherService.class, null);
+		tracker.open();
+		VoucherService service = tracker.getService();
+		if (service == null)
+		{
+			final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+					.getReceipt().getSettlement().getSalespoint().getProfile(), "Service nicht verfügbar",
+					new int[] { MessageDialog.BUTTON_OK }, 0);
+			dialog.setMessage("Der Service für die Abfrage von eGutscheinen ist nicht verfügbar.");
+			dialog.pack();
+			dialog.setVisible(true);
+		}
+		else
+		{
+			try
+			{
+				double value = service.getAccountBalance(code);
+				final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+						.getReceipt().getSettlement().getSalespoint().getProfile(), "Kontostand " + code,
+						new int[] { MessageDialog.BUTTON_OK }, 0);
+				dialog.setMessage("Der aktuelle Kontostand beträgt " + NumberFormat.getNumberInstance().format(value) + ".");
+				dialog.pack();
+				dialog.setVisible(true);
+			}
+			catch (Exception e)
+			{
+				final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+						.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler während der Abfrage",
+						new int[] { MessageDialog.BUTTON_OK }, 0);
+				dialog.setMessage("Während der Abfrage ist ein Fehler aufgetreten.\n\n" + e.getLocalizedMessage());
+				dialog.pack();
+				dialog.setVisible(true);
+			}
+		}
+		tracker.close();
+	}
+	
 	public Position preparePosition(final Receipt receipt)
 	{
 		final Position newPosition = Position.newInstance(receipt);

@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.common.settings.Activator;
@@ -22,13 +21,17 @@ import ch.eugster.colibri.admin.common.settings.editors.GeneralSettingsEditor;
 import ch.eugster.colibri.admin.common.settings.editors.GeneralSettingsEditorInput;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.GeneralSettingsParent;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.ProviderPropertyParent;
+import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.VoucherServiceParent;
 import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditor;
 import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditorInput;
 import ch.eugster.colibri.admin.ui.views.AbstractEntityView;
+import ch.eugster.colibri.admin.voucher.webservice.editors.VoucherWebservicePropertiesEditor;
+import ch.eugster.colibri.admin.voucher.webservice.editors.VoucherWebservicePropertiesEditorInput;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderConfigurator;
 import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
+import ch.eugster.colibri.voucher.client.VoucherService;
 
 @SuppressWarnings("rawtypes")
 public class CommonSettingsView extends AbstractEntityView implements IDoubleClickListener
@@ -40,6 +43,8 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
 	private ServiceTracker<ProviderConfigurator, ProviderConfigurator> providerConfiguratorTracker;
+
+	private ServiceTracker<VoucherService, VoucherService> voucherServiceTracker;
 
 	public CommonSettingsView()
 	{
@@ -63,111 +68,24 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		this.getSite().setSelectionProvider(this.viewer);
 
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-				PersistenceService.class, null)
-		{
-			@Override
-			public PersistenceService addingService(final ServiceReference<PersistenceService> reference)
-			{
-				final PersistenceService service = (PersistenceService) super.addingService(reference);
-				CommonSettingsView.this.getSite().getShell().getDisplay().asyncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						CommonSettingsView.this.viewer.setInput(service);
-					}
-				});
-				return service;
-			}
-
-			@Override
-			public void modifiedService(final ServiceReference<PersistenceService> reference, final PersistenceService service)
-			{
-				super.modifiedService(reference, service);
-				CommonSettingsView.this.getSite().getShell().getDisplay().asyncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						CommonSettingsView.this.viewer.setInput(service);
-					}
-				});
-			}
-
-			@Override
-			public void removedService(final ServiceReference<PersistenceService> reference, final PersistenceService service)
-			{
-				super.removedService(reference, service);
-				CommonSettingsView.this.getSite().getShell().getDisplay().asyncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						if (CommonSettingsView.this.viewer.getContentProvider() != null)
-						{
-							CommonSettingsView.this.viewer.setInput(CommonSettingsView.this.viewer);
-						}
-					}
-				});
-			}
-		};
+				PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
 
 		this.providerConfiguratorTracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderConfigurator.class, null)
-		{
-			@Override
-			public ProviderConfigurator addingService(final ServiceReference<ProviderConfigurator> reference)
-			{
-				final ProviderConfigurator service = (ProviderConfigurator) super.addingService(reference);
-				CommonSettingsView.this.getSite().getShell().getDisplay().asyncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						CommonSettingsView.this.viewer.setInput(service);
-					}
-				});
-				return service;
-			}
-
-			@Override
-			public void modifiedService(final ServiceReference<ProviderConfigurator> reference, final ProviderConfigurator service)
-			{
-				super.modifiedService(reference, service);
-				CommonSettingsView.this.getSite().getShell().getDisplay().asyncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						CommonSettingsView.this.viewer.setInput(service);
-					}
-				});
-			}
-
-			@Override
-			public void removedService(final ServiceReference<ProviderConfigurator> reference, final ProviderConfigurator service)
-			{
-				super.removedService(reference, service);
-				CommonSettingsView.this.getSite().getShell().getDisplay().asyncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						if (CommonSettingsView.this.viewer.getContentProvider() != null)
-						{
-							CommonSettingsView.this.viewer.setInput(CommonSettingsView.this.viewer);
-						}
-					}
-				});
-			}
-		};
+				ProviderConfigurator.class, null);
 		this.providerConfiguratorTracker.open();
+
+		this.voucherServiceTracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(),
+				VoucherService.class, null);
+		this.voucherServiceTracker.open();
+		
+		viewer.setInput(new Object());
 	}
 
 	@Override
 	public void dispose()
 	{
+		this.voucherServiceTracker.close();
 		this.providerConfiguratorTracker.close();
 		this.persistenceServiceTracker.close();
 		super.dispose();
@@ -185,6 +103,10 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		else if (object instanceof GeneralSettingsParent)
 		{
 			this.editGeneralSettings();
+		}
+		else if (object instanceof VoucherServiceParent)
+		{
+			this.editVoucherService();
 		}
 	}
 
@@ -207,6 +129,27 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 			catch (final PartInitException e)
 			{
 				e.printStackTrace();
+			}
+		}
+	}
+
+	public void editVoucherService()
+	{
+		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			VoucherService voucherService = (VoucherService) voucherServiceTracker.getService();
+			if (voucherService != null)
+			{
+				try
+				{
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+							.openEditor(new VoucherWebservicePropertiesEditorInput(persistenceService, voucherService), VoucherWebservicePropertiesEditor.ID, true);
+				}
+				catch (final PartInitException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 	}

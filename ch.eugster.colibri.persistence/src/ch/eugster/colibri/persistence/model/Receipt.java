@@ -573,6 +573,32 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		return this.referenceCurrencyRoundFactor;
 	}
+	
+	public Collection<Payment> getBackPayments()
+	{
+		Collection<Payment> payments = new ArrayList<Payment>();
+		for (Payment payment : this.getPayments())
+		{
+			if (payment.isBack())
+			{
+				payments.add(payment);
+			}
+		}
+		return payments;
+	}
+
+	public Collection<Payment> getBackVouchers()
+	{
+		Collection<Payment> payments = new ArrayList<Payment>();
+		for (Payment payment : this.getPayments())
+		{
+			if (payment.isBack() && payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+			{
+				payments.add(payment);
+			}
+		}
+		return payments;
+	}
 
 	public Settlement getSettlement()
 	{

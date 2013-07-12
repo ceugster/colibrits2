@@ -7,7 +7,22 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Properties;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
 import org.apache.derby.jdbc.ClientDriver;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -16,6 +31,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import ch.eugster.colibri.persistence.connection.Activator;
+import ch.eugster.colibri.persistence.model.AbstractEntity;
+import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.IReplicationRelevant;
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Version;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
@@ -529,6 +548,30 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
+							else if (structureVersion == 11)
+							{
+								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_common_settings_property";
+								status = this.tableExists(connection, tableName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = "CREATE TABLE " + tableName + " (csp_id BIGINT, csp_timestamp DATETIME, csp_version INTEGER, csp_update INTEGER, csp_deleted SMALLINT, csp_discriminator VARCHAR(255), csp_cs_id BIGINT, csp_sp_id BIGINT, csp_key VARCHAR(255), csp_value VARCHAR(255))";
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+
+									if (this.rowExists(stm, "colibri_sequence", "sq_key", "csp_id").equals(IStatus.CANCEL))
+									{
+										sql = "INSERT INTO colibri_sequence (sq_key, sq_val) VALUES ('csp_id', 0)";
+										this.log("SQL: " + sql);
+										result = stm.executeUpdate(sql);
+										this.log("SQL STATE:" + result + " OK)");
+									}
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
 
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");
@@ -567,6 +610,35 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 				}
 			}
 			this.log(status);
+		}
+		return status;
+	}
+	
+	protected IStatus rowExists(Statement stm, String tableName, String columnName, String value)
+	{
+		IStatus status = null;
+		try
+		{
+			StringBuilder msg = new StringBuilder("Prüfe, ob Tabelle " + tableName + " eine Zeile mit "
+					+ columnName + " = " + value + "enthält: ");
+			String sql = "SELECT COUNT(*) AS COUNT FROM " + tableName + " WHERE " + columnName + " = '" + value + "'";
+			this.log("SQL: " + sql);
+			ResultSet result = stm.executeQuery(sql);
+			if (result.next())
+			{
+				status = result.getInt("COUNT") > 0 ? new Status(IStatus.OK, Activator.PLUGIN_ID, msg.append("OK").toString())
+				: new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg.append("FEHLT").toString());
+			}
+			else
+			{
+				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+						"Beim Ermitteln der Versionstabelle ist ein Fehler aufgetreten.");
+			}
+		}
+		catch (final SQLException e)
+		{
+			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+					"Während der Abfrage ist ein Fehler aufgetreten.", e);
 		}
 		return status;
 	}

@@ -212,7 +212,8 @@ public class ProfileView extends AbstractEntityView implements IDoubleClickListe
 				{
 					Configurable configurable = (Configurable) entity;
 					Profile profile = configurable.getProfile();
-					viewer.add(profile, configurable);
+					profile.addConfigurable(configurable);
+					viewer.refresh(profile);
 					viewer.setSelection(new StructuredSelection(new Configurable[] { configurable }));
 //					viewer.expandToLevel(2);
 					return Status.OK_STATUS;
@@ -229,8 +230,8 @@ public class ProfileView extends AbstractEntityView implements IDoubleClickListe
 				{
 					Tab tab = (Tab) entity;
 					Configurable configurable = tab.getConfigurable();
-//					configurable.addTab(tab);
-					viewer.add(configurable, tab);
+					configurable.addTab(tab);
+					viewer.refresh(configurable);
 					viewer.setSelection(new StructuredSelection(new Tab[] { tab }));
 //					viewer.expandToLevel(3);
 					return Status.OK_STATUS;
@@ -238,19 +239,6 @@ public class ProfileView extends AbstractEntityView implements IDoubleClickListe
 			};
 			job.schedule();
 		}
-//		else if (entity instanceof Key)
-//		{
-//			UIJob job = new UIJob("refreshing viewer...")
-//			{
-//				@Override
-//				public IStatus runInUIThread(IProgressMonitor monitor)
-//				{
-//					viewer.expandToLevel(3);
-//					return Status.OK_STATUS;
-//				}
-//			};
-//			job.schedule();
-//		}
 	}
 
 	@Override

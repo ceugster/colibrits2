@@ -941,9 +941,9 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		{
 			for (final Key[] keys : col.values())
 			{
-				if (!keys[1].isDeleted())
+				if (keys[1] != null)
 				{
-					if (keys[1] != null)
+					if (!keys[1].isDeleted())
 					{
 						if (keys[1].getKeyType().equals(KeyType.FUNCTION))
 						{

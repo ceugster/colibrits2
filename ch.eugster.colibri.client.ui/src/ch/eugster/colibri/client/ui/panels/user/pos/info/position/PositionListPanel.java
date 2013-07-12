@@ -36,6 +36,7 @@ import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.panels.user.pos.info.position.PositionListModel.Column;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
+import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.ui.panels.ProfilePanel;
 
 public class PositionListPanel extends ProfilePanel implements TableModelListener, ActionListener, StateChangeListener
@@ -94,7 +95,9 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 										PositionListPanel.this.profile, title, message, MessageDialog.TYPE_QUESTION) == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 								{
 									final PositionListModel model = (PositionListModel) table.getModel();
-									userPanel.getReceiptWrapper().prepareReceipt();
+									Receipt receipt = userPanel.getReceiptWrapper().prepareReceipt();
+									userPanel.getPositionWrapper().preparePosition(receipt);
+									userPanel.getPaymentWrapper().preparePayment(receipt);
 									model.fireTableDataChanged();
 								}
 							}

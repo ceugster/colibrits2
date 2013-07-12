@@ -1,6 +1,8 @@
 package ch.eugster.colibri.print.voucher.sections;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -9,6 +11,7 @@ import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
 import ch.eugster.colibri.print.section.ILayoutSection;
 import ch.eugster.colibri.print.section.ILayoutSectionType;
+import ch.eugster.colibri.print.section.ILayoutSection.AreaType;
 
 public class VoucherLayoutFooterSection extends AbstractLayoutSection
 {
@@ -86,6 +89,42 @@ public class VoucherLayoutFooterSection extends AbstractLayoutSection
 	protected boolean hasTotalArea()
 	{
 		return false;
+	}
+
+	protected Collection<String> prepareAreaDetail(final IPrintable printable)
+	{
+		final Collection<String> lines = new ArrayList<String>();
+		if (printIt(AreaType.DETAIL, printable))
+		{
+			if (printable instanceof Receipt)
+			{
+				Receipt receipt = (Receipt) printable;
+				if (hasData(receipt))
+				{
+					lines.add("------------------------------------------\n");
+					lines.add("");
+					lines.add("");
+					lines.add("");
+					lines.add("");
+					lines.add("Unterschrift");
+				}
+			}
+			Collection<String> patternLines = adaptPatternDetail(this.getPattern(AreaType.DETAIL), printable);
+			final String[] markers = this.getMarkers(AreaType.DETAIL, patternLines);
+			for (String patternLine : patternLines)
+			{
+
+				for (final String marker : markers)
+				{
+					patternLine = this.replace(AreaType.DETAIL, printable, marker, patternLine);
+				}
+				if (!patternLine.trim().isEmpty() || this.getPrintOption(AreaType.DETAIL).equals(PrintOption.ALWAYS))
+				{
+					lines.add(patternLine);
+				}
+			}
+		}
+		return lines;
 	}
 
 	public enum DetailKey implements IKey

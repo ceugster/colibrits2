@@ -130,6 +130,7 @@ public class TabEditorButton extends HTMLButton
 			}
 			this.setHorizontalTextPosition(this.keys[1].getTextImageHorizontalPosition());
 			this.setVerticalTextPosition(this.keys[1].getTextImageVerticalPosition());
+			this.setEnabled(true);
 		}
 	}
 
@@ -165,6 +166,8 @@ public class TabEditorButton extends HTMLButton
 		this.setIcon(null);
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setForeground(Color.LIGHT_GRAY);
+		this.setEnabled(false);
+		this.setVisible(true);
 	}
 
 	private void updateFailOver()

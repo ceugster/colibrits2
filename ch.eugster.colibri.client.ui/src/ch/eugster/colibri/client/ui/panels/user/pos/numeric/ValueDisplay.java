@@ -171,7 +171,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 			return;
 		}
 
-		if ("E0123456789.".indexOf(event.getKeyChar()) > -1)
+		if ("EGCD0123456789.".indexOf(event.getKeyChar()) > -1)
 		{
 			this.addChar(event.getKeyChar());
 		}
@@ -315,7 +315,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 				return;
 			}
 		}
-		if ("00123456789.".contains(text))
+		if ("0123456789.".contains(text))
 		{
 			final String oldText = this.value;
 			this.value = this.value.concat(text);

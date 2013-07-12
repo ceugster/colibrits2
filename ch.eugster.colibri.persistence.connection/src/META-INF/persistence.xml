@@ -3,6 +3,7 @@
     <persistence-unit name="ch.eugster.colibri.persistence.local" transaction-type="RESOURCE_LOCAL">
        <class>ch.eugster.colibri.persistence.model.AbstractEntity</class>
        <class>ch.eugster.colibri.persistence.model.CommonSettings</class>
+       <class>ch.eugster.colibri.persistence.model.CommonSettingsProperty</class>
        <class>ch.eugster.colibri.persistence.model.Configurable</class>
        <class>ch.eugster.colibri.persistence.model.Currency</class>
        <class>ch.eugster.colibri.persistence.model.CurrentTax</class>
@@ -66,6 +67,7 @@
     <persistence-unit name="ch.eugster.colibri.persistence.server" transaction-type="RESOURCE_LOCAL">
        <class>ch.eugster.colibri.persistence.model.AbstractEntity</class>
        <class>ch.eugster.colibri.persistence.model.CommonSettings</class>
+       <class>ch.eugster.colibri.persistence.model.CommonSettingsProperty</class>
        <class>ch.eugster.colibri.persistence.model.Configurable</class>
        <class>ch.eugster.colibri.persistence.model.Currency</class>
        <class>ch.eugster.colibri.persistence.model.CurrentTax</class>

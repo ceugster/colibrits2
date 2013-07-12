@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.Image;
 import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.Parent;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.ProviderPropertyParent;
+import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.VoucherServiceParent;
 
 public class CommonSettingsLabelProvider extends LabelProvider
 {
@@ -16,6 +17,10 @@ public class CommonSettingsLabelProvider extends LabelProvider
 		if (element instanceof ProviderPropertyParent)
 		{
 			return Activator.getDefault().getImageRegistry().get(Activator.IMAGE_STOCK);
+		}
+		else if (element instanceof VoucherServiceParent)
+		{
+			return Activator.getDefault().getImageRegistry().get(Activator.IMAGE_GEARWHEEL);
 		}
 		// else if (element instanceof SalespointRegistrationParent)
 		// {

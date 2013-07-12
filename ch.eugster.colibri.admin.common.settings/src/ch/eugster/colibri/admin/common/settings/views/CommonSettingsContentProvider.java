@@ -18,6 +18,7 @@ import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.voucher.client.VoucherService;
 
 public class CommonSettingsContentProvider implements ITreeContentProvider
 {
@@ -25,6 +26,8 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 
 	private GeneralSettingsParent generalSettingsParent;
 
+	private VoucherServiceParent voucherServiceParent;
+	
 	@Override
 	public void dispose()
 	{
@@ -59,6 +62,27 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 			
 		};
 		tracker.open();
+
+		final ServiceTracker<VoucherService, VoucherService> voucherTracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(), VoucherService.class, null)
+		{
+
+			@Override
+			public VoucherService addingService(ServiceReference<VoucherService> reference) {
+				VoucherService service = this.getService(reference);
+				CommonSettingsContentProvider.this.voucherServiceParent = new VoucherServiceParent();
+				items.add(CommonSettingsContentProvider.this.voucherServiceParent);
+				return service;
+			}
+
+			@Override
+			public void removedService(ServiceReference<VoucherService> reference,
+					VoucherService service) {
+				items.remove(CommonSettingsContentProvider.this.voucherServiceParent);
+				super.removedService(reference, service);
+			}
+		};
+		voucherTracker.open();
+		
 		return items.toArray(new Object[0]);
 	}
 
@@ -111,6 +135,14 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 		public String getName()
 		{
 			return "Warenbewirtschaftung";
+		}
+	}
+
+	public class VoucherServiceParent implements Parent
+	{
+		public String getName()
+		{
+			return "eGutschein";
 		}
 	}
 }

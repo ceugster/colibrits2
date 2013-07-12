@@ -105,34 +105,31 @@ public class VoucherLayoutAmountSection extends AbstractLayoutSection
 			if (printable instanceof Receipt)
 			{
 				final Receipt receipt = (Receipt) printable;
-				if (receipt.getCustomer() != null)
+				switch (this)
 				{
-					switch (this)
+					case W:
 					{
-						case W:
+						return layoutSection.replaceMarker(receipt.getDefaultCurrency().getCode(), marker, true);
+					}
+					case V:
+					{
+						double amount = 0d;
+						final Collection<Payment> payments = receipt.getBackVouchers();
+						for (final Payment payment : payments)
 						{
-							return layoutSection.replaceMarker(receipt.getDefaultCurrency().getCode(), marker, true);
-						}
-						case V:
-						{
-							double amount = 0d;
-							final Collection<Payment> payments = receipt.getAllPayments();
-							for (final Payment payment : payments)
+							if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
 							{
-								if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
-								{
-									amount += payment.getAmount();
-								}
+								amount += payment.getAmount();
 							}
-							final java.util.Currency currency = receipt.getDefaultCurrency().getCurrency();
-							DetailKey.amountFormatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
-							DetailKey.amountFormatter.setMinimumFractionDigits(currency.getDefaultFractionDigits());
-							return layoutSection.replaceMarker(DetailKey.amountFormatter.format(amount), marker, false);
 						}
-						default:
-						{
-							throw new RuntimeException("invalid key");
-						}
+						final java.util.Currency currency = receipt.getDefaultCurrency().getCurrency();
+						DetailKey.amountFormatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+						DetailKey.amountFormatter.setMinimumFractionDigits(currency.getDefaultFractionDigits());
+						return layoutSection.replaceMarker(DetailKey.amountFormatter.format(Math.abs(amount)), marker, false);
+					}
+					default:
+					{
+						throw new RuntimeException("invalid key");
 					}
 				}
 			}
@@ -145,7 +142,8 @@ public class VoucherLayoutAmountSection extends AbstractLayoutSection
 	{
 		if (printable instanceof Receipt)
 		{
-
+			Receipt receipt = (Receipt) printable;
+			return receipt.getBackVouchers().size() > 0;
 		}
 		return false;
 	}

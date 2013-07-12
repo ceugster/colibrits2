@@ -25,6 +25,7 @@ import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.TaxUpdater;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.CommonSettingsProperty;
 import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.CurrentTax;
@@ -63,6 +64,7 @@ import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.AbstractQuery;
+import ch.eugster.colibri.persistence.queries.CommonSettingsPropertyQuery;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.ConfigurableQuery;
 import ch.eugster.colibri.persistence.queries.CurrencyQuery;
@@ -130,6 +132,10 @@ public abstract class AbstractConnectionService implements ConnectionService
 			if (adaptable.equals(CommonSettings.class))
 			{
 				query = new CommonSettingsQuery();
+			}
+			else if (adaptable.equals(CommonSettingsProperty.class))
+			{
+				query = new CommonSettingsPropertyQuery();
 			}
 			else if (adaptable.equals(Configurable.class))
 			{

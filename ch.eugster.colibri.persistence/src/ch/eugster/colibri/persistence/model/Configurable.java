@@ -97,7 +97,10 @@ public class Configurable extends AbstractEntity implements IReplicationRelevant
 
 	public void addTab(final Tab tab)
 	{
-		this.propertyChangeSupport.firePropertyChange("tabs", this.tabs, this.tabs.add(tab));
+		if (!tabs.contains(tab))
+		{
+			this.propertyChangeSupport.firePropertyChange("tabs", this.tabs, this.tabs.add(tab));
+		}
 	}
 
 	public int getBg()

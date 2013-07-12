@@ -283,6 +283,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 				this.remove(i);
 			}
 		}
+		this.doLayout();
 		userPanel.dispose();
 	}
 

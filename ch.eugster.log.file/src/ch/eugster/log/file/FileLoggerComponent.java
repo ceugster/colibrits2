@@ -3,7 +3,9 @@ package ch.eugster.log.file;
 import java.io.File;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -105,7 +107,7 @@ public class FileLoggerComponent implements LogListener
 	@Override
 	public void logged(LogEntry entry)
 	{
-		String log = String.format("[%s] <%s> %s", getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
+		String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
 		out.println(log);
 		Throwable exception = entry.getException();
 		if (exception != null)

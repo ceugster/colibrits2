@@ -5,6 +5,7 @@ ch.eugster.colibri.admin.common.settings/.settings/org.eclipse.pde.core.prefs -t
 ch.eugster.colibri.admin.common.settings/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.common.settings/build.properties -text
 ch.eugster.colibri.admin.common.settings/icons/books.gif -text
+ch.eugster.colibri.admin.common.settings/icons/gearwheel_16.png -text
 ch.eugster.colibri.admin.common.settings/icons/gluehbirne_16.png -text
 ch.eugster.colibri.admin.common.settings/icons/gluehbirne_grey_16.png -text
 ch.eugster.colibri.admin.common.settings/icons/layout_16.png -text
@@ -1215,6 +1216,7 @@ ch.eugster.colibri.persistence.replication.impl/plugin.xml -text
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/Activator.java -text
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/handlers/ReplicateHandler.java -text
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/replicators/AbstractEntityReplicator.java -text
+ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/replicators/CommonSettingsPropertyReplicator.java -text
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/replicators/CommonSettingsReplicator.java -text
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/replicators/ConfigurableReplicator.java -text
 ch.eugster.colibri.persistence.replication.impl/src/ch/eugster/colibri/persistence/replication/impl/replicators/CurrencyReplicator.java -text
@@ -1292,6 +1294,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/events/EntityM
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/AbstractEntity.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ChargeType.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CommonSettings.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CommonSettingsProperty.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Configurable.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Currency.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CurrentTax.java -text
@@ -1354,6 +1357,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/product/
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/product/ProductGroupType.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/report/ReportSettlement.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/queries/AbstractQuery.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/queries/CommonSettingsPropertyQuery.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/queries/CommonSettingsQuery.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/queries/ConfigurableQuery.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/queries/CurrencyQuery.java -text

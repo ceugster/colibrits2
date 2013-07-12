@@ -58,12 +58,6 @@ public class StoreReceiptAction extends ConfigurableAction implements PropertyCh
 		if (this.userPanel.getReceiptWrapper().isReceiptBalanced())
 		{
 			this.userPanel.getReceiptWrapper().storeReceipt();
-
-//			Receipt receipt = this.userPanel.getReceiptWrapper().prepareReceipt();
-//			this.userPanel.getPositionWrapper().preparePosition(receipt);
-//			this.userPanel.getPaymentWrapper().preparePayment(receipt);
-//			this.userPanel.fireStateChange(new StateChangeEvent(this.userPanel.getCurrentState(),
-//					UserPanel.State.POSITION_INPUT));
 		}
 	}
 

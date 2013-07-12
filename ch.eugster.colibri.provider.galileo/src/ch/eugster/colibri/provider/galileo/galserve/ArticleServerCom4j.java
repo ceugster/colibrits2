@@ -138,7 +138,8 @@ public class ArticleServerCom4j implements IArticleServer
 				}
 				else
 				{
-					if (this.galserve.do_NSearch(barcode.getProductCode()))
+					this.galserve.do_NSearch(barcode.getProductCode());
+					if (((Boolean) this.galserve.gefunden()).booleanValue())
 					{
 						this.updatePosition(barcode, position);
 						barcode.updatePosition(position);
@@ -146,7 +147,7 @@ public class ArticleServerCom4j implements IArticleServer
 					else
 					{
 						msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
-								+ barcode.getProductCode() + " konnte nicht gefunden werden.";
+								+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
 						this.status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg);
 						if (log != null)
 						{
