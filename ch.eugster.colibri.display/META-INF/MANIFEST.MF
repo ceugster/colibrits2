@@ -4,7 +4,7 @@ Bundle-Name: Display Service
 Bundle-SymbolicName: ch.eugster.colibri.display;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: ch.eugster.colibri.display.area,
  ch.eugster.colibri.display.service

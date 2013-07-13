@@ -5,7 +5,7 @@ Bundle-SymbolicName: ch.eugster.colibri.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.client.Activator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Import-Package: ch.eugster.colibri.persistence.replication.service,
  org.eclipse.core.runtime;version="3.4.0",

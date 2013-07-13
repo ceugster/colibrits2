@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: BarcodeService
 Bundle-SymbolicName: ch.eugster.colibri.barcode.bookcenter;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Bundle-Activator: ch.eugster.colibri.barcode.bookcenter.Activator
 Bundle-ActivationPolicy: lazy

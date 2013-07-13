@@ -7,7 +7,7 @@ Bundle-ClassPath: .,
  icons/
 Bundle-Activator: ch.eugster.colibri.client.ui.Activator
 Bundle-Localization: plugin
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Christian Eugster
 Export-Package: ch.eugster.colibri.client.ui,

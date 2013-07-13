@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Isbn Service
 Bundle-SymbolicName: ch.eugster.colibri.barcode.isbn;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Export-Package: ch.eugster.colibri.barcode.isbn.code
 Service-Component: OSGI-INF/service-component.xml

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Ean13 Service
 Bundle-SymbolicName: ch.eugster.colibri.barcode.ean13;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Service-Component: OSGI-INF/service-component.xml
 Bundle-Activator: ch.eugster.colibri.barcode.ean13.Activator
