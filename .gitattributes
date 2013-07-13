@@ -1098,10 +1098,6 @@ ch.eugster.colibri.persistence.connection/icons/database_go.png -text
 ch.eugster.colibri.persistence.connection/icons/db.gif -text
 ch.eugster.colibri.persistence.connection/icons/delete_16.png -text
 ch.eugster.colibri.persistence.connection/icons/error.png -text
-ch.eugster.colibri.persistence.connection/lib/derby.jar -text
-ch.eugster.colibri.persistence.connection/lib/derbyclient.jar -text
-ch.eugster.colibri.persistence.connection/lib/derbynet.jar -text
-ch.eugster.colibri.persistence.connection/lib/derbytools.jar -text
 ch.eugster.colibri.persistence.connection/lib/jdom.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/antlr-2.7.5.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/commons-beanutils-1.7.0.jar -text
@@ -1117,9 +1113,7 @@ ch.eugster.colibri.persistence.connection/lib/migration/commons-transaction-1.1.
 ch.eugster.colibri.persistence.connection/lib/migration/db-ojb-1.0.4-tools.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/db-ojb-1.0.4.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/jakarta-regexp-1.3.jar -text
-ch.eugster.colibri.persistence.connection/lib/mysql-connector-java-5.1.7-bin.jar -text
 ch.eugster.colibri.persistence.connection/lib/postgresql-8.4-701.jdbc4.jar -text
-ch.eugster.colibri.persistence.connection/lib/sqljdbc4.jar -text
 ch.eugster.colibri.persistence.connection/plugin.xml -text
 ch.eugster.colibri.persistence.connection/src/META-INF/persistence.xml -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/Activator.java -text

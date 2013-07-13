@@ -4,7 +4,7 @@ Bundle-Name: Replication Implementation
 Bundle-SymbolicName: ch.eugster.colibri.persistence.replication.impl;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.persistence.replication.impl.Activator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Service-Component: OSGI-INF/service-component.xml
 Import-Package: ch.eugster.colibri.persistence.events,
