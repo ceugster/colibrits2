@@ -11,7 +11,7 @@ Export-Package: ch.eugster.colibri.admin.user,
  ch.eugster.colibri.admin.user.handlers,
  ch.eugster.colibri.admin.user.preferences,
  ch.eugster.colibri.admin.user.views
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Christian Eugster
 Import-Package: ch.eugster.colibri.admin.ui.dialogs,

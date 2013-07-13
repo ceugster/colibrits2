@@ -342,10 +342,7 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		final ProductGroup productGroup = (ProductGroup) this.getEditorInput().getAdapter(ProductGroup.class);
 
 		this.createDescriptionSection(scrolledForm);
-		if (!productGroup.getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
-		{
-			this.createDefaultSection(scrolledForm);
-		}
+		this.createDefaultSection(scrolledForm);
 		this.createFinanceSection(scrolledForm);
 
 		if (productGroup.getProductGroupType().isMappable())
@@ -385,6 +382,8 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		this.name.setText(productGroup.getName());
 		this.mappingId.setText(productGroup.getMappingId());
 		this.account.setText(productGroup.getAccount());
+		this.quantityProposal.setValue(productGroup.getQuantityProposal());
+		this.priceProposal.setValue(productGroup.getPriceProposal());
 
 		if (productGroup.getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
 		{
@@ -395,8 +394,6 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		}
 		else
 		{
-			this.quantityProposal.setValue(productGroup.getQuantityProposal());
-			this.priceProposal.setValue(productGroup.getPriceProposal());
 			if (this.options != null)
 			{
 				Option[] options = null;
@@ -462,6 +459,12 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		productGroup.setMappingId(this.mappingId.getText());
 		productGroup.setAccount(this.account.getText());
 
+		String value = this.quantityProposal.getControl().getText();
+		productGroup.setQuantityProposal(Integer.parseInt(value));
+
+		value = this.priceProposal.getControl().getText();
+		productGroup.setPriceProposal(Double.parseDouble(value));
+
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
@@ -489,12 +492,6 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 				final PaymentType paymentType = (PaymentType) persistenceService.getServerService().find(
 						PaymentType.class, Long.valueOf(1L));
 				productGroup.setPaymentType(paymentType);
-
-				String value = this.quantityProposal.getControl().getText();
-				productGroup.setQuantityProposal(Integer.parseInt(value));
-
-				value = this.priceProposal.getControl().getText();
-				productGroup.setPriceProposal(Double.parseDouble(value));
 
 				if (this.options != null)
 				{
@@ -777,44 +774,12 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 		this.priceProposal = new FormattedText(text);
 		this.priceProposal.setFormatter(new NumberFormatter("########0.00"));
 
-		final Option[] options = productGroup.getProductGroupType().getOptions();
-		if (options.length > 0)
+		if (!productGroup.getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
 		{
-			label = this.formToolkit.createLabel(composite, "Vorschlag Option", SWT.NONE);
-			label.setLayoutData(new GridData());
-
-			final CCombo combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
-			combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			combo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
-			combo.addSelectionListener(new SelectionListener()
+			final Option[] options = productGroup.getProductGroupType().getOptions();
+			if (options.length > 0)
 			{
-				@Override
-				public void widgetDefaultSelected(final SelectionEvent e)
-				{
-					this.widgetSelected(e);
-				}
-
-				@Override
-				public void widgetSelected(final SelectionEvent e)
-				{
-					ProductEditor.this.setDirty(true);
-				}
-			});
-			this.formToolkit.adapt(combo);
-
-			this.options = new ComboViewer(combo);
-			this.options.setContentProvider(new OptionContentProvider());
-			this.options.setLabelProvider(new OptionLabelProvider());
-		}
-
-		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
-		if (persistenceService != null)
-		{
-			final TaxTypeQuery query = (TaxTypeQuery) persistenceService.getServerService().getQuery(TaxType.class);
-			final Tax[] taxes = query.selectTaxes(productGroup.getProductGroupType()).toArray(new Tax[0]);
-			if (taxes.length > 0)
-			{
-				label = this.formToolkit.createLabel(composite, "Vorschlag Mehrwertsteuer", SWT.NONE);
+				label = this.formToolkit.createLabel(composite, "Vorschlag Option", SWT.NONE);
 				label.setLayoutData(new GridData());
 
 				final CCombo combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
@@ -834,12 +799,47 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 						ProductEditor.this.setDirty(true);
 					}
 				});
+				this.formToolkit.adapt(combo);
 
-				this.defaultTax = new ComboViewer(combo);
-				this.defaultTax.setContentProvider(new TaxContentProvider());
-				this.defaultTax.setLabelProvider(new TaxLabelProvider());
-				this.defaultTax.setSorter(new TaxSorter());
-				this.defaultTax.setInput(taxes);
+				this.options = new ComboViewer(combo);
+				this.options.setContentProvider(new OptionContentProvider());
+				this.options.setLabelProvider(new OptionLabelProvider());
+			}
+
+			final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+			if (persistenceService != null)
+			{
+				final TaxTypeQuery query = (TaxTypeQuery) persistenceService.getServerService().getQuery(TaxType.class);
+				final Tax[] taxes = query.selectTaxes(productGroup.getProductGroupType()).toArray(new Tax[0]);
+				if (taxes.length > 0)
+				{
+					label = this.formToolkit.createLabel(composite, "Vorschlag Mehrwertsteuer", SWT.NONE);
+					label.setLayoutData(new GridData());
+
+					final CCombo combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
+					combo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					combo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+					combo.addSelectionListener(new SelectionListener()
+					{
+						@Override
+						public void widgetDefaultSelected(final SelectionEvent e)
+						{
+							this.widgetSelected(e);
+						}
+
+						@Override
+						public void widgetSelected(final SelectionEvent e)
+						{
+							ProductEditor.this.setDirty(true);
+						}
+					});
+
+					this.defaultTax = new ComboViewer(combo);
+					this.defaultTax.setContentProvider(new TaxContentProvider());
+					this.defaultTax.setLabelProvider(new TaxLabelProvider());
+					this.defaultTax.setSorter(new TaxSorter());
+					this.defaultTax.setInput(taxes);
+				}
 			}
 		}
 

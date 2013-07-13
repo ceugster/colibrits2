@@ -14,7 +14,7 @@ Export-Package: ch.eugster.colibri.admin.profile,
  ch.eugster.colibri.admin.profile.menus,
  ch.eugster.colibri.admin.profile.swt.dialogs,
  ch.eugster.colibri.admin.profile.views
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Christian Eugster
 Import-Package: ch.eugster.colibri.admin.ui.dialogs,

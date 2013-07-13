@@ -11,7 +11,7 @@ Export-Package: ch.eugster.colibri.admin.tax,
  ch.eugster.colibri.admin.tax.handlers,
  ch.eugster.colibri.admin.tax.views,
  ch.eugster.colibri.admin.tax.wizards
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Christian Eugster
 Import-Package: ch.eugster.colibri.admin.ui.dialogs,
