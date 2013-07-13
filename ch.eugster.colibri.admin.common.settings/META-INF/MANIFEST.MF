@@ -4,14 +4,13 @@ Bundle-Name: Globale Settings Plugin
 Bundle-SymbolicName: ch.eugster.colibri.admin.common.settings;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Import-Package: ch.eugster.colibri.admin.provider.editors,
  ch.eugster.colibri.admin.ui.dialogs,
  ch.eugster.colibri.admin.ui.editors,
  ch.eugster.colibri.admin.ui.menus,
  ch.eugster.colibri.admin.ui.views,
- ch.eugster.colibri.admin.voucher.webservice.editors,
  ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.service,
