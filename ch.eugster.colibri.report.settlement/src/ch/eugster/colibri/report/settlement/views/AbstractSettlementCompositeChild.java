@@ -77,10 +77,10 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 			if (entry == null)
 			{
 				entry = new SettlementEntry(Section.POSITION);
-				section.put(position.getProductGroup().getId(), entry);
 				entry.setGroup(position.getProductGroup().getProductGroupType().ordinal());
 				entry.setCode(position.getProductGroup().getCode());
 				entry.setText(position.getProductGroup().getName());
+				section.put(position.getProductGroup().getId(), entry);
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + position.getQuantity();
 			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
@@ -264,7 +264,7 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 				entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
 
 				amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
-				amount += tax.getTaxAmount();
+				amount += -tax.getTaxAmount();
 				entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
 			}
 		}

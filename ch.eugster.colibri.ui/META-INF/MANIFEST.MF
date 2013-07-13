@@ -4,7 +4,7 @@ Bundle-Name: Ui
 Bundle-SymbolicName: ch.eugster.colibri.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: ch.eugster.colibri.ui.actions,
  ch.eugster.colibri.ui.buttons,
  ch.eugster.colibri.ui.filters,

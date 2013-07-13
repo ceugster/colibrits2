@@ -192,7 +192,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	@Override
 	public JRDataSource createDataSource()
 	{
-		JRDataSource dataSource = new JRMapArrayDataSource(new SettlementEntry[0]);
+		JRDataSource dataSource = null;
 		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
 		tracker.open();
@@ -231,7 +231,10 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 						+ entry.get("text") + ", " + entry.get("quantity") + ", " + entry.get("amount1") + ", "
 						+ entry.get("amount2"));
 			}
-			dataSource = new JRMapArrayDataSource(allEntries);
+			if (allEntries.length > 0)
+			{
+				dataSource = new JRMapArrayDataSource(allEntries);
+			}
 		}
 		tracker.close();
 

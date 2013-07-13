@@ -4,7 +4,7 @@ Bundle-Name: Log Writer
 Bundle-SymbolicName: ch.eugster.log.writer
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Service-Component: OSGI-INF/writer-component.xml
 Import-Package: org.osgi.service.component;version="1.1.0",
  org.osgi.service.log;version="1.3.0"

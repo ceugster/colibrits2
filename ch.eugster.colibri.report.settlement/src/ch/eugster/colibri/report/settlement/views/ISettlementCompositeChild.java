@@ -11,6 +11,10 @@ import org.eclipse.ui.ISelectionListener;
 
 public interface ISettlementCompositeChild extends ISelectionListener, ISelectionProvider
 {
+	/**
+	 * 
+	 * @return JRDataSource or <code>null</code> if no records are found
+	 */
 	JRDataSource createDataSource();
 
 	Hashtable<String, Object> getParameters();

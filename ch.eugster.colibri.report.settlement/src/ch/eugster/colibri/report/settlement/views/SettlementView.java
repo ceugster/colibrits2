@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -189,6 +190,11 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 					try
 					{
 						final JRDataSource dataSource = selectedChild.createDataSource();
+						if (dataSource == null)
+						{
+							MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden.");
+							return;
+						}
 						final Hashtable<String, Object> parameters = selectedChild.getParameters();
 						final InputStream report = selectedChild.getReport();
 						

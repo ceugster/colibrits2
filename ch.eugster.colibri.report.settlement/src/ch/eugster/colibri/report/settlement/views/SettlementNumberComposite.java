@@ -265,7 +265,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 					+ entry.get("amount2"));
 		}
 
-		return new JRMapArrayDataSource(allEntries);
+		return allEntries.length == 0 ? null : new JRMapArrayDataSource(allEntries);
 	}
 
 	public boolean validSelection()

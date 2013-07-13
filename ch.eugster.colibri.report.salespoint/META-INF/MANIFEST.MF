@@ -5,7 +5,7 @@ Bundle-SymbolicName: ch.eugster.colibri.report.salespoint;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.report.salespoint.Activator
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: ch.eugster.colibri.report.salespoint.views
 Import-Package: ch.eugster.colibri.persistence.model,
