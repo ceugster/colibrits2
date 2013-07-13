@@ -5,7 +5,7 @@ Bundle-SymbolicName: ch.eugster.colibri.persistence.transfer.impl;singleton:=tru
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.persistence.transfer.impl.Activator
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/transfer-component.xml, OSGI-INF/transfer-scheduler-component.xml
 Import-Package: ch.eugster.colibri.persistence.model,

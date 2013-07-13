@@ -4,7 +4,7 @@ Bundle-Name: Galileo Plugin
 Bundle-SymbolicName: ch.eugster.colibri.provider.galileo;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Christian Eugster
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/com4j.jar,
  .
 Service-Component: OSGI-INF/id-component.xml, OSGI-INF/provider-property-selector-component.xml, OSGI-INF/interface-component.xml, OSGI-INF/configurator-component.xml

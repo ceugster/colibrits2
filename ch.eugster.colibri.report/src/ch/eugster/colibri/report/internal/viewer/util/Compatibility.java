@@ -7,6 +7,7 @@ import java.util.List;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRPrintElement;
+import net.sf.jasperreports.engine.JRPrintFrame;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
@@ -16,15 +17,16 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
  * 
  * @author Peter Severin (petru_severin@yahoo.com)
  */
+@SuppressWarnings("unchecked")
 public class Compatibility {
-    private static Class classJRPrintFrame;
+    private static Class<JRPrintFrame> classJRPrintFrame;
 
     private static Method classJRPrintFrame_getElements;
 
     static {
         try {
-            classJRPrintFrame = Class.forName("net.sf.jasperreports.engine.JRPrintFrame");
-            classJRPrintFrame_getElements = classJRPrintFrame.getMethod("getElements", null);
+            classJRPrintFrame = (Class<JRPrintFrame>) Class.forName("net.sf.jasperreports.engine.JRPrintFrame");
+            classJRPrintFrame_getElements = classJRPrintFrame.getMethod("getElements", (Class<?>[]) null);
         } catch (ClassNotFoundException e) {
             // ignore. running under an old version of JasperReports
         } catch (SecurityException e) {
@@ -45,7 +47,7 @@ public class Compatibility {
      *            the print element
      * @return the children list or null if the element has not children
      */
-    public static List getChildren(JRPrintElement element) {
+    public static List<JRPrintElement> getChildren(JRPrintElement element) {
         if (classJRPrintFrame == null)
             return null;
 
@@ -53,7 +55,7 @@ public class Compatibility {
             return null;
 
         try {
-            return (List) classJRPrintFrame_getElements.invoke(element, null);
+            return (List<JRPrintElement>) classJRPrintFrame_getElements.invoke(element, (Object[]) null);
         } catch (IllegalArgumentException e) {
             compatibilityError(e);
         } catch (IllegalAccessException e) {

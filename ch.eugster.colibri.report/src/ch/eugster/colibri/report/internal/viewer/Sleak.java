@@ -105,7 +105,8 @@ public void open () {
 	shell.open ();
 }
 
-void refreshLabel () {
+void refreshLabel () 
+{
 	int colors = 0, cursors = 0, fonts = 0, gcs = 0, images = 0, regions = 0;
 	for (int i=0; i<objects.length; i++) {
 		Object object = objects [i];
@@ -171,8 +172,9 @@ void refreshDifference () {
 }
 
 private Object[] findObjects(DeviceData info) {
-    java.util.List objects = new ArrayList();
-    for (int i = 0; i < info.objects.length; i++) {
+    java.util.List<Object> objects = new ArrayList<Object>();
+    for (int i = 0; i < info.objects.length; i++) 
+    {
         objects.add(info.objects[i]);
     }
     Shell[] shells = display.getShells();
@@ -182,18 +184,21 @@ private Object[] findObjects(DeviceData info) {
     return objects.toArray();
 }
 
-private void findWidgets(java.util.List objects, Widget widget) {
+private void findWidgets(java.util.List<Object> objects, Widget widget) {
     objects.add(widget);
-    if(widget instanceof Composite) {
+    if(widget instanceof Composite) 
+    {
         Composite comp = (Composite) widget;
         Control[] children = comp.getChildren();
-        for (int i = 0; i < children.length; i++) {
+        for (int i = 0; i < children.length; i++) 
+        {
             findWidgets(objects, children[i]);
         }
     }
 }
 
-String objectName (Object object) {
+String objectName (Object object) 
+{
 	String string = object.toString ();
 	int index = string.lastIndexOf ('.');
 	if (index == -1) return string;
@@ -303,7 +308,7 @@ void refreshAll () {
 
 void layout () {
 	Rectangle rect = shell.getClientArea ();
-	String [] strings = new String [objects.length];
+//	String [] strings = new String [objects.length];
 	int width = 0;
 	String [] items = list.getItems ();
 	GC gc = new GC (list);

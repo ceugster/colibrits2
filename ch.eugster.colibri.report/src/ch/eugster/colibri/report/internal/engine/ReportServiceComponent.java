@@ -17,6 +17,7 @@ import net.sf.jasperreports.engine.data.JRBeanArrayDataSource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.progress.UIJob;
 
 import ch.eugster.colibri.report.engine.ReportService;

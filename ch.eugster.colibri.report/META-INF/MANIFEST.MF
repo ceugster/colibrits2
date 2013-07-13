@@ -5,7 +5,7 @@ Bundle-SymbolicName: ch.eugster.colibri.report;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.report.Activator
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Bundle-ClassPath: lib/jasperreports-4.8.0.jar,
  lib/jdt-compiler-3.1.1.jar,
