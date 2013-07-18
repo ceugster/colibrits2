@@ -61,6 +61,74 @@ public enum SupportedDriver
 		}
 	}
 
+	public boolean hasInstance()
+	{
+		if (this.equals(MSSQLSERVER_2008))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public String getInstanceDelimiter()
+	{
+		if (this.equals(POSTGRESQL_8X))
+		{
+			return "";
+		}
+		else if (this.equals(MSSQLSERVER_2008))
+		{
+			return "\\";
+		}
+		else if (this.equals(MYSQL_51))
+		{
+			return "";
+		}
+		else if (this.equals(DERBY_CS))
+		{
+			return "";
+		}
+		else if (this.equals(DERBY_EMBEDDED))
+		{
+			return "";
+		}
+		else
+		{
+			throw new RuntimeException("Invalid driver");
+		}
+	}
+
+	public String getDefaultPort()
+	{
+		if (this.equals(POSTGRESQL_8X))
+		{
+			return "5432";
+		}
+		else if (this.equals(MSSQLSERVER_2008))
+		{
+			return "1433";
+		}
+		else if (this.equals(MYSQL_51))
+		{
+			return "3306";
+		}
+		else if (this.equals(DERBY_CS))
+		{
+			return "1527";
+		}
+		else if (this.equals(DERBY_EMBEDDED))
+		{
+			return "";
+		}
+		else
+		{
+			throw new RuntimeException("Invalid driver");
+		}
+	}
+
 	public String getDefaultURL()
 	{
 		if (this.equals(POSTGRESQL_8X))
@@ -298,7 +366,7 @@ public enum SupportedDriver
 	}
 	
 	@SuppressWarnings("unchecked")
-	public String getUrl(String protocol, String host, String port, String database, Object parameters)
+	public String getUrl(String protocol, String host, String delimiter, String instance, String port, String database, Object parameters)
 	{
 		List<Property> properties = null;
 		if (parameters instanceof List)
@@ -314,7 +382,8 @@ public enum SupportedDriver
 				.append(protocol)
 				.append("//")
 				.append(host == null || host.isEmpty() ? "localhost" : host)
-				.append(port == null || port.isEmpty() ? "" : ":" + port)
+				.append(instance == null || instance.isEmpty() ? "" : delimiter + instance)
+				.append(port == null || port.isEmpty() || port.equals(this.getDefaultPort()) ? "" : ":" + port)
 				.append(database == null || database.isEmpty() ? "" : ";database=" + database);
 				return builder.append(getProperties(properties)).toString();
 			}
@@ -324,6 +393,7 @@ public enum SupportedDriver
 				.append(protocol)
 				.append("//")
 				.append(host == null || host.isEmpty() ? "localhost" : host)
+				.append(instance == null || instance.isEmpty() ? "" : delimiter + instance)
 				.append(port == null || port.isEmpty() ? "" : ":" + port)
 				.append(database == null || database.isEmpty() ? "" : "/" + database);
 				return builder.append(getProperties(properties)).toString();

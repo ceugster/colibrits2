@@ -86,6 +86,8 @@ public class DatabaseWizardConnectionPage extends WizardPage
 	
 	private Text host;
 	
+	private Text instance;
+	
 	private Text port;
 	
 	private Text database;
@@ -204,7 +206,7 @@ public class DatabaseWizardConnectionPage extends WizardPage
 				}
 				else
 				{
-					selectedDriver = SupportedDriver.MYSQL_51;
+					selectedDriver = SupportedDriver.MSSQLSERVER_2008;
 					status = Status.CANCEL_STATUS;
 				}
 				DatabaseWizardConnectionPage.this.drivers.setSelection(new StructuredSelection(
@@ -254,8 +256,10 @@ public class DatabaseWizardConnectionPage extends WizardPage
 					final SupportedDriver supportedDriver = (SupportedDriver) ssel.getFirstElement();
 					DatabaseWizardConnectionPage.this.protocol.setText(supportedDriver.getBaseProtocol());
 					DatabaseWizardConnectionPage.this.setDescription(supportedDriver.getDescription());
+					DatabaseWizardConnectionPage.this.instance.setEnabled(supportedDriver.hasInstance());
 					DatabaseWizardConnectionPage.this.helpLabel.setText(DatabaseWizardConnectionPage.this.getDescription());
 					DatabaseWizardConnectionPage.this.exampleUrl.setText(supportedDriver.getExampleURL());
+					DatabaseWizardConnectionPage.this.port.setText(supportedDriver.getDefaultPort());
 					DatabaseWizardConnectionPage.this.getShell().layout();
 				}
 				else
@@ -297,6 +301,24 @@ public class DatabaseWizardConnectionPage extends WizardPage
 		this.host = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		this.host.setLayoutData(gridData);
 		this.host.addModifyListener(new ModifyListener()
+		{
+			@Override
+			public void modifyText(final ModifyEvent e)
+			{
+				updateUrl();
+			}
+		});
+
+		label = new Label(composite, SWT.NONE);
+		label.setLayoutData(new GridData());
+		label.setText("Instanz");
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = cols - 1;
+		
+		this.instance = new Text(composite, SWT.BORDER | SWT.SINGLE);
+		this.instance.setLayoutData(gridData);
+		this.instance.addModifyListener(new ModifyListener()
 		{
 			@Override
 			public void modifyText(final ModifyEvent e)
@@ -710,7 +732,7 @@ public class DatabaseWizardConnectionPage extends WizardPage
 			{
 				Object object = propertyViewer.getInput();
 				SupportedDriver driver = (SupportedDriver) ssel.getFirstElement();
-				this.url.setText(driver.getUrl(protocol.getText(), host.getText(), port.getText(), database.getText(), object));
+				this.url.setText(driver.getUrl(protocol.getText(), host.getText(), driver.getInstanceDelimiter(), instance.getText(), port.getText(), database.getText(), object));
 			}
 		}
 		

@@ -9,7 +9,9 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.event.ActionEvent;
 
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
+import ch.eugster.colibri.client.ui.panels.user.PaymentWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.client.ui.panels.user.pos.numeric.ValueDisplay;
 import ch.eugster.colibri.persistence.model.Profile;
 
 public class EnterAction extends UserPanelProfileAction
@@ -44,109 +46,21 @@ public class EnterAction extends UserPanelProfileAction
 			{
 				userPanel.getPositionListPanel().getModel().actionPerformed(event);
 			}
-			else
+			else if (userPanel.getValueDisplay().getText().isEmpty())
 			{
-//				if (userPanel.getValueDisplay().getText().isEmpty())
-//				{
 				userPanel.fireStateChange(new StateChangeEvent(userPanel.getCurrentState(), UserPanel.State.PAYMENT_INPUT));
-//				}
-//				else
-//				{
-//					if (testForBarcode())
-//					{
-//						updateBarcode();
-//					}
-//					else if (testForQuantity())
-//					{
-//						updateQuantity();
-//					}
-//					else if (testForPrice())
-//					{
-//						updatePrice();
-//					}
-//				}
 			}
 		}
 		else if (state.equals(UserPanel.State.PAYMENT_INPUT))
 		{
-//			final PaymentWrapper wrapper = userPanel.getPaymentWrapper();
-//			final ValueDisplay display = userPanel.getValueDisplay();
-//
-//			if (wrapper.isPaymentComplete())
-//			{
-				// this.fireActionPerformed(event);
-//			}
-//			else if (display.getText().equals(""))
-//			{
-			userPanel.fireStateChange(new StateChangeEvent(state, UserPanel.State.POSITION_INPUT));
-//			}
+			final PaymentWrapper wrapper = userPanel.getPaymentWrapper();
+			final ValueDisplay display = userPanel.getValueDisplay();
+
+			if (!wrapper.isPaymentComplete() && display.getText().equals(""))
+			{
+				userPanel.fireStateChange(new StateChangeEvent(state, UserPanel.State.POSITION_INPUT));
+			}
 		}
 	}
 
-//	private boolean testForPrice()
-//	{
-//		if (userPanel.getPositionWrapper().doesPositionNeedPrice())
-//		{
-//			final double maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxPriceRange());
-//			final double price = Math.abs(userPanel.getValueDisplay().testAmount());
-//			if ((maxRange == 0) || ((price > 0) && (price <= maxRange)))
-//			{
-//				firePropertyChange("label", null, "Preis");
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-
-//	private boolean testForQuantity()
-//	{
-//		if (userPanel.getPositionWrapper().doesPositionNeedQuantity())
-//		{
-//			final int maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxQuantityRange());
-//			final int quantity = Math.abs(userPanel.getValueDisplay().testQuantity());
-//			if ((maxRange == 0) || ((quantity > 0) && (quantity <= maxRange)))
-//			{
-//				firePropertyChange("label", null, "Menge");
-//				return true;
-//			}
-//		}
-//
-//		return false;
-//	}
-
-//	private boolean testForBarcode()
-//	{
-//		return userPanel.getValueDisplay().testBarcode() != null;
-//	}
-
-//	private void updatePrice()
-//	{
-//		if (userPanel.getPositionWrapper().doesPositionNeedPrice())
-//		{
-//			final double maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxPriceRange());
-//			final double price = Math.abs(userPanel.getValueDisplay().testAmount());
-//			if ((maxRange == 0) || ((price > 0) && (price <= maxRange)))
-//			{
-//				userPanel.getPositionDetailPanel().getPriceButton().doClick();
-//			}
-//		}
-//	}
-
-//	private void updateQuantity()
-//	{
-//		if (userPanel.getPositionWrapper().doesPositionNeedQuantity())
-//		{
-//			final int maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxQuantityRange());
-//			final int quantity = Math.abs(userPanel.getValueDisplay().testQuantity());
-//			if ((maxRange == 0) || ((quantity > 0) && (quantity <= maxRange)))
-//			{
-//				userPanel.getPositionDetailPanel().getQuantityButton().doClick();
-//			}
-//		}
-//	}
-
-//	private void updateBarcode()
-//	{
-//		userPanel.getPositionWrapper().keyPressed(new KeyEvent(this.userPanel, KeyEvent.VK_ENTER, GregorianCalendar.getInstance().getTimeInMillis(), 0, KeyEvent.VK_ENTER, (char)0xd));
-//	}
 }

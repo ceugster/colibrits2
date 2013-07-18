@@ -16,15 +16,22 @@ public class AdminApplicationWorkbenchAdvisor extends WorkbenchAdvisor
 	@Override
 	public boolean preShutdown() 
 	{
-		IEditorReference[] references = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
-		for (IEditorReference reference : references)
+		try
 		{
-			IEditorPart editor = reference.getEditor(true);
-			if (editor.isDirty())
+			IEditorReference[] references = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getEditorReferences();
+			for (IEditorReference reference : references)
 			{
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(editor);
-				return !MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Änderungen speichern", "Sie haben Änderungen vorgenommen, die noch nicht gespeichert worden sind. Wollen Sie diese Änderungen speichern?");
+				IEditorPart editor = reference.getEditor(true);
+				if (editor.isDirty())
+				{
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(editor);
+					return !MessageDialog.openQuestion(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Änderungen speichern", "Sie haben Änderungen vorgenommen, die noch nicht gespeichert worden sind. Wollen Sie diese Änderungen speichern?");
+				}
 			}
+		}
+		catch (NullPointerException e)
+		{
+			
 		}
 		return true;
 	}

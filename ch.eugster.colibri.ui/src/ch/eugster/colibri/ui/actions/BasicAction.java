@@ -48,6 +48,6 @@ public abstract class BasicAction extends AbstractAction implements IActionKeys
 	
 	public void actionPerformed(ActionEvent event)
 	{
-		
+		System.out.println(this.getActionCommand());
 	}
 }

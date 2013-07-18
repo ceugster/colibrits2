@@ -26,7 +26,8 @@ public class StartDatabaseConnectionService extends AbstractHandler implements I
 	public Object execute(ExecutionEvent event) throws ExecutionException
 	{
 		IStatus status = Status.OK_STATUS;
-		for (final Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles())
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (final Bundle bundle : bundles)
 		{
 			if (bundle.getSymbolicName().equals("org.eclipse.persistence.jpa"))
 			{

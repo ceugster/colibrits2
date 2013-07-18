@@ -1191,7 +1191,6 @@ ch.eugster.colibri.persistence.connection/src/ch/eugster/pos/db/User.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/pos/db/Version.java -text
 ch.eugster.colibri.persistence.feature/.project -text
 ch.eugster.colibri.persistence.feature/build.properties -text
-ch.eugster.colibri.persistence.feature/category.xml -text
 ch.eugster.colibri.persistence.feature/feature.xml -text
 ch.eugster.colibri.persistence.replication.feature/.project -text
 ch.eugster.colibri.persistence.replication.feature/build.properties -text
@@ -1274,6 +1273,7 @@ ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/trans
 ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/transfer/services/TransferScheduler.java -text
 ch.eugster.colibri.persistence/.classpath -text
 ch.eugster.colibri.persistence/.project -text
+ch.eugster.colibri.persistence/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.jpt.core.prefs -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.wst.common.component -text

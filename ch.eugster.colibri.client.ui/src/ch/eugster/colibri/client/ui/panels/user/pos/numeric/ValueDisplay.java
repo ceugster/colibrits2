@@ -315,7 +315,10 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 				return;
 			}
 		}
-		if ("0123456789.".contains(text))
+		/*
+		 * Important do not remove second "0" from String below it is essential for Button "00"!
+		 */
+		if ("00123456789.".contains(text))
 		{
 			final String oldText = this.value;
 			this.value = this.value.concat(text);

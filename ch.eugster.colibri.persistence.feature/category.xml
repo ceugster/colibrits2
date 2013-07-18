@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <feature url="features/ch.eugster.colibri.persistence.feature_1.0.0.201203231621.jar" id="ch.eugster.colibri.persistence.feature" version="1.0.0.201203231621">
-      <category name="persistence"/>
-   </feature>
-   <category-def name="persistence" label="Datenbankanbindung"/>
-</site>

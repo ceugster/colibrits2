@@ -309,14 +309,23 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 		}
 		else
 		{
+			if ((this.configurable.getPositionDefaultTab() != null) && !this.configurable.getPositionDefaultTab().isDeleted())
+			{
+				this.positionDefaultTab = this.configurable.getPositionDefaultTab();
+			}
+			if ((this.configurable.getPaymentDefaultTab() != null) && !this.configurable.getPaymentDefaultTab().isDeleted())
+			{
+				this.paymentDefaultTab = this.configurable.getPaymentDefaultTab();
+			}
 			this.setLayout(new BorderLayout());
-
 			this.fgSelected = new java.awt.Color(this.configurable.getFgSelected());
 			this.fg = new java.awt.Color(this.configurable.getFg());
 			this.bg = new java.awt.Color(this.configurable.getBg());
-
+			
 			this.tabbedPane = new JTabbedPane();
 			this.tabbedPane.setFont(this.tabbedPane.getFont().deriveFont(this.configurable.getFontStyle(), this.configurable.getFontSize()));
+			this.tabbedPane.setBackground(this.bg);
+			this.tabbedPane.setForeground(this.fg);
 			this.tabbedPane.addChangeListener(new ChangeListener()
 			{
 				public void stateChanged(final ChangeEvent event)
@@ -343,14 +352,6 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 				this.tabbedPane.addTab(tab.getName(), this.fillPanel(new JPanel(), tab));
 			}
 
-			if ((this.configurable.getPositionDefaultTab() != null) && !this.configurable.getPositionDefaultTab().isDeleted())
-			{
-				this.positionDefaultTab = this.configurable.getPositionDefaultTab();
-			}
-			if ((this.configurable.getPaymentDefaultTab() != null) && !this.configurable.getPaymentDefaultTab().isDeleted())
-			{
-				this.paymentDefaultTab = this.configurable.getPaymentDefaultTab();
-			}
 		}
 	}
 }

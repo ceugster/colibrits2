@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.eugster.colibri.product.feature"
-      label="Product Feature"
+      id="ch.eugster.colibri.product.full.feature"
+      label="ColibriTSII Produkt"
       version="1.0.0.qualifier"
       provider-name="Christian Eugster">
 
@@ -227,6 +227,7 @@ litigation.
    <requires>
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.equinox.app"/>
       <import plugin="org.eclipse.jface"/>
@@ -234,7 +235,6 @@ litigation.
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.osgi.services"/>
-      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

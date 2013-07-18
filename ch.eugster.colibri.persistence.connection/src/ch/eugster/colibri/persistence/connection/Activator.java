@@ -56,10 +56,12 @@ public class Activator extends AbstractUIPlugin
 
 	private ServiceTracker<EncryptionService, EncryptionService> encryptionServiceTracker;
 
-	private ServiceTracker<PersistenceProvider, PersistenceProvider> persistenceProviderTracker;
+//	private ServiceTracker<PersistenceProvider, PersistenceProvider> persistenceProviderTracker;
 
 	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;
 
+	private PersistenceProvider persistenceProvider;
+	
 	private EntityManager cacheEntityManager;
 
 	private Document document;
@@ -286,8 +288,8 @@ public class Activator extends AbstractUIPlugin
 		this.encryptionServiceTracker = new ServiceTracker<EncryptionService, EncryptionService>(context, EncryptionService.class, null);
 		this.encryptionServiceTracker.open();
 
-		this.persistenceProviderTracker = new ServiceTracker<PersistenceProvider, PersistenceProvider>(context, PersistenceProvider.class, null);
-		this.persistenceProviderTracker.open();
+//		this.persistenceProviderTracker = new ServiceTracker<PersistenceProvider, PersistenceProvider>(context, PersistenceProvider.class, null);
+//		this.persistenceProviderTracker.open();
 		
 		this.eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(context, EventAdmin.class, null);
 		this.eventAdminTracker.open();
@@ -320,7 +322,7 @@ public class Activator extends AbstractUIPlugin
 		this.log("Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 
 		this.eventAdminTracker.close();
-		this.persistenceProviderTracker.close();
+//		this.persistenceProviderTracker.close();
 		this.encryptionServiceTracker.close();
 		this.logServiceTracker.close();
 		
@@ -362,8 +364,11 @@ public class Activator extends AbstractUIPlugin
 
 	public PersistenceProvider getPersistenceProvider()
 	{
-		PersistenceProvider provider = this.persistenceProviderTracker.getService();
-		return provider;
+		if (persistenceProvider == null)
+		{
+			persistenceProvider = new org.eclipse.persistence.jpa.PersistenceProvider();
+		}
+		return persistenceProvider;
 	}
 
 	public EventAdmin getEventAdmin()
