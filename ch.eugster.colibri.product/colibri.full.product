@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="1.0.0.201302271100" useFeatures="true" includeLaunchers="true">
+<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="1.0.0.201307201500" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/ch.eugster.colibri.product/icons/kasse_128x128.png"/>
@@ -50,7 +50,7 @@
    </launcher>
 
    <vm>
-      <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
+      <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7</windows>
    </vm>
 
    <license>
@@ -174,7 +174,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.print.receipt.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.print.settlement.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.print.voucher.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.product.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.provider.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.provider.galileo.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.feature" version="1.0.0.qualifier"/>
@@ -186,6 +185,16 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="org.eclipse.equinox.p2.user.ui" version="2.1.2.R37x_v20110815-1155-6-Bk8pYWZz0qUTX5I15GZWwbXkrl"/>
       <feature id="ch.eugster.colibri.export.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.log.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.report.export.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.periphery.printer.dummy.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.drivers.derby.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.drivers.sqlserver.featrue" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.drivers.mysql.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.drivers.postgresql.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.voucher.client.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.voucher.client.webservice.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.product.full.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.report.time.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>
@@ -196,6 +205,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.persistence.jpa" autoStart="true" startLevel="3" />
+      <property name="org.eclipse.update.reconcile" value="false" />
    </configurations>
 
 </product>

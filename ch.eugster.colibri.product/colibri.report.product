@@ -17,7 +17,8 @@
       <programArgs>-data
 @user.home/colibri
 -consoleLog
--console</programArgs>
+-console
+-clean</programArgs>
       <vmArgs>-Dorg.eclipse.update.reconcile=false
 -Declipse.p2.profile=profile
 -Declipse.p2.data.area=@config.dir/../p2
@@ -47,7 +48,6 @@
             winLargeLow="/ch.eugster.colibri.product/icons/kasse_48x48.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
       <windows include="true">org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6</windows>
@@ -150,7 +150,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
    </plugins>
 
    <features>
-      <feature id="ch.eugster.colibri.product.feature" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.equinox.executable" version="3.5.1.v20111216-1653-7P7NFUIFIbaUcU77s0KQWHw5HZTZ"/>
       <feature id="org.eclipse.equinox.p2.user.ui" version="2.1.2.R37x_v20110815-1155-6-Bk8pYWZz0qUTX5I15GZWwbXkrl"/>
       <feature id="ch.eugster.colibri.barcode.bookcenter.feature" version="1.0.0.qualifier"/>
@@ -177,6 +176,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.report.receipt.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.settlement.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.ui.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.product.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>

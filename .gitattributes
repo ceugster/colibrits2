@@ -1487,7 +1487,6 @@ ch.eugster.colibri.product.feature/build.properties -text
 ch.eugster.colibri.product.feature/feature.xml -text
 ch.eugster.colibri.product/.classpath -text
 ch.eugster.colibri.product/.project -text
-ch.eugster.colibri.product/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.product/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.product/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.product/build.properties -text
@@ -1511,7 +1510,7 @@ ch.eugster.colibri.product/icons/kasse_48x48_32.bmp -text
 ch.eugster.colibri.product/icons/kasse_64x64.bmp -text
 ch.eugster.colibri.product/icons/kasse_64x64.png -text
 ch.eugster.colibri.product/icons/kasse_64x64_32.bmp -text
-ch.eugster.colibri.product/p2.inf -text
+ch.eugster.colibri.product/p2.inf.not_used -text
 ch.eugster.colibri.product/plugin.xml -text
 ch.eugster.colibri.product/plugin_customization.ini -text
 ch.eugster.colibri.product/splash.bmp -text
