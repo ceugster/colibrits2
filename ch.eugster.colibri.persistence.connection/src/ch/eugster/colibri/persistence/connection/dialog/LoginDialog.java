@@ -185,6 +185,7 @@ public class LoginDialog extends TitleAreaDialog implements EventHandler
 	{
 		if (User.getLoginUser() == null)
 		{
+			close();
 			shutdown();
 		}
 		else

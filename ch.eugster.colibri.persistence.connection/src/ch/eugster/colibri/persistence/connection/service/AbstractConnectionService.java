@@ -486,7 +486,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				tx.begin();
 				if (updateTimestamp)
 				{
-					entity.setTimestamp(Calendar.getInstance().getTime());
+					entity.setTimestamp(Calendar.getInstance());
 				}
 
 				try
@@ -559,7 +559,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 			}
 			if (updateTimestamp)
 			{
-				entity.setTimestamp(Calendar.getInstance().getTime());
+				entity.setTimestamp(Calendar.getInstance());
 			}
 
 			try

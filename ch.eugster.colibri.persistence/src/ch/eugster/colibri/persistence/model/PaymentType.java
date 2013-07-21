@@ -25,7 +25,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
 
@@ -40,9 +39,6 @@ import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 public class PaymentType extends AbstractEntity implements IReplicationRelevant
 {
 	public static final Long CASH_ID = new Long(1l);
-
-	@Transient
-	private double value;
 
 	@Id
 	@Column(name = "pt_id")
@@ -114,6 +110,13 @@ public class PaymentType extends AbstractEntity implements IReplicationRelevant
 	@Convert("booleanConverter")
 	@Column(name = "pt_open_cashdrawer")
 	private boolean openCashdrawer;
+
+//	/**
+//	 * Used for Vouchers: gives value of voucher
+//	 */
+//	@Basic
+//	@Column(name = "pt_value")
+//	private double value;
 
 	/**
 	 * true if this paymentType is enabled to give change
@@ -239,10 +242,10 @@ public class PaymentType extends AbstractEntity implements IReplicationRelevant
 		return this.stocks;
 	}
 
-	public double getValue()
-	{
-		return this.value;
-	}
+//	public double getValue()
+//	{
+//		return this.value;
+//	}
 
 	@Override
 	public int hashCode()
@@ -415,13 +418,13 @@ public class PaymentType extends AbstractEntity implements IReplicationRelevant
 	 */
 	public void setUndeletable(final boolean undeletable)
 	{
-		this.undeletable = undeletable;
+		this.propertyChangeSupport.firePropertyChange("undeletable", this.undeletable, this.undeletable = undeletable);
 	}
 
-	public void setValue(final double value)
-	{
-		this.value = value;
-	}
+//	public void setValue(final double value)
+//	{
+//		this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = value);
+//	}
 
 	public static PaymentType newInstance(final PaymentTypeGroup paymentTypeGroup)
 	{

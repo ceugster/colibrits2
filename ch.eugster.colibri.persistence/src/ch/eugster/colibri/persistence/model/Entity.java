@@ -1,12 +1,12 @@
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Date;
+import java.util.Calendar;
 
 public interface Entity
 {
 	Long getId();
 
-	Date getTimestamp();
+	Calendar getTimestamp();
 
 	int getUpdate();
 
@@ -18,7 +18,7 @@ public interface Entity
 
 	void setId(Long id);
 
-	void setTimestamp(Date timestamp);
+	void setTimestamp(Calendar timestamp);
 
 	void setUpdate(int update);
 

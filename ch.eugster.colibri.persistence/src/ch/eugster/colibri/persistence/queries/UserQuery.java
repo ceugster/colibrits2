@@ -14,7 +14,8 @@ public class UserQuery extends AbstractQuery<User>
 {
 	public User findByPosLogin(final Integer posLogin)
 	{
-		final Expression expression = new ExpressionBuilder(User.class).get("posLogin").equal(posLogin);
+		Expression expression = new ExpressionBuilder(User.class).get("posLogin").equal(posLogin);
+		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
 		return this.find(expression);
 	}
 

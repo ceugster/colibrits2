@@ -98,7 +98,7 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 		target.setFixCharge(source.getFixCharge());
 		target.setChargeType(source.getChargeType());
 		target.setUndeletable(source.isUndeletable());
-		target.setValue(source.getValue());
+//		target.setValue(source.getValue());
 		return target;
 	}
 }

@@ -239,13 +239,21 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.select(expression);
 	}
 	
+	public Collection<Receipt> selectParked(final Settlement settlement)
+	{
+		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
+		return this.select(expression);
+	}
+	
 	public int removeParked(final Salespoint salespoint)
 	{
 		int result = 0;
 		Collection<Receipt> receipts = selectParked(salespoint);
 		for (Receipt receipt : receipts)
 		{
-			this.getConnectionService().remove(receipt);
+			this.getConnectionService().delete(receipt);
 			result++;
 		}
 		return result;

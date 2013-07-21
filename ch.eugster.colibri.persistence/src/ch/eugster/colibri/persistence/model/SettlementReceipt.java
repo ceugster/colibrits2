@@ -117,7 +117,7 @@ public class SettlementReceipt extends AbstractEntity implements Comparable<Sett
 				.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
 		this.setNumber(receipt.getNumber());
 		this.setReceiptId(receipt.getId());
-		this.setTime(receipt.getTimestamp());
+		this.setTime(receipt.getTimestamp().getTime());
 	}
 
 	public void setSettlement(final Settlement settlement)

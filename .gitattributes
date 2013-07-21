@@ -1113,7 +1113,6 @@ ch.eugster.colibri.persistence.connection/lib/migration/commons-transaction-1.1.
 ch.eugster.colibri.persistence.connection/lib/migration/db-ojb-1.0.4-tools.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/db-ojb-1.0.4.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/jakarta-regexp-1.3.jar -text
-ch.eugster.colibri.persistence.connection/lib/postgresql-8.4-701.jdbc4.jar -text
 ch.eugster.colibri.persistence.connection/plugin.xml -text
 ch.eugster.colibri.persistence.connection/src/META-INF/persistence.xml -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/Activator.java -text
@@ -1294,6 +1293,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Currency
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CurrentTax.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CurrentTaxCodeMapping.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CustomerDisplaySettings.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DayTimeRow.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DeletedFilter.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Display.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DisplayArea.java -text

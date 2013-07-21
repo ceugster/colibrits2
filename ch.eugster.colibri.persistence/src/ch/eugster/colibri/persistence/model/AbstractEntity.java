@@ -3,7 +3,6 @@ package ch.eugster.colibri.persistence.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Calendar;
-import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.EntityListeners;
@@ -46,7 +45,7 @@ public abstract class AbstractEntity implements Entity
 
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date timestamp;
+	private Calendar timestamp;
 
 	@Basic
 	private int update;
@@ -88,7 +87,7 @@ public abstract class AbstractEntity implements Entity
 	}
 
 	@Override
-	public Date getTimestamp()
+	public Calendar getTimestamp()
 	{
 		return this.timestamp;
 	}
@@ -123,7 +122,7 @@ public abstract class AbstractEntity implements Entity
 	}
 
 	@Override
-	public void setTimestamp(final Date timestamp)
+	public void setTimestamp(final Calendar timestamp)
 	{
 		this.propertyChangeSupport.firePropertyChange("timestamp", this.timestamp, this.timestamp = timestamp);
 	}
@@ -158,7 +157,7 @@ public abstract class AbstractEntity implements Entity
 	protected static AbstractEntity newInstance(final AbstractEntity entity)
 	{
 		entity.setId(null);
-		entity.setTimestamp(Calendar.getInstance().getTime());
+		entity.setTimestamp(Calendar.getInstance());
 		entity.setVersion(0);
 		entity.setDeleted(false);
 		entity.setUpdate(0);

@@ -30,5 +30,44 @@ public class DerbyDatabaseUpdater extends DatabaseUpdater
 							.append(nullAllowed ? "" : " NOT NULL");
 		return sql.toString();
 	}
-	
+
+	protected String getDatePart(DatePart datePart, String dateField)
+	{
+		return getFunction(datePart, dateField);
+	}
+
+	private String getFunction(DatePart datePart, String dateField) throws IllegalArgumentException
+	{
+		switch(datePart)
+		{
+		case SECOND:
+		{
+			return "SECOND(" + dateField + ")";
+		}
+		case MINUTE:
+		{
+			return "MINUTE(" + dateField + ")";
+		}
+		case HOUR:
+		{
+			return "HOUR(" + dateField + ")";
+		}
+		case DAY:
+		{
+			return "DAY(" + dateField + ")";
+		}
+		case MONTH:
+		{
+			return "MONTH(" + dateField + ")";
+		}
+		case YEAR:
+		{
+			return "YEAR(" + dateField + ")";
+		}
+		default:
+		{
+			throw new IllegalArgumentException("Invalid Datepart: " + datePart.toString());
+		}
+		}
+	}
 }

@@ -3,11 +3,8 @@ package ch.eugster.colibri.persistence.queries;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.persistence.Query;
 
@@ -22,6 +19,7 @@ import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.CurrentTax;
+import ch.eugster.colibri.persistence.model.DayTimeRow;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Position.Option;
@@ -831,8 +829,8 @@ public class PositionQuery extends AbstractQuery<Position>
 		return super.selectReportQueryResults(reportQuery);
 	}
 
-	public Map<Integer, Double> selectDayHourStatisticsRange(final Salespoint[] salespoints,
-			Calendar[] dateRange, int[] weekdays)
+	public Collection<DayTimeRow> selectDayHourStatisticsRange(final Salespoint[] salespoints,
+			Calendar[] dateRange, int[] weekdays, int[] hourRange)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
@@ -881,35 +879,45 @@ public class PositionQuery extends AbstractQuery<Position>
 			expression.and(weekdayExpression);
 		}
 
+		expression.and(new ExpressionBuilder().get("receipt").get("hour").between(hourRange[0], hourRange[1]));
+
+		Map<Long, DayTimeRow> rows = new HashMap<Long, DayTimeRow>();
+
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		Vector<Object> args = new Vector<Object>();
-		args.add("hour");
-		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("timestamp").datePart("hour"));
-		reportQuery.addSum("quantity", Integer.class);
-		reportQuery.addSum("baseAmount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
-//		reportQuery.addGrouping("hour");
-//		Call call = new SQLCall("SELECT DATEPART(t0.re_timestamp, 'hour'), SUM(t1.po_quantity), SUM((FLOOR((((((t1.po_quantity * t1.po_price) * (? + t1.po_discount)) * (t1.po_fc_quotation / t0.re_dc_quotation)) / t0.re_dc_round_factor) + ?)) * t0.re_dc_round_factor)) FROM colibri_receipt t0, colibri_product_group t2, colibri_position t1 WHERE (t0.re_id = t1.po_re_id) AND (t2.pg_id = t1.po_pg_id)");
-//		ReportQuery rq = new ReportQuery(Position.class, new ExpressionBuilder());
-//		rq.setCall(call);
-		Map<Integer, Double> r = new HashMap<Integer, Double>();
+		reportQuery.addAttribute("name", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"), String.class);
+		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("hour"), Integer.class);
+//		reportQuery.addSum("quantity", Integer.class);
+		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name").ascending());
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("hour").ascending());
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("hour"));
 		Collection<ReportQueryResult> results =  super.selectReportQueryResults(reportQuery);
-		for (ReportQueryResult result : results)
+		if (results != null && results.size() > 0)
 		{
-			Object o = result.get("hour");
-			Double value = r.get((Integer) o);
-			if (value == null)
+			for (ReportQueryResult result : results)
 			{
-				value = new Double(0d);
+				Long id = (Long) result.get("id");
+				String name = (String) result.get("name");
+				Integer hour = (Integer) result.get("hour");
+				Double amount = (Double) result.get("amount");
+				DayTimeRow row = rows.get(id);
+				if (row == null)
+				{
+					row = new DayTimeRow(id, name, hour, amount);
+					for (int i = hourRange[0]; i <= hourRange[1]; i++)
+					{
+						row.put("h" + new Integer(i).toString(), new Double(0D));
+					}
+					rows.put(id, row);
+				}
+				else
+				{
+					row.add(hour, amount);
+				}
 			}
-			else
-			{
-				value = new Double(value.doubleValue());
-			}
-			r.put(0, value);
 		}
-		return r;
+		return rows.values();
 	}
 
 	private Expression taxFactor()

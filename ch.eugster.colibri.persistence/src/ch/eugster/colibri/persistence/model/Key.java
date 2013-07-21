@@ -20,6 +20,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.Transient;
 
 import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.model.key.KeyType;
@@ -32,6 +33,9 @@ import ch.eugster.colibri.persistence.model.key.KeyType;
 @Table(name = "colibri_key")
 public class Key extends AbstractEntity implements Comparable<Key>, IReplicationRelevant
 {
+	@Transient
+	public PaymentType paymentType;
+	
 	@Id
 	@Column(name = "key_id")
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "key_id")

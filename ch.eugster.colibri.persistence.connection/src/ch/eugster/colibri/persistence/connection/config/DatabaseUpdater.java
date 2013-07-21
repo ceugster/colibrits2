@@ -7,22 +7,7 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Properties;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.TableGenerator;
 
 import org.apache.derby.jdbc.ClientDriver;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -31,10 +16,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
 import ch.eugster.colibri.persistence.connection.Activator;
-import ch.eugster.colibri.persistence.model.AbstractEntity;
-import ch.eugster.colibri.persistence.model.CommonSettings;
-import ch.eugster.colibri.persistence.model.IReplicationRelevant;
-import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Version;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
@@ -88,6 +69,8 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 		}
 		return status;
 	}
+	
+	protected abstract String getDatePart(DatePart datePart, String dateField);
 
 	private IStatus tableExists(final Connection connection, final String tableName)
 	{
@@ -572,6 +555,49 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
+							else if (structureVersion == 12)
+							{
+								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_receipt";
+								String columnName = "re_hour";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "INTEGER", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								sql = "UPDATE " + tableName + " SET " + columnName + " = " + getDatePart(DatePart.HOUR, "re_timestamp");
+								this.log("SQL: " + sql);
+								result = stm.executeUpdate(sql);
+								this.log("SQL STATE:" + result + " OK)");
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+//							else if (structureVersion == 13)
+//							{
+//								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+//								tableName = "colibri_payment_type";
+//								String columnName = "pt_value";
+//								status = this.columnExists(connection, tableName, columnName);
+//								if (status.getSeverity() == IStatus.CANCEL)
+//								{
+//									sql = getAddColumnStatement(tableName, columnName, this.getDoubleTypeName(), "0.0", false);
+//									this.log("SQL: " + sql);
+//									result = stm.executeUpdate(sql);
+//									this.log("SQL STATE:" + result + " OK)");
+//								}
+//								sql = "UPDATE " + tableName + " SET " + columnName + " = 0 ";
+//								this.log("SQL: " + sql);
+//								result = stm.executeUpdate(sql);
+//								this.log("SQL STATE:" + result + " OK)");
+//
+//								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+//										: structureVersion;
+//							}
+//
 
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");
@@ -665,4 +691,9 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 	}
 	
 	protected abstract String getDoubleTypeName();
+
+	public enum DatePart
+	{
+		SECOND, MINUTE, HOUR, DAY, MONTH, YEAR;
+	}
 }

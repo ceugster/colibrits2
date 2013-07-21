@@ -66,23 +66,28 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 
 	public boolean isUniqueValue(final Map<String, Object> params, final Long id)
 	{
-		Expression expression = null;
-		if (params != null)
+		Expression expression = new ExpressionBuilder(this.getEntityClass());
+		if (params != null && !params.isEmpty())
 		{
-			expression = this.addParameters(params);
+			boolean firstEntry = true;
+			final Set<Entry<String, Object>> entries = params.entrySet();
+			for (Entry<String, Object> entry : entries)
+			{
+				if (firstEntry)
+				{
+					firstEntry = false;
+					expression = expression.get(entry.getKey()).equal(entry.getValue());
+				}
+				else
+				{
+					expression = expression.and(new ExpressionBuilder().get(entry.getKey()).equal(entry.getValue()));
+				}
+			}
 		}
-
-		if (expression.get("deleted") == null)
-		{
-			expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
-		}
-
+		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
 		if (id != null)
 		{
-			if (expression.get("id") == null)
-			{
-				expression = expression.and(new ExpressionBuilder().get("id").notEqual(id));
-			}
+			expression = expression.and(new ExpressionBuilder().get("id").notEqual(id));
 		}
 
 		return this.count(expression) == 0;
@@ -280,42 +285,5 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 			this.getConnectionService().resetEntityManager(e);
 		}
 		return results;
-	}
-
-//	protected ReportQueryResult getReportQueryResult(ReportQuery reportQuery)
-//	{
-//		ReportQueryResult result = null;
-//		EntityManager entityManager = null;
-//		try
-//		{
-//			entityManager = this.connectionService.getEntityManager();
-//			if (entityManager != null)
-//			{
-//				final Query query = JpaHelper.createQuery(reportQuery, this.connectionService.getEntityManager());
-//				result = (ReportQueryResult) query.getSingleResult();
-//			}
-//		}
-//		finally
-//		{
-//			if (entityManager != null)
-//			{
-//				closeEntityManager(entityManager);
-//			}
-//		}
-//		return result;
-//	}
-
-	private Expression addParameters(final Map<String, Object> params)
-	{
-		Expression expression = new ExpressionBuilder(this.getEntityClass());
-		if ((params != null) && !params.isEmpty())
-		{
-			final Set<Entry<String, Object>> entries = params.entrySet();
-			for (final Entry<String, Object> entry : entries)
-			{
-				expression = expression.get(entry.getKey()).equal(entry.getValue());
-			}
-		}
-		return expression;
 	}
 }

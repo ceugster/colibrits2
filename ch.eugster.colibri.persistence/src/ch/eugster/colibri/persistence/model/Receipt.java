@@ -3,6 +3,7 @@ package ch.eugster.colibri.persistence.model;
 import static javax.persistence.FetchType.EAGER;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Vector;
 
@@ -123,6 +124,10 @@ public class Receipt extends AbstractEntity implements IPrintable
 	private long transaction;
 
 	@Basic
+	@Column(name = "re_hour")
+	private int hour;
+
+	@Basic
 	@Column(name = "re_rc_quotation")
 	private double referenceCurrencyQuotation;
 
@@ -187,6 +192,13 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		this(settlement);
 		this.setUser(user);
+	}
+
+	@Override
+	public void setTimestamp(final Calendar timestamp)
+	{
+		super.setTimestamp(timestamp);
+		this.hour = timestamp.get(Calendar.HOUR_OF_DAY);
 	}
 
 	public void addPayment(final Payment payment)
@@ -880,6 +892,16 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public void setUser(final User user)
 	{
 		this.propertyChangeSupport.firePropertyChange("user", this.user, this.user = user);
+	}
+
+	public int getHour() 
+	{
+		return hour;
+	}
+
+	public void setHour(int hour) 
+	{
+		this.propertyChangeSupport.firePropertyChange("hour", this.hour, this.hour = hour);
 	}
 
 	public static Receipt newInstance(final Settlement settlement, final User user)

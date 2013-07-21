@@ -6,7 +6,6 @@
  */
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.AttributeOverride;
@@ -57,7 +56,7 @@ public class SettlementInternal extends SettlementAbstractSinglePosition impleme
 	protected SettlementInternal(final Settlement settlement, final Position position)
 	{
 		super(settlement, position);
-		this.setDate(position.getReceipt().getTimestamp());
+		this.setDate(position.getReceipt().getTimestamp().getTime());
 		this.setForeignCurrency(position.getForeignCurrency());
 		this.setForeignCurrencyAmount(position.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
 				Position.AmountType.NETTO));
