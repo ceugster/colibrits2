@@ -86,7 +86,7 @@ public class DateView extends ViewPart implements ISelectionProvider
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
-				settings.put("date.end", getStartDate().getTimeInMillis());
+				settings.put("date.end", getEndDate().getTimeInMillis());
 				updateStartDate();
 				fireSelectionChanged();
 			}

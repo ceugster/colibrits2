@@ -1230,7 +1230,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	private Element convertToJdomElement(Receipt receipt, Element element)
 	{
 		element.setAttribute("id", receipt.getId().toString()); //$NON-NLS-2$
-		element.setAttribute("timestamp", Long.valueOf(receipt.getTimestamp().getTime()).toString());
+		element.setAttribute("timestamp", Long.valueOf(receipt.getTimestamp().getTimeInMillis()).toString());
 		element.setAttribute("number", receipt.getNumber().toString());
 		element.setAttribute("transaction-id", "0");
 		element.setAttribute("booking-id", "0");
@@ -1382,7 +1382,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		receipt.setState(getState(element.getAttributeValue("status")));
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.setTimeInMillis(Long.valueOf(element.getAttributeValue("timestamp")).longValue());
-		receipt.setTimestamp(calendar.getTime());
+		receipt.setTimestamp(calendar);
 		receipt.setTransaction(Long.valueOf(element.getAttributeValue("transaction-id")));
 		receipt.setTransferred(Boolean.valueOf(element.getAttributeValue("transferred")));
 		receipt.setUser(getUser(element.getAttributeValue("user-id")));

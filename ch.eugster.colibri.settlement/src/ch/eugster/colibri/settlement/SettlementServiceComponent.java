@@ -94,7 +94,7 @@ public class SettlementServiceComponent implements SettlementService
 			try
 			{
 				settlement.setReceiptCount(SettlementServiceComponent.this.countReceipts(settlement));
-				settlement.setTimestamp(GregorianCalendar.getInstance().getTime());
+				settlement.setTimestamp(GregorianCalendar.getInstance());
 				settlement.setPositions(SettlementServiceComponent.this.getPositions(persistenceService.getCacheService(), settlement));
 				settlement.setPayments(SettlementServiceComponent.this.getPayments(persistenceService.getCacheService(), settlement));
 				settlement.setTaxes(SettlementServiceComponent.this.getTaxes(persistenceService.getCacheService(), settlement));
@@ -107,7 +107,7 @@ public class SettlementServiceComponent implements SettlementService
 				if (state.equals(State.DEFINITIVE))
 				{
 					settlement.setSettled(GregorianCalendar.getInstance());
-					settlement.setTimestamp(settlement.getSettled().getTime());
+					settlement.setTimestamp(settlement.getSettled());
 					settlement.setUser(settlement.getUser());
 					updateStocks(settlement);
 					ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
