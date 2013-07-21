@@ -114,7 +114,14 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		{
 			if (this.userPanel.getValueDisplay().testAmount() == 0d)
 			{
-				return this.userPanel.getReceiptWrapper().getReceiptDifference() != 0D;
+				if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+				{
+					return this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{
@@ -130,7 +137,14 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		{
 			if (this.key.getValue() == 0d)
 			{
-				this.setEnabled(this.userPanel.getValueDisplay().testAmount() != 0d);
+				if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+				{
+					this.setEnabled(this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D);
+				}
+				else
+				{
+					this.setEnabled(this.userPanel.getValueDisplay().testAmount() != 0d);
+				}
 			}
 		}
 	}

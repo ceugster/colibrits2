@@ -104,6 +104,42 @@ public class UserView extends AbstractEntityView implements IDoubleClickListener
 		tableColumn.setResizable(true);
 		tableColumn.setText("Rolle");
 
+		tableViewerColumn = new TableViewerColumn(this.viewer, SWT.NONE);
+		tableViewerColumn.setLabelProvider(new CellLabelProvider()
+		{
+			@Override
+			public void update(final ViewerCell cell)
+			{
+				final Object object = cell.getElement();
+				if (object instanceof User)
+				{
+					final User user = (User) object;
+					cell.setText(user.getPassword());
+				}
+			}
+		});
+		tableColumn = tableViewerColumn.getColumn();
+		tableColumn.setResizable(true);
+		tableColumn.setText("Passwort");
+
+		tableViewerColumn = new TableViewerColumn(this.viewer, SWT.NONE);
+		tableViewerColumn.setLabelProvider(new CellLabelProvider()
+		{
+			@Override
+			public void update(final ViewerCell cell)
+			{
+				final Object object = cell.getElement();
+				if (object instanceof User)
+				{
+					final User user = (User) object;
+					cell.setText(user.getPosLogin().toString());
+				}
+			}
+		});
+		tableColumn = tableViewerColumn.getColumn();
+		tableColumn.setResizable(true);
+		tableColumn.setText("Login Kasse");
+
 		this.viewer.addDoubleClickListener(this);
 
 		this.createContextMenu();

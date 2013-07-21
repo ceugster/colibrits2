@@ -40,18 +40,20 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 
 	private static String[] columnNames = new String[] { "Nummer", "Datum", "Zeit", "Betrag", "Status" };
 
-	private static int[] columnAlignments = new int[] { SwingConstants.LEFT, SwingConstants.CENTER,
+	private static int[] columnAlignments = new int[] { SwingConstants.LEFT, SwingConstants.LEFT, SwingConstants.CENTER,
 			SwingConstants.CENTER, SwingConstants.RIGHT, SwingConstants.LEFT };
 
 	public static final int COL_NUMBER = 0;
 
-	public static final int COL_DATE = 1;
+	public static final int COL_SALESPOINT = 1;
+	
+	public static final int COL_DATE = 2;
 
-	public static final int COL_TIME = 2;
+	public static final int COL_TIME = 3;
 
-	public static final int COL_AMOUNT = 3;
+	public static final int COL_AMOUNT = 4;
 
-	public static final int COL_STATE = 4;
+	public static final int COL_STATE = 5;
 
 	private ParkedReceiptListSelectionModel selectionListModel;
 
@@ -151,6 +153,8 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 		{
 			case COL_NUMBER:
 				return String.class;
+			case COL_SALESPOINT:
+				return String.class;
 			case COL_DATE:
 				return String.class;
 			case COL_TIME:
@@ -214,14 +218,16 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 			{
 				case ParkedReceiptListModel.COL_NUMBER:
 					return this.receipts[rowIndex].getNumber().toString();
+				case ParkedReceiptListModel.COL_SALESPOINT:
+					return this.receipts[rowIndex].getSettlement().getSalespoint().getName();
 				case COL_DATE:
 				{
-					this.calendar.setTime(this.receipts[rowIndex].getTimestamp());
+					this.calendar = this.receipts[rowIndex].getTimestamp();
 					return this.dateFormatter.format(this.calendar.getTime());
 				}
 				case COL_TIME:
 				{
-					this.calendar.setTime(this.receipts[rowIndex].getTimestamp());
+					this.calendar = this.receipts[rowIndex].getTimestamp();
 					return this.timeFormatter.format(this.calendar.getTime());
 				}
 				case COL_AMOUNT:

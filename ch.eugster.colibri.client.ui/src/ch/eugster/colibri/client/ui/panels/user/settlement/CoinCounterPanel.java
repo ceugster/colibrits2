@@ -36,6 +36,7 @@ import ch.eugster.colibri.client.ui.actions.SettleAction;
 import ch.eugster.colibri.client.ui.buttons.ProfileButton;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Currency;
+import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Money;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
@@ -45,8 +46,8 @@ import ch.eugster.colibri.persistence.model.SettlementDetail.Part;
 import ch.eugster.colibri.persistence.model.SettlementMoney;
 import ch.eugster.colibri.persistence.model.Stock;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.queries.KeyQuery;
 import ch.eugster.colibri.persistence.queries.PaymentQuery;
-import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.ui.panels.ProfilePanel;
 
@@ -221,9 +222,9 @@ public class CoinCounterPanel extends ProfilePanel
 	private JPanel createPanel(final Stock stock)
 	{
 		final Money[] moneys = stock.getPaymentType().getMoneys().toArray(new Money[0]);
-		final PaymentType[] paymentTypes = this.getVouchers(stock.getPaymentType().getCurrency());
+		final Key[] keys = this.getVouchers(stock.getPaymentType().getCurrency());
 		int cols = moneys.length == 0 ? 0 : 1;
-		cols += paymentTypes.length == 0 ? 0 : 1;
+		cols += keys.length == 0 ? 0 : 1;
 
 		final JPanel panel = new JPanel();
 		panel.setLayout(new GridLayout(1, cols));
@@ -232,9 +233,9 @@ public class CoinCounterPanel extends ProfilePanel
 		{
 			panel.add(this.createMoneyPanel(stock), BorderLayout.WEST);
 		}
-		if (paymentTypes.length > 0)
+		if (keys.length > 0)
 		{
-			panel.add(this.createVoucherPanel(stock, paymentTypes), BorderLayout.EAST);
+			panel.add(this.createVoucherPanel(stock, keys), BorderLayout.EAST);
 		}
 		return panel;
 	}
@@ -268,27 +269,27 @@ public class CoinCounterPanel extends ProfilePanel
 		return tabbedPane;
 	}
 
-	private JPanel createVoucherPanel(final Stock stock, final PaymentType[] paymentTypes)
+	private JPanel createVoucherPanel(final Stock stock, final Key[] keys)
 	{
 		totalVouchers.put(stock.getPaymentType().getCurrency().getCode(), Double.valueOf(0D));
 
 		final int cols = 3;
 		int rows = stock.getPaymentType().getMoneys().size();
-		rows = rows > paymentTypes.length ? rows : paymentTypes.length;
+		rows = rows > keys.length ? rows : keys.length;
 
 		final JPanel voucherPanel = new JPanel();
 		voucherPanel.setLayout(new GridLayout(rows + 1, cols));
 
-		final VoucherRow[] voucherRows = new VoucherRow[paymentTypes.length];
+		final VoucherRow[] voucherRows = new VoucherRow[keys.length];
 		final ProfileButton deleteButton = new ProfileButton(this.userPanel.getProfile());
 		this.deleteButtons.add(deleteButton);
 		final JLabel totalVoucherLabel = new JLabel();
 
 		for (int i = 0; i < rows; i++)
 		{
-			if (paymentTypes.length > i)
+			if (keys.length > i)
 			{
-				final VoucherRow voucherRow = new VoucherRow(this.userPanel, stock, paymentTypes[i]);
+				final VoucherRow voucherRow = new VoucherRow(this.userPanel, stock, keys[i]);
 				voucherPanel.add(voucherRow.getCountButton());
 				voucherPanel.add(voucherRow.getVoucherButton());
 				voucherPanel.add(voucherRow.getValueLabel());
@@ -488,21 +489,37 @@ public class CoinCounterPanel extends ProfilePanel
 		return moneys;
 	}
 
-	private PaymentType[] getVouchers(final Currency currency)
+//	private PaymentType[] getVouchers(final Currency currency)
+//	{
+//		PaymentType[] vouchers = null;
+//		final ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+//				PersistenceService.class, null);
+//		tracker.open();
+//		final PersistenceService service = (PersistenceService) tracker.getService();
+//		if (service != null)
+//		{
+//			final PaymentTypeQuery query = (PaymentTypeQuery) service.getCacheService().getQuery(PaymentType.class);
+//			vouchers = query.selectByPaymentTypeGroupAndCurrency(PaymentTypeGroup.VOUCHER, currency).toArray(
+//					new PaymentType[0]);
+//		}
+//		tracker.close();
+//		return vouchers == null ? new PaymentType[0] : vouchers;
+//	}
+
+	private Key[] getVouchers(final Currency currency)
 	{
-		PaymentType[] vouchers = null;
+		Key[] vouchers = null;
 		final ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
 		tracker.open();
 		final PersistenceService service = (PersistenceService) tracker.getService();
 		if (service != null)
 		{
-			final PaymentTypeQuery query = (PaymentTypeQuery) service.getCacheService().getQuery(PaymentType.class);
-			vouchers = query.selectByPaymentTypeGroupAndCurrency(PaymentTypeGroup.VOUCHER, currency).toArray(
-					new PaymentType[0]);
+			final KeyQuery query = (KeyQuery) service.getCacheService().getQuery(Key.class);
+			vouchers = query.selectVouchers(this.getProfile(), currency).toArray(new Key[0]);
 		}
 		tracker.close();
-		return vouchers == null ? new PaymentType[0] : vouchers;
+		return vouchers;
 	}
 
 	private void init()

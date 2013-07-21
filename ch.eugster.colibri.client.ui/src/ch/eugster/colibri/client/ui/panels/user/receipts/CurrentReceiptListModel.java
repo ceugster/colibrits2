@@ -232,12 +232,12 @@ public class CurrentReceiptListModel extends AbstractTableModel implements Actio
 				}
 				case COL_DATE:
 				{
-					this.calendar.setTime(this.receipts[rowIndex].getTimestamp());
+					this.calendar = this.receipts[rowIndex].getTimestamp();
 					return this.dateFormatter.format(this.calendar.getTime());
 				}
 				case COL_TIME:
 				{
-					this.calendar.setTime(this.receipts[rowIndex].getTimestamp());
+					this.calendar = this.receipts[rowIndex].getTimestamp();
 					return this.timeFormatter.format(this.calendar.getTime());
 				}
 				case COL_AMOUNT:

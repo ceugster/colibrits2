@@ -84,7 +84,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 	private Button change;
 
 	private Button[] chargeTypes;
-	
+
 	public PaymentEditor()
 	{
 	}

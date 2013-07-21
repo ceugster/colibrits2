@@ -11,7 +11,7 @@ import javax.swing.SwingConstants;
 import ch.eugster.colibri.client.ui.actions.CifferAction;
 import ch.eugster.colibri.client.ui.buttons.ProfileButton;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
-import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementMoney;
@@ -28,34 +28,33 @@ public class VoucherRow
 
 	private final Stock stock;
 
-	private final PaymentType voucher;
-
 	private int count;
+	
+	private double value = 0D;
 
 	private final ProfileButton countButton;
 
-	private final ProfileButton voucherButton;
+	private final VoucherButton voucherButton;
 
 	private final JLabel valueLabel;
 
-	public VoucherRow(final UserPanel userPanel, final Stock stock, final PaymentType voucher)
+	public VoucherRow(final UserPanel userPanel, final Stock stock, final Key key)
 	{
 		this.userPanel = userPanel;
 		this.stock = stock;
-		this.voucher = voucher;
 
-		final java.util.Currency currency = voucher.getCurrency().getCurrency();
+		final java.util.Currency currency = key.paymentType.getCurrency().getCurrency();
 		this.integerFormatter.setGroupingUsed(false);
 		this.doubleFormatter.setGroupingUsed(false);
 		this.doubleFormatter.setMinimumFractionDigits(currency.getDefaultFractionDigits());
 		this.doubleFormatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
 
 		this.countButton = this.createCountButton();
-		this.voucherButton = this.createVoucherButton();
+		this.voucherButton = this.createVoucherButton(key);
 
 		this.valueLabel = new JLabel();
 		this.valueLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		this.valueLabel.setText(this.doubleFormatter.format(voucher.getValue()));
+		this.valueLabel.setText(this.doubleFormatter.format(this.value));
 	}
 
 	public void addCount(final int count)
@@ -65,7 +64,14 @@ public class VoucherRow
 
 	public void addValue(final double value)
 	{
-		this.setValue(this.voucher.getValue() + value);
+		if (voucherButton.getKey().getValue() == 0D)
+		{
+			this.setValue(this.value + value);
+		}
+		else
+		{
+			this.setValue(this.value + (value * this.voucherButton.getKey().getValue()));
+		}
 		this.addCount(1);
 	}
 
@@ -81,16 +87,16 @@ public class VoucherRow
 
 	public SettlementMoney getSettlementMoney(final Settlement settlement)
 	{
-		final SettlementMoney money = SettlementMoney.newInstance(settlement, this.stock, this.voucher);
-		money.setText(this.voucher.getName());
-		money.setCode(this.voucher.getCode());
+		final SettlementMoney money = SettlementMoney.newInstance(settlement, this.stock, this.voucherButton.getKey().paymentType);
+		money.setText(this.voucherButton.getKey().paymentType.getName());
+		money.setCode(this.voucherButton.getKey().paymentType.getCode());
 		money.setAmount(this.getValue());
 		return money;
 	}
 
 	public double getValue()
 	{
-		return this.voucher.getValue();
+		return value;
 	}
 
 	public JLabel getValueLabel()
@@ -98,9 +104,9 @@ public class VoucherRow
 		return this.valueLabel;
 	}
 
-	public PaymentType getVoucher()
+	public Key getVoucher()
 	{
-		return this.voucher;
+		return this.voucherButton.getKey();
 	}
 
 	public ProfileButton getVoucherButton()
@@ -116,8 +122,8 @@ public class VoucherRow
 
 	public void setValue(final double value)
 	{
-		this.voucher.setValue(value);
-		this.valueLabel.setText(this.doubleFormatter.format(this.voucher.getValue()));
+		this.value= value;
+		this.valueLabel.setText(this.doubleFormatter.format(value));
 	}
 
 	private ProfileButton createCountButton()
@@ -136,10 +142,10 @@ public class VoucherRow
 		return button;
 	}
 
-	private ProfileButton createVoucherButton()
+	private VoucherButton createVoucherButton(Key key)
 	{
-		final VoucherAction action = new VoucherAction(this.voucher.getCode(), "add", this.userPanel.getProfile());
-		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile());
+		final VoucherAction action = new VoucherAction(key.paymentType.getCode(), "add", this.userPanel.getProfile());
+		final VoucherButton button = new VoucherButton(action, this.userPanel.getProfile(), key);
 		button.addActionListener(new ActionListener()
 		{
 			@Override
@@ -168,9 +174,30 @@ public class VoucherRow
 		 */
 		private static final long serialVersionUID = 1L;
 
-		public VoucherAction(final String text, final String actionCommand, final Profile profile)
+		public VoucherAction(String text, final String actionCommand, final Profile profile)
 		{
 			super(text, actionCommand, profile);
+		}
+	}
+
+	private class VoucherButton extends ProfileButton
+	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
+		private Key key;
+		
+		public VoucherButton(ProfileAction action, final Profile profile, Key key)
+		{
+			super(action, profile);
+			this.key = key;
+		}
+		
+		public Key getKey()
+		{
+			return key;
 		}
 	}
 }

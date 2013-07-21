@@ -420,7 +420,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		 * Panels
 		 */
 		final Tab tab = (Tab) ((TabEditorInput) this.getEditorInput()).getAdapter(Tab.class);
-		tab.setTimestamp(Calendar.getInstance().getTime());
+		tab.setTimestamp(Calendar.getInstance());
 		tab.setName(this.name.getText());
 		/**
 		 * Tabbed Pane

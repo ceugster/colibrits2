@@ -400,7 +400,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 	public Element convertToJdomElement(Receipt receipt, Element element)
 	{
 		element.setAttribute("id", receipt.getId().toString()); //$NON-NLS-2$
-		element.setAttribute("timestamp", Long.valueOf(receipt.getTimestamp().getTime()).toString());
+		element.setAttribute("timestamp", Long.valueOf(receipt.getTimestamp().getTimeInMillis()).toString());
 		element.setAttribute("number", receipt.getNumber().toString());
 		element.setAttribute("transaction-id", "0");
 		element.setAttribute("booking-id", "0");
