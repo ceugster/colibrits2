@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.eugster.colibri.persistence.model.Payment;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
@@ -36,7 +37,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Total bezahlt                    SSSSSSSSS\n");
+		builder = builder.append("Total bezahlt      WWW FFFFFFFFF LLLLLLLLL\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -133,7 +134,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 
 	public enum DetailKey implements IKey
 	{
-		A, W, L, F;
+		A, F, L, W;
 
 		@Override
 		public String label()
@@ -249,16 +250,24 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 
 	public enum TotalKey implements IKey
 	{
-		S;
+		F, L, W;
 
 		@Override
 		public String label()
 		{
 			switch (this)
 			{
-				case S:
+				case F:
+				{
+					return "Fremdwährungsbetrag";
+				}
+				case L:
 				{
 					return "Summe Zahlungen LW";
+				}
+				case W:
+				{
+					return "Fremdwährungscode";
 				}
 				default:
 				{
@@ -276,7 +285,24 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 
 				switch (this)
 				{
-					case S:
+					case F:
+					{
+						if (receipt.getForeignCurrency().getId().equals(receipt.getDefaultCurrency().getId()))
+						{
+							return layoutSection.replaceMarker("", marker, true);
+						}
+						else
+						{
+							ReceiptLayoutPaymentSection.amountFormatter.setMinimumFractionDigits(receipt
+									.getForeignCurrency().getCurrency().getDefaultFractionDigits());
+							ReceiptLayoutPaymentSection.amountFormatter.setMaximumFractionDigits(receipt
+									.getForeignCurrency().getCurrency().getDefaultFractionDigits());
+							final double amount = receipt.getPaymentAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY);
+							return layoutSection.replaceMarker(ReceiptLayoutPaymentSection.amountFormatter.format(amount),
+									marker, false);
+						}
+					}
+					case L:
 					{
 						ReceiptLayoutPaymentSection.amountFormatter.setMinimumFractionDigits(receipt
 								.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
@@ -285,6 +311,17 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 						final double amount = receipt.getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
 						final String formattedAmount = ReceiptLayoutPaymentSection.amountFormatter.format(amount);
 						return layoutSection.replaceMarker(formattedAmount, marker, false);
+					}
+					case W:
+					{
+						if (receipt.getForeignCurrency().getId().equals(receipt.getDefaultCurrency().getId()))
+						{
+							return layoutSection.replaceMarker("", marker, false);
+						}
+						else
+						{
+							return layoutSection.replaceMarker(receipt.getForeignCurrency().getCurrency().getCurrencyCode(), marker, false);
+						}
 					}
 					default:
 					{

@@ -10,7 +10,6 @@ import ch.eugster.colibri.persistence.model.CurrentTaxCodeMapping;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
-import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
@@ -47,7 +46,7 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Total      SSSSSSSS RRRRRRR MM TTTTTTTT\n");
+		builder = builder.append("Total          FFF XXXXXXXX MM TTTTTTTT\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -338,29 +337,37 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 		{
 			switch (this)
 			{
-				case C:
+				case A:
 				{
-					return "Barcode";
-				}
-				case W:
-				{
-					return "Warengruppe";
-				}
-				case M:
-				{
-					return "Menge";
-				}
-				case E:
-				{
-					return "Einzelpreis";
+					return "Autor, Titel";
 				}
 				case B:
 				{
 					return "Bruttobetrag";
 				}
+				case C:
+				{
+					return "Barcode";
+				}
+				case E:
+				{
+					return "Einzelpreis";
+				}
+				case G:
+				{
+					return "Mehrwertsteuercode (extern)";
+				}
+				case M:
+				{
+					return "Menge";
+				}
 				case N:
 				{
 					return "Nettobetrag";
+				}
+				case O:
+				{
+					return "MWST (ext.) + Optionscode";
 				}
 				case P:
 				{
@@ -374,21 +381,9 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 				{
 					return "Mehrwertsteuercode";
 				}
-				case G:
+				case W:
 				{
-					return "Mehrwertsteuercode (extern)";
-				}
-				case O:
-				{
-					return "MWST (ext.) + Optionscode";
-				}
-				case A:
-				{
-					return "Autor, Titel";
-				}
-				case U:
-				{
-					return "Titel, Autor";
+					return "Warengruppe";
 				}
 				default:
 				{
@@ -563,24 +558,16 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 
 	public enum TotalKey implements IKey
 	{
-		S, R, T, M, N;
+		F, M, N, R, S, T, X;
 
 		@Override
 		public String label()
 		{
 			switch (this)
 			{
-				case S:
+				case F:
 				{
-					return "Subtotal";
-				}
-				case R:
-				{
-					return "Rabattbetrag";
-				}
-				case T:
-				{
-					return "Total";
+					return "Fremdwährungscode";
 				}
 				case M:
 				{
@@ -589,6 +576,22 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 				case N:
 				{
 					return "Anzahl Rabattierte";
+				}
+				case R:
+				{
+					return "Rabattbetrag";
+				}
+				case S:
+				{
+					return "Subtotal";
+				}
+				case T:
+				{
+					return "Total";
+				}
+				case X:
+				{
+					return "Fremdwährungsbetrag";
 				}
 				default:
 				{
@@ -606,22 +609,32 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 
 				switch (this)
 				{
-					case S:
+					case F:
 					{
-						String formattedAmount = "";
-						double discount = receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-								Position.AmountType.DISCOUNT);
-						if (Math.abs(discount) >= AbstractEntity.ROUND_FACTOR)
+						if (receipt.getForeignCurrency().getId().equals(receipt.getDefaultCurrency().getId()))
 						{
-							ReceiptLayoutPositionSection.amountFormatter.setMinimumFractionDigits(receipt
-									.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
-							ReceiptLayoutPositionSection.amountFormatter.setMaximumFractionDigits(receipt
-									.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
-							double amount = receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-									Position.AmountType.BRUTTO);
-							formattedAmount = ReceiptLayoutPositionSection.amountFormatter.format(amount);
+							return layoutSection.replaceMarker("", marker, false);
 						}
-						return layoutSection.replaceMarker(formattedAmount, marker, false);
+						else
+						{
+							return receipt.getForeignCurrency().getCurrency().getCurrencyCode();
+						}
+					}
+					case M:
+					{
+						final String quantity = ReceiptLayoutPositionSection.quantityFormatter.format(receipt
+								.getPositionQuantity(Option.values()));
+						return layoutSection.replaceMarker(quantity, marker, false);
+					}
+					case N:
+					{
+						String formattedQuantity = "";
+						int quantity = receipt.getPositionWithDiscountQuantity();
+						if (quantity != 0)
+						{
+							formattedQuantity = ReceiptLayoutPositionSection.quantityFormatter.format(quantity);
+						}
+						return layoutSection.replaceMarker(formattedQuantity, marker, false);
 					}
 					case R:
 					{
@@ -640,6 +653,23 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 						}
 						return layoutSection.replaceMarker(formattedAmount, marker, false);
 					}
+					case S:
+					{
+						String formattedAmount = "";
+						double discount = receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
+								Position.AmountType.DISCOUNT);
+						if (Math.abs(discount) >= AbstractEntity.ROUND_FACTOR)
+						{
+							ReceiptLayoutPositionSection.amountFormatter.setMinimumFractionDigits(receipt
+									.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
+							ReceiptLayoutPositionSection.amountFormatter.setMaximumFractionDigits(receipt
+									.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
+							double amount = receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
+									Position.AmountType.BRUTTO);
+							formattedAmount = ReceiptLayoutPositionSection.amountFormatter.format(amount);
+						}
+						return layoutSection.replaceMarker(formattedAmount, marker, false);
+					}
 					case T:
 					{
 						ReceiptLayoutPositionSection.amountFormatter.setMinimumFractionDigits(receipt
@@ -651,21 +681,23 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 						return layoutSection.replaceMarker(ReceiptLayoutPositionSection.amountFormatter.format(amount),
 								marker, false);
 					}
-					case M:
+					case X:
 					{
-						final String quantity = ReceiptLayoutPositionSection.quantityFormatter.format(receipt
-								.getPositionQuantity(Option.values()));
-						return layoutSection.replaceMarker(quantity, marker, false);
-					}
-					case N:
-					{
-						String formattedQuantity = "";
-						int quantity = receipt.getPositionWithDiscountQuantity();
-						if (quantity != 0)
+						if (receipt.getForeignCurrency().getId().equals(receipt.getDefaultCurrency().getId()))
 						{
-							formattedQuantity = ReceiptLayoutPositionSection.quantityFormatter.format(quantity);
+							return layoutSection.replaceMarker("", marker, false);
 						}
-						return layoutSection.replaceMarker(formattedQuantity, marker, false);
+						else
+						{
+							ReceiptLayoutPositionSection.amountFormatter.setMinimumFractionDigits(receipt
+									.getForeignCurrency().getCurrency().getDefaultFractionDigits());
+							ReceiptLayoutPositionSection.amountFormatter.setMaximumFractionDigits(receipt
+									.getForeignCurrency().getCurrency().getDefaultFractionDigits());
+							final double amount = receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY,
+									Position.AmountType.NETTO);
+							return layoutSection.replaceMarker(ReceiptLayoutPositionSection.amountFormatter.format(amount),
+									marker, false);
+						}
 					}
 					default:
 					{

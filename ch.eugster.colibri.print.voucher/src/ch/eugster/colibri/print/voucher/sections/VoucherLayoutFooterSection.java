@@ -11,7 +11,6 @@ import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
 import ch.eugster.colibri.print.section.ILayoutSection;
 import ch.eugster.colibri.print.section.ILayoutSectionType;
-import ch.eugster.colibri.print.section.ILayoutSection.AreaType;
 
 public class VoucherLayoutFooterSection extends AbstractLayoutSection
 {
@@ -184,14 +183,12 @@ public class VoucherLayoutFooterSection extends AbstractLayoutSection
 					}
 					case D:
 					{
-						Calendar calendar = Calendar.getInstance();
-						calendar.setTime(receipt.getTimestamp());
+						Calendar calendar = receipt.getTimestamp();
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case T:
 					{
-						Calendar calendar = Calendar.getInstance();
-						calendar.setTime(receipt.getTimestamp());
+						Calendar calendar = receipt.getTimestamp();
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case U:

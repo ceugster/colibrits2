@@ -185,14 +185,12 @@ public class ReceiptLayoutFooterSection extends AbstractLayoutSection
 					}
 					case D:
 					{
-						Calendar calendar = Calendar.getInstance();
-						calendar.setTime(receipt.getTimestamp());
+						Calendar calendar = receipt.getTimestamp();
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case T:
 					{
-						Calendar calendar = Calendar.getInstance();
-						calendar.setTime(receipt.getTimestamp());
+						Calendar calendar = receipt.getTimestamp();
 						return layoutSection.replaceMarker(calendar.getTime(), marker);
 					}
 					case U:
