@@ -946,8 +946,6 @@ ch.eugster.colibri.display.simple/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.display.simple/OSGI-INF/service-component.xml -text
 ch.eugster.colibri.display.simple/build.properties -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/Activator.java -text
-ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/DefaultLayoutAreaType.java -text
-ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/DefaultLayoutType.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/IKey.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/ILayoutArea.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/PaymentAddedMessageArea.java -text
@@ -956,7 +954,6 @@ ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/Sal
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/SimpleLayoutAreaType.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/SimpleLayoutType.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/WelcomeMessageArea.java -text
-ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/service/DefaultDisplayService.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/service/SimpleDisplayService.java -text
 ch.eugster.colibri.display/.classpath -text
 ch.eugster.colibri.display/.project -text

@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator
 {
-	public static final String PLUGIN_ID = "ch.eugster.colibri.display";
+	public static final String PLUGIN_ID = "ch.eugster.colibri.display.simple";
 
 	private BundleContext context;
 
