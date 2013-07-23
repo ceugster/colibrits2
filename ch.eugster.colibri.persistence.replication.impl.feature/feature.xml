@@ -224,6 +224,7 @@ litigation.
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="javax.persistence"/>
    </requires>
 
    <plugin
