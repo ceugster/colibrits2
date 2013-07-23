@@ -18,6 +18,7 @@ import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.ChargeType;
 import ch.eugster.colibri.persistence.model.Key;
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -52,8 +53,17 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 			{
 				if (!this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
 				{
-					double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
-					this.userPanel.getPaymentWrapper().getPayment().setAmount(difference);
+					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getId()))
+					{
+						double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
+						this.userPanel.getPaymentWrapper().getPayment().setAmount(difference);
+					}
+					else
+					{
+						Payment payment = Payment.newInstance(this.userPanel.getReceiptWrapper().getReceipt());
+						payment.setPaymentType(this.getPaymentType());
+						this.userPanel.getPaymentWrapper().replacePayment(payment);
+					}
 				}
 			}
 			else
@@ -120,7 +130,14 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 				}
 				else
 				{
-					return false;
+					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getId()))
+					{
+						return false;
+					}
+					else
+					{
+						return true;
+					}
 				}
 			}
 			else

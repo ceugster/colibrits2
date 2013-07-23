@@ -35,7 +35,7 @@ public abstract class DisplayPanel extends ch.eugster.colibri.ui.panels.DisplayP
 			PositionWrapper.KEY_POSITION };
 
 	protected String[] paymentProperties = new String[] { ReceiptWrapper.KEY_PROPERTY_PAYMENTS,
-			PaymentWrapper.KEY_PAYMENT };
+			PaymentWrapper.KEY_PAYMENT, PaymentWrapper.KEY_PROPERTY_PAYMENT_TYPE };
 
 	protected String[] receiptProperties = new String[] { ReceiptWrapper.KEY_PROPERTY_POSITIONS,
 			ReceiptWrapper.KEY_PROPERTY_PAYMENTS };

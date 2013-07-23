@@ -26,7 +26,7 @@ public class LogoutAction extends ConfigurableAction
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		MainTabbedPane.getTabbedPane().removeUserPanel(userPanel);
+		userPanel.getMainTabbedPane().removeUserPanel(userPanel);
 	}
 
 	protected boolean getState(final StateChangeEvent event)

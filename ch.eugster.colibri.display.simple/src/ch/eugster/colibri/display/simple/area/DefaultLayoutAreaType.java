@@ -126,4 +126,32 @@ public enum DefaultLayoutAreaType implements ILayoutAreaType
 	{
 		this.rowCount = rowCount;
 	}
+
+	@Override
+	public boolean isCustomerEditable() 
+	{
+		switch (this)
+		{
+			case SALESPOINT_CLOSED_MESSAGE:
+			{
+				return true;
+			}
+			case POSITION_ADDED_MESSAGE:
+			{
+				return false;
+			}
+			case PAYMENT_ADDED_MESSAGE:
+			{
+				return false;
+			}
+			case WELCOME_MESSAGE:
+			{
+				return true;
+			}
+			default:
+			{
+				throw new RuntimeException("Invalid print area type");
+			}
+		}
+	}
 }

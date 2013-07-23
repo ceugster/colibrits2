@@ -258,7 +258,7 @@ public class UserView extends AbstractEntityView implements IDoubleClickListener
 	@Override
 	public void postDelete(final AbstractEntity entity)
 	{
-		this.viewer.refresh(entity);
+		this.viewer.refresh();
 	}
 
 	@Override

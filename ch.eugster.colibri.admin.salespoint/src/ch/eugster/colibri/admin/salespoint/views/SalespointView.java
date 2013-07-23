@@ -319,26 +319,7 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) 
 			{
-				if (!viewer.getTree().isDisposed())
-				{
-					Object parent = null;
-					if (entity instanceof Salespoint)
-					{
-						parent = this;
-					}
-					else if (entity instanceof Stock)
-					{
-						parent = ((Stock) entity).getSalespoint();
-					}
-					else
-					{
-						return Status.OK_STATUS;
-					}
-
-					viewer.setInput(persistenceServiceTracker.getService());
-					viewer.expandToLevel(entity, AbstractTreeViewer.ALL_LEVELS);
-					packColumns();
-				}
+				viewer.refresh();
 				return Status.OK_STATUS;
 			}
 		};
@@ -348,31 +329,28 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 	@Override
 	public void postUpdate(final AbstractEntity entity)
 	{
-		if (!this.viewer.getTree().isDisposed())
+		final UIJob uiJob = new UIJob("refresh viewer")
 		{
-			if (entity instanceof Profile)
+			@Override
+			public IStatus runInUIThread(final IProgressMonitor monitor)
 			{
-				final Profile profile = (Profile) entity;
-				for (final Salespoint salespoint : profile.getSalespoints())
+				if (entity instanceof Profile)
 				{
-					this.viewer.refresh(salespoint);
-				}
-			}
-			else
-			{
-				final UIJob uiJob = new UIJob("refresh viewer")
-				{
-					@Override
-					public IStatus runInUIThread(final IProgressMonitor monitor)
+					final Profile profile = (Profile) entity;
+					for (final Salespoint salespoint : profile.getSalespoints())
 					{
-						SalespointView.this.viewer.refresh(entity);
-						packColumns();
-						return Status.OK_STATUS;
+						SalespointView.this.viewer.refresh(salespoint);
 					}
-				};
-				uiJob.schedule();
+				}
+				else
+				{
+					SalespointView.this.viewer.refresh(entity);
+				}
+				packColumns();
+				return Status.OK_STATUS;
 			}
-		}
+		};
+		uiJob.schedule();
 	}
 
 	/**

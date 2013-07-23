@@ -168,10 +168,6 @@ public class StockEditor extends AbstractEntityEditor<Stock>
 		stock.setPaymentType((PaymentType) ssel.getFirstElement());
 		final String value = this.amount.getControl().getText();
 		stock.setAmount(Double.parseDouble(value));
-		if (stock.getId() == null)
-		{
-			stock.getSalespoint().addStock(stock);
-		}
 	}
 
 	@Override

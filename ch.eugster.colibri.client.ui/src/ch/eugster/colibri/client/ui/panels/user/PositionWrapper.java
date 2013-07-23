@@ -102,7 +102,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private final ValueDisplay valueDisplay;
 
-	private boolean freeCopy;
+//	private boolean freeCopy;
 	
 	public PositionWrapper(final UserPanel userPanel, final ValueDisplay valueDisplay)
 	{
@@ -167,22 +167,22 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		this.logServiceTracker.close();
 	}
 
-	public boolean isFreeCopy()
-	{
-		return freeCopy;
-	}
-	
-	public void setFreeCopy(boolean freeCopy)
-	{
-		this.freeCopy = freeCopy;
-	}
+//	public boolean isFreeCopy()
+//	{
+//		return freeCopy;
+//	}
+//	
+//	public void setFreeCopy(boolean freeCopy)
+//	{
+//		this.freeCopy = freeCopy;
+//	}
 	
 	public boolean doesPositionNeedPrice()
 	{
-		if (this.freeCopy)
-		{
-			return false;
-		}
+//		if (this.freeCopy)
+//		{
+//			return false;
+//		}
 		return this.position.getPrice() == 0d ? true : false;
 	}
 
@@ -236,10 +236,10 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				return false;
 			}
 		}
-		if (this.position.getPrice() == 0d)
-		{
-			return this.freeCopy;
-		}
+//		if (this.position.getPrice() == 0d)
+//		{
+//			return this.freeCopy;
+//		}
 		if (this.position.getQuantity() == 0)
 		{
 			return false;

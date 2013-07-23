@@ -78,4 +78,17 @@ public class DefaultLayoutType extends AbstractLayoutType
 		return "Layouts Kundendisplay";
 	}
 
+	@Override
+	public boolean hasCustomerEditableAreaTypes() 
+	{
+		for (ILayoutAreaType areaType : DefaultLayoutAreaType.values())
+		{
+			if (areaType.isCustomerEditable())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

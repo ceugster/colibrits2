@@ -53,10 +53,8 @@ import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Profile.PanelType;
 import ch.eugster.colibri.persistence.model.Receipt;
-import ch.eugster.colibri.persistence.model.Role;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.User;
-import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.ui.actions.BasicAction;
 
 public class UserPanel extends MainPanel implements StateChangeProvider, StateChangeListener, PropertyChangeListener,
@@ -115,18 +113,26 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 	private State currentState;
 
 	private int restitutionPrintCount;
+
+	private MainTabbedPane mainTabbedPane;
 	
 	private final Collection<StateChangeListener> stateChangeListeners = new ArrayList<StateChangeListener>();
 
 	private final Map<Class<? extends BasicAction>, Collection<ActionListener>> actionListeners = new HashMap<Class<? extends BasicAction>, Collection<ActionListener>>();
 
-	public UserPanel(final Salespoint salespoint, final User user)
+	public UserPanel(MainTabbedPane mainTabbedPane, final User user)
 	{
-		super(salespoint.getProfile());
+		super(mainTabbedPane.getSalespoint().getProfile());
+		this.mainTabbedPane = mainTabbedPane;
 		this.user = user;
 		this.init();
 	}
 
+	public MainTabbedPane getMainTabbedPane()
+	{
+		return mainTabbedPane;
+	}
+	
 	public int getRestitutionPrintCount()
 	{
 		return restitutionPrintCount < 1 ? 1 : restitutionPrintCount;
@@ -142,8 +148,14 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 	{
 		if (event.getActionCommand().equals(BackAction.ACTION_COMMAND))
 		{
-			this.fireStateChange(new StateChangeEvent(this.getCurrentState(), this.oldState));
-
+			if (this.getMainTabbedPane().settlementRequired())
+			{
+				this.fireStateChange(new StateChangeEvent(this.getCurrentState(), State.MUST_SETTLE));
+			}
+			else
+			{
+				this.fireStateChange(new StateChangeEvent(this.getCurrentState(), this.oldState));
+			}
 		}
 		else if (event.getActionCommand().equals(DiscountAction.ACTION_COMMAND))
 		{
@@ -261,12 +273,11 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 
 	public Salespoint getSalespoint()
 	{
-		return MainTabbedPane.getTabbedPane().getSalespoint();
+		return mainTabbedPane.getSalespoint();
 	}
 
 	public void setSalespoint(Salespoint salespoint)
 	{
-		MainTabbedPane.getTabbedPane().setSalespoint(salespoint);
 		Receipt receipt = this.receiptWrapper.prepareReceipt();
 		this.positionWrapper.preparePosition(receipt);
 		this.paymentWrapper.preparePayment(receipt);
@@ -616,13 +627,16 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		this.addStateChangeListener(this);
 		this.addStateChangeListener(this.valueDisplay);
 
-		this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.POSITION_INPUT));
-		if (this.getSalespoint().settlementRequired())
+		if (this.mainTabbedPane.settlementRequired())
 		{
-			this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.MUST_SETTLE));
+			this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.COIN_COUNTER));
+		}
+		else
+		{
+			this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.POSITION_INPUT));
 		}
 	}
-
+	
 	public enum State
 	{
 		POSITION_INPUT, PAYMENT_INPUT, RECEIPTS_LIST, PARKED_RECEIPTS_LIST, COIN_COUNTER, LOCKED, MUST_SETTLE;

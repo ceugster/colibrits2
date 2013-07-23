@@ -30,8 +30,8 @@ public final class PriceAction extends UserPanelProfileAction
 	public PriceAction(final UserPanel userPanel, final Profile profile)
 	{
 		super(PriceAction.TEXT, PriceAction.ACTION_COMMAND, userPanel, profile);
-		maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxPriceRange());
-		maxAmount = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxPriceAmount());
+		maxRange = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxPriceRange());
+		maxAmount = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxPriceAmount());
 	}
 
 	@Override

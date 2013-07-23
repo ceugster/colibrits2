@@ -15,4 +15,6 @@ public interface ILayoutAreaType
 	void setColumnCount(final int columns);
 
 	void setRowCount(final int rowCount);
+	
+	boolean isCustomerEditable();
 }

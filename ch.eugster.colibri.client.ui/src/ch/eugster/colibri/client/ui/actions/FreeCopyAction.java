@@ -25,7 +25,8 @@ public final class FreeCopyAction extends ConfigurableAction implements DisposeL
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		userPanel.getPositionWrapper().setFreeCopy(true);
+		double value = this.key.getValue() == 0D ? 1D : this.key.getValue();
+		userPanel.getPositionWrapper().getPosition().setDiscount(value);
 	}
 
 	@Override
@@ -41,7 +42,5 @@ public final class FreeCopyAction extends ConfigurableAction implements DisposeL
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
-		
 	}
 }

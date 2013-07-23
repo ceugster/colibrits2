@@ -30,8 +30,8 @@ public final class QuantityAction extends UserPanelProfileAction
 	public QuantityAction(final UserPanel userPanel, final Profile profile)
 	{
 		super(QuantityAction.TEXT, QuantityAction.ACTION_COMMAND, userPanel, profile);
-		maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxQuantityRange());
-		maxQuantity = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxQuantityAmount());
+		maxRange = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxQuantityRange());
+		maxQuantity = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxQuantityAmount());
 	}
 
 	@Override

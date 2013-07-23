@@ -16,7 +16,6 @@ import javax.swing.event.ListSelectionListener;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
-import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.client.ui.panels.user.PositionWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
@@ -34,8 +33,8 @@ public class RestitutionAction extends ConfigurableAction implements PropertyCha
 	public RestitutionAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
-		this.maxRange = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxQuantityRange());
-		this.maxAmount = Math.abs(MainTabbedPane.getTabbedPane().getSetting().getMaxQuantityAmount());
+		this.maxRange = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxQuantityRange());
+		this.maxAmount = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxQuantityAmount());
 		new PositionChangeMediator(userPanel, this, this.positionProperties);
 		userPanel.getValueDisplay().addPropertyChangeListener(this);
 		userPanel.getPositionListPanel().getModel().getSelectionListModel().addListSelectionListener(this);

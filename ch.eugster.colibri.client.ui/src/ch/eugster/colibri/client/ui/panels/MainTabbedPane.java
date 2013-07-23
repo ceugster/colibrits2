@@ -11,6 +11,8 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.beans.PropertyChangeEvent;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -40,11 +42,12 @@ import ch.eugster.colibri.persistence.events.EntityListener;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Profile;
+import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.SalespointCustomerDisplaySettings;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.Version;
-import ch.eugster.colibri.persistence.queries.SalespointQuery;
+import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
 import ch.eugster.colibri.provider.service.ProviderInterface;
@@ -53,8 +56,6 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		EntityListener
 {
 	public static final long serialVersionUID = 0l;
-
-	private static MainTabbedPane tabbedPane;
 
 	private final Color fgSelected;
 
@@ -66,8 +67,6 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private String version;
 	
-	private Salespoint salespoint;
-
 	private ServiceTracker<DisplayService, DisplayService> displayTracker;
 
 	private ServiceTracker<TransferAgent, TransferAgent> transferServiceTracker;
@@ -86,8 +85,6 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 	{
 		this.state = State.STARTING;
 
-		MainTabbedPane.tabbedPane = this;
-
 		this.clientView = clientView;
 		this.addChangeListener(this.clientView);
 
@@ -102,14 +99,12 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			public PersistenceService addingService(final ServiceReference<PersistenceService> reference)
 			{
 				final PersistenceService service = (PersistenceService) super.addingService(reference);
-				final SalespointQuery query = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);
-				MainTabbedPane.this.salespoint = query.getCurrentSalespoint();
 				return service;
 			}
 		};
 		this.persistenceServiceTracker.open();
 
-		final SalespointCustomerDisplaySettings customerDisplaySettings = this.salespoint.getCustomerDisplaySettings();
+		final SalespointCustomerDisplaySettings customerDisplaySettings = this.getSalespoint().getCustomerDisplaySettings();
 		if (customerDisplaySettings != null)
 		{
 			this.displayTracker = new ServiceTracker<DisplayService, DisplayService>(Activator.getDefault().getBundle().getBundleContext(),
@@ -134,14 +129,14 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			}
 		}
 
-		final Profile profile = this.salespoint.getProfile();
+		final Profile profile = this.getSalespoint().getProfile();
 
 		this.setFont(this.getFont().deriveFont(profile.getTabbedPaneFontStyle(), profile.getTabbedPaneFontSize()));
 		this.fgSelected = new java.awt.Color(profile.getTabbedPaneFgSelected());
 		this.fg = new java.awt.Color(profile.getTabbedPaneFg());
 		this.bg = new java.awt.Color(profile.getTabbedPaneBg());
 
-		final LoginPanel loginPanel = new LoginPanel(this.salespoint.getProfile());
+		final LoginPanel loginPanel = new LoginPanel(this.getSalespoint().getProfile());
 		loginPanel.addLoginListener(this);
 		this.addChangeListener(this);
 		this.add("Anmelden", loginPanel);
@@ -164,11 +159,50 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		this.state = State.RUNNING;
 	}
 
-	public void setSalespoint(Salespoint salespoint)
+	public boolean settlementRequired()
 	{
-		this.salespoint = salespoint;
+		if (!this.getSalespoint().isForceSettlement())
+		{
+			return false;
+		}
+		if (this.getSalespoint().getSettlement() == null)
+		{
+			return false;
+		}
+		if (this.getSalespoint().getSettlement().getSettled() != null)
+		{
+			return false;
+		}
+		
+		PersistenceService service = persistenceServiceTracker.getService();
+		if (service != null)
+		{
+			ReceiptQuery query = (ReceiptQuery) service.getCacheService().getQuery(Receipt.class);
+			if (query.countTransferables(this.getSalespoint().getSettlement()) == 0L)
+			{
+				return mustSettle(service);
+			}
+		}
+		return false;
 	}
 
+	private boolean mustSettle(PersistenceService persistenceService)
+	{
+		Salespoint salespoint = (Salespoint) persistenceService.getServerService().find(Salespoint.class, this.getSalespoint().getId());
+		ReceiptQuery query = (ReceiptQuery) persistenceService.getServerService().getQuery(Receipt.class);
+		if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
+		{
+			Calendar today = GregorianCalendar.getInstance();
+			today.set(Calendar.HOUR_OF_DAY, 0);
+			today.set(Calendar.MINUTE, 0);
+			today.set(Calendar.SECOND, 0);
+			today.set(Calendar.MILLISECOND, 0);
+			boolean settle = salespoint.getSettlement().getTimestamp().before(today);
+			return settle;
+		}
+		return false;
+	}
+	
 	public MainPanel getCurrentPanel()
 	{
 		return (MainPanel) this.getSelectedComponent();
@@ -176,12 +210,12 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	public Salespoint getSalespoint()
 	{
-		return this.salespoint;
+		return this.clientView.getSalespoint();
 	}
 
 	public CommonSettings getSetting()
 	{
-		return this.salespoint.getCommonSettings();
+		return this.clientView.getSalespoint().getCommonSettings();
 	}
 
 	public void initFocus()
@@ -280,11 +314,29 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		{
 			if (this.getComponent(i) == userPanel)
 			{
-				this.remove(i);
+				this.remove(userPanel);
 			}
 		}
-		this.doLayout();
 		userPanel.dispose();
+		UIJob job = new UIJob("")
+		{
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) 
+			{
+				if (clientView.getSite().getWorkbenchWindow().getShell().getMaximized())
+				{
+					clientView.getSite().getWorkbenchWindow().getShell().setMaximized(false);
+					clientView.getSite().getWorkbenchWindow().getShell().setMaximized(true);
+				}
+				else if (!clientView.getSite().getWorkbenchWindow().getShell().getMinimized())
+				{
+					clientView.getSite().getWorkbenchWindow().getShell().setMaximized(true);
+					clientView.getSite().getWorkbenchWindow().getShell().setMaximized(false);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 
 	@Override
@@ -416,7 +468,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			}
 		}
 
-		final UserPanel userPanel = new UserPanel(this.salespoint, user);
+		final UserPanel userPanel = new UserPanel(this, user);
 		userPanel.initFocus();
 
 		this.add(user.getUsername(), userPanel);
@@ -433,10 +485,10 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		MessageDialog.showInformation(frame, profile, title, msg, MessageDialog.TYPE_WARN);
 	}
 
-	public static MainTabbedPane getTabbedPane()
-	{
-		return MainTabbedPane.tabbedPane;
-	}
+//	public static MainTabbedPane getTabbedPane()
+//	{
+//		return MainTabbedPane.tabbedPane;
+//	}
 
 	public enum State
 	{

@@ -484,7 +484,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 
 		try
 		{
-			final java.util.Currency currency = Currency.getInstance(MainTabbedPane.getTabbedPane().getSalespoint().getPaymentType().getCurrency()
+			final java.util.Currency currency = Currency.getInstance(this.userPanel.getMainTabbedPane().getSalespoint().getPaymentType().getCurrency()
 					.getCode());
 			minFractionDigits = currency.getDefaultFractionDigits();
 			maxFractionDigits = currency.getDefaultFractionDigits();

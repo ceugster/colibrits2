@@ -38,7 +38,7 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 {
 	public static final long serialVersionUID = 0l;
 
-	private static String[] columnNames = new String[] { "Nummer", "Datum", "Zeit", "Betrag", "Status" };
+	private static String[] columnNames = new String[] { "Nummer", "Kasse", "Datum", "Zeit", "Betrag", "Status" };
 
 	private static int[] columnAlignments = new int[] { SwingConstants.LEFT, SwingConstants.LEFT, SwingConstants.CENTER,
 			SwingConstants.CENTER, SwingConstants.RIGHT, SwingConstants.LEFT };

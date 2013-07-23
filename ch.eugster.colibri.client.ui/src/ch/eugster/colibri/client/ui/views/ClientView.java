@@ -109,11 +109,18 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private ReceiptChangeMediator receiptChangeMediator;
 
+	private Salespoint salespoint;
+
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
 	public boolean addShutdownListener(final ShutdownListener listener)
 	{
 		return this.shutdownListeners.add(listener);
+	}
+	
+	public Salespoint getSalespoint()
+	{
+		return this.salespoint;
 	}
 
 	@Override
@@ -127,7 +134,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		{
 			final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
 					Salespoint.class);
-			Salespoint salespoint = salespointQuery.getCurrentSalespoint();
+			salespoint = salespointQuery.getCurrentSalespoint();
 			msg = "Für diese Arbeitsstation ist noch keine Kasse registriert.";
 			errors = errors.append(salespoint == null ? msg : "");
 			if (salespoint != null)

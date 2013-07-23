@@ -74,10 +74,10 @@ public class ActionResolver
 		{
 			return PrintLastReceiptAction.class;
 		}
-//		else if (functionType.equals(FunctionType.FUNCTION_FREE_COPY))
-//		{
-//			return FreeCopyAction.class;
-//		}
+		else if (functionType.equals(FunctionType.FUNCTION_FREE_COPY))
+		{
+			return FreeCopyAction.class;
+		}
 		throw new RuntimeException("No such function type");
 	}
 
