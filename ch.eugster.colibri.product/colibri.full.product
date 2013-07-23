@@ -164,7 +164,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.display.simple.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.encryption.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.display.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.periphery.display.serial.scd122u.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.printer.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.printer.serial.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.persistence.feature" version="1.0.0.qualifier"/>
@@ -195,6 +194,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.voucher.client.webservice.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.product.full.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.time.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.periphery.display.serial.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>
