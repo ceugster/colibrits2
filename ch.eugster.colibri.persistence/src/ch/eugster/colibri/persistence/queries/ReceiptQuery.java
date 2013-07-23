@@ -23,6 +23,16 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.count(expression);
 	}
 
+	public long countSavedAndReversedBySettlement(Settlement settlement)
+	{
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
+		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
+		expression = expression.and(states);
+		return this.count(expression);
+	}
+
 	public Collection<Receipt> selectSavedBySettlement(Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
@@ -297,6 +307,11 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.selectTransferables(0);
 	}
 
+	public Collection<Receipt> selectTransferables(Settlement settlement)
+	{
+		return this.selectTransferables(settlement, 0);
+	}
+
 	public Collection<Receipt> selectTransferables(final int maxResults)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
@@ -305,6 +320,28 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
 		expression = expression.and(states);
 		return this.select(expression, maxResults);
+	}
+
+	public Collection<Receipt> selectTransferables(final Settlement settlement, final int maxResults)
+	{
+		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
+		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
+		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
+		expression = expression.and(states);
+		return this.select(expression, maxResults);
+	}
+
+	public long countTransferables(Settlement settlement)
+	{
+		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
+		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
+		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
+		expression = expression.and(states);
+		return this.count(expression);
 	}
 
 	@Override

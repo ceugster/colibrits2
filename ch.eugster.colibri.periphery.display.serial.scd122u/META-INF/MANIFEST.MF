@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scd122u Plugin
-Bundle-SymbolicName: ch.eugster.colibri.periphery.display.serial.scd122u;singleton:=true
+Bundle-Name: Serial Customer Display Plugin
+Bundle-SymbolicName: ch.eugster.colibri.periphery.display.serial;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: ch.eugster.colibri.periphery.display.serial.scd122u.Activator
+Bundle-Activator: ch.eugster.colibri.periphery.display.serial.Activator
 Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

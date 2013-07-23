@@ -33,7 +33,7 @@ public class Version extends AbstractEntity
 
 	public static final int DATA = 0;
 
-	public static final String DATE = "20.07.2013";
+	public static final String DATE = "22.07.2013";
 
 	@Basic
 	@Column(name = "v_data")

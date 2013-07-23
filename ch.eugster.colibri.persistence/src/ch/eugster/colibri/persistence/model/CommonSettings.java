@@ -480,7 +480,7 @@ public class CommonSettings extends AbstractEntity implements IReplicationReleva
 	}
 
 	public void setMaximizedClientWindow(boolean maximizedClientWindow) {
-		this.maximizedClientWindow = maximizedClientWindow;
+		this.propertyChangeSupport.firePropertyChange("maximizedClientWindow", this.maximizedClientWindow, this.maximizedClientWindow = maximizedClientWindow);
 	}
 
 	public boolean isForceSettlement() {

@@ -576,28 +576,6 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
-//							else if (structureVersion == 13)
-//							{
-//								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
-//								tableName = "colibri_payment_type";
-//								String columnName = "pt_value";
-//								status = this.columnExists(connection, tableName, columnName);
-//								if (status.getSeverity() == IStatus.CANCEL)
-//								{
-//									sql = getAddColumnStatement(tableName, columnName, this.getDoubleTypeName(), "0.0", false);
-//									this.log("SQL: " + sql);
-//									result = stm.executeUpdate(sql);
-//									this.log("SQL STATE:" + result + " OK)");
-//								}
-//								sql = "UPDATE " + tableName + " SET " + columnName + " = 0 ";
-//								this.log("SQL: " + sql);
-//								result = stm.executeUpdate(sql);
-//								this.log("SQL STATE:" + result + " OK)");
-//
-//								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
-//										: structureVersion;
-//							}
-//
 
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");

@@ -1,4 +1,4 @@
-package ch.eugster.colibri.periphery.display.serial.scd122u.service;
+package ch.eugster.colibri.periphery.display.serial.service;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -8,10 +8,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import ch.eugster.colibri.periphery.converters.Converter;
-import ch.eugster.colibri.periphery.display.serial.scd122u.Activator;
+import ch.eugster.colibri.periphery.display.serial.Activator;
 import ch.eugster.colibri.periphery.display.service.AbstractCustomerDisplayService;
 
-public class Scd122uCustomerDisplayService extends AbstractCustomerDisplayService
+public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 {
 	private PrintStream display;
 
@@ -41,7 +41,7 @@ public class Scd122uCustomerDisplayService extends AbstractCustomerDisplayServic
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
 				{
-					Scd122uCustomerDisplayService.this.displayText(text);
+					SerialCustomerDisplayService.this.displayText(text);
 					return Status.OK_STATUS;
 				}
 				

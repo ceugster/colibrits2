@@ -1,11 +1,11 @@
-package ch.eugster.colibri.periphery.display.serial.scd122u;
+package ch.eugster.colibri.periphery.display.serial;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator
 {
-	public static final String PLUGIN_ID = "ch.eugster.colibri.periphery.serial.display.scd122u";
+	public static final String PLUGIN_ID = "ch.eugster.colibri.periphery.display.serial";
 
 	private static BundleContext context;
 

@@ -1027,8 +1027,8 @@ ch.eugster.colibri.periphery.display.serial.scd122u/.settings/org.eclipse.pde.co
 ch.eugster.colibri.periphery.display.serial.scd122u/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.display.serial.scd122u/OSGI-INF/service-component.xml -text
 ch.eugster.colibri.periphery.display.serial.scd122u/build.properties -text
-ch.eugster.colibri.periphery.display.serial.scd122u/src/ch/eugster/colibri/periphery/display/serial/scd122u/Activator.java -text
-ch.eugster.colibri.periphery.display.serial.scd122u/src/ch/eugster/colibri/periphery/display/serial/scd122u/service/Scd122uCustomerDisplayService.java -text
+ch.eugster.colibri.periphery.display.serial.scd122u/src/ch/eugster/colibri/periphery/display/serial/Activator.java -text
+ch.eugster.colibri.periphery.display.serial.scd122u/src/ch/eugster/colibri/periphery/display/serial/service/SerialCustomerDisplayService.java -text
 ch.eugster.colibri.periphery.display/.classpath -text
 ch.eugster.colibri.periphery.display/.project -text
 ch.eugster.colibri.periphery.display/.settings/org.eclipse.pde.core.prefs -text

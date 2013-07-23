@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="ch.eugster.colibri.periphery.display.serial.scd122u.feature"
-      label="Modul Kundendisplay Star Scd122u"
+      id="ch.eugster.colibri.periphery.display.serial.feature"
+      label="Modul Serielles Kundendisplay"
       version="1.0.0.qualifier"
       provider-name="Christian Eugster">
 
    <description>
-      Konkrete Implementation eines Kundendisplay für das Start SCD122U.
+      Konkrete Implementation für serielle Kundendisplays.
    </description>
 
    <copyright>
@@ -110,10 +110,11 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="org.eclipse.core.jobs"/>
    </requires>
 
    <plugin
-         id="ch.eugster.colibri.periphery.display.serial.scd122u"
+         id="ch.eugster.colibri.periphery.display.serial"
          download-size="0"
          install-size="0"
          version="0.0.0"

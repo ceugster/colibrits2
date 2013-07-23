@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.periphery.display.serial.scd122u">
-   <implementation class="ch.eugster.colibri.periphery.display.serial.scd122u.service.Scd122uCustomerDisplayService"/>
-   <property name="custom.device" type="String" value="Star SCD122U Customer Display"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.periphery.display.serial">
+   <implementation class="ch.eugster.colibri.periphery.display.serial.service.SerialCustomerDisplayService"/>
+   <property name="custom.device" type="String" value="Serielles Kundendisplay"/>
    <property name="custom.group" type="Integer" value="1"/>
    <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
    <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="persistenceService" policy="static" unbind="unsetPersistenceService"/>

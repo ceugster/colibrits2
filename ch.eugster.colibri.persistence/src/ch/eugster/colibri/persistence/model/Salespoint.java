@@ -1,8 +1,6 @@
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -523,32 +521,6 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 		}
 	}
 	
-	public boolean settlementRequired()
-	{
-		if (!this.isForceSettlement())
-		{
-			return false;
-		}
-		if (this.settlement == null)
-		{
-			return false;
-		}
-		if (this.settlement.getReceiptCount() == 0L)
-		{
-			return false;
-		}
-		if (this.settlement.getSettled() != null)
-		{
-			return false;
-		}
-		Calendar today = GregorianCalendar.getInstance();
-		today.set(Calendar.HOUR_OF_DAY, 0);
-		today.set(Calendar.MINUTE, 0);
-		today.set(Calendar.SECOND, 0);
-		today.set(Calendar.MILLISECOND, 0);
-		return this.settlement.getTimestamp().before(today.getTime());
-	}
-
 	public boolean isExport() 
 	{
 		return useIndividualExport ? export : this.commonSettings.isExport();
