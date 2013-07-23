@@ -953,6 +953,8 @@ ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/ILa
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/PaymentAddedMessageArea.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/PositionAddedMessageArea.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/SalespointClosedMessageArea.java -text
+ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/SimpleLayoutAreaType.java -text
+ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/SimpleLayoutType.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/WelcomeMessageArea.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/service/DefaultDisplayService.java -text
 ch.eugster.colibri.display/.classpath -text
