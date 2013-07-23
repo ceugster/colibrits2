@@ -957,6 +957,7 @@ ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/Sim
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/SimpleLayoutType.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/area/WelcomeMessageArea.java -text
 ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/service/DefaultDisplayService.java -text
+ch.eugster.colibri.display.simple/src/ch/eugster/colibri/display/simple/service/SimpleDisplayService.java -text
 ch.eugster.colibri.display/.classpath -text
 ch.eugster.colibri.display/.project -text
 ch.eugster.colibri.display/.settings/org.eclipse.pde.core.prefs -text
