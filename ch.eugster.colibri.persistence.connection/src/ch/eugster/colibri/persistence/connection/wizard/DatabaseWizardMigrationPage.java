@@ -314,6 +314,8 @@ public class DatabaseWizardMigrationPage extends WizardPage
 						if (DatabaseWizardMigrationPage.this.document != null)
 						{
 							Activator.getDefault().log("Verbindung mit der Datenbank herstellen.");
+							File ojbProperties = new File(colibriXML.getParent()+ File.separator + "ojb" + File.separator + "OJB.properties");
+							System.setProperty("OJB.properties", ojbProperties.getAbsolutePath());
 							final PersistenceBroker broker = DatabaseWizardMigrationPage.this.connect();
 							monitor.worked(1);
 							if ((broker != null) && !broker.isClosed())

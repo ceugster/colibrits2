@@ -111,19 +111,15 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 					DisplayService.class, null);
 			this.displayTracker.open();
 
-			final ServiceReference<DisplayService>[] references = this.displayTracker.getServiceReferences();
-			if (references != null)
+			final Object[] services = this.displayTracker.getServices();
+			if (services != null)
 			{
-				for (final ServiceReference<DisplayService> reference : references)
+				for (Object service : services)
 				{
-					final String componentName = (String) reference.getProperty("component.name");
-					if (customerDisplaySettings.getComponentName().equals(componentName))
+					DisplayService displayService = (DisplayService) service;
+					if (displayService.getLayoutType(customerDisplaySettings.getComponentName()) != null)
 					{
-						this.displayService = (DisplayService) this.displayTracker.getService(reference);
-						if (this.displayService != null)
-						{
-							this.displayService.displayWelcomeMessage();
-						}
+						this.displayService = displayService;
 					}
 				}
 			}
@@ -389,7 +385,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 					{
 						if (panel instanceof UserPanel)
 						{
-							this.displayService.displayWelcomeMessage();
+							this.displayService.displayWelcomeMessage(0);
 						}
 						else
 						{
@@ -449,6 +445,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private void selectUserPanel(final User user)
 	{
+		String topics = null;;
 		final Component[] children = this.getComponents();
 		for (final Component component : children)
 		{
@@ -459,16 +456,19 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 				{
 					this.setSelectedComponent(component);
 					userPanel.initFocus();
-					return;
+					topics = "ch/eugster/colibri/client/user/added";
 				}
 			}
 		}
+		if (topics == null)
+		{
+			final UserPanel userPanel = new UserPanel(this, user);
+			userPanel.initFocus();
 
-		final UserPanel userPanel = new UserPanel(this, user);
-		userPanel.initFocus();
-
-		this.add(user.getUsername(), userPanel);
-		this.setSelectedComponent(userPanel);
+			this.add(user.getUsername(), userPanel);
+			this.setSelectedComponent(userPanel);
+			topics = "ch/eugster/colibri/client/user/added";
+		}
 	}
 
 	private void showProviderInterfaceMessage(final boolean failOver)
@@ -481,9 +481,35 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		MessageDialog.showInformation(frame, profile, title, msg, MessageDialog.TYPE_WARN);
 	}
 
-//	public static MainTabbedPane getTabbedPane()
+//	private void sendEvent(String topics)
 //	{
-//		return MainTabbedPane.tabbedPane;
+//		ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+//		try
+//		{
+//			tracker.open();
+//			final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
+//			if (eventAdmin != null)
+//			{
+//				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), topics));
+//			}
+//		}
+//		finally
+//		{
+//			tracker.close();
+//		}
+//	}
+//
+//	private Event getEvent(ServiceReference<EventAdmin> reference, final String topics)
+//	{
+//		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+//		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
+//		properties.put(EventConstants.BUNDLE_ID,
+//				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
+//		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+//		properties.put(EventConstants.SERVICE, reference);
+//		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
+//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+//		return new Event(topics, properties);
 //	}
 
 	public enum State

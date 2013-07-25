@@ -64,6 +64,7 @@ import ch.eugster.colibri.client.ui.events.ShutdownEvent;
 import ch.eugster.colibri.client.ui.events.ShutdownListener;
 import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.persistence.events.EntityMediator;
+import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
@@ -71,6 +72,7 @@ import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.product.Customer;
+import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
@@ -372,8 +374,23 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		this.eventServiceTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(),
 				EventAdmin.class, null);
 		this.eventServiceTracker.open();
+
+		setWindowMode(site);
 	}
 
+	private void setWindowMode(IViewSite site)
+	{
+		PersistenceService service = this.persistenceServiceTracker.getService();
+		if (service != null)
+		{
+			CommonSettingsQuery query = (CommonSettingsQuery) service.getCacheService().getQuery(CommonSettings.class);
+			CommonSettings settings = query.findDefault();
+			if (settings != null)
+			{
+				site.getShell().setMaximized(settings.isMaximizedClientWindow());
+			}
+		}
+	}
 	@Override
 	public void postShutdown(final IWorkbench workbench)
 	{

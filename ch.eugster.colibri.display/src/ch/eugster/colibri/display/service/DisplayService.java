@@ -21,6 +21,8 @@ public interface DisplayService
 
 	void displayWelcomeMessage();
 
+	void displayWelcomeMessage(int delay);
+
 	ComponentContext getContext();
 
 	ILayoutType getLayoutType();

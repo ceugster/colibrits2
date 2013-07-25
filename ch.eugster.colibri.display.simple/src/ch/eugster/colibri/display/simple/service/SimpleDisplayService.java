@@ -59,4 +59,13 @@ public class SimpleDisplayService extends AbstractDisplayService implements Disp
 		return "Layout Kundendisplay bearbeiten";
 	}
 
+	@Override
+	public void displayWelcomeMessage(int delay) 
+	{
+		if (this.getLayoutType() != null)
+		{
+			this.getLayoutType().displayWelcomeMessage(delay);
+		}
+	}
+
 }

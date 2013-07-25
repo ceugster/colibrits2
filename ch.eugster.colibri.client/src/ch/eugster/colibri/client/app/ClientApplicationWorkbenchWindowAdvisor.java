@@ -25,11 +25,11 @@ public class ClientApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 		return new ClientApplicationActionBarAdvisor(configurer);
 	}
 	
-	@Override
-	public void postWindowCreate()
-	{
-		this.getWindowConfigurer().getWindow().getShell().setMaximized(true);
-	}
+//	@Override
+//	public void postWindowCreate()
+//	{
+//		this.getWindowConfigurer().getWindow().getShell().setMaximized(true);
+//	}
 
 	@Override
 	public void postWindowOpen()

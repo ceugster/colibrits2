@@ -34,9 +34,16 @@ public class SimpleLayoutType extends AbstractLayoutType
 	public void displayWelcomeMessage()
 	{
 		final ILayoutAreaType layoutAreaType = this.getLayoutAreaTypes()[SimpleLayoutAreaType.WELCOME_MESSAGE.ordinal()];
+		displayWelcomeMessage(layoutAreaType.getLayoutArea().getTimerDelay());
+	}
+
+	@Override
+	public void displayWelcomeMessage(int delay)
+	{
+		final ILayoutAreaType layoutAreaType = this.getLayoutAreaTypes()[SimpleLayoutAreaType.WELCOME_MESSAGE.ordinal()];
 		final Collection<String> displayText = layoutAreaType.getLayoutArea().prepareDisplay(null);
 		final String text = this.finish(displayText);
-		this.getCustomerDisplayService().displayText(layoutAreaType.getLayoutArea().getTimerDelay(), text);
+		this.getCustomerDisplayService().displayText(delay, text);
 	}
 
 	@Override

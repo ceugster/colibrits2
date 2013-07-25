@@ -32,6 +32,8 @@ public interface ILayoutType
 
 	void displayWelcomeMessage();
 
+	void displayWelcomeMessage(int delay);
+
 	CustomerDisplayService getCustomerDisplayService();
 
 	String getId();

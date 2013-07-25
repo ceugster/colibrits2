@@ -112,32 +112,39 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+		if (isReady())
 		{
-			this.displayWelcomeMessage();
-		}
-		else if (event.getTopic().equals("ch/eugster/colibri/client/salespoint/closed"))
-		{
-			this.displaySalespointClosedMessage();
-		}
-		else if (event.getTopic().equals("ch/eugster/colibri/client/started"))
-		{
-			this.displayWelcomeMessage();
-		}
-		else if (event.getTopic().equals("ch/eugster/colibri/client/add/position"))
-		{
-			if (event.getProperty(IPrintable.class.getName()) instanceof Position)
+			if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
 			{
-				final Position position = (Position) event.getProperty(IPrintable.class.getName());
-				this.displayPositionAddedMessage(position);
+				this.displayWelcomeMessage();
 			}
-		}
-		else if (event.getTopic().equals("ch/eugster/colibri/client/add/payment"))
-		{
-			if (event.getProperty(IPrintable.class.getName()) instanceof Payment)
+			else if (event.getTopic().equals("ch/eugster/colibri/client/salespoint/closed"))
 			{
-				final Payment payment = (Payment) event.getProperty(IPrintable.class.getName());
-				this.displayPaymentAddedMessage(payment);
+				this.displaySalespointClosedMessage();
+			}
+			else if (event.getTopic().equals("ch/eugster/colibri/client/user/added"))
+			{
+				this.displayWelcomeMessage(0);
+			}
+			else if (event.getTopic().equals("ch/eugster/colibri/client/started"))
+			{
+				this.displaySalespointClosedMessage();
+			}
+			else if (event.getTopic().equals("ch/eugster/colibri/client/add/position"))
+			{
+				if (event.getProperty(IPrintable.class.getName()) instanceof Position)
+				{
+					final Position position = (Position) event.getProperty(IPrintable.class.getName());
+					this.displayPositionAddedMessage(position);
+				}
+			}
+			else if (event.getTopic().equals("ch/eugster/colibri/client/add/payment"))
+			{
+				if (event.getProperty(IPrintable.class.getName()) instanceof Payment)
+				{
+					final Payment payment = (Payment) event.getProperty(IPrintable.class.getName());
+					this.displayPaymentAddedMessage(payment);
+				}
 			}
 		}
 	}
@@ -183,6 +190,7 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 		final Collection<String> t = new ArrayList<String>();
 		t.add("ch/eugster/colibri/client/store/receipt");
 		t.add("ch/eugster/colibri/client/salespoint/closed");
+		t.add("ch/eugster/colibri/client/user/added");
 		t.add("ch/eugster/colibri/client/started");
 		t.add("ch/eugster/colibri/client/add/position");
 		t.add("ch/eugster/colibri/client/add/payment");
@@ -267,6 +275,9 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 			{
 				if (this.salespoint.getCustomerDisplaySettings() != null)
 				{
+					/**
+					 * There is a customerDisplay selected for the salespoint
+					 */
 					final DisplayQuery query = (DisplayQuery) service.getQuery(Display.class);
 					final ILayoutType layoutType = this.getLayoutType();
 					if (layoutType != null)
