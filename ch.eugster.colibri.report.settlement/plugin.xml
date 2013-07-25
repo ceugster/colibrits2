@@ -61,7 +61,8 @@
          <view
                id="ch.eugster.colibri.report.settlement.view"
                minimized="false"
-               relationship="stack">
+               relationship="left"
+               relative="org.eclipse.ui.editorss">
          </view>
       </perspectiveExtension>
    </extension>

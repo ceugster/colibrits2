@@ -33,6 +33,7 @@ import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.User;
+import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
 public class PositionQuery extends AbstractQuery<Position>
@@ -708,8 +709,7 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private Collection<Position> selectRestitutedPositionsBySettlement(final Settlement settlement)
 	{
-		Expression expression = new ExpressionBuilder(this.getEntityClass());
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("settlement").equal(settlement);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		expression = expression.and(new ExpressionBuilder().get("quantity").lessThan(0));
@@ -730,8 +730,7 @@ public class PositionQuery extends AbstractQuery<Position>
 			return new ArrayList<Position>();
 		}
 
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
-				.equal(Receipt.State.SAVED);
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
@@ -742,6 +741,12 @@ public class PositionQuery extends AbstractQuery<Position>
 		}
 		expression = expression.and(sps);
 		expression = expression.and(new ExpressionBuilder().get("quantity").lessThan(0));
+
+		Expression restitution = new ExpressionBuilder().get("productGroup").get("productGroupType")
+				.equal(ProductGroupType.SALES_RELATED);
+		restitution = restitution.or(new ExpressionBuilder().get("productGroup").get("productGroupType")
+				.equal(ProductGroupType.NON_SALES_RELATED));
+		expression = expression.and(restitution);
 
 		if (dateRange[0] != null && dateRange[1] != null)
 		{

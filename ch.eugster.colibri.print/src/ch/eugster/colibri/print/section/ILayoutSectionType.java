@@ -15,4 +15,6 @@ public interface ILayoutSectionType
 	int ordinal();
 
 	void setColumnCount(int columns);
+	
+	boolean isCustomerEditable();
 }

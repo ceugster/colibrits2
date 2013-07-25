@@ -81,8 +81,17 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 				final Collection<SettlementDetail> currencyDetails = subSections.get(key);
 				if ((currencyDetails != null) && !currencyDetails.isEmpty())
 				{
-					final SettlementDetail[] details = currencyDetails.toArray(new SettlementDetail[0]);
-					if (details.length > 0)
+					boolean hasEntries = false;
+					for (SettlementDetail detail : currencyDetails)
+					{
+						if (detail.getCredit() != 0D || detail.getDebit() != 0)
+						{
+							hasEntries = true;
+							break;
+						}
+					}
+					SettlementDetail[] details = currencyDetails.toArray(new SettlementDetail[0]);
+					if (hasEntries && details.length > 0)
 					{
 						if (this.hasTitleArea())
 						{

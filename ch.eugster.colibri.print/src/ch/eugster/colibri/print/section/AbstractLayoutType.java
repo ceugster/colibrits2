@@ -105,4 +105,17 @@ public abstract class AbstractLayoutType implements ILayoutType
 		return this.receiptPrinterService;
 	}
 
+	@Override
+	public boolean hasCustomerEditableAreaTypes() 
+	{
+		ILayoutSectionType[] sectionTypes = this.getLayoutSectionTypes();
+		for (ILayoutSectionType sectionType : sectionTypes)
+		{
+			if (sectionType.isCustomerEditable())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }

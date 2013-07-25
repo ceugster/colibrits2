@@ -194,7 +194,7 @@ public class PaymentType extends AbstractEntity implements IReplicationRelevant
 
 	public Collection<Money> getMoneys()
 	{
-		return this.moneys;
+		return getMoneys(false);
 	}
 
 	public Collection<Money> getMoneys(boolean deletedToo)

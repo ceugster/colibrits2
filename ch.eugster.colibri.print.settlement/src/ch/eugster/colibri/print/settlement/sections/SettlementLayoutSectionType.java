@@ -346,6 +346,12 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 	}
 
 	@Override
+	public boolean isCustomerEditable() 
+	{
+		return false;
+	}
+
+	@Override
 	public void setColumnCount(final int columns)
 	{
 		this.columnCount = columns;

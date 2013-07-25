@@ -156,7 +156,7 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 			entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
 
 			amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
-			amount += restitutedPosition.getPosition().getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
+			amount += -restitutedPosition.getPosition().getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
 			entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
 		}
 		return section;

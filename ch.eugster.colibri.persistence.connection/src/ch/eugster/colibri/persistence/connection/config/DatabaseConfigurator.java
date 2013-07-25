@@ -555,8 +555,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 
 					if (paymentType.getCurrency().getCode().equals("CHF"))
 					{
-						final double[] values = new double[] { .01d, .02d, .05d, .1d, .2d, .5d, 1d, 2d, 5d, 10d, 20d,
-								50d, 100d, 200d };
+						final double[] values = new double[] { .05d, .1d, .2d, .5d, 1d, 2d, 5d, 10d, 20d, 50d, 100d, 200d };
 						for (final double value : values)
 						{
 							final Money money = Money.newInstance(paymentType);

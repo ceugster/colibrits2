@@ -190,4 +190,20 @@ public enum ReceiptLayoutSectionType implements ILayoutSectionType
 	{
 		this.columnCount = columns;
 	}
+
+	@Override
+	public boolean isCustomerEditable() 
+	{
+		switch (this)
+		{
+			case FOOTER:
+			{
+				return true;
+			}
+			default:
+			{
+				return false;
+			}
+		}
+	}
 }

@@ -21,4 +21,6 @@ public interface ILayoutType
 	void printDocument(IPrintable printable);
 
 	void testDocument(Printout printout);
+
+	boolean hasCustomerEditableAreaTypes();
 }

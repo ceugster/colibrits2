@@ -1,5 +1,6 @@
 package ch.eugster.colibri.persistence.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -306,7 +307,15 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicati
 
 	public Collection<Stock> getStocks()
 	{
-		return this.stocks;
+		Collection<Stock> stocks = new ArrayList<Stock>();
+		for (Stock stock : this.stocks)
+		{
+			if (!stock.isDeleted())
+			{
+				stocks.add(stock);
+			}
+		}
+		return stocks;
 	}
 
 	public boolean isLocalProviderProperties()

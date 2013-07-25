@@ -6,7 +6,9 @@
  */
 package ch.eugster.colibri.persistence.model.product;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
@@ -315,5 +317,13 @@ public enum ProductGroupType implements IProductGroupType
 		{
 			throw new RuntimeException("Invalid ProductGroupType");
 		}
+	}
+	
+	public static ProductGroupType[] restitutionAffectedProductGroupTypes()
+	{
+		List<ProductGroupType> productGroupTypes = new ArrayList<ProductGroupType>();
+		productGroupTypes.add(ProductGroupType.SALES_RELATED);
+		productGroupTypes.add(ProductGroupType.NON_SALES_RELATED);
+		return productGroupTypes.toArray(new ProductGroupType[0]);
 	}
 }

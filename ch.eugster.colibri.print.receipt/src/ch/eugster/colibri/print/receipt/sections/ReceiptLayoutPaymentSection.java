@@ -28,7 +28,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("AAAAAAAAAAAAAAAAAA WWW FFFFFFFFF LLLLLLLLL");
+		builder = builder.append("AAAAAAAAAAAAA WWW FFFFFFFF KKKKK LLLLLLLLL");
 		return builder.toString();
 	}
 
@@ -37,7 +37,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Total bezahlt      WWW FFFFFFFFF LLLLLLLLL\n");
+		builder = builder.append("Total bezahlt WWW FFFFFFFF KKKKK LLLLLLLLL\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -134,7 +134,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 
 	public enum DetailKey implements IKey
 	{
-		A, F, L, W;
+		A, F, K, L, W;
 
 		@Override
 		public String label()
@@ -145,17 +145,21 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 				{
 					return "Zahlungsart";
 				}
-				case W:
+				case F:
 				{
-					return "Währung";
+					return "Zahlungsbetrag FW";
+				}
+				case K:
+				{
+					return "Kurs";
 				}
 				case L:
 				{
 					return "Zahlungsbetrag LW";
 				}
-				case F:
+				case W:
 				{
-					return "Zahlungsbetrag FW";
+					return "Währung";
 				}
 				default:
 				{
@@ -220,6 +224,19 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 						}
 						return layoutSection.replaceMarker("", marker, false);
 					}
+					case K:
+					{
+						if (!payment.getPaymentType().getCurrency().getId()
+								.equals(payment.getReceipt().getDefaultCurrency().getId()))
+						{
+							ReceiptLayoutPaymentSection.amountFormatter.setMinimumFractionDigits(0);
+							ReceiptLayoutPaymentSection.amountFormatter.setMaximumFractionDigits(3);
+							double quotation = payment.getForeignCurrencyQuotation();
+							final String formattedAmount = ReceiptLayoutPaymentSection.amountFormatter.format(quotation);
+							return layoutSection.replaceMarker(formattedAmount, marker, false);
+						}
+						return layoutSection.replaceMarker("", marker, false);
+					}
 					default:
 					{
 						throw new RuntimeException("invalid key");
@@ -250,7 +267,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 
 	public enum TotalKey implements IKey
 	{
-		F, L, W;
+		F, K, L, W;
 
 		@Override
 		public String label()
@@ -260,6 +277,10 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 				case F:
 				{
 					return "Fremdwährungsbetrag";
+				}
+				case K:
+				{
+					return "Kurs";
 				}
 				case L:
 				{
@@ -299,6 +320,21 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 									.getForeignCurrency().getCurrency().getDefaultFractionDigits());
 							final double amount = receipt.getPaymentAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY);
 							return layoutSection.replaceMarker(ReceiptLayoutPaymentSection.amountFormatter.format(amount),
+									marker, false);
+						}
+					}
+					case K:
+					{
+						if (receipt.getForeignCurrency().getId().equals(receipt.getDefaultCurrency().getId()))
+						{
+							return layoutSection.replaceMarker("", marker, true);
+						}
+						else
+						{
+							ReceiptLayoutPaymentSection.amountFormatter.setMinimumFractionDigits(0);
+							ReceiptLayoutPaymentSection.amountFormatter.setMaximumFractionDigits(6);
+							final double quotation = receipt.getForeignCurrency().getQuotation();
+							return layoutSection.replaceMarker(ReceiptLayoutPaymentSection.amountFormatter.format(quotation),
 									marker, false);
 						}
 					}

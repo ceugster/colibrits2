@@ -151,8 +151,8 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 				final Query query = createQuery(entityManager, expression);
 				try
 				{
-					final Object object = query.getSingleResult();
-					result = (T) object;
+					final List<T> list = query.getResultList();
+					result = list.isEmpty() ? null : list.iterator().next();
 				}
 				catch (final NoResultException e)
 				{
@@ -260,6 +260,7 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 			this.connectionService.resetEntityManager(e);
 		}
 		return result;

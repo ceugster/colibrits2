@@ -90,8 +90,17 @@ public class SettlementLayoutMoneySection extends AbstractLayoutSection
 				final Collection<SettlementMoney> currencyMoneys = subSections.get(key);
 				if ((currencyMoneys != null) && !currencyMoneys.isEmpty())
 				{
+					boolean hasEntries = false;
+					for (SettlementMoney currencyMoney : currencyMoneys)
+					{
+						if (currencyMoney.getQuantity() != 0)
+						{
+							hasEntries = true;
+							break;
+						}
+					}
 					final SettlementMoney[] moneys = currencyMoneys.toArray(new SettlementMoney[0]);
-					if (moneys.length > 0)
+					if (hasEntries && moneys.length > 0)
 					{
 						Arrays.sort(moneys);
 						if (this.hasTitleArea())

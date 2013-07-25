@@ -79,4 +79,5 @@ public class ReceiptLayoutType extends AbstractLayoutType
 //			this.getReceiptPrinterService().cutPaper();
 		}
 	}
+
 }

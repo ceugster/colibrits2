@@ -381,6 +381,10 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 				{
 					return "Mehrwertsteuercode";
 				}
+				case U:
+				{
+					return "Artikel";
+				}
 				case W:
 				{
 					return "Warengruppe";
