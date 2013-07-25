@@ -242,10 +242,10 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	public void storeReceipt()
 	{
-		UIJob job = new UIJob("Storing Receipt...")
+		Job job = new Job("Storing Receipt...")
 		{
 			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) 
+			public IStatus run(IProgressMonitor monitor) 
 			{
 				ReceiptWrapper.this.receipt.setState(Receipt.State.SAVED);
 				ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getSalespoint().getNextReceiptNumber());
@@ -269,7 +269,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				return Status.OK_STATUS;
 			}
 		};
-//		job.setRule(LocalDatabaseRule.getRule());
+		job.setRule(LocalDatabaseRule.getRule());
 		job.setPriority(Job.SHORT);
 		job.schedule();
 	}

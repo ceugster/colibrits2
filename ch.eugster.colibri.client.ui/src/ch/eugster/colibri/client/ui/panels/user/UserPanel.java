@@ -627,6 +627,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		this.addStateChangeListener(this);
 		this.addStateChangeListener(this.valueDisplay);
 
+		this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.POSITION_INPUT));
 		if (this.mainTabbedPane.settlementRequired())
 		{
 			this.fireStateChange(new StateChangeEvent(UserPanel.State.POSITION_INPUT, UserPanel.State.COIN_COUNTER));

@@ -134,8 +134,7 @@ public class EditPrintoutMenu extends ContributionItem
 				if (service instanceof PersistenceService)
 				{
 					final PrintoutQuery query = (PrintoutQuery) service.getServerService().getQuery(Printout.class);
-					Printout printout = query.findTemplate(receiptPrinterService.getReceiptPrinterSettings()
-							.getComponentName(), receiptPrinterService.getReceiptPrinterSettings());
+					Printout printout = query.findTemplate(printService.getLayoutTypeId(), receiptPrinterService.getReceiptPrinterSettings());
 					if (printout == null)
 					{
 						printout = Printout.newInstance(printService.getLayoutType(receiptPrinterService).getId(),

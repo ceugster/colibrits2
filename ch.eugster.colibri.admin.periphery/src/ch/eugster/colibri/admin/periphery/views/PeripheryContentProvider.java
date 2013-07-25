@@ -8,6 +8,7 @@ package ch.eugster.colibri.admin.periphery.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
@@ -16,8 +17,15 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.periphery.Activator;
+import ch.eugster.colibri.display.area.ILayoutType;
+import ch.eugster.colibri.display.service.DisplayService;
+import ch.eugster.colibri.periphery.display.service.CustomerDisplayService;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
+import ch.eugster.colibri.persistence.model.Display;
 import ch.eugster.colibri.persistence.model.Printout;
+import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
+import ch.eugster.colibri.persistence.queries.DisplayQuery;
 import ch.eugster.colibri.persistence.queries.PrintoutQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.print.service.PrintService;
@@ -73,36 +81,74 @@ public class PeripheryContentProvider implements ITreeContentProvider
 		}
 		else if (parent instanceof ServiceReference)
 		{
-			final Collection<Printout> printouts = new ArrayList<Printout>();
-			@SuppressWarnings("unchecked")
-			final ServiceReference<ReceiptPrinterService> receiptPrinterServiceReference = (ServiceReference<ReceiptPrinterService>) parent;
-			final ReceiptPrinterService receiptPrinterService = (ReceiptPrinterService) this.receiptPrinterServiceTracker
-					.getService(receiptPrinterServiceReference);
-			if (receiptPrinterService != null)
+			ServiceReference<?> reference = (ServiceReference<?>) parent;
+			Object service = Activator.getDefault().getBundle().getBundleContext().getService(reference);
+			if (service instanceof CustomerDisplayService)
 			{
-				final ServiceReference<PrintService>[] references = this.printServiceTracker.getServiceReferences();
-				for (final ServiceReference<PrintService> reference : references)
+				CustomerDisplayService customerDisplayService = (CustomerDisplayService) service;
+				PersistenceService persistenceService = persistenceServiceTracker.getService();
+				if (persistenceService != null)
 				{
-					final PrintService printService = (PrintService) this.printServiceTracker.getService(reference);
-					if (printService != null)
+					List<Display> displays = new ArrayList<Display>();
+					DisplayQuery displayQuery = (DisplayQuery) persistenceService.getServerService().getQuery(Display.class);
+					CustomerDisplaySettings settings = customerDisplayService.getCustomerDisplaySettings();
+					try
 					{
-						final PersistenceService service = (PersistenceService) this.persistenceServiceTracker.getService();
-						if (service != null)
+						Collection<ServiceReference<DisplayService>> refs = Activator.getDefault().getBundle().getBundleContext().getServiceReferences(DisplayService.class, null);
+						for (ServiceReference<DisplayService> ref : refs)
 						{
-							final PrintoutQuery query = (PrintoutQuery) service.getServerService().getQuery(Printout.class);
-							Printout printout = query.findTemplate(printService.getLayoutType(receiptPrinterService).getId(),
-									receiptPrinterService.getReceiptPrinterSettings());
-							if (printout == null)
+							DisplayService displayService = Activator.getDefault().getBundle().getBundleContext().getService(ref);
+							ILayoutType layoutType = displayService.getLayoutType(customerDisplayService.getCustomerDisplaySettings().getComponentName());
+							if (layoutType.hasCustomerEditableAreaTypes())
 							{
-								printout = Printout.newInstance(printService.getLayoutType(receiptPrinterService).getId(),
-										receiptPrinterService.getReceiptPrinterSettings());
+								Display display = displayQuery.findTemplate(displayService.getContext().getProperties().get("component.name").toString(), settings);
+								if (display == null)
+								{
+									display = Display.newInstance(displayService.getContext().getProperties().get("component.name").toString(), settings);
+								}
+								displays.add(display);
 							}
-							printouts.add(printout);
 						}
 					}
+					catch (InvalidSyntaxException e)
+					{
+					}
+					return displays.toArray(new Display[0]);
 				}
 			}
-			return new Printout[0];
+			else if (service instanceof ReceiptPrinterService)
+			{
+				ReceiptPrinterService receiptPrinterService = (ReceiptPrinterService) service;
+				PersistenceService persistenceService = persistenceServiceTracker.getService();
+				if (persistenceService != null)
+				{
+					List<Printout> printouts = new ArrayList<Printout>();
+					PrintoutQuery printoutQuery = (PrintoutQuery) persistenceService.getServerService().getQuery(Printout.class);
+					ReceiptPrinterSettings settings = receiptPrinterService.getReceiptPrinterSettings();
+					try
+					{
+						Collection<ServiceReference<PrintService>> refs = Activator.getDefault().getBundle().getBundleContext().getServiceReferences(PrintService.class, null);
+						for (ServiceReference<PrintService> ref : refs)
+						{
+							PrintService printService = Activator.getDefault().getBundle().getBundleContext().getService(ref);
+							ch.eugster.colibri.print.section.ILayoutType layoutType = printService.getLayoutType(receiptPrinterService);
+							if (layoutType.hasCustomerEditableAreaTypes())
+							{
+								Printout printout = printoutQuery.findTemplate(printService.getLayoutTypeId(), settings);
+								if (printout == null)
+								{
+									printout = Printout.newInstance(printService.getLayoutTypeId(), settings);
+								}
+								printouts.add(printout);
+							}
+						}
+					}
+					catch (InvalidSyntaxException e)
+					{
+					}
+					return printouts.toArray(new Printout[0]);
+				}
+			}
 		}
 		return PeripheryGroup.values();
 	}
@@ -131,6 +177,7 @@ public class PeripheryContentProvider implements ITreeContentProvider
 	@Override
 	public boolean hasChildren(final Object parent)
 	{
+		boolean hasChildren = false;
 		if (parent instanceof PeripheryGroup)
 		{
 			final PeripheryGroup peripheryGroup = (PeripheryGroup) parent;
@@ -140,7 +187,7 @@ public class PeripheryContentProvider implements ITreeContentProvider
 						.getServiceReferences(peripheryGroup.getServiceName(), null);
 				if (references instanceof ServiceReference[])
 				{
-					return references.length > 0;
+					hasChildren = references.length > 0;
 				}
 			}
 			catch (final InvalidSyntaxException e)
@@ -148,7 +195,52 @@ public class PeripheryContentProvider implements ITreeContentProvider
 				e.printStackTrace();
 			}
 		}
-		return false;
+		else if (parent instanceof ServiceReference)
+		{
+			ServiceReference<?> reference = (ServiceReference<?>) parent;
+			Object service = Activator.getDefault().getBundle().getBundleContext().getService(reference);
+			if (service instanceof CustomerDisplayService)
+			{
+				CustomerDisplayService customerDisplayService = (CustomerDisplayService) service;
+				try
+				{
+					Collection<ServiceReference<DisplayService>> displayServiceReferences = Activator.getDefault().getBundle().getBundleContext().getServiceReferences(DisplayService.class, null);
+					for (ServiceReference<DisplayService> displayServiceReference : displayServiceReferences)
+					{
+						DisplayService displayService = Activator.getDefault().getBundle().getBundleContext().getService(displayServiceReference);
+						ILayoutType layoutType = displayService.getLayoutType(customerDisplayService);
+						if (layoutType != null && layoutType.hasCustomerEditableAreaTypes())
+						{
+							hasChildren = true;
+						}
+					}
+				}
+				catch(InvalidSyntaxException e)
+				{
+				}
+			}
+			else if (service instanceof ReceiptPrinterService)
+			{
+				ReceiptPrinterService receiptPrinterService = (ReceiptPrinterService) service;
+				try
+				{
+					Collection<ServiceReference<PrintService>> printServiceReferences = Activator.getDefault().getBundle().getBundleContext().getServiceReferences(PrintService.class, null);
+					for (ServiceReference<PrintService> printServiceReference : printServiceReferences)
+					{
+						PrintService printService = Activator.getDefault().getBundle().getBundleContext().getService(printServiceReference);
+						ch.eugster.colibri.print.section.ILayoutType layoutType = printService.getLayoutType(receiptPrinterService);
+						if (layoutType != null && layoutType.hasCustomerEditableAreaTypes())
+						{
+							hasChildren = true;
+						}
+					}
+				}
+				catch(InvalidSyntaxException e)
+				{
+				}
+			}
+		}
+		return hasChildren;
 	}
 
 	@Override

@@ -115,7 +115,12 @@ public class PrintLastReceiptAction extends ConfigurableAction implements Dispos
 	
 	protected boolean getState(StateChangeEvent event)
 	{
-		return this.lastReceipt != null;
+		boolean state = super.getState(event);
+		if (state)
+		{
+			state = this.lastReceipt != null;
+		}
+		return state;
 	}
 
 	@Override

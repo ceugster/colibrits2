@@ -47,9 +47,12 @@ public abstract class AbstractEntityEditorInput<T extends AbstractEntity> implem
 		{
 			final AbstractEntityEditorInput<?> input = (AbstractEntityEditorInput<?>) other;
 			final AbstractEntity otherEntity = (AbstractEntity) input.getAdapter(input.getEntity().getClass());
-			if ((otherEntity.getId() != null) && (this.entity.getId() != null))
+			if (otherEntity.getClass().equals(entity.getClass()))
 			{
-				return otherEntity.getId().equals(this.entity.getId());
+				if ((otherEntity.getId() != null) && (this.entity.getId() != null))
+				{
+					return otherEntity.getId().equals(this.entity.getId());
+				}
 			}
 		}
 		return false;

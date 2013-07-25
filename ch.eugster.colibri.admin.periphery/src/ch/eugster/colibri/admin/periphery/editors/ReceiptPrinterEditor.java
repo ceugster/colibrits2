@@ -60,7 +60,7 @@ import ch.eugster.colibri.persistence.model.Salespoint;
 public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSettings> implements
 		PropertyChangeListener, EventHandler
 {
-	public static final String ID = "ch.eugster.colibri.admin.periphery.printer.editor";
+	public static final String ID = "ch.eugster.colibri.admin.periphery.receipt.printer.editor";
 
 	private Text port;
 

@@ -80,10 +80,10 @@ public class EditDisplayMenu extends ContributionItem
 				if (service instanceof PersistenceService)
 				{
 					final DisplayQuery query = (DisplayQuery) service.getServerService().getQuery(Display.class);
-					Display display = query.findTemplate(customerDisplaySettings.getComponentName(), customerDisplaySettings);
+					Display display = query.findTemplate(displayService.getContext().getProperties().get("component.name").toString(), customerDisplaySettings);
 					if (display == null)
 					{
-						final String displayName = (String) displayService.getContext().getProperties().get("component.name");
+						final String displayName = displayService.getContext().getProperties().get("component.name").toString();
 						display = Display.newInstance(displayName, customerDisplaySettings);
 					}
 					try
@@ -130,7 +130,7 @@ public class EditDisplayMenu extends ContributionItem
 						Display parent = query.findTemplate(displayService.getLayoutType().getId(), customerDisplaySettings);
 						if (parent == null)
 						{
-							parent = Display.newInstance(displayService.getLayoutType().getId(), customerDisplaySettings);
+							parent = Display.newInstance(displayService.getContext().getProperties().get("component.name").toString(), customerDisplaySettings);
 						}
 						display.setParent(parent);
 						parent.addPrintout(display);

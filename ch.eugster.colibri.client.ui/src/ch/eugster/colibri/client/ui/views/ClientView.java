@@ -29,6 +29,7 @@ import javax.swing.event.ChangeListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -542,15 +543,15 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 		EntityMediator.addListener(Salespoint.class, this.mainTabbedPane);
 
-		this.timeInformation = new StatusLineContributionItem("time.information", true, 48);
+		this.timeInformation = new StatusLineContributionItem("time.information", true, 24);
 		this.timeInformation.setText("");
-		this.getViewSite().getActionBars().getStatusLineManager().add(this.timeInformation);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.timeInformation);
 
 		this.customerInformation = new StatusLineContributionItem("customer.information", true, 48);
 		// this.customerInformation = new
 		// StatusLineContributionItem("customer.information", 48);
 		this.customerInformation.setText("Kunde: ");
-		this.getViewSite().getActionBars().getStatusLineManager().add(this.customerInformation);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.customerInformation);
 
 		String count = "?";
 		Image image = null;
@@ -575,7 +576,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				this.providerInformation.setImage(image);
 			}
 		}
-		this.getViewSite().getActionBars().getStatusLineManager().add(this.providerInformation);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.MIDDLE_GROUP, this.providerInformation);
 
 		this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
 		this.transferInformation.setErrorText("");
@@ -594,7 +595,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				this.transferInformation.setImage(image);
 			}
 		}
-		this.getViewSite().getActionBars().getStatusLineManager().add(this.transferInformation);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.MIDDLE_GROUP, this.transferInformation);
 		this.sendEvent("ch/eugster/colibri/client/started");
 		
 		startTimer();

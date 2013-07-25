@@ -32,9 +32,12 @@ public final class FreeCopyAction extends ConfigurableAction implements DisposeL
 	@Override
 	public boolean getState(final StateChangeEvent event)
 	{
-		if (event.getNewState().equals(UserPanel.State.POSITION_INPUT))
+		if (super.getState(event)) 
 		{
-			return true;
+			if (event.getNewState().equals(UserPanel.State.POSITION_INPUT))
+			{
+				return true;
+			}
 		}
 		return false;
 	}

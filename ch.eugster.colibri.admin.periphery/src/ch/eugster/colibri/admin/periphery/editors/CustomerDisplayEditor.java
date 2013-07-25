@@ -51,7 +51,7 @@ import ch.eugster.colibri.persistence.model.Salespoint;
 public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplaySettings> implements
 		PropertyChangeListener
 {
-	public static final String ID = "ch.eugster.colibri.admin.periphery.display.editor";
+	public static final String ID = "ch.eugster.colibri.admin.periphery.customer.display.editor";
 
 	private Text port;
 

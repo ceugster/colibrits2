@@ -57,6 +57,7 @@ ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/handlers
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/views/CurrencyContentProvider.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/views/CurrencySorter.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/views/CurrencyView.java -text
+ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/views/CurrencyViewerFilter.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/CurrencyContentProvider.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/CurrencyLabelProvider.java -text
 ch.eugster.colibri.admin.currency/src/ch/eugster/colibri/admin/currency/wizards/CurrencySorter.java -text
@@ -163,6 +164,7 @@ ch.eugster.colibri.admin.periphery/icons/delete_grey_16.png -text
 ch.eugster.colibri.admin.periphery/icons/display.png -text
 ch.eugster.colibri.admin.periphery/icons/edit_16.png -text
 ch.eugster.colibri.admin.periphery/icons/edit_grey_16.png -text
+ch.eugster.colibri.admin.periphery/icons/layout_16.png -text
 ch.eugster.colibri.admin.periphery/icons/printer.png -text
 ch.eugster.colibri.admin.periphery/icons/props_16x16.png -text
 ch.eugster.colibri.admin.periphery/icons/props_48x48.png -text
@@ -176,6 +178,11 @@ ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/AdminP
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/AsciiConstants.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/CustomerDisplayEditor.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/CustomerDisplayEditorInput.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/DisplayEditor.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/DisplayEditorInput.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/PrintOptionLabelProvider.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/PrintoutEditor.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/PrintoutEditorInput.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/ReceiptPrinterEditor.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/ReceiptPrinterEditorInput.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/handlers/EditPeripheryHandler.java -text

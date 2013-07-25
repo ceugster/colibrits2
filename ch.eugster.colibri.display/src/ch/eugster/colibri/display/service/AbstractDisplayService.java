@@ -105,7 +105,8 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 	@Override
 	public ILayoutType getLayoutType(final String CustomerDisplayComponentName)
 	{
-		return CustomerDisplayComponentName == null ? null : this.layoutTypes.get(CustomerDisplayComponentName);
+		ILayoutType layoutType = this.layoutTypes.get(CustomerDisplayComponentName);
+		return layoutType;
 	}
 
 	@Override

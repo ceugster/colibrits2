@@ -177,11 +177,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		PersistenceService service = persistenceServiceTracker.getService();
 		if (service != null)
 		{
-			ReceiptQuery query = (ReceiptQuery) service.getCacheService().getQuery(Receipt.class);
-			if (query.countTransferables(this.getSalespoint().getSettlement()) == 0L)
-			{
-				return mustSettle(service);
-			}
+			return mustSettle(service);
 		}
 		return false;
 	}

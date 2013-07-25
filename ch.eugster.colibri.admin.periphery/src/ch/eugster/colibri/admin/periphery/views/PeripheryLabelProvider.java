@@ -14,12 +14,22 @@ import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.ServiceReference;
 
 import ch.eugster.colibri.admin.periphery.Activator;
+import ch.eugster.colibri.display.service.DisplayService;
+import ch.eugster.colibri.persistence.model.Display;
 import ch.eugster.colibri.persistence.model.Printout;
+import ch.eugster.colibri.print.service.PrintService;
 
 public class PeripheryLabelProvider extends LabelProvider implements ILabelProvider
 {
 	public static final NumberFormat nf = NumberFormat.getCurrencyInstance();
 
+	private PeripheryView view;
+	
+	public PeripheryLabelProvider(PeripheryView view)
+	{
+		this.view = view;
+	}
+	
 	@Override
 	public Image getImage(final Object element)
 	{
@@ -37,6 +47,14 @@ public class PeripheryLabelProvider extends LabelProvider implements ILabelProvi
 				final PeripheryGroup peripheryGroup = PeripheryGroup.values()[group.intValue()];
 				return Activator.getDefault().getImageRegistry().get(peripheryGroup.image());
 			}
+		}
+		else if (element instanceof Printout)
+		{
+			return Activator.getDefault().getImageRegistry().get("layout");
+		}
+		else if (element instanceof Display)
+		{
+			return Activator.getDefault().getImageRegistry().get("layout");
 		}
 		return null;
 	}
@@ -62,10 +80,14 @@ public class PeripheryLabelProvider extends LabelProvider implements ILabelProvi
 		else if (element instanceof Printout)
 		{
 			final Printout printout = (Printout) element;
-			if (printout.getPrintoutType().equals("ch.eugster.colibri.printing.receipt"))
-			{
-				return "Beleglayout";
-			}
+			PrintService service = view.getPrintService(printout);
+			return service == null ? "" : service.getMenuLabel();
+		}
+		else if (element instanceof Display)
+		{
+			Display display = (Display) element;
+			DisplayService service = view.getDisplayService(display);
+			return service == null ? "" : service.getMenuLabel();
 		}
 		return "";
 	}

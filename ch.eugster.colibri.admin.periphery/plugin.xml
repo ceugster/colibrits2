@@ -119,23 +119,19 @@
       </menuContribution>
       <menuContribution
             locationURI="menu:ch.eugster.colibri.admin.menu.views?after=additions">
-         <menu
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               disabledIcon="icons/usb_grey_16.png"
+               hoverIcon="icons/usb_16.png"
                icon="icons/usb_16.png"
-               label="Peripherie">
-            <command
-                  commandId="org.eclipse.ui.views.showView"
-                  disabledIcon="icons/usb_grey_16.png"
-                  hoverIcon="icons/usb_16.png"
-                  icon="icons/usb_16.png"
-                  label="Peripherie"
-                  style="push"
-                  tooltip="Öffnen der Sicht mit der Peripherie">
-               <parameter
-                     name="org.eclipse.ui.views.showView.viewId"
-                     value="ch.eugster.colibri.admin.periphery.view">
-               </parameter>
-            </command>
-         </menu>
+               label="Peripherie"
+               style="push"
+               tooltip="Öffnen der Sicht mit der Peripherie">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.admin.periphery.view">
+            </parameter>
+         </command>
       </menuContribution>
       <menuContribution
             allPopups="false"
@@ -162,22 +158,36 @@
             class="ch.eugster.colibri.admin.periphery.editors.CustomerDisplayEditor"
             default="false"
             icon="icons/usb_16.png"
-            id="ch.eugster.colibri.admin.periphery.display.editor"
+            id="ch.eugster.colibri.admin.periphery.customer.display.editor"
             name="Kundendisplay">
       </editor>
       <editor
             class="ch.eugster.colibri.admin.periphery.editors.ReceiptPrinterEditor"
             default="false"
             icon="icons/usb_16.png"
-            id="ch.eugster.colibri.admin.periphery.printer.editor"
+            id="ch.eugster.colibri.admin.periphery.receipt.printer.editor"
             name="Belegdrucker">
+      </editor>
+      <editor
+            class="ch.eugster.colibri.admin.periphery.editors.DisplayEditor"
+            default="false"
+            icon="icons/layout_16.png"
+            id="ch.eugster.colibri.admin.periphery.display.layout.editor"
+            name="Display Layout Editor">
+      </editor>
+      <editor
+            class="ch.eugster.colibri.admin.periphery.editors.PrintoutEditor"
+            default="false"
+            icon="icons/layout_16.png"
+            id="ch.eugster.colibri.admin.periphery.printout.layout.editor"
+            name="Print Layout Editor">
       </editor>
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">
       <editorContribution
             id="ch.eugster.colibri.admin.periphery.display.editorContribution"
-            targetID="ch.eugster.colibri.admin.periphery.display.editor">
+            targetID="ch.eugster.colibri.admin.periphery.customer.display.editor">
          <action
                actionID="periphery.reset"
                class="ch.eugster.colibri.admin.ui.menus.ResetEditorActionDelegate"
@@ -201,7 +211,55 @@
       </editorContribution>
       <editorContribution
             id="ch.eugster.colibri.admin.periphery.printer.editorContribution"
-            targetID="ch.eugster.colibri.admin.periphery.printer.editor">
+            targetID="ch.eugster.colibri.admin.periphery.receipt.printer.editor">
+         <action
+               actionID="periphery.reset"
+               class="ch.eugster.colibri.admin.ui.menus.ResetEditorActionDelegate"
+               icon="icons/undo_edit.png"
+               id="periphery.reset"
+               label="Verwerfen"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen verwerfen">
+         </action>
+         <action
+               actionID="periphery.save"
+               class="ch.eugster.colibri.admin.ui.menus.SaveEditorActionDelegate"
+               icon="icons/save_edit.png"
+               id="periphery.save"
+               label="Speichern"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen speichern">
+         </action>
+      </editorContribution>
+      <editorContribution
+            id="ch.eugster.colibri.admin.periphery.display.layout.editorContribution"
+            targetID="ch.eugster.colibri.admin.periphery.display.layout.editor">
+         <action
+               actionID="periphery.reset"
+               class="ch.eugster.colibri.admin.ui.menus.ResetEditorActionDelegate"
+               icon="icons/undo_edit.png"
+               id="periphery.reset"
+               label="Verwerfen"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen verwerfen">
+         </action>
+         <action
+               actionID="periphery.save"
+               class="ch.eugster.colibri.admin.ui.menus.SaveEditorActionDelegate"
+               icon="icons/save_edit.png"
+               id="periphery.save"
+               label="Speichern"
+               style="push"
+               toolbarPath="additions"
+               tooltip="Änderungen speichern">
+         </action>
+      </editorContribution>
+      <editorContribution
+            id="ch.eugster.colibri.admin.periphery.printout.layout.editorContribution"
+            targetID="ch.eugster.colibri.admin.periphery.printout.layout.editor">
          <action
                actionID="periphery.reset"
                class="ch.eugster.colibri.admin.ui.menus.ResetEditorActionDelegate"

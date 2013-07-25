@@ -203,6 +203,8 @@ public class Activator extends AbstractUIPlugin
 				ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/props_16x16.png")));
 		imageRegistry.put(Activator.IMAGE_PROPERTIES,
 				ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/props_16x16.png")));
+		imageRegistry.put("layout",
+				ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/layout_16.png")));
 	}
 
 	/**
