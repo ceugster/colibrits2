@@ -375,7 +375,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 			else if (oldKey.className.equals("ch.eugster.pos.events.StoreReceiptAction"))
 			{
 				newKey.setKeyType(KeyType.FUNCTION);
-				newKey.setFunctionType(FunctionType.FUNCTION_STORE_RECEIPT);
+				newKey.setFunctionType(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION);
 			}
 			else
 			{

@@ -20,7 +20,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "dia_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "dia_deleted")) })
 @Table(name = "colibri_display_area")
-public class DisplayArea extends AbstractEntity implements Comparable<DisplayArea>, IReplicationRelevant
+public class DisplayArea extends AbstractEntity implements Comparable<DisplayArea>, IReplicatable
 {
 	@Id
 	@Column(name = "dia_id")

@@ -135,7 +135,12 @@ public class KeyDropTargetListener implements DropTargetListener
 			final FunctionType functionType = (FunctionType) source;
 			keys[1].setKeyType(KeyType.FUNCTION);
 			keys[1].setFunctionType(functionType);
-			if (functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT) || functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION)
+//			if (functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT) || functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION)
+//					|| functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION))
+//			{
+//				keys[1].setParentId(new Long(1l));
+//			}
+			if (functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION)
 					|| functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION))
 			{
 				keys[1].setParentId(new Long(1l));

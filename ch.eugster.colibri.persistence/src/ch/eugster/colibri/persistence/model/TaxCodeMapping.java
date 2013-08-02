@@ -25,7 +25,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "tcm_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "tcm_deleted")) })
 @Table(name = "colibri_tax_code_mapping")
-public class TaxCodeMapping extends AbstractEntity implements IReplicationRelevant
+public class TaxCodeMapping extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "tcm_id")

@@ -26,10 +26,10 @@ public class ActionResolver
 		{
 			return SelectCustomerAction.class;
 		}
-		else if (functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT))
-		{
-			return StoreReceiptAction.class;
-		}
+//		else if (functionType.equals(FunctionType.FUNCTION_STORE_RECEIPT))
+//		{
+//			return StoreReceiptAction.class;
+//		}
 		else if (functionType.equals(FunctionType.FUNCTION_SHOW_CURRENT_RECEIPT_LIST))
 		{
 			return ShowCurrentReceiptListAction.class;

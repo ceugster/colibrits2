@@ -1,10 +1,30 @@
 package ch.eugster.colibri.persistence.model.key;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum FunctionType
 {
 //	FUNCTION_LOCK, FUNCTION_LOGOUT, FUNCTION_SHUTDOWN, FUNCTION_SELECT_CUSTOMER, FUNCTION_STORE_RECEIPT, FUNCTION_SHOW_CURRENT_RECEIPT_LIST, FUNCTION_SHOW_PARKED_RECEIPT_LIST, FUNCTION_SHOW_COIN_COUNTER_PANEL, FUNCTION_RESTITUTION, FUNCTION_TOTAL_SALES, FUNCTION_SALESPOINT_SALES, FUNCTION_USER_SALES, FUNCTION_OPEN_DRAWER, FUNCTION_STORE_RECEIPT_EXPRESS_ACTION, FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION, FUNCTION_PRINT_LAST_RECEIPT;
-	FUNCTION_LOCK, FUNCTION_LOGOUT, FUNCTION_SHUTDOWN, FUNCTION_SELECT_CUSTOMER, FUNCTION_STORE_RECEIPT, FUNCTION_SHOW_CURRENT_RECEIPT_LIST, FUNCTION_SHOW_PARKED_RECEIPT_LIST, FUNCTION_SHOW_COIN_COUNTER_PANEL, FUNCTION_RESTITUTION, FUNCTION_TOTAL_SALES, FUNCTION_SALESPOINT_SALES, FUNCTION_USER_SALES, FUNCTION_OPEN_DRAWER, FUNCTION_STORE_RECEIPT_EXPRESS_ACTION, FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION, FUNCTION_PRINT_LAST_RECEIPT, FUNCTION_FREE_COPY;
+//	FUNCTION_LOCK, FUNCTION_LOGOUT, FUNCTION_SHUTDOWN, FUNCTION_SELECT_CUSTOMER, FUNCTION_STORE_RECEIPT, FUNCTION_SHOW_CURRENT_RECEIPT_LIST, FUNCTION_SHOW_PARKED_RECEIPT_LIST, FUNCTION_SHOW_COIN_COUNTER_PANEL, FUNCTION_RESTITUTION, FUNCTION_TOTAL_SALES, FUNCTION_SALESPOINT_SALES, FUNCTION_USER_SALES, FUNCTION_OPEN_DRAWER, FUNCTION_STORE_RECEIPT_EXPRESS_ACTION, FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION, FUNCTION_PRINT_LAST_RECEIPT, FUNCTION_FREE_COPY, FUNCTION_REVERSE_RECEIPT;
+	FUNCTION_LOCK, FUNCTION_LOGOUT, FUNCTION_SHUTDOWN, FUNCTION_SELECT_CUSTOMER, FUNCTION_SHOW_CURRENT_RECEIPT_LIST, FUNCTION_SHOW_PARKED_RECEIPT_LIST, FUNCTION_SHOW_COIN_COUNTER_PANEL, FUNCTION_RESTITUTION, FUNCTION_TOTAL_SALES, FUNCTION_SALESPOINT_SALES, FUNCTION_USER_SALES, FUNCTION_OPEN_DRAWER, FUNCTION_STORE_RECEIPT_EXPRESS_ACTION, FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION, FUNCTION_PRINT_LAST_RECEIPT, FUNCTION_FREE_COPY, FUNCTION_REVERSE_RECEIPT;
 
+	/**
+	 * 
+	 * @return functions that can be used in tabs
+	 */
+	public static FunctionType[] assignables()
+	{
+		List<FunctionType> assignables = new ArrayList<FunctionType>();
+		for (FunctionType functionType : FunctionType.values())
+		{
+			if (functionType.isAssignable())
+			{
+				assignables.add(functionType);
+			}
+		}
+		return assignables.toArray(new FunctionType[0]);
+	}
 
 	public boolean isFailOverEnabled()
 	{
@@ -16,6 +36,21 @@ public enum FunctionType
 		switch (this)
 		{
 			case FUNCTION_LOCK:
+			{
+				return false;
+			}
+			default:
+			{
+				return true;
+			}
+		}
+	}
+
+	public boolean isAssignable()
+	{
+		switch (this)
+		{
+			case FUNCTION_REVERSE_RECEIPT:
 			{
 				return false;
 			}
@@ -46,10 +81,10 @@ public enum FunctionType
 			{
 				return "function.customer";
 			}
-			case FUNCTION_STORE_RECEIPT:
-			{
-				return "function.store.receipt";
-			}
+//			case FUNCTION_STORE_RECEIPT:
+//			{
+//				return "function.store.receipt";
+//			}
 			case FUNCTION_SHOW_CURRENT_RECEIPT_LIST:
 			{
 				return "function.show.current.receipt.list";
@@ -98,6 +133,10 @@ public enum FunctionType
 			{
 				return "function.free.copy";
 			}
+			case FUNCTION_REVERSE_RECEIPT:
+			{
+				return "function.reverse.receipt";
+			}
 			default:
 			{
 				throw new RuntimeException("No such action type");
@@ -125,10 +164,10 @@ public enum FunctionType
 			{
 				return "Kunde";
 			}
-			case FUNCTION_STORE_RECEIPT:
-			{
-				return "Beleg speichern";
-			}
+//			case FUNCTION_STORE_RECEIPT:
+//			{
+//				return "Beleg speichern";
+//			}
 			case FUNCTION_SHOW_CURRENT_RECEIPT_LIST:
 			{
 				return "Belegliste";
@@ -147,7 +186,7 @@ public enum FunctionType
 			}
 			case FUNCTION_TOTAL_SALES:
 			{
-				return "Tagesumsatz";
+				return "Umsatz";
 			}
 			case FUNCTION_SALESPOINT_SALES:
 			{
@@ -177,6 +216,10 @@ public enum FunctionType
 			{
 				return "Gratis";
 			}
+			case FUNCTION_REVERSE_RECEIPT:
+			{
+				return "Beleg stornieren";
+			}
 			default:
 			{
 				throw new RuntimeException("No such action type");
@@ -205,10 +248,10 @@ public enum FunctionType
 			{
 				return "Kundenauswahl";
 			}
-			case FUNCTION_STORE_RECEIPT:
-			{
-				return "Beleg speichern";
-			}
+//			case FUNCTION_STORE_RECEIPT:
+//			{
+//				return "Beleg speichern";
+//			}
 			case FUNCTION_SHOW_CURRENT_RECEIPT_LIST:
 			{
 				return "Belegliste zeigen";
@@ -256,6 +299,10 @@ public enum FunctionType
 			case FUNCTION_FREE_COPY:
 			{
 				return "Gratis";
+			}
+			case FUNCTION_REVERSE_RECEIPT:
+			{
+				return "Beleg stornieren";
 			}
 			default:
 			{

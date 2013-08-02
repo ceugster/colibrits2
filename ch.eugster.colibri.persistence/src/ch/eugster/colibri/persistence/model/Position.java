@@ -470,6 +470,7 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 					if (this.getOption().equals(option))
 					{
 						found = true;
+						break;
 					}
 				}
 				if (!found)

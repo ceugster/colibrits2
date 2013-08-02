@@ -36,7 +36,7 @@ import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 		@AttributeOverride(name = "update", column = @Column(name = "pt_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "pt_deleted")) })
 @Table(name = "colibri_payment_type")
-public class PaymentType extends AbstractEntity implements IReplicationRelevant
+public class PaymentType extends AbstractEntity implements IReplicatable
 {
 	public static final Long CASH_ID = new Long(1l);
 

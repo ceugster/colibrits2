@@ -21,7 +21,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "version", column = @Column(name = "scd_version")),
 		@AttributeOverride(name = "update", column = @Column(name = "scd_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "scd_deleted")) })
-public class SalespointCustomerDisplaySettings extends AbstractEntity implements IReplicationRelevant
+public class SalespointCustomerDisplaySettings extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "scd_id")

@@ -36,7 +36,7 @@ import javax.persistence.Transient;
 		@AttributeOverride(name = "update", column = @Column(name = "tx_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "tx_deleted")) })
 @Table(name = "colibri_tax")
-public class Tax extends AbstractEntity implements IReplicationRelevant
+public class Tax extends AbstractEntity implements IReplicatable
 {
 	@Transient
 	private static NumberFormat percentFormatter;

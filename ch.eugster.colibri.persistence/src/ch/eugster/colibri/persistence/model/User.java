@@ -28,7 +28,7 @@ import org.eclipse.persistence.annotations.Convert;
 		@AttributeOverride(name = "update", column = @Column(name = "us_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "us_deleted")) })
 @Table(name = "colibri_user")
-public class User extends AbstractEntity implements IReplicationRelevant
+public class User extends AbstractEntity implements IReplicatable
 {
 	@Transient
 	public static final String POS_LOGIN_PATTERN = "#######0";

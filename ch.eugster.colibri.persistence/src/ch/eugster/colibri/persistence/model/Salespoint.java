@@ -32,7 +32,7 @@ import org.eclipse.persistence.annotations.Convert;
 		@AttributeOverride(name = "update", column = @Column(name = "sp_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "sp_deleted")) })
 @Table(name = "colibri_salespoint")
-public class Salespoint extends AbstractEntity implements IAdaptable, IReplicationRelevant
+public class Salespoint extends AbstractEntity implements IAdaptable, IReplicatable
 {
 	@Id
 	@Column(name = "sp_id")

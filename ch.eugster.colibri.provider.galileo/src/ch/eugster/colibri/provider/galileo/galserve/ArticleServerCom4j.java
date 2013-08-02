@@ -58,10 +58,6 @@ public class ArticleServerCom4j implements IArticleServer
 
 	private boolean keepConnection;
 
-	private String bibwinPath;
-
-	private boolean searchCd;
-
 	private boolean open;
 
 	private ServiceTracker<LogService, LogService> logServiceTracker;
@@ -73,34 +69,6 @@ public class ArticleServerCom4j implements IArticleServer
 	public ArticleServerCom4j()
 	{
 		this.status = Status.OK_STATUS;
-	}
-
-	@Override
-	public IStatus deleteOrdered(final Position position)
-	{
-		if (position.isOrdered())
-		{
-			if (this.open())
-			{
-				LogService log = (LogService) this.logServiceTracker.getService();
-				if (log != null)
-				{
-					log.log(LogService.LOG_INFO, "Sende Nachricht an Warenbewirtschaftung: Lösche Artikel mit Bestellnummer " + position.getOrder() + ".");
-				}
-				if (!this.galserve.do_delabholfach(position.getOrder(), position.getQuantity()))
-				{
-					this.status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Die Bestellung " + position.getOrder()
-							+ " konnte nicht gelöscht werden.");
-				}
-				if (log != null)
-				{
-					log.log(LogService.LOG_INFO, "Bestätigung aus Warenbewirtschaftung: " + (status.getSeverity() == IStatus.OK ? " Artikel gelöscht." : "Artikel konnte nicht gelöscht werden."));
-				}
-				this.close();
-			}
-		}
-
-		return this.status;
 	}
 
 	@Override
@@ -161,50 +129,6 @@ public class ArticleServerCom4j implements IArticleServer
 		}
 		
 		return this.status;
-	}
-
-	@Override
-	public String getBibIniPath() throws Exception
-	{
-		final StringBuilder bibini = new StringBuilder("");
-
-		if (this.open())
-		{
-			bibini.append(this.galserve.cbibini().toString());
-	
-			this.close();
-		}
-		
-		return bibini.toString();
-	}
-
-	@Override
-	public Customer selectCustomer(final Barcode barcode) throws Exception
-	{
-		Customer customer = null;
-
-		if (this.open())
-		{
-			final LogService logService = (LogService) this.logServiceTracker.getService();
-
-			final int customerId = this.getCustomerId(barcode);
-			if (logService != null)
-			{
-				logService.log(LogService.LOG_INFO, "Suche Kunden " + customerId + ".");
-			}
-			if (this.galserve.do_getkunde(customerId))
-			{
-				customer = this.getCustomer(customerId);
-			}
-			if (logService != null)
-			{
-				logService.log(LogService.LOG_INFO, (customer == null ? "Kunden " + customerId + " nicht gefunden." : "Kunden gefunden."));
-			}
-	
-			this.close();
-		}
-		
-		return customer;
 	}
 
 	@Override
@@ -874,18 +798,6 @@ public class ArticleServerCom4j implements IArticleServer
 		}
 	}
 
-	private void setProduct(boolean ebook, Barcode barcode, Position position)
-	{
-		if (ebook)
-		{
-			setEbookProduct(barcode, position);
-		}
-		else
-		{
-			setProduct(barcode, position);
-		}
-	}
-
 	private void setEbookProduct(final Barcode barcode, final Position position)
 	{
 		Product product = Product.newInstance(position);
@@ -1061,7 +973,7 @@ public class ArticleServerCom4j implements IArticleServer
 		return status;
 	}
 
-	private IStatus start()
+	public IStatus start()
 	{
 		this.status = new Status(IStatus.OK, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
 
@@ -1109,16 +1021,12 @@ public class ArticleServerCom4j implements IArticleServer
 
 				this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
 				this.keepConnection = Boolean.parseBoolean(properties.get(Property.KEEP_CONNECTION.key()).getValue());
-				this.bibwinPath = properties.get(Property.BIBWIN_PATH.key()).getValue();
-				this.searchCd = Boolean.parseBoolean(properties.get(Property.SEARCH_CD.key()).getValue());
 			}
 		}
 
 		try
 		{
 			this.galserve = ClassFactory.creategdserve();
-			this.galserve.cbibini(this.bibwinPath);
-			this.galserve.lcdsuche(this.searchCd);
 		}
 		catch (ComException e)
 		{

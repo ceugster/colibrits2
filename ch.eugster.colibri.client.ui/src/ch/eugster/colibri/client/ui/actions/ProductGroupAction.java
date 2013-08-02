@@ -47,7 +47,6 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": " + this.getText() + " action performed.");
 		if (this.setExternalProductGroup(this.getProductGroup()))
 		{
 			if (this.userPanel.getValueDisplay().testAmount() != 0d)

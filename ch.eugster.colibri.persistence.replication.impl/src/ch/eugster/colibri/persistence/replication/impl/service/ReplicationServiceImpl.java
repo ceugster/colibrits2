@@ -98,10 +98,6 @@ public class ReplicationServiceImpl implements ReplicationService
 
 								new CurrencyReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new PaymentTypeReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new MoneyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new RoleReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
@@ -153,6 +149,11 @@ public class ReplicationServiceImpl implements ReplicationService
 
 								new CommonSettingsReplicator(ReplicationServiceImpl.this.persistenceService)
 										.update(new SubProgressMonitor(monitor, 1));
+
+								new PaymentTypeReplicator(ReplicationServiceImpl.this.persistenceService)
+								.replicate(new SubProgressMonitor(monitor, 1), force);
+								new MoneyReplicator(ReplicationServiceImpl.this.persistenceService)
+								.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new SalespointReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);

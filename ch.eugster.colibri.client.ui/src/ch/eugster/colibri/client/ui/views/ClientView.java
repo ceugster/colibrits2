@@ -440,6 +440,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	public void updateProviderMessage(final Event event)
 	{
+		ProviderInterface provider = providerServiceTracker.getService();
+		if (provider == null || !provider.isConnect())
+		{
+			return;
+		}
+
 		final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
 		{
 			@Override
@@ -582,7 +588,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		if (persistenceService != null)
 		{
 			ProviderInterface provider = (ProviderInterface) this.providerServiceTracker.getService();
-			if (provider != null)
+			if (provider == null || !provider.isConnect())
+			{
+				this.providerInformation.setText("");
+				this.providerInformation.setImage(null);
+			}
+			else
 			{
 				final PositionQuery query = (PositionQuery) persistenceService.getCacheService().getQuery(
 						Position.class);

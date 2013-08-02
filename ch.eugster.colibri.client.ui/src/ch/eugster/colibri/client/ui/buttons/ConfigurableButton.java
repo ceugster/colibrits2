@@ -261,10 +261,10 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 			{
 				return SelectCustomerAction.class;
 			}
-			case FUNCTION_STORE_RECEIPT:
-			{
-				return StoreReceiptAction.class;
-			}
+//			case FUNCTION_STORE_RECEIPT:
+//			{
+//				return StoreReceiptAction.class;
+//			}
 			case FUNCTION_SHOW_CURRENT_RECEIPT_LIST:
 			{
 				return ShowCurrentReceiptListAction.class;

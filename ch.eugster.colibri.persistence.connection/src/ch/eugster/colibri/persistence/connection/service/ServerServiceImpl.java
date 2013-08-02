@@ -20,7 +20,7 @@ import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
 import ch.eugster.colibri.persistence.connection.dialog.LoginDialog;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Entity;
-import ch.eugster.colibri.persistence.model.IReplicationRelevant;
+import ch.eugster.colibri.persistence.model.IReplicatable;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.AbstractQuery;
@@ -169,7 +169,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	@Override
 	protected void updateReplicationValue(Entity entity) 
 	{
-		if (IReplicationRelevant.class.isInstance(entity))
+		if (IReplicatable.class.isInstance(entity))
 		{
 			VersionQuery query = (VersionQuery) this.getQuery(Version.class);
 			Version version = query.findDefault();

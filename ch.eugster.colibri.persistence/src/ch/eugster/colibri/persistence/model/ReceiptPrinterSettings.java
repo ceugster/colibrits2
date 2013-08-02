@@ -23,7 +23,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "version", column = @Column(name = "rp_version")),
 		@AttributeOverride(name = "update", column = @Column(name = "rp_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "rp_deleted")) })
-public class ReceiptPrinterSettings extends AbstractEntity implements IReplicationRelevant
+public class ReceiptPrinterSettings extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "rp_id")

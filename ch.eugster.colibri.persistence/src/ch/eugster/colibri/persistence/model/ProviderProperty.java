@@ -27,7 +27,7 @@ import javax.persistence.TableGenerator;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "pp_type", discriminatorType = DiscriminatorType.STRING, length = 100)
 @DiscriminatorValue("provider_property")
-public class ProviderProperty extends AbstractEntity implements IReplicationRelevant
+public class ProviderProperty extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "pp_id")

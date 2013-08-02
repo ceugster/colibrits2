@@ -152,7 +152,7 @@ public class GalileoConfiguration implements ProviderConfiguration
 
 	public enum Property implements IProperty
 	{
-		DATABASE_PATH, BIBWIN_PATH, KEEP_CONNECTION, SEARCH_CD;
+		DATABASE_PATH, CONNECT, KEEP_CONNECTION;
 
 		public static Map<String, IProperty> asMap()
 		{
@@ -171,19 +171,11 @@ public class GalileoConfiguration implements ProviderConfiguration
 			{
 				return FileDialog.class.getName();
 			}
-			else if (this.equals(BIBWIN_PATH))
-			{
-				return FileDialog.class.getName();
-			}
 			else if (this.equals(KEEP_CONNECTION))
 			{
 				return Button.class.getName();
 			}
-			else if (this.equals(SEARCH_CD))
-			{
-				return Button.class.getName();
-			}
-			else if (this.equals(SEARCH_CD))
+			else if (this.equals(CONNECT))
 			{
 				return Button.class.getName();
 			}
@@ -200,15 +192,11 @@ public class GalileoConfiguration implements ProviderConfiguration
 			{
 				return new String[] { "galidata.dbc", "*.dbc" };
 			}
-			else if (this.equals(BIBWIN_PATH))
-			{
-				return new String[] { "bibwin.ini", "*.ini" };
-			}
 			else if (this.equals(KEEP_CONNECTION))
 			{
 				return null;
 			}
-			else if (this.equals(SEARCH_CD))
+			else if (this.equals(CONNECT))
 			{
 				return null;
 			}
@@ -225,17 +213,13 @@ public class GalileoConfiguration implements ProviderConfiguration
 			{
 				return "galileo.database.path";
 			}
-			else if (this.equals(BIBWIN_PATH))
-			{
-				return "galileo.bibwin.path";
-			}
 			else if (this.equals(KEEP_CONNECTION))
 			{
 				return "galileo.keep.connection";
 			}
-			else if (this.equals(SEARCH_CD))
+			else if (this.equals(CONNECT))
 			{
-				return "galileo.search.cd";
+				return "galileo.connect";
 			}
 			else
 			{
@@ -250,17 +234,13 @@ public class GalileoConfiguration implements ProviderConfiguration
 			{
 				return "Datenbankpfad";
 			}
-			else if (this.equals(BIBWIN_PATH))
-			{
-				return "Pfad zur Datei bibwin.ini";
-			}
 			else if (this.equals(KEEP_CONNECTION))
 			{
 				return "Verbindung aufrechterhalten";
 			}
-			else if (this.equals(SEARCH_CD))
+			else if (this.equals(CONNECT))
 			{
-				return "CD durchsuchen";
+				return "Verbindung verwenden";
 			}
 			else
 			{
@@ -275,15 +255,11 @@ public class GalileoConfiguration implements ProviderConfiguration
 			{
 				return "C:/Comeliv/Galileo/Data/Galidata.dbc";
 			}
-			else if (this.equals(BIBWIN_PATH))
-			{
-				return "C:/Dokumente und Einstellungen/All Users/Anwendungsdaten/bibwin/bibwin.ini";
-			}
 			else if (this.equals(KEEP_CONNECTION))
 			{
 				return Boolean.toString(false);
 			}
-			else if (this.equals(SEARCH_CD))
+			else if (this.equals(CONNECT))
 			{
 				return Boolean.toString(true);
 			}

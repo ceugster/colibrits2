@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
@@ -61,6 +62,11 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 				}
 			}
 		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			e.printStackTrace();
+		}
 		finally
 		{
 			if (monitor != null)
@@ -82,6 +88,11 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 	protected PaymentType replicate(final PaymentType source, PaymentType target)
 	{
 		final Currency currency = (Currency) this.persistenceService.getCacheService().find(Currency.class, source.getCurrency().getId());
+		ProductGroup productGroup = null;
+		if (source.getProductGroup() != null)
+		{
+			productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getProductGroup().getId());
+		}
 
 		target = super.replicate(source, target);
 		target.setAccount(source.getAccount());
@@ -93,7 +104,7 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 		target.setOpenCashdrawer(source.isOpenCashdrawer());
 		target.setPaymentTypeGroup(source.getPaymentTypeGroup());
 		target.setUndeletable(source.isUndeletable());
-		target.setProductGroup(source.getProductGroup());
+		target.setProductGroup(productGroup);
 		target.setPercentualCharge(source.getPercentualCharge());
 		target.setFixCharge(source.getFixCharge());
 		target.setChargeType(source.getChargeType());

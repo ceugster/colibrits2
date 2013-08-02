@@ -26,7 +26,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "epg_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "epg_deleted")) })
 @Table(name = "colibri_external_product_group")
-public class ExternalProductGroup extends AbstractEntity implements IReplicationRelevant
+public class ExternalProductGroup extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "epg_id")

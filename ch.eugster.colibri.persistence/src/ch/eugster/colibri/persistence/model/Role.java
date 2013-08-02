@@ -24,7 +24,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "ro_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "ro_deleted")) })
 @Table(name = "colibri_role")
-public class Role extends AbstractEntity implements IReplicationRelevant
+public class Role extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "ro_id")

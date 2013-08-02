@@ -297,10 +297,10 @@ public class TabEditorButton extends HTMLButton
 			{
 				return SelectCustomerPopupMenu.class;
 			}
-			case FUNCTION_STORE_RECEIPT:
-			{
-				return StoreReceiptPopupMenu.class;
-			}
+//			case FUNCTION_STORE_RECEIPT:
+//			{
+//				return StoreReceiptPopupMenu.class;
+//			}
 			case FUNCTION_SHOW_CURRENT_RECEIPT_LIST:
 			{
 				return NameablePopupMenu.class;

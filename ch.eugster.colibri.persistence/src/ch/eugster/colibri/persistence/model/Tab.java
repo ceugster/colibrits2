@@ -32,7 +32,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "tab_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "tab_deleted")) })
 @Table(name = "colibri_tab")
-public class Tab extends AbstractEntity implements Comparable<Tab>, IReplicationRelevant
+public class Tab extends AbstractEntity implements Comparable<Tab>, IReplicatable
 {
 	@Id
 	@Column(name = "tab_id")

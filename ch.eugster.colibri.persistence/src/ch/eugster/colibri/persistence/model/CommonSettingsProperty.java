@@ -19,7 +19,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "csp_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "csp_deleted")) })
 @Table(name = "colibri_common_settings_property")
-public class CommonSettingsProperty extends AbstractEntity implements IReplicationRelevant
+public class CommonSettingsProperty extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "csp_id")

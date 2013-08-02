@@ -26,7 +26,7 @@ import javax.persistence.Transient;
 		@AttributeOverride(name = "update", column = @Column(name = "mo_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "mo_deleted")) })
 @Table(name = "colibri_money")
-public class Money extends AbstractEntity implements Comparable<Money>, IReplicationRelevant
+public class Money extends AbstractEntity implements Comparable<Money>, IReplicatable
 {
 	@Id
 	@Column(name = "mo_id")

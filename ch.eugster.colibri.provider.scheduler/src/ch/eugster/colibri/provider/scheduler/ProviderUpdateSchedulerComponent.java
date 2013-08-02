@@ -71,25 +71,31 @@ public class ProviderUpdateSchedulerComponent implements ProviderUpdateScheduler
 	{
 		this.context = componentContext;
 		
-		ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
-		Map<String, String> defaults = new HashMap<String, String>();
-		for (SchedulerProperty property : SchedulerProperty.values())
+		if (providerInterface.isConnect())
 		{
-			defaults.put(property.key(), property.value());
+			ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
+			Map<String, String> defaults = new HashMap<String, String>();
+			for (SchedulerProperty property : SchedulerProperty.values())
+			{
+				defaults.put(property.key(), property.value());
+			}
+			Map<String, ProviderProperty> properties = query.selectByProviderAsMap(providerInterface.getProviderId(), defaults);
+			this.providerUpdateJob = new ProviderUpdateJob(this.providerInterface.getName() + " wird aktualisiert...", properties);
+//			this.providerUpdateJob.setSystem(true);
+			this.providerUpdateJob.setRule(LocalDatabaseRule.getRule());
+			this.providerUpdateJob.setPriority(Job.LONG);
+			this.providerUpdateJob.schedule(this.providerUpdateJob.getDelay());
 		}
-		Map<String, ProviderProperty> properties = query.selectByProviderAsMap(providerInterface.getProviderId(), defaults);
-		this.providerUpdateJob = new ProviderUpdateJob(this.providerInterface.getName() + " wird aktualisiert...", properties);
-//		this.providerUpdateJob.setSystem(true);
-		this.providerUpdateJob.setRule(LocalDatabaseRule.getRule());
-		this.providerUpdateJob.setPriority(Job.LONG);
-		this.providerUpdateJob.schedule(this.providerUpdateJob.getDelay());
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
 	{
-		this.providerUpdateJob.stop();
-		this.providerUpdateJob.cancel();
-		this.context = null;
+		if (providerInterface.isConnect())
+		{
+			this.providerUpdateJob.stop();
+			this.providerUpdateJob.cancel();
+			this.context = null;
+		}
 	}
 
 	private class ProviderUpdateJob extends Job
@@ -163,7 +169,8 @@ public class ProviderUpdateSchedulerComponent implements ProviderUpdateScheduler
 						if (status.getException() != null)
 						{
 							properties.put(EventConstants.EXCEPTION, status.getException());
-							properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage());
+							String msg = status.getException().getMessage();
+							properties.put(EventConstants.EXCEPTION_MESSAGE, msg == null ? "" : msg);
 						}
 						properties.put("status", status);
 						ProviderInterface.Topic topic = null;

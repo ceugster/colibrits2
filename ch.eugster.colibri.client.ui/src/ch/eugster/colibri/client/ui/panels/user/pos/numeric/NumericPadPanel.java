@@ -10,6 +10,8 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -26,18 +28,28 @@ import ch.eugster.colibri.client.ui.actions.EnterAction;
 import ch.eugster.colibri.client.ui.actions.NumericPadAction;
 import ch.eugster.colibri.client.ui.buttons.EnterButton;
 import ch.eugster.colibri.client.ui.buttons.NumericPadButton;
+import ch.eugster.colibri.client.ui.events.PositionChangeEvent;
+import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
+import ch.eugster.colibri.client.ui.panels.user.PositionWrapper;
+import ch.eugster.colibri.client.ui.panels.user.ReceiptWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.model.CurrentTax;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
+import ch.eugster.colibri.persistence.model.Position.Option;
 
 /**
  * 
  * @author ceugster
  */
-public class NumericPadPanel extends JPanel
+public class NumericPadPanel extends JPanel implements PropertyChangeListener
 {
 	public static final long serialVersionUID = 0l;
 
 	public static final String ID = "ch.eugster.colibri.ui.user.swing.number.pad.panel";
+
+	private static final String[] positionProperties = new String[] 
+			{ PositionWrapper.KEY_POSITION }; 
 
 	private final Collection<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
@@ -47,11 +59,11 @@ public class NumericPadPanel extends JPanel
 
 	private NumericPadButton enter;
 
+	private JLabel displayLabel;
+	
 	private final ValueDisplay display;
 
 	private final UserPanel userPanel;
-
-	public static final String LABEL_TEXT = "Eingabe";
 
 	public static final String PROPERTY_VALUE_KEY = "value";
 
@@ -78,6 +90,8 @@ public class NumericPadPanel extends JPanel
 	public static final String TEXT_00 = "00";
 
 	public static final String TEXT_DOT = ".";
+
+	private PositionChangeMediator positionChangeMediator;
 
 	public NumericPadPanel(final UserPanel userPanel, final ValueDisplay display, final Profile profile)
 	{
@@ -146,18 +160,18 @@ public class NumericPadPanel extends JPanel
 		/*
 		 * Display Area
 		 */
-		final JLabel label = new JLabel(NumericPadPanel.LABEL_TEXT);
-		label.setFont(label.getFont().deriveFont(profile.getNameLabelFontStyle(), profile.getNameLabelFontSize()));
-		label.setOpaque(true);
-		label.setForeground(new java.awt.Color(profile.getNameLabelFg()));
-		label.setBackground(new java.awt.Color(profile.getNameLabelBg()));
-		label.setBorder(new EmptyBorder(2, 2, 2, 2));
+		displayLabel = new JLabel("WG / Barcode");
+		displayLabel.setFont(displayLabel.getFont().deriveFont(profile.getNameLabelFontStyle(), profile.getNameLabelFontSize()));
+		displayLabel.setOpaque(true);
+		displayLabel.setForeground(new java.awt.Color(profile.getNameLabelFg()));
+		displayLabel.setBackground(new java.awt.Color(profile.getNameLabelBg()));
+		displayLabel.setBorder(new EmptyBorder(2, 2, 2, 2));
 
 		this.configureDisplay(profile, SwingConstants.LEADING, "");
 
 		final JPanel displayArea = new JPanel();
 		displayArea.setLayout(new BorderLayout());
-		displayArea.add(label, BorderLayout.WEST);
+		displayArea.add(displayLabel, BorderLayout.WEST);
 		displayArea.add(this.display, BorderLayout.CENTER);
 
 		this.add(displayArea, BorderLayout.NORTH);
@@ -232,5 +246,41 @@ public class NumericPadPanel extends JPanel
 		cifferArea.add(bottomRightArea);
 
 		this.add(cifferArea, BorderLayout.CENTER);
+		
+		this.userPanel.getPositionWrapper().addPropertyChangeListener(this);
+		this.positionChangeMediator = new PositionChangeMediator(userPanel, this, NumericPadPanel.positionProperties);
 	}
+
+	@Override
+	public void propertyChange(final PropertyChangeEvent event)
+	{
+		if (event.getSource() instanceof Position)
+		{
+			Position position = (Position) event.getSource();
+			if (position.getProductGroup() == null)
+			{
+				this.displayLabel.setText("WG / Barcode");
+			}
+			else if (position.getQuantity() == 0)
+			{
+				this.displayLabel.setText("Menge");
+			}
+			else if (position.getPrice() == 0D)
+			{
+				this.displayLabel.setText("Preis");
+			}
+			else if (position.getCurrentTax() == null)
+			{
+				this.displayLabel.setText("MWST");
+			}
+		}
+		else if (event.getSource() instanceof PositionChangeMediator)
+		{
+			if (event.getNewValue() instanceof Position)
+			{
+				this.displayLabel.setText("WG / Barcode");
+			}
+		}
+	}
+
 }

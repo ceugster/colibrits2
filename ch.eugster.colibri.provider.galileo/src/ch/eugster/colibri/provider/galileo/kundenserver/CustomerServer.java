@@ -35,6 +35,8 @@ public class CustomerServer
 
 	private boolean keepConnection;
 
+	private boolean connect;
+	
 	private boolean open;
 
 	private IStatus status;
@@ -44,6 +46,11 @@ public class CustomerServer
 	public IStatus selectCustomer(final Position position)
 	{
 		return selectCustomer(position, null);
+	}
+	
+	public boolean isConnect()
+	{
+		return connect;
 	}
 
 	public IStatus selectCustomer(final Position position, final ProductGroup productGroup)
@@ -157,6 +164,7 @@ public class CustomerServer
 
 				this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
 				this.keepConnection = Boolean.parseBoolean(properties.get(Property.KEEP_CONNECTION.key()).getValue());
+				this.connect = Boolean.parseBoolean(properties.get(Property.CONNECT.key()).getValue());
 			}
 		}
 	}

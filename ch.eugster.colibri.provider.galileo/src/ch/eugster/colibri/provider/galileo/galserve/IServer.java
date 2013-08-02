@@ -6,7 +6,15 @@
  */
 package ch.eugster.colibri.provider.galileo.galserve;
 
+import org.eclipse.core.runtime.IStatus;
+
 public interface IServer
 {
 	public static final String PROPERTY_DATA_PATH = "CDATAPATH";
+
+	IStatus checkConnection(String path);
+
+	IStatus start();
+	
+	void stop();
 }

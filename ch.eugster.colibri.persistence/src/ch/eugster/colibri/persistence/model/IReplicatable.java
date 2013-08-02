@@ -1,5 +1,5 @@
 package ch.eugster.colibri.persistence.model;
 
-public interface IReplicationRelevant {
+public interface IReplicatable {
 
 }

@@ -1306,7 +1306,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Display.
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DisplayArea.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Entity.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ExternalProductGroup.java -text
-ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/IReplicationRelevant.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/IReplicatable.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Key.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Money.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Payment.java -text
@@ -1548,9 +1548,14 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/conf
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/AbstractServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/ArticleServerCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/ClassFactory.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/FindArticleServerCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IArticleServer.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IFindArticleServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IServer.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IUpdateProviderServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/Igdserve.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/UpdateProviderServer.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/UpdateProviderServerCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/package.html -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/AddGalileoTaxCodes.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/ImportProductGroupHandler.java -text

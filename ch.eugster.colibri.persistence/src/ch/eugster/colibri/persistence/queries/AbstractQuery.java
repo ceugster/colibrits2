@@ -152,6 +152,7 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 				try
 				{
 					final List<T> list = query.getResultList();
+					
 					result = list.isEmpty() ? null : list.iterator().next();
 				}
 				catch (final NoResultException e)

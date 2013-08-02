@@ -31,7 +31,7 @@ import ch.eugster.colibri.persistence.model.key.KeyType;
 		@AttributeOverride(name = "update", column = @Column(name = "key_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "key_deleted")) })
 @Table(name = "colibri_key")
-public class Key extends AbstractEntity implements Comparable<Key>, IReplicationRelevant
+public class Key extends AbstractEntity implements Comparable<Key>, IReplicatable
 {
 	@Transient
 	public PaymentType paymentType;

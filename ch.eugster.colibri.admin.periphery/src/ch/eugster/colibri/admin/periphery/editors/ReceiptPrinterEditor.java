@@ -6,8 +6,11 @@
  */
 package ch.eugster.colibri.admin.periphery.editors;
 
+import java.awt.Toolkit;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -42,8 +45,10 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -76,6 +81,8 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 
 	private ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> receiptPrinterTracker;
 
+	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
+
 	public ReceiptPrinterEditor()
 	{
 	}
@@ -86,6 +93,7 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		EntityMediator.removeListener(ReceiptPrinterSettings.class, this);
 		this.eventAdminTracker.close();
 		this.receiptPrinterTracker.close();
+		this.eventHandlerServiceRegistration.unregister();
 		super.dispose();
 	}
 
@@ -106,6 +114,7 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 				@Override
 				public IStatus runInUIThread(final IProgressMonitor monitor)
 				{
+					Toolkit.getDefaultToolkit().beep();
 					final MessageDialog dialog = new MessageDialog(ReceiptPrinterEditor.this.getSite().getShell(),
 							"Drucker nicht bereit", null, "Der Drucker kann nicht angesprochen werden.",
 							MessageDialog.INFORMATION, new String[] { "OK" }, 0);
@@ -132,6 +141,11 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		this.receiptPrinterTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(),
 				ReceiptPrinterService.class, null);
 		this.receiptPrinterTracker.open();
+
+		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.EVENT_TOPIC, ReceiptPrinterService.EVENT_ADMIN_TOPIC_ERROR);
+		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
+				.registerService(EventHandler.class, this, properties);
 	}
 
 	@Override
@@ -498,8 +512,7 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 				final ServiceReference<ReceiptPrinterService> reference = input.getServiceReference();
 				if (reference != null)
 				{
-					final ReceiptPrinterService service = Activator.getDefault().getBundle().getBundleContext().getService(reference);
-					final ReceiptPrinterService printer = (ReceiptPrinterService) service;
+					final ReceiptPrinterService printer = Activator.getDefault().getBundle().getBundleContext().getService(reference);
 					printer.testPrint(ReceiptPrinterEditor.this.port.getText(), ReceiptPrinterEditor.this.converter.getText(), test.getText(), linesBeforeCut.getSelection());
 				}
 			}

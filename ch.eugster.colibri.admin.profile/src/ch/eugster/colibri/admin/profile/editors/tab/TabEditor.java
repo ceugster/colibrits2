@@ -512,9 +512,9 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 				else if (key.getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION))
 				{
 				}
-				else if (key.getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT))
-				{
-				}
+//				else if (key.getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT))
+//				{
+//				}
 			}
 			else if (key.getKeyType().equals(KeyType.OPTION))
 			{
@@ -981,16 +981,16 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 									return msg;
 								}
 							}
-							else if (keys[1].getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT))
-							{
-								if (keys[1].getParentId() == null)
-								{
-									msg = new Message(this.name, "Fehler");
-									msg.setMessage("Für die Taste " + FunctionType.FUNCTION_STORE_RECEIPT.toCode()
-											+ " muss die Wechselgeldwährung festgelegt werden.");
-									return msg;
-								}
-							}
+//							else if (keys[1].getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT))
+//							{
+//								if (keys[1].getParentId() == null)
+//								{
+//									msg = new Message(this.name, "Fehler");
+//									msg.setMessage("Für die Taste " + FunctionType.FUNCTION_STORE_RECEIPT.toCode()
+//											+ " muss die Wechselgeldwährung festgelegt werden.");
+//									return msg;
+//								}
+//							}
 							else if (keys[1].getFunctionType().equals(FunctionType.FUNCTION_SELECT_CUSTOMER))
 							{
 								if (keys[1].getParentId() == null)

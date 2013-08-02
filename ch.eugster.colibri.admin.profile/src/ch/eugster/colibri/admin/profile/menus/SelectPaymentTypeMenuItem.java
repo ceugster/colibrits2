@@ -88,7 +88,7 @@ public class SelectPaymentTypeMenuItem extends MenuItem implements ActionListene
 							paymentType = dialog.getSelection();
 							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setParentId(paymentType.getId());
 							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setDeleted(false);
-							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setLabel(FunctionType.FUNCTION_STORE_RECEIPT.toCode() + "<br>"
+							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setLabel(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION.toCode() + "<br>"
 									+ paymentType.getCode() + " " + paymentType.getCurrency().getCode());
 							SelectPaymentTypeMenuItem.this.button.update(SelectPaymentTypeMenuItem.this.editor.getFailOverState());
 						}

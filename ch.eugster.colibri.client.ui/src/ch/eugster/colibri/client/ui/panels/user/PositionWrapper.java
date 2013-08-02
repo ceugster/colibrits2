@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.osgi.service.log.LogService;
@@ -84,8 +85,10 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private KeyListener keyListener;
 
-	private final Collection<PositionChangeListener> positionChangeListeners = new ArrayList<PositionChangeListener>();
+	private final List<PositionChangeListener> positionChangeListeners = new ArrayList<PositionChangeListener>();
 
+	private final List<PropertyChangeListener> propertyChangeListeners = new ArrayList<PropertyChangeListener>();
+	
 	private final String[] propertyNames = new String[] { ReceiptWrapper.KEY_PROPERTY_POSITIONS };
 
 	private Position position;
@@ -102,8 +105,6 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private final ValueDisplay valueDisplay;
 
-//	private boolean freeCopy;
-	
 	public PositionWrapper(final UserPanel userPanel, final ValueDisplay valueDisplay)
 	{
 		this.valueDisplay = valueDisplay;
@@ -151,11 +152,21 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		}
 	}
 
+	public void addPropertyChangeListener(final PropertyChangeListener listener)
+	{
+		if (listener != null)
+		{
+			if (!this.propertyChangeListeners.contains(listener))
+			{
+				this.propertyChangeListeners.add(listener);
+			}
+		}
+	}
+
 	public void clearPosition()
 	{
 		final Position newPosition = Position.reinitialize(this.position);
-		this.firePositionChangeEvent(new PositionChangeEvent(this.position, newPosition));
-		this.position = newPosition;
+		replacePosition(newPosition);
 	}
 
 	@Override
@@ -236,10 +247,10 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				return false;
 			}
 		}
-//		if (this.position.getPrice() == 0d)
-//		{
-//			return this.freeCopy;
-//		}
+		if (this.position.getPrice() == 0d)
+		{
+			return false;
+		}
 		if (this.position.getQuantity() == 0)
 		{
 			return false;
@@ -370,11 +381,9 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				newPosition.setBookProvider(providerIdService.getConfiguration().updateLocalItems());
 			}
 		}
-		this.firePositionChangeEvent(new PositionChangeEvent(this.position, newPosition));
-		this.position = newPosition;
-		return this.position;
+		return replacePosition(newPosition);
 	}
-
+	
 	@Override
 	public void propertyChange(final PropertyChangeEvent event)
 	{
@@ -383,6 +392,14 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			if (event.getPropertyName().equals(ReceiptWrapper.KEY_PROPERTY_POSITIONS))
 			{
 				this.preparePosition((Receipt) event.getSource());
+			}
+		}
+		else if (event.getSource() instanceof Position)
+		{
+			PropertyChangeListener[] listeners = this.propertyChangeListeners.toArray(new PropertyChangeListener[0]);
+			for (PropertyChangeListener listener : listeners)
+			{
+				listener.propertyChange(event);
 			}
 		}
 	}
@@ -398,10 +415,30 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		}
 	}
 
+	public void removePropertyChangeListener(final PropertyChangeListener listener)
+	{
+		if (listener != null)
+		{
+			if (this.propertyChangeListeners.contains(listener))
+			{
+				this.propertyChangeListeners.remove(listener);
+			}
+		}
+	}
+
 	public Position replacePosition(final Position position)
 	{
 		this.firePositionChangeEvent(new PositionChangeEvent(this.position, position));
+		if (this.position != null)
+		{
+			this.position.removePropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP, this);
+			this.position.removePropertyChangeListener(PositionWrapper.KEY_PROPERTY_QUANTITY, this);
+			this.position.removePropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRICE, this);
+		}
 		this.position = position;
+		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP, this);
+		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_QUANTITY, this);
+		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRICE, this);
 		return this.position;
 	}
 
@@ -413,7 +450,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	private void findAndRead(final Barcode barcode)
 	{
 		final ProviderInterface providerInterface = (ProviderInterface) this.providerInterfaceTracker.getService();
-		if (providerInterface != null)
+		if (providerInterface != null && providerInterface.isConnect())
 		{
 			final IStatus status = providerInterface.findAndRead(barcode, this.position);
 			if (status.getSeverity() == IStatus.CANCEL)

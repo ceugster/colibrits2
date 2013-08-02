@@ -31,9 +31,11 @@ public interface ProviderInterface extends ProviderService
 
 	IStatus checkTaxCodes(PersistenceService service);
 	
+	boolean isConnect();
+	
 	enum Topic
 	{
-		ARTICLE_UPDATE, CUSTOMER_UPDATE, PROVIDER_TAX_NOT_SPECIFIED, PROVIDER_FAILOVER;
+		ARTICLE_UPDATE, CUSTOMER_UPDATE, PROVIDER_TAX_NOT_SPECIFIED, PROVIDER_FAILOVER, PROVIDER_UPDATE_ERROR;
 
 		public static String[] topics()
 		{
@@ -65,6 +67,10 @@ public interface ProviderInterface extends ProviderService
 			{
 				return "ch/eugster/colibri/provider/failover";
 			}
+			case PROVIDER_UPDATE_ERROR:
+			{
+				return "ch/eugster/colibri/provider/update/error";
+			}
 			default:
 			{
 				return "";
@@ -92,6 +98,10 @@ public interface ProviderInterface extends ProviderService
 			{
 				return "Keine Verbindung.";
 			}
+			case PROVIDER_UPDATE_ERROR:
+			{
+				return "Beim Aktualisieren der Daten für die Warenbewirtschaftung ist ein Fehler aufgetreten.";
+			}
 			default:
 			{
 				return "";
@@ -116,6 +126,10 @@ public interface ProviderInterface extends ProviderService
 				return "error";
 			}
 			case PROVIDER_FAILOVER:
+			{
+				return "error";
+			}
+			case PROVIDER_UPDATE_ERROR:
 			{
 				return "error";
 			}

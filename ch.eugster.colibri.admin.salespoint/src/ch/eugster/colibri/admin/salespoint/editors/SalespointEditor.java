@@ -571,14 +571,28 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 			else
 			{
 				final ReceiptPrinterSettings selectedPrinter = (ReceiptPrinterSettings) ssel.getFirstElement();
-				SalespointReceiptPrinterSettings currentPrinterSettings = salespoint.getReceiptPrinterSettings();
-				currentPrinterSettings = SalespointReceiptPrinterSettings.newInstance(selectedPrinter, salespoint);
-				currentPrinterSettings.setDeleted(selectedPrinter.getId() == null ? true : false);
-				currentPrinterSettings.setCols(this.receiptPrinterCols.getSelection());
-				currentPrinterSettings.setConverter(this.receiptPrinterConverter.getText().isEmpty() ? null : this.receiptPrinterConverter.getText());
-				currentPrinterSettings.setLinesBeforeCut(this.receiptPrinterLinesBeforeCut.getSelection());
-				currentPrinterSettings.setPort(this.receiptPrinterPort.getText().isEmpty() ? null : receiptPrinterPort.getText());
-				salespoint.setReceiptPrinterSettings(currentPrinterSettings);
+				if (selectedPrinter.getId() == null)
+				{
+					final SalespointReceiptPrinterSettings salespointPrinter = salespoint.getReceiptPrinterSettings();
+					if (salespointPrinter instanceof SalespointReceiptPrinterSettings)
+					{
+						salespointPrinter.setDeleted(true);
+					}
+				}
+				else
+				{
+					SalespointReceiptPrinterSettings currentPrinterSettings = salespoint.getReceiptPrinterSettings();
+					if (currentPrinterSettings == null)
+					{
+						currentPrinterSettings = SalespointReceiptPrinterSettings.newInstance(selectedPrinter, salespoint);
+					}
+					currentPrinterSettings.setDeleted(selectedPrinter.getId() == null ? true : false);
+					currentPrinterSettings.setCols(this.receiptPrinterCols.getSelection());
+					currentPrinterSettings.setConverter(this.receiptPrinterConverter.getText().isEmpty() ? null : this.receiptPrinterConverter.getText());
+					currentPrinterSettings.setLinesBeforeCut(this.receiptPrinterLinesBeforeCut.getSelection());
+					currentPrinterSettings.setPort(this.receiptPrinterPort.getText().isEmpty() ? null : receiptPrinterPort.getText());
+					salespoint.setReceiptPrinterSettings(currentPrinterSettings);
+				}
 			}
 		}
 

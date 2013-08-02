@@ -30,7 +30,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "tr_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "tr_deleted")) })
 @Table(name = "colibri_tax_rate")
-public class TaxRate extends AbstractEntity implements IReplicationRelevant
+public class TaxRate extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "tr_id")

@@ -31,7 +31,7 @@ import org.eclipse.persistence.annotations.Convert;
 		@AttributeOverride(name = "update", column = @Column(name = "pr_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "pr_deleted")) })
 @Table(name = "colibri_profile")
-public class Profile extends AbstractEntity implements IReplicationRelevant
+public class Profile extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "pr_id")

@@ -23,7 +23,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "version", column = @Column(name = "cd_version")),
 		@AttributeOverride(name = "update", column = @Column(name = "cd_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "cd_deleted")) })
-public class CustomerDisplaySettings extends AbstractEntity implements IReplicationRelevant
+public class CustomerDisplaySettings extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "cd_id")

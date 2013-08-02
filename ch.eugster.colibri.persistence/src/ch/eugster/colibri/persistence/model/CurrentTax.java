@@ -35,7 +35,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "ct_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "ct_deleted")) })
 @Table(name = "colibri_current_tax")
-public class CurrentTax extends AbstractEntity implements IReplicationRelevant
+public class CurrentTax extends AbstractEntity implements IReplicatable
 {
 	private static NumberFormat nf = NumberFormat.getPercentInstance();
 

@@ -524,6 +524,10 @@ public abstract class AbstractConnectionService implements ConnectionService
 //					closeEntityManager(entityManager);
 				}
 			}
+			if (tx.isActive())
+			{
+				System.out.println();
+			}
 		}
 		return entity;
 	}

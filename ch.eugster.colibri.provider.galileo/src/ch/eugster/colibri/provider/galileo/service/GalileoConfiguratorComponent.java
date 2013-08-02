@@ -45,6 +45,8 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 {
 	private String database;
 
+	private boolean connect;
+	
 	private boolean open;
 
 	private Iwgserve wgserve;
@@ -120,6 +122,11 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	{
 		return this.configuration.getProviderId();
 	}
+	
+	public boolean isConnect()
+	{
+		return connect;
+	}
 
 	private IStatus importExternalProductGroups(final IProgressMonitor monitor, IStatus status)
 	{
@@ -155,6 +162,8 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	@Override
 	public IStatus importProductGroups(final IProgressMonitor monitor)
 	{
+		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+				"Die Warengruppen wurden erfolgreich importiert.");
 		if (this.persistenceService == null)
 		{
 			return new Status(
@@ -164,13 +173,14 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		else
 		{
-			IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID,
-					"Die Warengruppen wurden erfolgreich importiert.");
 			status = GalileoConfiguratorComponent.this.start(status);
-			status = GalileoConfiguratorComponent.this.importExternalProductGroups(monitor, status);
-			status = GalileoConfiguratorComponent.this.stop(status);
-			return status;
+			if (status.getSeverity() == IStatus.OK && this.isConnect())
+			{
+				status = GalileoConfiguratorComponent.this.importExternalProductGroups(monitor, status);
+				status = GalileoConfiguratorComponent.this.stop(status);
+			}
 		}
+		return status;
 	}
 
 	public IStatus start(IStatus status)
@@ -198,6 +208,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 				this.configuration.getProviderId(), this.configuration.getDefaultPropertiesAsMap());
 
 		this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
+		this.connect = Boolean.getBoolean(properties.get(Property.CONNECT.key()).getValue());
 
 		try
 		{
@@ -256,6 +267,8 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	@Override
 	public IStatus synchronizeProductGroups(final IProgressMonitor monitor)
 	{
+		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+				"Die Warengruppen wurden erfolgreich synchronisiert.");
 		if (this.persistenceService == null)
 		{
 			return new Status(
@@ -265,13 +278,14 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		else
 		{
-			IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID,
-					"Die Warengruppen wurden erfolgreich synchronisiert.");
 			status = GalileoConfiguratorComponent.this.start(status);
-			status = GalileoConfiguratorComponent.this.synchronizeExternalProductGroups(monitor, status);
-			status = GalileoConfiguratorComponent.this.stop(status);
-			return status;
+			if (status.getSeverity() == IStatus.OK && this.isConnect())
+			{
+				status = GalileoConfiguratorComponent.this.synchronizeExternalProductGroups(monitor, status);
+				status = GalileoConfiguratorComponent.this.stop(status);
+			}
 		}
+		return status;
 	}
 
 	protected void activate(final ComponentContext componentContext)
@@ -334,10 +348,11 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 					{
 						if (!mapping.isDeleted())
 						{
-							productGroup.addProductGroupMapping(productGroupMapping);
-							this.notMapped = false;
+							mapping.setDeleted(true);
 						}
 					}
+					productGroup.addProductGroupMapping(productGroupMapping);
+					this.notMapped = false;
 				}
 			}
 			else

@@ -158,9 +158,9 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 				else if (key.getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION))
 				{
 				}
-				else if (key.getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT))
-				{
-				}
+//				else if (key.getFunctionType().equals(FunctionType.FUNCTION_STORE_RECEIPT))
+//				{
+//				}
 			}
 			else if (key.getKeyType().equals(KeyType.OPTION))
 			{

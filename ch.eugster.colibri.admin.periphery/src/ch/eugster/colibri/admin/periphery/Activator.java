@@ -113,19 +113,13 @@ public class Activator extends AbstractUIPlugin
 				ReceiptPrinterSettings periphery = query.findByComponentName(componentName);
 				if (periphery == null)
 				{
-					final ServiceReference<ReceiptPrinterService> receiptPrinterReference = Activator.getDefault().getBundle().getBundleContext()
-					.getServiceReference(ReceiptPrinterService.class);
-					if (receiptPrinterReference != null)
+					final ReceiptPrinterService receiptPrinterService = (ReceiptPrinterService) Activator.getDefault().getBundle()
+					.getBundleContext().getService(reference);
+					if (receiptPrinterService != null)
 					{
-						final ReceiptPrinterService receiptPrinterService = (ReceiptPrinterService) Activator.getDefault().getBundle()
-						.getBundleContext().getService(receiptPrinterReference);
-						if (receiptPrinterService != null)
-						{
-							periphery = receiptPrinterService.createReceiptPrinterSettings();
-							periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);
-						}
+						periphery = receiptPrinterService.createReceiptPrinterSettings();
+						periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);
 					}
-					periphery = ReceiptPrinterSettings.newInstance();
 				}
 				try
 				{

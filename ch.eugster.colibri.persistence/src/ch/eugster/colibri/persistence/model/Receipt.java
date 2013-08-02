@@ -32,6 +32,7 @@ import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.Customer;
+import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 
 @Entity
 @AttributeOverrides({ @AttributeOverride(name = "timestamp", column = @Column(name = "re_timestamp")),
@@ -230,6 +231,19 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return this.positions;
 	}
 
+	public Collection<Position> getRestituted()
+	{
+		Collection<Position> restituted = new ArrayList<Position>();
+		for (Position position : this.getPositions())
+		{
+			if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.SALES) && position.getQuantity() < 0)
+			{
+				restituted.add(position);
+			}
+		}
+		return restituted;
+	}
+	
 	public long getBookkeepingTransaction()
 	{
 		return this.bookkeepingTransaction;

@@ -143,8 +143,11 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			{
 				this.openPrinter(deviceName);
 			}
-			printer.print(printable + "\n");
-			this.cutPaper(feed);
+			if (printer != null)
+			{
+				printer.print(printable + "\n");
+				this.cutPaper(feed);
+			}
 		} 
 		finally
 		{

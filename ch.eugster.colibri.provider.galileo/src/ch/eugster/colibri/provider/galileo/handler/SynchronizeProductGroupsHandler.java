@@ -31,11 +31,11 @@ public class SynchronizeProductGroupsHandler extends AbstractHandler implements 
 				ProviderConfigurator.class, null);
 		try
 		{
+			final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			tracker.open();
 			final ProviderConfigurator configurator = (ProviderConfigurator) tracker.getService();
 			if (configurator == null)
 			{
-				final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 				final String msg = "Die Warengruppen können nicht synchronisiert werden. Der Dienst für das Synchronisieren der Warengruppen mit der Warenbewirtschaftung ist zur Zeit nicht verfügbar.";
 				final String title = "Dienst nicht verfügbar";
 				final String[] buttons = new String[] { "OK" };
@@ -45,53 +45,60 @@ public class SynchronizeProductGroupsHandler extends AbstractHandler implements 
 			}
 			else
 			{
-				final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-				final String msg = "Sollen die Warengruppen mit der Warenbewirtschaftung '" + configurator.getName()
-						+ "' synchronisiert werden?";
-				final String title = "Warengruppen synchronisieren";
-				final String[] buttons = new String[] { "Ja", "Nein" };
-				final MessageDialog dialog = new MessageDialog(shell, title, null, msg, MessageDialog.QUESTION, buttons, 0);
-				if (dialog.open() == 0)
+				if (configurator.isConnect())
 				{
-					final Job importJob = new Job("Warengruppen synchronisieren")
+					final String msg = "Sollen die Warengruppen mit der Warenbewirtschaftung '" + configurator.getName()
+							+ "' synchronisiert werden?";
+					final String title = "Warengruppen synchronisieren";
+					final String[] buttons = new String[] { "Ja", "Nein" };
+					final MessageDialog dialog = new MessageDialog(shell, title, null, msg, MessageDialog.QUESTION, buttons, 0);
+					if (dialog.open() == 0)
 					{
-						@Override
-						protected IStatus run(final IProgressMonitor monitor)
+						final Job importJob = new Job("Warengruppen synchronisieren")
 						{
-							return configurator.synchronizeProductGroups(monitor);
-						}
-					};
-					importJob.addJobChangeListener(new JobChangeAdapter()
-					{
-						@Override
-						public void done(final IJobChangeEvent event)
-						{
-							final IStatus status = event.getResult();
-							if (status != null)
+							@Override
+							protected IStatus run(final IProgressMonitor monitor)
 							{
-								final UIJob uiJob = new UIJob("send message")
-								{
-									@Override
-									public IStatus runInUIThread(final IProgressMonitor monitor)
-									{
-										final String title = "Synchronisation abgeschlossen";
-										if (status.getSeverity() == IStatus.ERROR)
-										{
-											ErrorDialog.openError(shell, title,
-													"Beim Synchronisieren ist ein Fehler aufgetreten.", status);
-										}
-										else
-										{
-											MessageDialog.openInformation(shell, title, status.getMessage());
-										}
-										return Status.OK_STATUS;
-									}
-								};
-								uiJob.schedule();
+								return configurator.synchronizeProductGroups(monitor);
 							}
-						}
-					});
-					importJob.schedule();
+						};
+						importJob.addJobChangeListener(new JobChangeAdapter()
+						{
+							@Override
+							public void done(final IJobChangeEvent event)
+							{
+								final IStatus status = event.getResult();
+								if (status != null)
+								{
+									final UIJob uiJob = new UIJob("send message")
+									{
+										@Override
+										public IStatus runInUIThread(final IProgressMonitor monitor)
+										{
+											final String title = "Synchronisation abgeschlossen";
+											if (status.getSeverity() == IStatus.ERROR)
+											{
+												ErrorDialog.openError(shell, title,
+														"Beim Synchronisieren ist ein Fehler aufgetreten.", status);
+											}
+											else
+											{
+												MessageDialog.openInformation(shell, title, status.getMessage());
+											}
+											return Status.OK_STATUS;
+										}
+									};
+									uiJob.schedule();
+								}
+							}
+						});
+						importJob.schedule();
+					}
+				}
+				else
+				{
+					MessageDialog dialog = new MessageDialog(shell, "Verbindung inaktiv", null, "Die Verbindung zu " + configurator.getName() + " ist deaktiviert.", MessageDialog.INFORMATION, new String[] { "OK" }, 0);
+					dialog.open();
 				}
 			}
 		}
@@ -111,7 +118,7 @@ public class SynchronizeProductGroupsHandler extends AbstractHandler implements 
 		{
 			tracker.open();
 			final ProviderConfigurator configurator = (ProviderConfigurator) tracker.getService();
-			this.setBaseEnabled(configurator != null);
+			this.setBaseEnabled(configurator != null && configurator.isConnect());
 		}
 		finally
 		{

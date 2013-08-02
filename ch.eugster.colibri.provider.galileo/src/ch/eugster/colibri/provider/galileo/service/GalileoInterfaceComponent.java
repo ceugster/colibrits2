@@ -27,8 +27,10 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
-import ch.eugster.colibri.provider.galileo.galserve.ArticleServerCom4j;
-import ch.eugster.colibri.provider.galileo.galserve.IArticleServer;
+import ch.eugster.colibri.provider.galileo.galserve.FindArticleServerCom4j;
+import ch.eugster.colibri.provider.galileo.galserve.IFindArticleServer;
+import ch.eugster.colibri.provider.galileo.galserve.IUpdateProviderServer;
+import ch.eugster.colibri.provider.galileo.galserve.UpdateProviderServerCom4j;
 import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
 import ch.eugster.colibri.provider.galileo.service.GalileoConfiguratorComponent.GalileoTaxCode;
 import ch.eugster.colibri.provider.service.ProviderInterface;
@@ -43,7 +45,11 @@ public class GalileoInterfaceComponent implements ProviderInterface
 
 	private GalileoConfiguration configuration;
 
-	private IArticleServer articleServer;
+//	private IArticleServer articleServer;
+
+	private IFindArticleServer findArticleServer;
+
+	private IUpdateProviderServer updateProviderServer;
 
 	private CustomerServer customerServer;
 
@@ -67,24 +73,27 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	{
 		return this.configuration.canMap(tax);
 	}
+	
+	public boolean isConnect()
+	{
+		return this.getFindArticleServer().isConnect();
+	}
 
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
-		if (this.logService != null)
+		IStatus status = Status.OK_STATUS;
+		if (getFindArticleServer().isConnect())
 		{
-			this.logService.log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
-		}
-		final IStatus status = this.getArticleServer().findAndRead(barcode, position);
-		if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
-		{
-			if (this.logService != null)
+			log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
+			status = this.getFindArticleServer().findAndRead(barcode, position);
+			if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
 			{
-				this.logService.log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
-			}
-			if (this.eventAdmin != null)
-			{
-				this.eventAdmin.sendEvent(this.getEvent(status));
+				log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
+				if (this.eventAdmin != null)
+				{
+					this.eventAdmin.sendEvent(this.getEvent(status));
+				}
 			}
 		}
 		return status;
@@ -117,24 +126,21 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	@Override
 	public IStatus selectCustomer(final Position position, ProductGroup productGroup)
 	{
-		if (this.logService != null)
-		{
-			this.logService.log(LogService.LOG_INFO, "Starte Kundensuche...");
-		}
 		IStatus status = Status.OK_STATUS;
-		try
+		if (this.getCustomerServer().isConnect())
 		{
-			status = this.getCustomerServer().selectCustomer(position, productGroup);
-		}
-		finally
-		{
-			if (this.logService != null)
+			log(LogService.LOG_INFO, "Starte Kundensuche...");
+			try
 			{
-				this.logService.log(LogService.LOG_INFO, position.getReceipt().getCustomer() == null ? "Kundensuche abgebrochen." : "Kunden ausgewählt: " + position.getReceipt().getCustomerCode() + " - " + position.getReceipt().getCustomer().getFullname() + ".");
+				status = this.getCustomerServer().selectCustomer(position, productGroup);
 			}
-			if (this.eventAdmin != null)
+			finally
 			{
-				this.eventAdmin.sendEvent(this.getEvent(status));
+				log(LogService.LOG_INFO, position.getReceipt().getCustomer() == null ? "Kundensuche abgebrochen." : "Kunden ausgewählt: " + position.getReceipt().getCustomerCode() + " - " + position.getReceipt().getCustomer().getFullname() + ".");
+				if (this.eventAdmin != null)
+				{
+					this.eventAdmin.sendEvent(this.getEvent(status));
+				}
 			}
 		}
 		return status;
@@ -143,63 +149,74 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	@Override
 	public IStatus updateProvider(final Position position)
 	{
-		if (this.logService != null)
+		IStatus status = Status.OK_STATUS;
+		if (getUpdateProviderServer().isConnect())
 		{
-			this.logService.log(LogService.LOG_INFO, "Aktualisiere Warenbewirtschaftung...");
-		}
-		/*
-		 * First check if position state is valid (e.g. if
-		 * Position.searchValue() is a barcode Position.Product must exist
-		 */
-		IStatus status = this.checkPosition(position);
-		if (status.getSeverity() == IStatus.OK)
-		{
-			status = this.getArticleServer().updateProvider(position);
-		}
-		if (this.logService != null)
-		{
-			this.logService.log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
-		}
-		if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
-		{
-			if (this.eventAdmin != null)
+			log(LogService.LOG_INFO, "Aktualisiere Warenbewirtschaftung...");
+			/*
+			 * First check if position state is valid (e.g. if
+			 * Position.searchValue() is a barcode Position.Product must exist
+			 */
+			status = this.checkPosition(position);
+			if (status.getSeverity() == IStatus.OK)
 			{
-				this.eventAdmin.sendEvent(this.getEvent(status));
+				status = this.getUpdateProviderServer().updateProvider(position);
+			}
+			log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
+			if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
+			{
+				if (this.eventAdmin != null)
+				{
+					this.eventAdmin.sendEvent(this.getEvent(status));
+				}
 			}
 		}
 		return status;
 	}
 
+	private void log(int severity, String msg)
+	{
+		if (this.logService != null)
+		{
+			this.logService.log(severity, msg);
+		}
+	}
+	
 	@Override
 	public IStatus checkConnection(Map<String, IProperty> properties)
 	{
-		IProperty property = properties.get(GalileoConfiguration.Property.DATABASE_PATH.key());
-		return this.getArticleServer().checkConnection(property.value());
+		IStatus status = Status.OK_STATUS;
+		if (getFindArticleServer().isConnect())
+		{
+			IProperty property = properties.get(GalileoConfiguration.Property.DATABASE_PATH.key());
+			status = this.getFindArticleServer().checkConnection(property.value());
+			if (status.getSeverity() == IStatus.OK)
+			{
+				if (getUpdateProviderServer().isConnect())
+				{
+					status = this.getUpdateProviderServer().checkConnection(property.value());
+				}
+			}
+		}
+		return status;
 	}
 
 	protected void activate(final ComponentContext componentContext)
 	{
 		this.context = componentContext;
-
 		this.configuration = new GalileoConfiguration();
-
-		if (this.logService != null)
-		{
-			this.logService.log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
-		}
+		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
 	{
-		this.stopArticleServer();
+//		this.stopArticleServer();
+		this.stopFindArticleServer();
+		this.stopUpdateProviderServer();
 		this.stopCustomerServer();
 
-		if (this.logService != null)
-		{
-			this.logService.log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
+		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
 					+ " deaktiviert.");
-		}
-
 		this.context = null;
 	}
 
@@ -251,12 +268,12 @@ public class GalileoInterfaceComponent implements ProviderInterface
 				{
 					if (this.logService != null)
 					{
-						this.logService.log(LogService.LOG_INFO, "Prüfe Position " + position.getSearchValue() + "...");
+						log(LogService.LOG_INFO, "Prüfe Position " + position.getSearchValue() + "...");
 					}
 					status = this.findAndRead(barcode, position);
 					if (this.logService != null)
 					{
-						this.logService.log(LogService.LOG_INFO, "Position " + (status.getSeverity() == IStatus.OK ? "OK." :  "FEHLER."));
+						log(LogService.LOG_INFO, "Position " + (status.getSeverity() == IStatus.OK ? "OK." :  "FEHLER."));
 					}
 					break;
 				}
@@ -265,10 +282,22 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		return status;
 	}
 
-	private IArticleServer getArticleServer()
+//	private IArticleServer getArticleServer()
+//	{
+//		this.startArticleServer();
+//		return this.articleServer;
+//	}
+
+	private IFindArticleServer getFindArticleServer()
 	{
-		this.startArticleServer();
-		return this.articleServer;
+		this.startFindArticleServer();
+		return this.findArticleServer;
+	}
+
+	private IUpdateProviderServer getUpdateProviderServer()
+	{
+		this.startUpdateProviderServer();
+		return this.updateProviderServer;
 	}
 
 	private CustomerServer getCustomerServer()
@@ -320,11 +349,27 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		return event;
 	}
 
-	private void startArticleServer()
+	private void startUpdateProviderServer()
 	{
-		if (this.articleServer == null)
+		if (this.updateProviderServer == null)
 		{
-			this.articleServer = new ArticleServerCom4j();
+			this.updateProviderServer = new UpdateProviderServerCom4j();
+		}
+	}
+
+//	private void startArticleServer()
+//	{
+//		if (this.articleServer == null)
+//		{
+//			this.articleServer = new ArticleServerCom4j();
+//		}
+//	}
+
+	private void startFindArticleServer()
+	{
+		if (this.findArticleServer == null)
+		{
+			this.findArticleServer = new FindArticleServerCom4j();
 		}
 	}
 
@@ -337,12 +382,30 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		}
 	}
 
-	private void stopArticleServer()
+//	private void stopArticleServer()
+//	{
+//		if (this.articleServer != null)
+//		{
+//			this.articleServer.stop();
+//			this.articleServer = null;
+//		}
+//	}
+
+	private void stopFindArticleServer()
 	{
-		if (this.articleServer != null)
+		if (this.findArticleServer != null)
 		{
-			this.articleServer.stop();
-			this.articleServer = null;
+			this.findArticleServer.stop();
+			this.findArticleServer = null;
+		}
+	}
+
+	private void stopUpdateProviderServer()
+	{
+		if (this.updateProviderServer != null)
+		{
+			this.updateProviderServer.stop();
+			this.updateProviderServer = null;
 		}
 	}
 

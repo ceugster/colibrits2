@@ -10,4 +10,6 @@ public interface ProviderConfigurator extends ProviderService
 	IStatus synchronizeProductGroups(IProgressMonitor monitor);
 
 	IStatus setTaxCodes(IProgressMonitor monitor);
+	
+	boolean isConnect();
 }

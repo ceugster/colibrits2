@@ -36,7 +36,7 @@ import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 		@AttributeOverride(name = "update", column = @Column(name = "pg_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "pg_deleted")) })
 @Table(name = "colibri_product_group")
-public class ProductGroup extends AbstractEntity implements IReplicationRelevant
+public class ProductGroup extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "pg_id")

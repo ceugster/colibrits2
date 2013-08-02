@@ -6,16 +6,12 @@ import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.product.Customer;
 
-public interface IArticleServer
+public interface IFindArticleServer extends IServer
 {
 	IStatus checkConnection(String path);
 
 	IStatus findAndRead(final Barcode barcode, final Position position);
 
-	IStatus updateProvider(final Position position);
-
-	IStatus start();
-	
-	void stop();
-
+	boolean isConnect();
+//	Customer selectCustomer(final Barcode barcode) throws Exception;
 }

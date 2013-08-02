@@ -35,7 +35,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "cfg_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "cfg_deleted")) })
 @Table(name = "colibri_configurable")
-public class Configurable extends AbstractEntity implements IReplicationRelevant
+public class Configurable extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "cfg_id")

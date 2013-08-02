@@ -27,7 +27,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "pgm_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "pgm_deleted")) })
 @Table(name = "colibri_product_group_mapping")
-public class ProductGroupMapping extends AbstractEntity implements IReplicationRelevant
+public class ProductGroupMapping extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "pgm_id")

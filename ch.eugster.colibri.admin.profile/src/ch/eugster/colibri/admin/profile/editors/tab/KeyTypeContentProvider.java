@@ -104,7 +104,7 @@ public class KeyTypeContentProvider implements ITreeContentProvider
 			}
 			case FUNCTION:
 			{
-				return FunctionType.values();
+				return FunctionType.assignables();
 			}
 			}
 		}

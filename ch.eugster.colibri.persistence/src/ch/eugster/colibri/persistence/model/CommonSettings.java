@@ -39,7 +39,7 @@ import org.eclipse.persistence.annotations.Convert;
 		@AttributeOverride(name = "update", column = @Column(name = "cs_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "cs_deleted")) })
 @Table(name = "colibri_common_settings")
-public class CommonSettings extends AbstractEntity implements IReplicationRelevant
+public class CommonSettings extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "cs_id")

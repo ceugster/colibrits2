@@ -28,6 +28,7 @@ import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.RoleProperty;
 import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
+import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
 
@@ -37,7 +38,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 
 	public static final String TEXT = "Stornieren";
 
-	public static final String ACTION_COMMAND = "reverse.action";
+	public static final String ACTION_COMMAND = FunctionType.FUNCTION_REVERSE_RECEIPT.key();
 
 	private final CurrentReceiptListModel tableModel;
 

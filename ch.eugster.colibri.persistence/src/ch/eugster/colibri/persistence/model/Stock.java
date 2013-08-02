@@ -28,7 +28,7 @@ import org.eclipse.persistence.annotations.Convert;
 		@AttributeOverride(name = "update", column = @Column(name = "st_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "st_deleted")) })
 @Table(name = "colibri_stock")
-public class Stock extends AbstractEntity implements Comparable<Stock>, IReplicationRelevant
+public class Stock extends AbstractEntity implements Comparable<Stock>, IReplicatable
 {
 	@Id
 	@Column(name = "st_id")

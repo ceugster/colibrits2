@@ -29,7 +29,7 @@ import javax.persistence.TableGenerator;
 		@AttributeOverride(name = "update", column = @Column(name = "di_update")),
 		@AttributeOverride(name = "deleted", column = @Column(name = "di_deleted")) })
 @Table(name = "colibri_display")
-public class Display extends AbstractEntity
+public class Display extends AbstractEntity implements IReplicatable
 {
 	@Id
 	@Column(name = "di_id")

@@ -71,11 +71,14 @@ public class RestitutionAction extends ConfigurableAction implements PropertyCha
 			{
 				if (this.userPanel.getPositionWrapper().getPosition().getReceipt().getCustomer() == null)
 				{
-					final String title = "Kunde";
-					final String message = "Kundennummer erfassen nicht vergessen!";
-					final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
-					result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
-							.getFrame(), this.userPanel.getProfile(), title, message, messageType);
+					if (this.userPanel.getReceiptWrapper().getReceipt().getRestituted().size() == 0)
+					{
+						final String title = "Kunde";
+						final String message = "Kundennummer erfassen nicht vergessen!";
+						final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
+						result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
+								.getFrame(), this.userPanel.getProfile(), title, message, messageType);
+					}
 				}
 			}
 		}
