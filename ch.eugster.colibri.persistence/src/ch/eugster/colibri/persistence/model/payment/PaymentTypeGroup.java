@@ -49,6 +49,22 @@ public enum PaymentTypeGroup implements IPaymentTypeGroup
 		}
 	}
 
+	public boolean isChargable()
+	{
+		if (this.equals(CREDIT))
+		{
+			return true;
+		}
+		else if (this.equals(DEBIT))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	public boolean isAsChangeAvailable()
 	{
 		if (this.equals(CASH))

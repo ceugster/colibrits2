@@ -20,6 +20,28 @@ import ch.eugster.colibri.provider.service.ProviderInterface;
 
 public class UpdateProviderServerCom4j extends AbstractServer implements IUpdateProviderServer
 {
+	private Barcode createCustomerBarcode(String code)
+	{
+		int currentSize = code.length() + Barcode.PREFIX_CUSTOMER.length();
+		StringBuilder builder = new StringBuilder();
+		for (int i = currentSize; i < 12; i++)
+		{
+			builder = builder.append("0");
+		}
+		String customerCode = Barcode.PREFIX_CUSTOMER + builder.toString() + code;
+		BarcodeVerifier[] verifiers = this.getBarcodeVerifiers();
+		Barcode barcode = null;
+		for (BarcodeVerifier verifier : verifiers)
+		{
+			barcode = verifier.verify(customerCode);
+			if (barcode != null)
+			{
+				break;
+			}
+		}
+		return barcode;
+	}
+	
 	@Override
 	public IStatus updateProvider(final Position position)
 	{
@@ -30,6 +52,26 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			{
 				if (this.open())
 				{
+					if (position.getReceipt().getCustomer() == null && position.getReceipt().getCustomerCode() != null && position.getReceipt().getCustomerCode().length() > 0)
+					{
+						final Barcode barcode = this.createCustomerBarcode(position.getReceipt().getCustomerCode());
+						if (barcode != null)
+						{
+							int customerId = this.getCustomerId(barcode);
+							if (customerId > 0)
+							{
+								if (this.getGalserve().do_getkunde(customerId))
+								{
+									this.updatePosition(barcode, position);
+								}
+								else
+								{
+									String msg = "Kundennummer \"" + customerId + "\" nicht vorhanden.";
+									log(LogService.LOG_INFO, msg);
+								}
+							}
+						}
+					}
 					if (position.getSearchValue() != null && position.getProduct() == null)
 					{
 						Barcode barcode = null;
@@ -361,6 +403,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			if (this.getGalserve().do_wgstorno())
 			{
 				position.setProviderBooked(true);
+				this.updateCustomerAccount(position);
 				log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
 							+ " aufgerufen... Ok!");
 			}
@@ -376,6 +419,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			if (sold)
 			{
 				position.setProviderBooked(true);
+				this.updateCustomerAccount(position);
 				log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
 							+ " aufgerufen... Ok!");
 			}

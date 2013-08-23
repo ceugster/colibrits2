@@ -487,6 +487,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				this.getEntityManager().getTransaction().begin();
 				profile = this.getEntityManager().merge(profile);
 				this.getEntityManager().getTransaction().commit();
+
+				this.updateSequence("pr_id", Long.valueOf(profile.getId().longValue() + 1L));
 			}
 
 			monitor.worked(1);
@@ -601,13 +603,14 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		monitor.beginTask("Die Rolle mit sämtlichen Berechtigungen wird eingerichtet...", 1);
 		try
 		{
-			long maxId = 1L;
-
+			long maxRoleId = 1L;
+			long maxRolePropertyId = 1L;
+			
 			Role role = this.getEntityManager().find(Role.class, Long.valueOf(1l));
 			if (role == null)
 			{
 				role = Role.newInstance();
-				role.setId(Long.valueOf(maxId));
+				role.setId(Long.valueOf(maxRoleId));
 				role.setName("Administrator");
 
 				RoleProperty prop = RoleProperty.newInstance(role);
@@ -624,7 +627,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				for (final FunctionType functionType : functionTypes)
 				{
 					final RoleProperty property = RoleProperty.newInstance(role);
-					property.setKey(functionType.toString());
+					property.setKey(functionType.key());
 					property.setValue(Boolean.toString(true));
 					role.addRoleProperty(property);
 				}
@@ -633,7 +636,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				for (final KeyType keyType : keyTypes)
 				{
 					final RoleProperty property = RoleProperty.newInstance(role);
-					property.setKey(keyType.toString());
+					property.setKey(keyType.key());
 					property.setValue(Boolean.toString(true));
 					role.addRoleProperty(property);
 				}
@@ -641,15 +644,36 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				this.getEntityManager().getTransaction().begin();
 				role = this.getEntityManager().merge(role);
 				this.getEntityManager().getTransaction().commit();
+
+				maxRoleId = role.getId().longValue();
+				for (RoleProperty property : role.getRoleProperties())
+				{
+					if (property.getId().longValue() > maxRolePropertyId)
+					{
+						maxRolePropertyId = property.getId().longValue();
+					}
+				}
+				maxRoleId = role.getId().longValue();
+				
 				monitor.worked(1);
 			}
 			else
 			{
-				if (role.getId().longValue() > maxId)
+				if (role.getId().longValue() > maxRoleId)
 				{
-					maxId = role.getId().longValue();
+					maxRoleId = role.getId().longValue();
+				}
+				for (RoleProperty property : role.getRoleProperties())
+				{
+					if (property.getId().longValue() > maxRolePropertyId)
+					{
+						maxRolePropertyId = property.getId().longValue();
+					}
 				}
 			}
+			this.updateSequence("ro_id", maxRoleId + 1L);
+			this.updateSequence("r_id", maxRolePropertyId + 1L);
+
 		}
 		catch (final Exception e)
 		{
@@ -674,6 +698,10 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		final TypedQuery<Salespoint> query = this.getEntityManager().createQuery(salespointQuery);
 		final List<Salespoint> salespoints = query.getResultList();
 
+		long maxSalespointId = 0L;
+		long maxStockId = 0L;
+
+
 		final String host = commonSettings.getHostnameResolver().getHostname();
 		if ((salespoints.size() == 0) && (host != null))
 		{
@@ -697,6 +725,16 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				this.getEntityManager().getTransaction().begin();
 				salespoint = this.getEntityManager().merge(salespoint);
 				this.getEntityManager().getTransaction().commit();
+
+				maxSalespointId = salespoint.getId().longValue();
+				for (Stock st : salespoint.getStocks())
+				{
+					if (st.getId().longValue() > maxStockId)
+					{
+						maxStockId = st.getId().longValue();
+					}
+				}
+
 				monitor.worked(1);
 			}
 			catch (final Exception e)
@@ -711,16 +749,23 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		else
 		{
-			long maxId = 0L;
 			for (final Salespoint salespoint : salespoints)
 			{
-				if (salespoint.getId().longValue() > maxId)
+				if (salespoint.getId().longValue() > maxSalespointId)
 				{
-					maxId = salespoint.getId().longValue();
+					maxSalespointId = salespoint.getId().longValue();
+				}
+				for (Stock st : salespoint.getStocks())
+				{
+					if (st.getId().longValue() > maxStockId)
+					{
+						maxStockId = st.getId().longValue();
+					}
 				}
 			}
-			this.updateSequence("sp_id", maxId + 1L);
 		}
+		this.updateSequence("sp_id", maxSalespointId + 1L);
+		this.updateSequence("st_id", maxStockId + 1L);
 		return status;
 	}
 
@@ -959,6 +1004,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				version = Version.newInstance();
 				version.setData(0);
 				version.setStructure(0);
+				version.setReplicationValue(version.getReplicationValue() + 1);
 
 				this.getEntityManager().getTransaction().begin();
 				version = this.getEntityManager().merge(version);

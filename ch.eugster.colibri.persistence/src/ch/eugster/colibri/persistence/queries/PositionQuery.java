@@ -152,6 +152,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Double amount = null;
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.get("productGroup").get("productGroupType").equal(productGroupType);
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
 		final Expression settled = new ExpressionBuilder().get("receipt").get("settlement").get("settled").isNull();
 		expression = expression.and(settled);
 
@@ -172,6 +173,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.get("productGroup").get("productGroupType").equal(productGroupType);
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoint));
 		final Expression settled = new ExpressionBuilder().get("receipt").get("settlement").get("settled").isNull();
@@ -193,6 +195,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.get("productGroup").get("productGroupType").equal(productGroupType);
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("user").equal(user));
 		final Expression settled = new ExpressionBuilder().get("receipt").get("settlement").get("settled").isNull();
 		expression = expression.and(settled);

@@ -28,7 +28,17 @@ public enum FunctionType
 
 	public boolean isFailOverEnabled()
 	{
-		return true;
+		switch (this)
+		{
+			case FUNCTION_SELECT_CUSTOMER:
+			{
+				return false;
+			}
+			default:
+			{
+				return true;
+			}
+		}
 	}
 
 	public boolean isLockable()

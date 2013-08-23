@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.CurrentTax;
@@ -63,7 +62,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 	protected boolean notMapped;
 
-	// protected IStatus status;
+	protected IStatus status;
 
 	private LogService logService;
 
@@ -125,6 +124,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	
 	public boolean isConnect()
 	{
+		this.updateProperties();
 		return connect;
 	}
 
@@ -136,7 +136,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		try
 		{
-			final boolean open = ((Boolean) this.wgserve.do_open(this.database)).booleanValue();
+			final boolean open = this.openDatabase(this.database);
 			if (!open)
 			{
 				return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
@@ -173,34 +173,18 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		else
 		{
-			status = GalileoConfiguratorComponent.this.start(status);
-			if (status.getSeverity() == IStatus.OK && this.isConnect())
+			updateProperties();
+			if (this.status.getSeverity() == IStatus.OK && this.isConnect())
 			{
-				status = GalileoConfiguratorComponent.this.importExternalProductGroups(monitor, status);
-				status = GalileoConfiguratorComponent.this.stop(status);
+				status = this.importExternalProductGroups(monitor, status);
 			}
 		}
 		return status;
 	}
 
-	public IStatus start(IStatus status)
+	private void updateProperties()
 	{
-		if (status.getSeverity() != IStatus.OK)
-		{
-			return status;
-		}
-
 		this.configuration = new GalileoConfiguration();
-
-		final ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle()
-				.getBundleContext(), PersistenceService.class, null);
-		persistenceServiceTracker.open();
-
-		final PersistenceService persistenceService = (PersistenceService) persistenceServiceTracker.getService();
-		if (persistenceService == null)
-		{
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Die Verbindung zur Datenbank ist nicht hergestellt.");
-		}
 
 		final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getServerService().getQuery(
 				ProviderProperty.class);
@@ -208,7 +192,16 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 				this.configuration.getProviderId(), this.configuration.getDefaultPropertiesAsMap());
 
 		this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
-		this.connect = Boolean.getBoolean(properties.get(Property.CONNECT.key()).getValue());
+		String value = properties.get(Property.CONNECT.key()).getValue();
+		this.connect = Boolean.valueOf(value).booleanValue();
+	}
+	
+	private IStatus start(IStatus status)
+	{
+		if (status.getSeverity() != IStatus.OK)
+		{
+			return status;
+		}
 
 		try
 		{
@@ -217,13 +210,13 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		catch (final Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-					" Die Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden.", e);
+					" Die Verbindung zu " + this.configuration.getName() + " konnte nicht hergestellt werden.", e);
 			e.printStackTrace();
 		}
 		return status;
 	}
 
-	public IStatus stop(final IStatus status)
+	private IStatus stop(final IStatus status)
 	{
 		if (wgserve != null)
 		{
@@ -273,16 +266,15 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		{
 			return new Status(
 					IStatus.WARNING,
-					"ch.eugster.colibri.provider.galileo.jcom",
-					"Es besteht keine Verbindung zur Datenbank. Bitte versuchen Sie diesen Vorgang, nachdem die Verbindung zur Datenbank wiederhergestellt ist. ");
+					Activator.PLUGIN_ID,
+					"Es besteht keine Verbindung zur Datenbank. Bitte versuchen Sie diesen Vorgang, wenn die Verbindung zur Datenbank wiederhergestellt ist.");
 		}
 		else
 		{
-			status = GalileoConfiguratorComponent.this.start(status);
+			updateProperties();
 			if (status.getSeverity() == IStatus.OK && this.isConnect())
 			{
-				status = GalileoConfiguratorComponent.this.synchronizeExternalProductGroups(monitor, status);
-				status = GalileoConfiguratorComponent.this.stop(status);
+				status = this.synchronizeExternalProductGroups(monitor, status);
 			}
 		}
 		return status;
@@ -294,6 +286,8 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		{
 			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name") + " aktiviert.");
 		}
+		this.status = this.start(Status.OK_STATUS);
+		System.out.println(this.status);
 	}
 
 	protected void confirmChanges(final String code)
@@ -321,6 +315,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name")
 					+ " deaktiviert.");
 		}
+		this.stop(status);
 	}
 
 	protected ExternalProductGroup getExternalProductGroup(final GalileoProductGroup group)
@@ -512,7 +507,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	{
 		if (this.open)
 		{
-			this.open = ((Boolean) this.wgserve.do_close()).booleanValue();
+			this.open = !((Boolean) this.wgserve.do_close()).booleanValue();
 		}
 	}
 
@@ -702,15 +697,11 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	@Override
 	public IStatus setTaxCodes(IProgressMonitor monitor) 
 	{
-		IStatus status = Status.OK_STATUS;
-		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
-		tracker.open();
-		PersistenceService service = tracker.getService();
-		if (service != null)
+		if (persistenceService != null)
 		{
 			int count = 0;
 			int newCodes = 0;
-			TaxTypeQuery typeQuery = (TaxTypeQuery) service.getServerService().getQuery(TaxType.class);
+			TaxTypeQuery typeQuery = (TaxTypeQuery) persistenceService.getServerService().getQuery(TaxType.class);
 			TaxType taxType = typeQuery.selectByCode("U");
 			Collection<Tax> taxes = taxType.getTaxes();
 			for (Tax tax : taxes)
@@ -724,7 +715,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 					mapping.setProvider(this.getProviderId());
 					mapping.setTax(tax);
 					tax.addTaxCodeMapping(mapping);
-					service.getServerService().merge(mapping.getTax());
+					persistenceService.getServerService().merge(mapping.getTax());
 					newCodes++;
 				}
 				count++;

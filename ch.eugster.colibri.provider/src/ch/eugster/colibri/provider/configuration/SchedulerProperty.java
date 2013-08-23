@@ -110,4 +110,25 @@ public enum SchedulerProperty implements IProperty
 			throw new RuntimeException("Invalid key");
 		}
 	}
+
+	@Override
+	public String label2()
+	{
+		if (this.equals(SCHEDULER_DELAY))
+		{
+			return "";
+		}
+		else if (this.equals(SCHEDULER_PERIOD))
+		{
+			return "";
+		}
+		else if (this.equals(SCHEDULER_RECEIPT_COUNT))
+		{
+			return "";
+		}
+		else
+		{
+			throw new RuntimeException("Invalid key");
+		}
+	}
 }

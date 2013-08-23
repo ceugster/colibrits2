@@ -115,18 +115,12 @@ public class Printout extends AbstractEntity implements IReplicatable
 		PrintoutArea pa = this.printoutAreas.get(Integer.valueOf(printoutArea.getPrintAreaType()));
 		if (pa == null)
 		{
-			pa = PrintoutArea.newInstance(this, printoutArea.getPrintAreaType());
+			pa = printoutArea;
 		}
 		else if (pa.isDeleted())
 		{
 			pa.setDeleted(false);
 		}
-		pa.setTitlePattern(printoutArea.getTitlePattern());
-		pa.setDetailPattern(printoutArea.getDetailPattern());
-		pa.setTotalPattern(printoutArea.getTotalPattern());
-		pa.setTitlePrintOption(printoutArea.getTitlePrintOption());
-		pa.setDetailPrintOption(printoutArea.getDetailPrintOption());
-		pa.setTotalPrintOption(printoutArea.getTotalPrintOption());
 		this.propertyChangeSupport.firePropertyChange("printoutAreas", this.printoutAreas,
 				this.printoutAreas.put(Integer.valueOf(printoutArea.getPrintAreaType()), pa));
 	}

@@ -159,7 +159,7 @@ public abstract class DisplayPanel extends ProfilePanel
 		amountPanel = new JPanel(new GridLayout(1, 2));
 
 		final Border border = textLabel.getBorder();
-		Border margin = new EmptyBorder(0, 0, 0, 10);
+		Border margin = new EmptyBorder(0, 20, 0, 60);
 
 		foreignCurrencyPanel = new JPanel(new BorderLayout());
 		foreignCurrencyLabel = createLabel(profile, "");
@@ -169,9 +169,10 @@ public abstract class DisplayPanel extends ProfilePanel
 		foreignCurrencyAmountLabel = createLabel(profile, "");
 		foreignCurrencyAmountLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		foreignCurrencyPanel.add(foreignCurrencyAmountLabel, BorderLayout.CENTER);
+//		foreignCurrencyPanel.add(createLabel(profile, "         "), BorderLayout.EAST);
 		amountPanel.add(foreignCurrencyPanel);
 
-		margin = new EmptyBorder(0, 10, 0, 10);
+		margin = new EmptyBorder(0, 60, 0, 20);
 
 		defaultCurrencyPanel = new JPanel(new BorderLayout());
 		defaultCurrencyLabel = createLabel(profile, "");

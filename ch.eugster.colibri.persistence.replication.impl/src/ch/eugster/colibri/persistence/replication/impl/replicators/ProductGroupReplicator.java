@@ -102,6 +102,7 @@ public class ProductGroupReplicator extends AbstractEntityReplicator<ProductGrou
 			target.setPaymentType((PaymentType) this.persistenceService.getCacheService().find(PaymentType.class,
 					source.getPaymentType().getId()));
 		}
+		target.setProductGroupType(source.getProductGroupType());
 		target.setMappingId(source.getMappingId());
 		target.setName(source.getName());
 		target.setPriceProposal(source.getPriceProposal());

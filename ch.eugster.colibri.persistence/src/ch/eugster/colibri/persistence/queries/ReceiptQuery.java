@@ -33,6 +33,15 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.count(expression);
 	}
 
+	public long countReversedBySettlement(Settlement settlement)
+	{
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED);
+		expression = expression.and(states);
+		return this.count(expression);
+	}
+
 	public Collection<Receipt> selectSavedBySettlement(Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);

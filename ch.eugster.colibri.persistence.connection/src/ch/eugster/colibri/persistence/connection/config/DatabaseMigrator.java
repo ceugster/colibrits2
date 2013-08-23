@@ -8,8 +8,13 @@ package ch.eugster.colibri.persistence.connection.config;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,6 +35,7 @@ import org.apache.ojb.broker.metadata.MetadataManager;
 import org.apache.ojb.broker.query.Criteria;
 import org.apache.ojb.broker.query.Query;
 import org.apache.ojb.broker.query.QueryByCriteria;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -1754,29 +1760,31 @@ public class DatabaseMigrator extends AbstractConfigurator
 
 	public static PersistenceBroker createOjbPersistenceBroker(final Document colibri)
 	{
-//		File ojbProperties = null;
+		File ojbProperties = null;
 		PersistenceBroker broker = null;
-//		try
-//		{
-//			URL url = Activator.getDefault().getBundle().getEntry("/META-INF/OJB.properties");
-//			URI uri = url.toURI();
-//			String path = uri.getPath();
-//
-//			final File file = FileLocator.getBundleFile(Activator.getDefault().getBundle());
-//			path = file.getAbsolutePath() + "/META-INF/OJB.properties";
-//			ojbProperties = new File(path);
-//			Activator.getDefault().log("Pfad zur Datei mit Datenbankeigenschaften: " + path + ".");
-//		}
-//		catch (final IOException e)
-//		{
-//			e.printStackTrace();
-//		}
-//		catch (URISyntaxException e)
-//		{
-//			e.printStackTrace();
-//		}
-		if (System.getProperty("OJB.properties") != null)
+		try
 		{
+			URL url = Activator.getDefault().getBundle().getEntry("/META-INF/OJB.properties");
+			URI uri = url.toURI();
+			String path = uri.getPath();
+
+			final File file = FileLocator.getBundleFile(Activator.getDefault().getBundle());
+			path = file.getAbsolutePath() + "/META-INF/OJB.properties";
+			ojbProperties = new File(path);
+			Activator.getDefault().log("Pfad zur Datei mit Datenbankeigenschaften: " + path + ".");
+		}
+		catch (final IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (URISyntaxException e)
+		{
+			e.printStackTrace();
+		}
+		if (ojbProperties.exists())
+		{
+			System.setProperty("OJB.properties", ojbProperties.getAbsolutePath());
+
 			final Element element = colibri.getRootElement().getChild("database").getChild("standard")
 					.getChild("connection");
 			final String driver = element.getAttributeValue("driver");

@@ -120,6 +120,11 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 	private boolean forceSettlement;
 
 	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "cs_force_cash_check")
+	private boolean forceCashCheck;
+
+	@Basic
 	@Column(name="cs_transfer_delay")
 	private int transferDelay;
 	
@@ -578,6 +583,14 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("exportPath", this.exportPath, this.exportPath = exportPath);
 	}
 	
+	public boolean isForceCashCheck() {
+		return forceCashCheck;
+	}
+
+	public void setForceCashCheck(boolean forceCashCheck) {
+		this.propertyChangeSupport.firePropertyChange("forceCashCheck", this.forceCashCheck, this.forceCashCheck = forceCashCheck);
+	}
+
 	public List<CommonSettingsProperty> getProperties()
 	{
 		return this.properties;

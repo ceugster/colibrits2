@@ -146,7 +146,7 @@ public class SettlementServiceComponent implements SettlementService
 		{
 			Salespoint serverSalespoint = (Salespoint) persistenceService.getServerService().find(Salespoint.class,
 					salespoint.getId());
-			serverSalespoint.setSettlement(Settlement.newInstance(salespoint));
+			serverSalespoint.setSettlement(Settlement.newInstance(serverSalespoint));
 			serverSalespoint = (Salespoint) persistenceService.getServerService().merge(serverSalespoint);
 		}
 		return salespoint;
@@ -458,5 +458,12 @@ public class SettlementServiceComponent implements SettlementService
 	{
 		final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
 		return query.countSavedBySettlement(settlement);
+	}
+
+	@Override
+	public Collection<SettlementReceipt> getReversedReceipts(final Settlement settlement)
+	{
+		final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+		return query.selectReversed(settlement);
 	}
 }

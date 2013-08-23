@@ -1441,7 +1441,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	private Position convertToPosition(Element element, Receipt receipt)
 	{
 		Position position = Position.newInstance(receipt);
-		position.setBookProvider(Boolean.getBoolean(element.getAttributeValue("galileo-book")));
+		position.setBookProvider(Boolean.valueOf(element.getAttributeValue("galileo-book")));
 		position.setDeleted(false);
 		position.setDiscount(Double.valueOf(element.getAttributeValue("discount")));
 		position.setEbook(false);
@@ -1459,17 +1459,17 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 //			position.setForeignCurrencyQuotation(quotation);
 //			receipt.setForeignCurrencyQuotation(quotation);
 //		}
-		position.setFromStock(Boolean.getBoolean(element.getAttributeValue("stock")));
+		position.setFromStock(Boolean.valueOf(element.getAttributeValue("stock")));
 		position.setOption(getOption(element.getAttributeValue("opt-code")));
 		String order = element.getAttributeValue("order-id");
 		position.setOrder(order == null || order.isEmpty() ? null : order);
-		position.setOrdered(Boolean.getBoolean(element.getAttributeValue("ordered")));
+		position.setOrdered(Boolean.valueOf(element.getAttributeValue("ordered")));
 		position.setOtherId(null);
 		position.setPrice(Double.valueOf(element.getAttributeValue("price")));
 		position.setProduct(null);
 		position.setProductGroup(getProductGroup(element.getAttributeValue("product-group-id")));
 		position.setProvider("ch.eugster.colibri.provider.galileo");
-		position.setProviderBooked(Boolean.getBoolean(element.getAttributeValue("galileo-booked")));
+		position.setProviderBooked(Boolean.valueOf(element.getAttributeValue("galileo-booked")));
 		position.setQuantity(Integer.valueOf(element.getAttributeValue("quantity")).intValue());
 		position.setSearchValue(element.getAttributeValue("product-number"));
 		String code = element.getAttributeValue("tax-id");
@@ -1493,7 +1493,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	{
 		Payment payment = Payment.newInstance(receipt);
 		payment.setAmount(Double.valueOf(element.getAttributeValue("amount-fc")));
-		payment.setBack(Boolean.getBoolean(element.getAttributeValue("back")));
+		payment.setBack(Boolean.valueOf(element.getAttributeValue("back")));
 		payment.setDeleted(false);
 		payment.setPaymentType(getPaymentType(element.getAttributeValue("payment-type-id")));
 		payment.setForeignCurrencyQuotation(Double.valueOf(element.getAttributeValue("quotation")));

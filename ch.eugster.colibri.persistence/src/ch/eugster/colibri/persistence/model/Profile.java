@@ -521,7 +521,7 @@ public class Profile extends AbstractEntity implements IReplicatable
 		this.setButtonNormalHorizontalAlign(SwingConstants.CENTER);
 		this.setButtonNormalVerticalAlign(SwingConstants.CENTER);
 		this.setButtonNormalFg(java.awt.Color.BLACK.getRGB());
-		this.setButtonNormalBg(java.awt.Color.ORANGE.getRGB());
+		this.setButtonNormalBg(new java.awt.Color(207,207,207).getRGB());
 
 		this.setButtonFailOverFontSize(12f);
 		this.setButtonFailOverFontStyle(java.awt.Font.BOLD);
@@ -533,11 +533,11 @@ public class Profile extends AbstractEntity implements IReplicatable
 		 * Labels
 		 */
 		this.setNameLabelFontSize(12f);
-		this.setNameLabelFontStyle(0);
+		this.setNameLabelFontStyle(Font.BOLD);
 		this.setNameLabelFg(Color.BLACK.getRGB());
 		this.setNameLabelBg(Color.WHITE.getRGB());
 		this.setValueLabelFontSize(12f);
-		this.setValueLabelFontStyle(0);
+		this.setValueLabelFontStyle(Font.BOLD);
 		this.setValueLabelFg(Color.BLACK.getRGB());
 		this.setValueLabelBg(Color.WHITE.getRGB());
 		this.setValueLabelBgSelected(Color.WHITE.getRGB());
@@ -547,7 +547,7 @@ public class Profile extends AbstractEntity implements IReplicatable
 		this.setListBg(Color.WHITE.getRGB());
 		this.setListFg(Color.BLACK.getRGB());
 		this.setListFontSize(12f);
-		this.setListFontStyle(Font.PLAIN);
+		this.setListFontStyle(Font.BOLD);
 
 		this.configurables = new Vector<Configurable>();
 		for (final Configurable.ConfigurableType configurableType : Configurable.ConfigurableType.values())

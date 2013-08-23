@@ -68,6 +68,12 @@ public class User extends AbstractEntity implements IReplicatable
 		super();
 	}
 
+	protected User(Role role)
+	{
+		super();
+		this.setRole(role);
+	}
+
 	@Override
 	public Long getId()
 	{
@@ -181,6 +187,12 @@ public class User extends AbstractEntity implements IReplicatable
 	public static User newInstance()
 	{
 		final User user = (User) AbstractEntity.newInstance(new User());
+		return user;
+	}
+
+	public static User newInstance(Role role)
+	{
+		final User user = (User) AbstractEntity.newInstance(new User(role));
 		return user;
 	}
 

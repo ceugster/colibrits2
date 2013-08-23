@@ -166,28 +166,14 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 									{
 										if (printable instanceof Receipt)
 										{
-											boolean opened = false;
 											Receipt receipt = (Receipt) printable;
 											Collection<Payment> payments = receipt.getPayments();
 											for (Payment payment : payments)
 											{
-												if (payment.getPaymentType().getId().equals(payment.getReceipt().getSettlement().getSalespoint().getPaymentType().getId()))
+												if (payment.getPaymentType().isOpenCashdrawer())
 												{
 													this.getReceiptPrinterService().openDrawer(payment.getPaymentType());
-													opened = true;
 													break;
-												}
-											}
-											if (!opened)
-											{
-												for (Payment payment : payments)
-												{
-													if (!payment.getPaymentType().getId().equals(payment.getReceipt().getSettlement().getSalespoint().getPaymentType().getId()))
-													{
-														this.getReceiptPrinterService().openDrawer(payment.getPaymentType());
-														opened = true;
-														break;
-													}
 												}
 											}
 										}

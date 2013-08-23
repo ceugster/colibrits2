@@ -11,6 +11,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.Printout;
+import ch.eugster.colibri.persistence.model.PrintoutArea;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.PrintoutQuery;
@@ -98,9 +99,7 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 	protected Printout replicate(final Printout source)
 	{
 		ReceiptPrinterSettings settings = (ReceiptPrinterSettings) this.persistenceService.getCacheService().find(ReceiptPrinterSettings.class, source.getId());
-		
 		final Printout target = Printout.newInstance(source.getPrintoutType(), settings);
-
 		if (source.getSalespoint() != null)
 		{
 			Salespoint salespoint = (Salespoint) this.persistenceService.getCacheService().find(Salespoint.class, source.getSalespoint().getId());
@@ -112,7 +111,23 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 			final Printout parent = (Printout) this.persistenceService.getCacheService().find(Printout.class, source.getParent().getId());
 			target.setParent(parent);
 		}
-
+		for (PrintoutArea sourceArea : source.getPrintoutAreas().values())
+		{
+			boolean found = false;
+			for (PrintoutArea targetArea : target.getPrintoutAreas().values())
+			{
+				if (targetArea.getId().equals(sourceArea.getId()))
+				{
+					this.replicate(sourceArea, targetArea);
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				this.replicate(target, sourceArea);
+			}
+		}
 		return this.replicate(source, target);
 	}
 
@@ -121,6 +136,27 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 	{
 		target = super.replicate(source, target);
 		target.setAutomaticPrint(source.isAutomaticPrint());
+		return target;
+	}
+
+	protected void replicate(final Printout targetPrintout, final PrintoutArea sourcePrintoutArea)
+	{
+		final PrintoutArea targetPrintoutArea = this.replicate(sourcePrintoutArea, PrintoutArea.newInstance(targetPrintout, sourcePrintoutArea.getPrintAreaType()));
+		targetPrintout.addPrintoutArea(targetPrintoutArea);
+	}
+
+	protected PrintoutArea replicate(final PrintoutArea source, PrintoutArea target)
+	{
+		target.setId(source.getId());
+		target.setDeleted(source.isDeleted());
+		target.setTimestamp(source.getTimestamp());
+		target.setUpdate(source.getVersion());
+		target.setTitlePattern(source.getTitlePattern());
+		target.setDetailPattern(source.getDetailPattern());
+		target.setTotalPattern(source.getTotalPattern());
+		target.setTitlePrintOption(source.getTitlePrintOption());
+		target.setDetailPrintOption(source.getDetailPrintOption());
+		target.setTotalPrintOption(source.getTotalPrintOption());
 		return target;
 	}
 }

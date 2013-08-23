@@ -46,6 +46,7 @@ public class RolePropertyReplicator extends AbstractEntityReplicator<RolePropert
 					if (target == null)
 					{
 						target = this.replicate(source);
+						target.getRole().addRoleProperty(target);
 					}
 					else
 					{

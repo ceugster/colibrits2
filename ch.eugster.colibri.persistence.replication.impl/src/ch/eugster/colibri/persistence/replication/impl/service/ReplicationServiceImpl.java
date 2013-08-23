@@ -100,11 +100,11 @@ public class ReplicationServiceImpl implements ReplicationService
 										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new RoleReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new UserReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new RolePropertyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
+										.replicate(new SubProgressMonitor(monitor, 1), true);
+//								new UserReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
+//								new RolePropertyReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new TaxRateReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
@@ -122,15 +122,15 @@ public class ReplicationServiceImpl implements ReplicationService
 										.setCurrentTaxes(new SubProgressMonitor(monitor, 1));
 
 								new ProfileReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new TabReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new KeyReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
-										.setDefaultTabs(new SubProgressMonitor(monitor, 1));
+										.replicate(new SubProgressMonitor(monitor, 1), true);
+//								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
+//								new TabReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
+//								new KeyReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
+//								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.setDefaultTabs(new SubProgressMonitor(monitor, 1));
 
 								new CommonSettingsReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
@@ -174,14 +174,14 @@ public class ReplicationServiceImpl implements ReplicationService
 										.updatePeriphery(new SubProgressMonitor(monitor, 1));
 
 								new PrintoutReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new PrintoutAreaReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
+										.replicate(new SubProgressMonitor(monitor, 1), true);
+//								new PrintoutAreaReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new DisplayReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
-								new DisplayAreaReplicator(ReplicationServiceImpl.this.persistenceService)
-										.replicate(new SubProgressMonitor(monitor, 1), force);
+//								new DisplayAreaReplicator(ReplicationServiceImpl.this.persistenceService)
+//										.replicate(new SubProgressMonitor(monitor, 1), force);
 								new SalespointReplicator(ReplicationServiceImpl.this.persistenceService)
 										.setPrintoutAndDisplay(new SubProgressMonitor(monitor, 1));
 
@@ -191,8 +191,7 @@ public class ReplicationServiceImpl implements ReplicationService
 							}
 							finally
 							{
-								ReplicationServiceImpl.this.persistenceService.getCacheService().getEntityManagerFactory()
-										.getCache().evictAll();
+								ReplicationServiceImpl.this.persistenceService.getCacheService().clearCache();
 								monitor.done();
 								manager.endRule(LocalDatabaseRule.getRule());
 							}

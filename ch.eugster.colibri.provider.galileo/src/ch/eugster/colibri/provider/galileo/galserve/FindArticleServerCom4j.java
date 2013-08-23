@@ -12,7 +12,6 @@ import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.provider.galileo.Activator;
 
 public class FindArticleServerCom4j extends AbstractServer implements IFindArticleServer
@@ -20,18 +19,23 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
-		IStatus status = Status.OK_STATUS;
+		status = Status.OK_STATUS;
 		String msg = null;
 
+		log(LogService.LOG_INFO, "Verbindung checken in Server.");
 		if (isConnect())
 		{
+			log(LogService.LOG_INFO, "Verbindung öffnen.");
 			if (this.open())
 			{
 				if (barcode.getType().equals(Barcode.Type.CUSTOMER))
 				{
+					log(LogService.LOG_INFO, "Kundennummer setzen.");
 					final int customerId = this.getCustomerId(barcode);
+					log(LogService.LOG_INFO, "Kunden suchen.");
 					if (this.getGalserve().do_getkunde(customerId))
 					{
+						log(LogService.LOG_INFO, "Kunden gefunden; aktualisieren.");
 						this.updatePosition(barcode, position);
 					}
 					else
@@ -39,20 +43,26 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 						msg = "Kundennummer \"" + customerId + "\" nicht vorhanden.";
 						log(LogService.LOG_INFO, msg);
 					}
+					position.setSearchValue(null);
 				}
 				else
 				{
+					log(LogService.LOG_INFO, "Position mit Barcodedaten aktualisieren.");
 					barcode.updatePosition(position);
 					if (position.isEbook())
 					{
+						log(LogService.LOG_INFO, "Position mit EBookdaten aktualisieren.");
 						this.updatePosition(barcode, position);
 					}
 					else
 					{
+						log(LogService.LOG_INFO, "Artikel suchen.");
 						this.getGalserve().do_NSearch(barcode.getProductCode());
 						if (((Boolean) this.getGalserve().gefunden()).booleanValue())
 						{
+							log(LogService.LOG_INFO, "Artikel gefunden; Position aktualisieren.");
 							this.updatePosition(barcode, position);
+							log(LogService.LOG_INFO, "Defaultwerte des Barcodes übernehmen, falls notwendig.");
 							barcode.updatePosition(position);
 						}
 						else
@@ -66,6 +76,14 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 				}
 
 				this.close();
+			}
+			else
+			{
+				if (barcode.getType().equals(Barcode.Type.CUSTOMER))
+				{
+					log(LogService.LOG_INFO, "Suchwert auf null setzen.");
+					position.setSearchValue(null);
+				}
 			}
 		}
 		return status;

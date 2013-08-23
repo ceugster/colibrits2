@@ -122,6 +122,11 @@ public abstract class AbstractConnectionService implements ConnectionService
 		return persistenceService.getTimeout();
 	}
 	
+	public void clearCache()
+	{
+		this.entityManager.clear();
+	}
+	
 	@Override
 	public AbstractQuery<? extends AbstractEntity> getQuery(final ConnectionService connectionService,
 			final Class<? extends AbstractEntity> adaptable)

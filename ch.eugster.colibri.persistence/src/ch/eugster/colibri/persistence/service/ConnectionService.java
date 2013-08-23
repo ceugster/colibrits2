@@ -37,6 +37,8 @@ public interface ConnectionService
 
 	EntityManager getEntityManager();
 
+	void clearCache();
+	
 	AbstractQuery<? extends AbstractEntity> getQuery(final Class<? extends AbstractEntity> adaptable);
 
 	AbstractEntity merge(AbstractEntity entity);

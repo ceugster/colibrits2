@@ -48,6 +48,14 @@ public class ReceiptLayoutTaxSection extends AbstractLayoutSection
 	}
 
 	@Override
+	protected String getDefaultPatternTitle()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder = builder.append("------------------------------------------");
+		return builder.toString();
+	}
+
+	@Override
 	protected String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
@@ -137,13 +145,13 @@ public class ReceiptLayoutTaxSection extends AbstractLayoutSection
 	@Override
 	protected boolean hasTitleArea()
 	{
-		return false;
+		return true;
 	}
 
 	@Override
 	protected boolean hasTotalArea()
 	{
-		return true;
+		return false;
 	}
 
 	private Collection<String> prepareArea(final Receipt receipt, final CurrentTax currentTax)

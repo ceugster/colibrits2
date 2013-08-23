@@ -11,6 +11,8 @@ import java.util.Collection;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.Role;
+import ch.eugster.colibri.persistence.model.RoleProperty;
+import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.queries.RoleQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
@@ -81,6 +83,76 @@ public class RoleReplicator extends AbstractEntityReplicator<Role>
 	{
 		target = super.replicate(source, target);
 		target.setName(source.getName());
+		for (RoleProperty sourceProperty : source.getRoleProperties())
+		{
+			boolean found = false;
+			for (RoleProperty targetProperty : target.getRoleProperties())
+			{
+				if (targetProperty.getId().equals(sourceProperty.getId()))
+				{
+					replicate(sourceProperty, targetProperty);
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				replicate(target, sourceProperty);
+			}
+		}
+		for (User sourceUser : source.getUsers())
+		{
+			boolean found = false;
+			for (User targetUser : target.getUsers())
+			{
+				if (targetUser.getId().equals(sourceUser.getId()))
+				{
+					replicate(sourceUser, targetUser);
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				replicate(target, sourceUser);
+			}
+		}
+		return target;
+	}
+	
+	protected void replicate(final Role targetRole, final RoleProperty sourceRoleProperty)
+	{
+		final RoleProperty targetRoleProperty = replicate(sourceRoleProperty, RoleProperty.newInstance(targetRole));
+		targetRole.addRoleProperty(targetRoleProperty);
+	}
+
+	protected RoleProperty replicate(final RoleProperty source, final RoleProperty target)
+	{
+		target.setId(source.getId());
+		target.setDeleted(source.isDeleted());
+		target.setTimestamp(source.getTimestamp());
+		target.setUpdate(source.getVersion());
+		target.setKey(source.getKey());
+		target.setValue(source.getValue());
+		return target;
+	}
+
+	protected void replicate(final Role targetRole, final User sourceUser)
+	{
+		final User targetUser = replicate(sourceUser, User.newInstance(targetRole));
+		targetRole.addUser(targetUser);
+	}
+
+	protected User replicate(final User source, final User target)
+	{
+		target.setId(source.getId());
+		target.setDeleted(source.isDeleted());
+		target.setTimestamp(source.getTimestamp());
+		target.setUpdate(source.getVersion());
+		target.setDefaultUser(source.isDefaultUser());
+		target.setPassword(source.getPassword());
+		target.setPosLogin(source.getPosLogin());
+		target.setUsername(source.getUsername());
 		return target;
 	}
 }

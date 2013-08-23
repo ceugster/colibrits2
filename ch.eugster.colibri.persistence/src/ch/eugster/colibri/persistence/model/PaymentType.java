@@ -459,6 +459,15 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 		return fixCharge;
 	}
 
+	public double getCharge() {
+		return charge;
+	}
+
+	public void setCharge(double charge) 
+	{
+		this.propertyChangeSupport.firePropertyChange("charge", this.charge, this.charge = charge);
+	}
+
 	public void setChargeType(ChargeType chargeType) 
 	{
 		this.propertyChangeSupport.firePropertyChange("chargeType", this.chargeType, this.chargeType = chargeType);

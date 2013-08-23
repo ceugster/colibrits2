@@ -249,6 +249,27 @@ public class GalileoConfiguration implements ProviderConfiguration
 		}
 
 		@Override
+		public String label2()
+		{
+			if (this.equals(DATABASE_PATH))
+			{
+				return "";
+			}
+			else if (this.equals(KEEP_CONNECTION))
+			{
+				return "(galserve, wgserve, kundenserver)";
+			}
+			else if (this.equals(CONNECT))
+			{
+				return "(galserve, wgserve, kundenserver)";
+			}
+			else
+			{
+				throw new RuntimeException("Invalid key");
+			}
+		}
+
+		@Override
 		public String value()
 		{
 			if (this.equals(DATABASE_PATH))

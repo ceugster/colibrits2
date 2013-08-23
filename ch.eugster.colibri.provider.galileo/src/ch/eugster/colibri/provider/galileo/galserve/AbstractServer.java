@@ -79,22 +79,18 @@ public abstract class AbstractServer implements IServer
 	
 	public boolean isConnect()
 	{
+		this.status = this.start();
 		return connect;
 	}
 	
 	protected void updatePosition(final Barcode barcode, final Position position)
 	{
 		String value = null;
-		LogService log = (LogService) this.logServiceTracker.getService();
-
 		switch (barcode.getType())
 		{
 			case ARTICLE:
 			{
-				if (log != null)
-				{
-					log.log(LogService.LOG_INFO, "Aktualisiere Artikeldaten aus Warenbewirtschaftung.");
-				}
+				log(LogService.LOG_INFO, "Aktualisiere Artikeldaten aus Warenbewirtschaftung.");
 				if (barcode.isEbook())
 				{
 					this.setEbookProduct(barcode, position);
@@ -108,30 +104,21 @@ public abstract class AbstractServer implements IServer
 			}
 			case ORDER:
 			{
-				if (log != null)
-				{
-					log.log(LogService.LOG_INFO, "Aktualisiere Bestelldaten aus Warenbewirtschaftung.");
-				}
+				log(LogService.LOG_INFO, "Aktualisiere Bestelldaten aus Warenbewirtschaftung.");
 				this.setProduct(barcode, position);
 				value = position.getOrder();
 				break;
 			}
 			case INVOICE:
 			{
-				if (log != null)
-				{
-					log.log(LogService.LOG_INFO, "Aktualisiere Rechnungsdaten aus Warenbewirtschaftung.");
-				}
+				log(LogService.LOG_INFO, "Aktualisiere Rechnungsdaten aus Warenbewirtschaftung.");
 				this.setProduct(barcode, position);
 				value = position.getProduct().getCode();
 				break;
 			}
 			case CUSTOMER:
 			{
-				if (log != null)
-				{
-					log.log(LogService.LOG_INFO, "Aktualisiere Kundendaten aus Warenbewirtschaftung.");
-				}
+				log(LogService.LOG_INFO, "Aktualisiere Kundendaten aus Warenbewirtschaftung.");
 				this.setCustomer(barcode, position);
 				value = this.getCustomerData(position.getReceipt().getCustomer());
 				break;
@@ -141,12 +128,8 @@ public abstract class AbstractServer implements IServer
 
 			}
 		}
-
-		if (log != null)
-		{
-			log.log(LogService.LOG_INFO, "Suche " + barcode.getType().toString() + " mit Code " + barcode.getCode()
+		log(LogService.LOG_INFO, "Suche " + barcode.getType().toString() + " mit Code " + barcode.getCode()
 					+ ": Gefunden: " + value);
-		}
 	}
 
 	
@@ -366,7 +349,7 @@ public abstract class AbstractServer implements IServer
 		return externalProductGroup;
 	}
 
-	private void setCustomer(final Barcode barcode, final Position position)
+	protected void setCustomer(final Barcode barcode, final Position position)
 	{
 		position.getReceipt().setCustomer(this.getCustomer(this.getCustomerId(barcode)));
 	}
@@ -534,6 +517,22 @@ public abstract class AbstractServer implements IServer
 		this.barcodeVerifierTracker = new ServiceTracker<BarcodeVerifier, BarcodeVerifier>(Activator.getDefault().getBundle().getBundleContext(), BarcodeVerifier.class, null);
 		this.barcodeVerifierTracker.open();
 
+		updateProperties();
+		try
+		{
+			this.galserve = ClassFactory.creategdserve();
+		}
+		catch (ComException e)
+		{
+			this.status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+					"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
+		}
+
+		return this.status;
+	}
+
+	protected void updateProperties()
+	{
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
@@ -568,23 +567,12 @@ public abstract class AbstractServer implements IServer
 
 				this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
 				this.keepConnection = Boolean.parseBoolean(properties.get(Property.KEEP_CONNECTION.key()).getValue());
-				this.connect = Boolean.parseBoolean(properties.get(Property.CONNECT.key()).getValue());
+				this.connect = Boolean.valueOf(properties.get(Property.CONNECT.key()).getValue());
 			}
 		}
 
-		try
-		{
-			this.galserve = ClassFactory.creategdserve();
-		}
-		catch (ComException e)
-		{
-			this.status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-					"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
-		}
-
-		return this.status;
 	}
-
+	
 	protected void close()
 	{
 		if (!this.wasOpen && this.open && !this.keepConnection)

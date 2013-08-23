@@ -10,5 +10,7 @@ public interface IProperty
 
 	String label();
 
+	String label2();
+
 	String value();
 }

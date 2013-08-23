@@ -61,6 +61,11 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 	{
 		super();
 	}
+	
+	public boolean isFailOver()
+	{
+		return this.failOver;
+	}
 
 	public HTMLButton(final BasicAction action, final int fgNormal, final int fgFailOver)
 	{

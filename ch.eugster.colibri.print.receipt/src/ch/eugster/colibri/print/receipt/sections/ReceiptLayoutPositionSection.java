@@ -35,7 +35,7 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("WWWWWWWWWWWWWWWWWWW EEEEEEE MM BBBBBBBB OO\n");
+		builder = builder.append("CCCCCCCCCCCCCCCCCCC EEEEEEE MM BBBBBBBB OO\n");
 		builder = builder.append("              BBBBB PPPPPPP    RRRRRRRR\n");
 		builder = builder.append("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU\n");
 		return builder.toString();
@@ -409,6 +409,10 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 					{
 						if (position.getProduct() == null)
 						{
+							if (position.getSearchValue() != null && position.getSearchValue().length() > 0)
+							{
+								return layoutSection.replaceMarker(position.getSearchValue(), marker, true);
+							}
 							return layoutSection.replaceMarker(position.getProductGroup().getCode(), marker, true);
 						}
 						else
@@ -490,25 +494,11 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 					}
 					case A:
 					{
-						if (position.getProduct() == null)
-						{
-							return layoutSection.replaceMarker("", marker, true);
-						}
-						else
-						{
-							return layoutSection.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
-						}
+						return getValue(position, layoutSection, marker);
 					}
 					case U:
 					{
-						if (position.getProduct() == null)
-						{
-							return layoutSection.replaceMarker("", marker, true);
-						}
-						else
-						{
-							return layoutSection.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
-						}
+						return getArticle(position, layoutSection, marker);
 					}
 					default:
 					{
@@ -519,6 +509,34 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 			return marker;
 		}
 
+		private String getValue(Position position, ILayoutSection section, String marker)
+		{
+			if (position.getProduct() == null)
+			{
+				if (position.getSearchValue() != null && position.getSearchValue().length() > 0)
+				{
+					return section.replaceMarker(position.getSearchValue(), marker, true);
+				}
+				return section.replaceMarker("", marker, true);
+			}
+			else
+			{
+				return section.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
+			}
+		}
+		
+		private String getArticle(Position position, ILayoutSection section, String marker)
+		{
+			if (position.getProduct() == null)
+			{
+				return section.replaceMarker("", marker, true);
+			}
+			else
+			{
+				return section.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
+			}
+		}
+		
 		public String getExternalTaxCode(Position position)
 		{
 			String code = position.getCurrentTax().getTax().getTaxRate().getCode();

@@ -256,15 +256,20 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 	protected Salespoint replicate(final Salespoint source, Salespoint target)
 	{
 		target = super.replicate(source, target);
+		target.setAllowTestSettlement(source.isAllowTestSettlement());
+		target.setCommonSettings((CommonSettings) this.persistenceService.getCacheService().find(CommonSettings.class,
+				source.getCommonSettings().getId()));
 		target.setCurrentParkedReceiptNumber(source.getCurrentParkedReceiptNumber());
 		target.setCurrentReceiptNumber(source.getCurrentReceiptNumber());
+		target.setExport(source.isExport());
+		target.setExportPath(source.getExportPath());
+		target.setForceCashCheck(source.isForceCashCheck());
+		target.setForceSettlement(source.isForceSettlement());
 		target.setHost(source.getHost());
+		target.setLocalProviderProperties(source.isLocalProviderProperties());
 		target.setLocation(source.getLocation());
 		target.setMapping(source.getMapping());
 		target.setName(source.getName());
-		target.setLocalProviderProperties(source.isLocalProviderProperties());
-		target.setCommonSettings((CommonSettings) this.persistenceService.getCacheService().find(CommonSettings.class,
-				source.getCommonSettings().getId()));
 		target.setPaymentType((PaymentType) this.persistenceService.getCacheService().find(PaymentType.class,
 				source.getPaymentType().getId()));
 		target.setProfile((Profile) this.persistenceService.getCacheService().find(Profile.class,
@@ -277,10 +282,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 			target.setProposalTax((Tax) this.persistenceService.getCacheService().find(Tax.class,
 					source.getProposalTax().getId()));
 		}
-		target.setForceSettlement(source.isForceSettlement());
 		target.setUseIndividualExport(source.isUseIndividualExport());
-		target.setExport(source.isExport());
-		target.setExportPath(source.getExportPath());
 		return target;
 	}
 

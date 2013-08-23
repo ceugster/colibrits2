@@ -287,7 +287,14 @@ public class PrintoutArea extends AbstractEntity implements Comparable<PrintoutA
 
 	public static PrintoutArea newInstance(final Printout printout, final int printAreaType)
 	{
-		return (PrintoutArea) AbstractEntity.newInstance(new PrintoutArea(printout, printAreaType));
+		PrintoutArea printoutArea = (PrintoutArea) AbstractEntity.newInstance(new PrintoutArea(printout, printAreaType));
+		printoutArea.setTitlePattern(printoutArea.getTitlePattern());
+		printoutArea.setDetailPattern(printoutArea.getDetailPattern());
+		printoutArea.setTotalPattern(printoutArea.getTotalPattern());
+		printoutArea.setTitlePrintOption(printoutArea.getTitlePrintOption());
+		printoutArea.setDetailPrintOption(printoutArea.getDetailPrintOption());
+		printoutArea.setTotalPrintOption(printoutArea.getTotalPrintOption());
+		return printoutArea;
 	}
 
 	public enum PrintOption

@@ -107,9 +107,19 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 	private boolean localProviderProperties;
 
 	@Basic
-	@Column(name = "sp_force_settlement")
 	@Convert("booleanConverter")
+	@Column(name = "sp_allow_test_settlement")
+	private Boolean allowTestSettlement;
+
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "sp_force_settlement")
 	private Boolean forceSettlement;
+
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "sp_force_cash_check")
+	private Boolean forceCashCheck;
 
 	@Basic
 	@Convert("booleanConverter")
@@ -526,6 +536,52 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 			if (this.forceSettlement == null || this.forceSettlement.booleanValue() != forceSettlement)
 			{
 				this.propertyChangeSupport.firePropertyChange("forceSettlement", this.forceSettlement, this.forceSettlement = null);
+			}
+		}
+	}
+	
+	public boolean isAllowTestSettlement() 
+	{
+		return allowTestSettlement == null ? this.getCommonSettings().isAllowTestSettlement() : allowTestSettlement.booleanValue();
+	}
+
+	public void setAllowTestSettlement(boolean allowTestSettlement) 
+	{
+		if (allowTestSettlement == this.getCommonSettings().isAllowTestSettlement())
+		{
+			if (this.allowTestSettlement != null)
+			{
+				this.propertyChangeSupport.firePropertyChange("allowTestSettlement", this.allowTestSettlement, this.allowTestSettlement = null);
+			}
+		}
+		else
+		{
+			if (this.allowTestSettlement == null || this.allowTestSettlement.booleanValue() != allowTestSettlement)
+			{
+				this.propertyChangeSupport.firePropertyChange("allowTestSettlement", this.allowTestSettlement, this.allowTestSettlement = allowTestSettlement);
+			}
+		}
+	}
+	
+	public boolean isForceCashCheck() 
+	{
+		return forceCashCheck == null ? this.getCommonSettings().isForceCashCheck() : forceCashCheck.booleanValue();
+	}
+
+	public void setForceCashCheck(boolean forceCashCheck) 
+	{
+		if (forceCashCheck == this.getCommonSettings().isForceCashCheck())
+		{
+			if (this.forceCashCheck != null)
+			{
+				this.propertyChangeSupport.firePropertyChange("forceCashCheck", this.forceCashCheck, this.forceCashCheck = null);
+			}
+		}
+		else
+		{
+			if (this.forceCashCheck == null || this.forceCashCheck.booleanValue() != forceCashCheck)
+			{
+				this.propertyChangeSupport.firePropertyChange("forceCashCheck", this.forceCashCheck, this.forceCashCheck = forceCashCheck);
 			}
 		}
 	}

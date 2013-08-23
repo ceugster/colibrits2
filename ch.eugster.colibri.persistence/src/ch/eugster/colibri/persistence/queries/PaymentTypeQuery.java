@@ -7,9 +7,6 @@ import org.eclipse.persistence.expressions.ExpressionBuilder;
 
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.PaymentType;
-import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.model.ProductGroup;
-import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 
 public class PaymentTypeQuery extends AbstractQuery<PaymentType>
@@ -31,6 +28,14 @@ public class PaymentTypeQuery extends AbstractQuery<PaymentType>
 	public Collection<PaymentType> selectByChange(final boolean isChange)
 	{
 		Expression expression = new ExpressionBuilder(PaymentType.class).get("changer").equal(isChange);
+		expression = expression.and(new ExpressionBuilder().get("paymentTypeGroup").equal(PaymentTypeGroup.CASH));
+		return this.select(expression);
+	}
+
+	public Collection<PaymentType> selectByCode(String code)
+	{
+		Expression expression = new ExpressionBuilder(PaymentType.class).get("currency").get("code").equal(code);
+		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
 		expression = expression.and(new ExpressionBuilder().get("paymentTypeGroup").equal(PaymentTypeGroup.CASH));
 		return this.select(expression);
 	}

@@ -24,6 +24,13 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 		super(layoutAreaType);
 	}
 
+	protected String getDefaultPatternTitle()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder = builder.append("Bezahlt");
+		return builder.toString();
+	}
+
 	@Override
 	public String getDefaultPatternDetail()
 	{
@@ -85,13 +92,13 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 	@Override
 	protected boolean hasTitleArea()
 	{
-		return false;
+		return true;
 	}
 
 	@Override
 	protected boolean hasTotalArea()
 	{
-		return true;
+		return false;
 	}
 
 	@Override

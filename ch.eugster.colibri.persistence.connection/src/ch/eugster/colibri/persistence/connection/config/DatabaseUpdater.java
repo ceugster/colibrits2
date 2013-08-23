@@ -576,6 +576,43 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
+							else if (structureVersion == 13)
+							{
+								this.log("Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_common_settings";
+								String columnName = "cs_force_cash_check";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								tableName = "colibri_salespoint";
+								columnName = "sp_allow_test_settlement";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", true);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+								tableName = "colibri_salespoint";
+								columnName = "sp_force_cash_check";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", true);
+									this.log("SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log("SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
 
 							this.log("Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");

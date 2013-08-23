@@ -59,7 +59,6 @@ public class GalileoInterfaceComponent implements ProviderInterface
 
 	public GalileoInterfaceComponent()
 	{
-		System.out.println();
 	}
 
 	@Override
@@ -83,6 +82,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
 		IStatus status = Status.OK_STATUS;
+		log(LogService.LOG_INFO, "Verbindung checken.");
 		if (getFindArticleServer().isConnect())
 		{
 			log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
@@ -90,13 +90,18 @@ public class GalileoInterfaceComponent implements ProviderInterface
 			if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
 			{
 				log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
-				if (this.eventAdmin != null)
-				{
-					this.eventAdmin.sendEvent(this.getEvent(status));
-				}
+				this.sendEvent(this.getEvent(status, true));
 			}
 		}
 		return status;
+	}
+	
+	private void sendEvent(Event event)
+	{
+		if (this.eventAdmin != null)
+		{
+			this.eventAdmin.sendEvent(event);
+		}
 	}
 
 	@Override
@@ -137,10 +142,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 			finally
 			{
 				log(LogService.LOG_INFO, position.getReceipt().getCustomer() == null ? "Kundensuche abgebrochen." : "Kunden ausgewählt: " + position.getReceipt().getCustomerCode() + " - " + position.getReceipt().getCustomer().getFullname() + ".");
-				if (this.eventAdmin != null)
-				{
-					this.eventAdmin.sendEvent(this.getEvent(status));
-				}
+				this.sendEvent(this.getEvent(status, true));
 			}
 		}
 		return status;
@@ -165,10 +167,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 			log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
 			if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
 			{
-				if (this.eventAdmin != null)
-				{
-					this.eventAdmin.sendEvent(this.getEvent(status));
-				}
+				this.sendEvent(this.getEvent(status, false));
 			}
 		}
 		return status;
@@ -185,7 +184,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	@Override
 	public IStatus checkConnection(Map<String, IProperty> properties)
 	{
-		IStatus status = Status.OK_STATUS;
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + configuration.getName() + " konnte hergestellt werden.");
 		if (getFindArticleServer().isConnect())
 		{
 			IProperty property = properties.get(GalileoConfiguration.Property.DATABASE_PATH.key());
@@ -306,7 +305,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		return this.customerServer;
 	}
 
-	private Event getEvent(final IStatus status)
+	private Event getEvent(final IStatus status, boolean force)
 	{
 		final String topic = status.getMessage();
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -334,9 +333,10 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		{
 			properties.put(EventConstants.EXCEPTION, status.getException());
 			properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage() == null ? "" : status.getException().getMessage());
-			properties.put("message", "Die Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
 		}
+		properties.put("message", "Die Verbindung zu " + configuration.getName() + " konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
 		properties.put("status", status);
+		properties.put("force", Boolean.valueOf(force));
 		for (ProviderInterface.Topic t : ProviderInterface.Topic.values())
 		{
 			if (t.topic().equals(status.getMessage()))
@@ -354,6 +354,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		if (this.updateProviderServer == null)
 		{
 			this.updateProviderServer = new UpdateProviderServerCom4j();
+			this.updateProviderServer.start();
 		}
 	}
 

@@ -95,6 +95,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 			}
 			text = builder.toString();
 		}
+		System.out.println(text);
 		return text;
 	}
 

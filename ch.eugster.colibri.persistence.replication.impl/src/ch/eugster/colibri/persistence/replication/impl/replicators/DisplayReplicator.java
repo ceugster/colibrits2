@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
 import ch.eugster.colibri.persistence.model.Display;
+import ch.eugster.colibri.persistence.model.DisplayArea;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.DisplayQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -118,6 +119,23 @@ public class DisplayReplicator extends AbstractEntityReplicator<Display>
 	protected Display replicate(final Display source, Display target)
 	{
 		target = super.replicate(source, target);
+		return target;
+	}
+
+	protected void replicate(final Display targetDisplay, final DisplayArea sourceDisplayArea)
+	{
+		DisplayArea targetDisplayArea = this.replicate(sourceDisplayArea, DisplayArea.newInstance(targetDisplay, sourceDisplayArea.getDisplayAreaType()));
+		targetDisplay.addDisplayArea(targetDisplayArea);
+	}
+
+	protected DisplayArea replicate(final DisplayArea source, DisplayArea target)
+	{
+		target.setId(source.getId());
+		target.setDeleted(source.isDeleted());
+		target.setTimestamp(source.getTimestamp());
+		target.setUpdate(source.getVersion());
+		target.setPattern(source.getPattern());
+		target.setTimerDelay(source.getTimerDelay());
 		return target;
 	}
 }
