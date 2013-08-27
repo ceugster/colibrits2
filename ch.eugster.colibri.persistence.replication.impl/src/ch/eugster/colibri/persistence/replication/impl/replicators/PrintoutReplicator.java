@@ -100,34 +100,6 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 	{
 		ReceiptPrinterSettings settings = (ReceiptPrinterSettings) this.persistenceService.getCacheService().find(ReceiptPrinterSettings.class, source.getId());
 		final Printout target = Printout.newInstance(source.getPrintoutType(), settings);
-		if (source.getSalespoint() != null)
-		{
-			Salespoint salespoint = (Salespoint) this.persistenceService.getCacheService().find(Salespoint.class, source.getSalespoint().getId());
-			target.setSalespoint(salespoint);
-		}
-
-		if (source.getParent() != null)
-		{
-			final Printout parent = (Printout) this.persistenceService.getCacheService().find(Printout.class, source.getParent().getId());
-			target.setParent(parent);
-		}
-		for (PrintoutArea sourceArea : source.getPrintoutAreas().values())
-		{
-			boolean found = false;
-			for (PrintoutArea targetArea : target.getPrintoutAreas().values())
-			{
-				if (targetArea.getId().equals(sourceArea.getId()))
-				{
-					this.replicate(sourceArea, targetArea);
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				this.replicate(target, sourceArea);
-			}
-		}
 		return this.replicate(source, target);
 	}
 
@@ -135,14 +107,73 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 	protected Printout replicate(final Printout source, Printout target)
 	{
 		target = super.replicate(source, target);
+		Printout parent = null;
+		if (source.getParent() != null)
+		{
+			parent = (Printout) this.persistenceService.getCacheService().find(Printout.class, source.getParent().getId());
+		}
+		target.setParent(parent);
+		target.setPrintoutType(source.getPrintoutType());
 		target.setAutomaticPrint(source.isAutomaticPrint());
+		ReceiptPrinterSettings settings = null;
+		if (source.getReceiptPrinterSettings() != null)
+		{
+			settings = (ReceiptPrinterSettings) this.persistenceService.getCacheService().find(ReceiptPrinterSettings.class, source.getReceiptPrinterSettings().getId());
+		}
+		target.setReceiptPrinterSettings(settings);
+		Salespoint salespoint = null;
+		if (source.getSalespoint() != null)
+		{
+			salespoint = (Salespoint) this.persistenceService.getCacheService().find(Salespoint.class, source.getSalespoint().getId());
+		}
+		target.setSalespoint(salespoint);
+		Collection<Printout> sourceChildren = source.getChildren();
+		for (Printout sourceChild : sourceChildren)
+		{
+			boolean found = false;
+			Collection<Printout> targetChildren = target.getChildren();
+			for (Printout targetChild : targetChildren)
+			{
+				if (targetChild.getId().equals(sourceChild.getId()))
+				{
+					found = true;
+				}
+			}
+			if (!found)
+			{
+				Printout targetChild = replicate(sourceChild);
+				target.addPrintout(targetChild);
+			}
+		}
+		Collection<PrintoutArea> areas = target.getPrintoutAreas().values();
+		for (PrintoutArea area : areas)
+		{
+			area.setDeleted(true);
+		}
+		areas = source.getPrintoutAreas().values();
+		for (PrintoutArea area : areas)
+		{
+			replicate(target, area);
+		}
+		
 		return target;
 	}
 
 	protected void replicate(final Printout targetPrintout, final PrintoutArea sourcePrintoutArea)
 	{
-		final PrintoutArea targetPrintoutArea = this.replicate(sourcePrintoutArea, PrintoutArea.newInstance(targetPrintout, sourcePrintoutArea.getPrintAreaType()));
-		targetPrintout.addPrintoutArea(targetPrintoutArea);
+		PrintoutArea area = targetPrintout.getPrintoutArea(sourcePrintoutArea.getPrintAreaType());
+		if (area == null)
+		{
+			if (!sourcePrintoutArea.isDeleted())
+			{
+				final PrintoutArea targetPrintoutArea = this.replicate(sourcePrintoutArea, PrintoutArea.newInstance(targetPrintout, sourcePrintoutArea.getPrintAreaType()));
+				targetPrintout.addPrintoutArea(targetPrintoutArea);
+			}
+		}
+		else
+		{
+			area = this.replicate(sourcePrintoutArea, area);
+		}
 	}
 
 	protected PrintoutArea replicate(final PrintoutArea source, PrintoutArea target)

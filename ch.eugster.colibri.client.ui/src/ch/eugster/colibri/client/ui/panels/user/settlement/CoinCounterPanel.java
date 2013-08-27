@@ -371,6 +371,20 @@ public class CoinCounterPanel extends ProfilePanel
 		return value;
 	}
 
+//	public double getCountVoucherSum()
+//	{
+//		double value = 0d;
+//		Collection<VoucherRow[]> vouchers = voucherRows.values();
+//		for (VoucherRow[] rows : vouchers)
+//		{
+//			for (VoucherRow row : rows)
+//			{
+//				value += Double.valueOf(row.getValue().getSumLabel().getText()).doubleValue();
+//			}
+//		}
+//		return value;
+//	}
+
 	private Collection<SettlementMoney> getMoneyDetails(final Stock stock, final Settlement settlement)
 	{
 		final Collection<SettlementMoney> moneys = new ArrayList<SettlementMoney>();

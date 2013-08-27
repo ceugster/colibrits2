@@ -8,25 +8,17 @@ package ch.eugster.colibri.admin.profile.editors.tab;
 
 import org.eclipse.jface.viewers.LabelProvider;
 
-import ch.eugster.colibri.persistence.model.PaymentType;
-import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.model.Currency;
 
 public class DrawerLabelProvider extends LabelProvider
 {
 	@Override
 	public String getText(final Object element)
 	{
-		if (element instanceof PaymentType)
+		if (element instanceof Currency)
 		{
-			final PaymentType paymentType = (PaymentType) element;
-			if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CASH))
-			{
-				return paymentType.getName() + " - " + paymentType.getCurrency().getCode();
-			}
-			else
-			{
-				return paymentType.getName();
-			}
+			final Currency currency = (Currency) element;
+			return currency.getName();
 		}
 		return "";
 	}

@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import ch.eugster.colibri.admin.profile.editors.tab.DrawerLabelProvider;
 import ch.eugster.colibri.admin.profile.editors.tab.TabEditor;
 import ch.eugster.colibri.admin.profile.editors.tab.TabEditorButton;
-import ch.eugster.colibri.admin.ui.filters.PaymentTypeChangeOnlyViewerFilter;
+import ch.eugster.colibri.admin.ui.filters.UsedCurrenciesOnlyViewerFilter;
 import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
 public class DrawerPopupMenu extends KeyPopupMenu
@@ -37,8 +37,8 @@ public class DrawerPopupMenu extends KeyPopupMenu
 		 */
 
 		final LabelProvider labelProvider = new DrawerLabelProvider();
-		final ViewerFilter[] filters = new ViewerFilter[] { new DeletedEntityViewerFilter(), new PaymentTypeChangeOnlyViewerFilter() };
-		this.add(new SelectPaymentTypeMenuItem(editor, button, "Schublade...", "action.drawer", labelProvider, filters, "Schublade"));
+		final ViewerFilter[] filters = new ViewerFilter[] { new DeletedEntityViewerFilter(), new UsedCurrenciesOnlyViewerFilter() };
+		this.add(new SelectCurrencyMenuItem(editor, button, "Schublade...", "action.drawer", labelProvider, filters, "Schublade"));
 
 		addSeparator();
 		/*

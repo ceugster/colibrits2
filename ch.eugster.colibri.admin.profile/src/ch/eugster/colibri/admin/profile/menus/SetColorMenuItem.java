@@ -49,7 +49,7 @@ public class SetColorMenuItem extends MenuItem implements ActionListener
 			public IStatus runInUIThread(final IProgressMonitor monitor)
 			{
 				RGB rgb = SetColorMenuItem.this.getRGB();
-				final Shell shell = new Shell(Display.getDefault());
+				final Shell shell = new Shell(this.getDisplay());
 				final ColorDialog dialog = new ColorDialog(shell);
 				dialog.setRGB(rgb);
 				final RGB result = rgb = dialog.open();

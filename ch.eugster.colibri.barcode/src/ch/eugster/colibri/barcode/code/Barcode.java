@@ -4,6 +4,18 @@ import ch.eugster.colibri.persistence.model.Position;
 
 public interface Barcode
 {
+	public static final int EAN13_LENGTH = 13;
+	
+	public static final int EAN13_EBOOK_LENGTH = 14;
+
+	public static final String PREFIX_ISBN = "978";
+
+	public static final String PREFIX_ORDER = "989";
+
+	public static final String PREFIX_CUSTOMER = "992";
+	
+	public static final String PREFIX_EBOOK = "E";
+
 	String getCode();
 
 	String getDescription();

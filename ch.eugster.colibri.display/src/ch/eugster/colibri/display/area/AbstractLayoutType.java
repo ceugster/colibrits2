@@ -119,9 +119,17 @@ public abstract class AbstractLayoutType implements ILayoutType
 		StringBuilder result = new StringBuilder();
 		for (final String line : lines)
 		{
-			result = result.append(line);
+			String[] sublines = line.split("[\r\n]");
+			for (String subline : sublines)
+			{
+				subline = padRight(subline, 20);
+				if (subline.trim().length() > 0)
+				{
+					result = result.append(subline);
+				}
+			}
 		}
-		return result.toString().replace("\n", "");
+		return result.toString();
 	}
 
 	protected void setCustomerDisplayService(final CustomerDisplayService customerDisplayService)

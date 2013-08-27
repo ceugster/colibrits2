@@ -22,21 +22,23 @@ public class VoucherLayoutFooterSection extends AbstractLayoutSection
 	@Override
 	public String getDefaultPatternDetail()
 	{
-		StringBuilder builder = new StringBuilder();
-		String number = this.getCommonSettingsTaxNumber();
-		number = (number == null || number.isEmpty()) ? "000 000" : number;
-		int left = (42 - "MWST-Nr: ".length() - number.length()) / 2;
 		StringBuilder n = new StringBuilder();
-		for (int i = 0; i < left; i++)
+		String number = this.getCommonSettingsTaxNumber();
+		if (number != null && !number.isEmpty())
 		{
-			n = n.append(" ");
+			int left = (42 - "MWST-Nr: ".length() - number.length()) / 2;
+			for (int i = 0; i < left; i++)
+			{
+				n = n.append(" ");
+			}
+			n = n.append("MWST-Nr.: ");
+			n = n.append(number);
+			for (int i = n.length(); i < 42; i++)
+			{
+				n = n.append(" ");
+			}
 		}
-		n = n.append("MWST-Nr.: ");
-		n = n.append(number);
-		for (int i = n.length(); i < 42; i++)
-		{
-			n = n.append(" ");
-		}
+		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
 		builder = builder.append(n.toString() + "\n");
 		builder = builder.append("      Vielen Dank für Ihren Einkauf!      \n");
@@ -97,16 +99,16 @@ public class VoucherLayoutFooterSection extends AbstractLayoutSection
 		{
 			if (printable instanceof Receipt)
 			{
-				Receipt receipt = (Receipt) printable;
-				if (hasData(receipt))
-				{
-					lines.add("------------------------------------------\n");
-					lines.add("");
-					lines.add("");
-					lines.add("");
-					lines.add("");
-					lines.add("Unterschrift");
-				}
+//				Receipt receipt = (Receipt) printable;
+//				if (hasData(receipt))
+//				{
+//					lines.add("------------------------------------------\n");
+//					lines.add("");
+//					lines.add("");
+//					lines.add("");
+//					lines.add("");
+//					lines.add("Unterschrift");
+//				}
 			}
 			Collection<String> patternLines = adaptPatternDetail(this.getPattern(AreaType.DETAIL), printable);
 			final String[] markers = this.getMarkers(AreaType.DETAIL, patternLines);

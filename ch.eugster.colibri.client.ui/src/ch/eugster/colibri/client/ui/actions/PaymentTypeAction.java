@@ -13,6 +13,7 @@ import java.beans.PropertyChangeListener;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
+import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
@@ -68,14 +69,36 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 			}
 			else
 			{
-				this.userPanel.getPaymentWrapper().getPayment().setAmount(value);
+				boolean setAmount = true;
+				double range = this.userPanel.getSalespoint().getCommonSettings().getMaxPaymentRange();
+				double max = this.userPanel.getSalespoint().getCommonSettings().getMaxPaymentAmount();
+				if (Math.abs(value) > Math.abs(range))
+				{
+					if (Math.abs(value) > Math.abs(max))
+					{
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getProfile(), "Eingabe zu hoch", "Der eingegebene Betrag ist höher als zugelassen.\nBitte korrigieren Sie den Betrag.", MessageDialog.TYPE_ERROR);
+						setAmount = false;
+						return;
+					}
+					else
+					{
+						if (MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.userPanel.getProfile(), "Eingabe sehr hoch", "Der eingegebene Betrag ist sehr hoch.\nWollen Sie ihn trotzdem verwenden?", MessageDialog.TYPE_QUESTION, new int[] { MessageDialog.BUTTON_YES, MessageDialog.BUTTON_NO}, 0) != MessageDialog.BUTTON_YES)
+						{
+							setAmount = false;
+						}
+					}
+				}
+				if (setAmount)
+				{
+					this.userPanel.getPaymentWrapper().getPayment().setAmount(value);
+				}
 			}
 		}
 		else
 		{
 			this.userPanel.getPaymentWrapper().getPayment().setAmount(this.key.getValue());
 		}
-		if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+		if (this.getPaymentType().getPaymentTypeGroup().isChargable())
 		{
 			if (!this.getPaymentType().getChargeType().equals(ChargeType.NONE))
 			{
@@ -124,21 +147,21 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		{
 			if (this.userPanel.getValueDisplay().testAmount() == 0d)
 			{
-				if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
-				{
+//				if (this.getPaymentType().getPaymentTypeGroup().isChargable())
+//				{
 					return this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D;
-				}
-				else
-				{
-					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getId()))
-					{
-						return false;
-					}
-					else
-					{
-						return true;
-					}
-				}
+//				}
+//				else
+//				{
+//					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getId()))
+//					{
+//						return false;
+//					}
+//					else
+//					{
+//						return true;
+//					}
+//				}
 			}
 			else
 			{
@@ -154,7 +177,7 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		{
 			if (this.key.getValue() == 0d)
 			{
-				if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+				if (this.getPaymentType().getPaymentTypeGroup().isChargable())
 				{
 					this.setEnabled(this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D);
 				}

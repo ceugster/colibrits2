@@ -114,6 +114,10 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 
 	private Button forceSettlement;
 
+	private Button allowTestSettlement;
+
+	private Button forceCashCheck;
+
 	private ComboViewer taxes;
 
 	private ComboViewer receiptPrinterViewer;
@@ -381,6 +385,8 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.location.setText(salespoint.getLocation());
 		this.mappingId.setText(salespoint.valueOf(salespoint.getMapping()));
 		this.forceSettlement.setSelection(salespoint.isForceSettlement());
+		this.allowTestSettlement.setSelection(salespoint.isAllowTestSettlement());
+		this.forceCashCheck.setSelection(salespoint.isForceCashCheck());
 		
 		this.loadProviderValues(salespoint);
 
@@ -472,7 +478,9 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		salespoint.setLocation(this.location.getText());
 		salespoint.setMapping(this.mappingId.getText());
 		salespoint.setForceSettlement(forceSettlement.getSelection());
-
+		salespoint.setAllowTestSettlement(allowTestSettlement.getSelection());
+		salespoint.setForceCashCheck(forceCashCheck.getSelection());
+		
 		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
 		for (Bundle bundle : bundles)
 		{
@@ -562,26 +570,22 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 			ssel = (StructuredSelection) this.receiptPrinterViewer.getSelection();
 			if (ssel.isEmpty())
 			{
-				final SalespointReceiptPrinterSettings selectedPrinter = salespoint.getReceiptPrinterSettings();
-				if (selectedPrinter instanceof SalespointReceiptPrinterSettings)
-				{
-					selectedPrinter.setDeleted(true);
-				}
+				salespoint.setReceiptPrinterSettings(null);
 			}
 			else
 			{
 				final ReceiptPrinterSettings selectedPrinter = (ReceiptPrinterSettings) ssel.getFirstElement();
 				if (selectedPrinter.getId() == null)
 				{
-					final SalespointReceiptPrinterSettings salespointPrinter = salespoint.getReceiptPrinterSettings();
-					if (salespointPrinter instanceof SalespointReceiptPrinterSettings)
-					{
-						salespointPrinter.setDeleted(true);
-					}
+					salespoint.setReceiptPrinterSettings(null);
 				}
 				else
 				{
 					SalespointReceiptPrinterSettings currentPrinterSettings = salespoint.getReceiptPrinterSettings();
+					if (currentPrinterSettings == null || !currentPrinterSettings.getReceiptPrinterSettings().getId().equals(selectedPrinter.getId()))
+					{
+						currentPrinterSettings = selectedPrinter.getSalespointReceiptPrinter(salespoint);
+					}
 					if (currentPrinterSettings == null)
 					{
 						currentPrinterSettings = SalespointReceiptPrinterSettings.newInstance(selectedPrinter, salespoint);
@@ -613,6 +617,11 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 				final CustomerDisplaySettings selectedDisplay = (CustomerDisplaySettings) ssel.getFirstElement();
 				SalespointCustomerDisplaySettings currentDisplay = salespoint.getCustomerDisplaySettings();
 				if (currentDisplay == null)
+				{
+					currentDisplay = SalespointCustomerDisplaySettings.newInstance(selectedDisplay, salespoint);
+					salespoint.setCustomerDisplaySettings(currentDisplay);
+				}
+				else if (!currentDisplay.getCustomerDisplaySettings().getId().equals(selectedDisplay.getId()))
 				{
 					currentDisplay = SalespointCustomerDisplaySettings.newInstance(selectedDisplay, salespoint);
 					salespoint.setCustomerDisplaySettings(currentDisplay);
@@ -1995,6 +2004,52 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.forceSettlement = this.formToolkit.createButton(composite, "Tagesabschluss erzwingen", SWT.CHECK);
 		this.forceSettlement.setLayoutData(gridData);
 		this.forceSettlement.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				SalespointEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				SalespointEditor.this.setDirty(true);
+			}
+		});
+
+		label = this.formToolkit.createLabel(composite, "", SWT.NONE);
+		label.setLayoutData(new GridData());
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+
+		this.allowTestSettlement = this.formToolkit.createButton(composite, "Provisorischen Abschluss erlauben", SWT.CHECK);
+		this.allowTestSettlement.setLayoutData(gridData);
+		this.allowTestSettlement.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				SalespointEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				SalespointEditor.this.setDirty(true);
+			}
+		});
+
+		label = this.formToolkit.createLabel(composite, "", SWT.NONE);
+		label.setLayoutData(new GridData());
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+
+		this.forceCashCheck = this.formToolkit.createButton(composite, "Kassensturz erzwingen", SWT.CHECK);
+		this.forceCashCheck.setLayoutData(gridData);
+		this.forceCashCheck.addSelectionListener(new SelectionListener()
 		{
 			@Override
 			public void widgetSelected(final SelectionEvent e)

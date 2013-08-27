@@ -130,7 +130,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 	{
 		this.createPaymentSection(scrolledForm);
 		final PaymentType paymentType = (PaymentType) this.getEditorInput().getAdapter(PaymentType.class);
-		if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+		if (paymentType.getPaymentTypeGroup().isChargable())
 		{
 			this.createCreditCardSection(scrolledForm);
 		}
@@ -211,7 +211,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 			this.change.setSelection(paymentType.isChange());
 		}
 
-		if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+		if (paymentType.getPaymentTypeGroup().isChargable())
 		{
 			PersistenceService service = (PersistenceService) this.persistenceServiceTracker.getService();
 			if (service != null)
@@ -253,7 +253,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 			paymentType.setChange(this.change.getSelection());
 		}
 
-		if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+		if (paymentType.getPaymentTypeGroup().isChargable())
 		{
 			ssel = (StructuredSelection) productGroupViewer.getSelection();
 			ProductGroup productGroup = (ProductGroup) ssel.getFirstElement();
@@ -289,7 +289,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 		Message msg = this.getEmptyCurrencySelectionMessage();
 
 		final PaymentType paymentType = (PaymentType) this.getEditorInput().getAdapter(PaymentType.class);
-		if (msg == null && paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
+		if (msg == null && paymentType.getPaymentTypeGroup().isChargable())
 		{
 			msg = this.getEmptyProductGroupSelectionMessage();
 		}
@@ -475,11 +475,6 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 			}
 		});
 
-		if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CREDIT))
-		{
-			
-		}
-		
 		layoutData = new TableWrapData();
 		layoutData.grabHorizontal = false;
 

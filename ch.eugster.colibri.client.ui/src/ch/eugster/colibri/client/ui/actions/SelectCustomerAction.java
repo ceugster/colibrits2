@@ -53,36 +53,41 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		final UIJob uiJob = new UIJob("send message")
-		{
-			@Override
-			public IStatus runInUIThread(final IProgressMonitor monitor)
-			{
-				IStatus status = Status.CANCEL_STATUS;
+//		final UIJob uiJob = new UIJob("send message")
+//		{
+//			@Override
+//			public IStatus runInUIThread(final IProgressMonitor monitor)
+//			{
+//				IStatus status = Status.CANCEL_STATUS;
 				final ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
 						ProviderInterface.class, null);
 				providerInterfaceTracker.open();
-
-				final ProviderInterface providerInterface = (ProviderInterface) providerInterfaceTracker.getService();
-				if (providerInterface != null)
+				try
 				{
-					status = providerInterface.selectCustomer(userPanel.getPositionWrapper().getPosition(), getProductGroup());
-					if (status.getSeverity() == IStatus.OK)
+					final ProviderInterface providerInterface = (ProviderInterface) providerInterfaceTracker.getService();
+					if (providerInterface != null)
 					{
-						userPanel.getPositionListPanel().getModel().actionPerformed(event);
-					}
-					else if (status.getSeverity() != IStatus.CANCEL)
-					{
-						MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), "Lesen der Kundendaten",
-								status.getMessage(), MessageDialog.BUTTON_OK);
+						IStatus status = providerInterface.selectCustomer(userPanel.getPositionWrapper().getPosition(), getProductGroup());
+						if (status.getSeverity() == IStatus.OK)
+						{
+							userPanel.getPositionListPanel().getModel().actionPerformed(event);
+						}
+//						else if (status.getSeverity() != IStatus.CANCEL)
+//						{
+//							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), "Lesen der Kundendaten",
+//									status.getMessage(), MessageDialog.BUTTON_OK);
+//						}
 					}
 				}
-				providerInterfaceTracker.close();
-				return status;
-			}
-		};
-		uiJob.setUser(true);
-		uiJob.schedule();
+				finally
+				{
+					providerInterfaceTracker.close();
+				}
+//				return status;
+//			}
+//		};
+//		uiJob.setUser(true);
+//		uiJob.schedule();
 	}
 
 	@Override

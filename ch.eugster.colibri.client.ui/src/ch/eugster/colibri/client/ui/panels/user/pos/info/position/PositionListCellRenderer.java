@@ -8,6 +8,7 @@ package ch.eugster.colibri.client.ui.panels.user.pos.info.position;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.Arrays;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -50,7 +51,7 @@ public class PositionListCellRenderer extends DefaultTableCellRenderer
 
 		if (isNegativePriceValue(row))
 		{
-			result.setForeground(isSelected ? Color.GREEN : expense);
+			result.setForeground(isSelected ? Color.MAGENTA : expense);
 		}
 		else if (isNegativeQuantityValue(row))
 		{
@@ -67,6 +68,7 @@ public class PositionListCellRenderer extends DefaultTableCellRenderer
 	private boolean isNegativePriceValue(final int row)
 	{
 		final Position[] positions = userPanel.getReceiptWrapper().getReceipt().getPositions().toArray(new Position[0]);
+		Arrays.sort(positions);
 		if ((row >= 0) && (row < positions.length))
 		{
 			return positions[row].getPrice() < 0d;
@@ -80,6 +82,7 @@ public class PositionListCellRenderer extends DefaultTableCellRenderer
 	private boolean isNegativeQuantityValue(final int row)
 	{
 		final Position[] positions = userPanel.getReceiptWrapper().getReceipt().getPositions().toArray(new Position[0]);
+		Arrays.sort(positions);
 		if ((row >= 0) && (row < positions.length))
 		{
 			return positions[row].getQuantity() < 0;

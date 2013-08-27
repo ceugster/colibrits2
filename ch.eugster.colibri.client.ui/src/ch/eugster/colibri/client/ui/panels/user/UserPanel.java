@@ -28,6 +28,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.actions.BackAction;
+import ch.eugster.colibri.client.ui.actions.ClearAction;
 import ch.eugster.colibri.client.ui.actions.DiscountAction;
 import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeEvent;
@@ -49,6 +50,7 @@ import ch.eugster.colibri.client.ui.panels.user.pos.numeric.ValueDisplay;
 import ch.eugster.colibri.client.ui.panels.user.pos.selection.SelectionPanel;
 import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListPanel;
 import ch.eugster.colibri.client.ui.panels.user.settlement.CoinCounterPanel;
+import ch.eugster.colibri.client.ui.views.ClientView;
 import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Profile.PanelType;
@@ -146,7 +148,11 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		if (event.getActionCommand().equals(BackAction.ACTION_COMMAND))
+		if (event.getActionCommand().equals(ClearAction.ACTION_COMMAND))
+		{
+			this.getReceiptWrapper().getReceipt().setCustomer(null);
+		}
+		else if (event.getActionCommand().equals(BackAction.ACTION_COMMAND))
 		{
 			if (this.getMainTabbedPane().settlementRequired())
 			{
@@ -278,6 +284,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 
 	public void setSalespoint(Salespoint salespoint)
 	{
+		ClientView.getClientView().updateSalespoint(salespoint);
 		Receipt receipt = this.receiptWrapper.prepareReceipt();
 		this.positionWrapper.preparePosition(receipt);
 		this.paymentWrapper.preparePayment(receipt);
@@ -530,6 +537,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		{
 			final InfoPanel infoPanel = new InfoPanel(this, profile);
 			this.numericPadPanel.addActionListener(infoPanel);
+			this.numericPadPanel.addActionListener(this);
 			this.addStateChangeListener(infoPanel);
 			return infoPanel;
 		}

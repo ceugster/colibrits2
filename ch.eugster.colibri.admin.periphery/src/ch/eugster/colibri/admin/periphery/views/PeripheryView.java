@@ -33,6 +33,7 @@ import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
 import ch.eugster.colibri.persistence.model.Display;
 import ch.eugster.colibri.persistence.model.Printout;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.print.service.PrintService;
 import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
@@ -119,13 +120,14 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 		else if (ssel.getFirstElement() instanceof Display)
 		{
 			Display display = (Display) ssel.getFirstElement();
+			display = refresh(display);
 			try
 			{
-				DisplayService service = getDisplayService(display);
-				if (service != null)
+				DisplayService displayService = getDisplayService(display);
+				if (displayService != null)
 				{
 					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-					.openEditor(new DisplayEditorInput(service, display), DisplayEditor.ID, true);
+					.openEditor(new DisplayEditorInput(displayService, display), DisplayEditor.ID, true);
 				}
 			}
 			catch (final PartInitException ex)
@@ -136,6 +138,7 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 		else if (ssel.getFirstElement() instanceof Printout)
 		{
 			Printout printout = (Printout) ssel.getFirstElement();
+			printout = refresh(printout);
 			try
 			{
 				PrintService service = getPrintService(printout);
@@ -189,6 +192,36 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 //				printServiceTracker.close();
 //			}
 //		}
+	}
+
+	private Display refresh(Display display)
+	{
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
+		tracker.open();
+		try
+		{
+			PersistenceService service = tracker.getService();
+			return (Display) service.getServerService().refresh(display);
+		}
+		finally
+		{
+			tracker.close();
+		}
+	}
+
+	private Printout refresh(Printout printout)
+	{
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
+		tracker.open();
+		try
+		{
+			PersistenceService service = tracker.getService();
+			return (Printout) service.getServerService().refresh(printout);
+		}
+		finally
+		{
+			tracker.close();
+		}
 	}
 
 	public DisplayService getDisplayService(Display display)

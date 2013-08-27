@@ -1,6 +1,7 @@
 package ch.eugster.colibri.periphery.printer.serial.service;
 
 import java.io.PrintStream;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -9,9 +10,11 @@ import org.osgi.service.component.ComponentContext;
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.printer.serial.Activator;
 import ch.eugster.colibri.periphery.printer.service.AbstractReceiptPrinterService;
-import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
+import ch.eugster.colibri.persistence.model.Stock;
 
 public class SerialReceiptPrinterService extends AbstractReceiptPrinterService 
 {
@@ -100,7 +103,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		}
 		if (printer != null)
 		{
-			for (final String line : text)
+			for (String line : text)
 			{
 				final String printable = this.getConverter().convert(line);
 				System.out.println(printable);
@@ -112,23 +115,61 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	}
 
 	@Override
-	public void openDrawer(PaymentType paymentType) 
+	public void openDrawer(Currency currency) 
 	{
+		if (currency == null)
+		{
+			return;
+		}
 		if (printer == null)
 		{
 			this.openPrinter(this.getPort());
 		}
 		if (printer != null)
 		{
-			if (paymentType.getId().equals(salespoint.getPaymentType().getId()))
+			Collection<Stock> stocks = salespoint.getStocks();
+			for (Stock stock : stocks)
 			{
-				this.printer.print(new char[] { 16, 20, 1, 0, 4});
-			}
-			else
-			{
-				this.printer.print(new char[] { 16, 20, 1, 1, 4});
+				if (stock.getPaymentType().getCurrency().getId().equals(currency.getId()))
+				{
+					if (salespoint.getPaymentType().getCurrency().getId().equals(stock.getPaymentType().getCurrency().getId()))
+					{
+						this.printer.print(new char[] { 16, 20, 1, 0, 4});
+					}
+					else
+					{
+						this.printer.print(new char[] { 16, 20, 1, 1, 4});
+					}
+				}
 			}
 			this.closePrinter();
+		}
+	}
+
+	public char[] getFontSize(ReceiptPrinterService.Size size) 
+	{
+		switch(size)
+		{
+		case NORMAL:
+		{
+			return new char[] { 29, 33, 0};
+		}
+		case DOUBLE_WIDTH:
+		{
+			return new char[] { 29, 33, 16};
+		}
+		case DOUBLE_HEIGHT:
+		{
+			return new char[] { 29, 33, 1};
+		}
+		case DOUBLE_WIDTH_AND_HEIGHT:
+		{
+			return new char[] { 29, 33, 17};
+		}
+		default:
+		{
+			return new char[] { 29, 33, 0};
+		}
 		}
 	}
 

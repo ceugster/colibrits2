@@ -34,10 +34,12 @@ import ch.eugster.colibri.client.ui.events.ReceiptChangeEvent;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.rules.LocalDatabaseRule;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
@@ -235,7 +237,10 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		final Collection<Position> positions = this.receipt.getAllPositions();
 		for (final Position position : positions)
 		{
-			position.setDiscount(discount);
+			if (position.getQuantity() > 0 && position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
+			{
+				position.setDiscount(discount);
+			}
 		}
 		this.fireReceiptChangeEvent(new ReceiptChangeEvent(null, this.receipt));
 	}
@@ -285,6 +290,15 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	private Event getEvent(final String topics, final Receipt receipt)
 	{
+		boolean openCashdrawer = false;
+		for (Payment payment : receipt.getPayments())
+		{
+			if (payment.getPaymentType().isOpenCashdrawer())
+			{
+				openCashdrawer = true;
+				break;
+			}
+		}
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
@@ -296,7 +310,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), receipt);
 		properties.put("status", Status.OK_STATUS);
-		properties.put("open.drawer", true);
+		properties.put("open.drawer", Boolean.valueOf(openCashdrawer));
 		properties.put("copies", receipt.hasRestitution() ? Integer.valueOf(userPanel.getRestitutionPrintCount()) : Integer.valueOf(1));
 		return new Event(topics, properties);
 	}

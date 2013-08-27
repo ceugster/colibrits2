@@ -21,17 +21,6 @@ import ch.eugster.colibri.persistence.model.Position;
  */
 public class Ean13 extends AbstractBarcode
 {
-	public static final int EAN13_LENGTH = 13;
-	
-	public static final int EAN13_EBOOK_LENGTH = 14;
-
-	public static final String PREFIX_ISBN = "978";
-
-	public static final String PREFIX_ORDER = "989";
-
-	public static final String PREFIX_CUSTOMER = "992";
-	
-	public static final String PREFIX_EBOOK = "E";
 
 	public boolean isEbook()
 	{
@@ -45,7 +34,6 @@ public class Ean13 extends AbstractBarcode
 	protected Ean13(final String ean13)
 	{
 		this(null, ean13);
-
 	}
 
 	protected Ean13(final String prefix, final String ean13)

@@ -258,6 +258,15 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		return true;
 	}
 
+	private void log(int level, String message)
+	{
+		LogService service = logServiceTracker.getService();
+		if (service != null)
+		{
+			service.log(level, message);
+		}
+	}
+	
 	public boolean isPositionEmpty()
 	{
 		if (this.position.getProductGroup() == null)
@@ -280,11 +289,13 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	{
 		if (event.getKeyCode() == KeyEvent.VK_ENTER)
 		{
+			log(LogService.LOG_INFO, "Enter Key pressed.");
 			final String input = this.valueDisplay.readAndInitDisplay();
 			if ((input != null) && (input.length() > 0))
 			{
 				if (input.startsWith("GCD"))
 				{
+					log(LogService.LOG_INFO, "eGutschein eingelesen.");
 					checkBalance(input);
 				}
 				else
@@ -292,9 +303,20 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 					final Barcode barcode = this.verifyInput(input);
 					if (barcode instanceof Barcode)
 					{
-						if (this.verifyOrderedNotYetScanned(barcode))
+						log(LogService.LOG_INFO, "Barcode: " + barcode.getName());
+						if (barcode.getCode().startsWith(Barcode.PREFIX_CUSTOMER))
 						{
+							log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
+							this.position.getReceipt().setCustomerCode(barcode.getCode());
+							this.findAndRead(barcode);
+						}
+						else if (this.verifyOrderedNotYetScanned(barcode))
+						{
+							log(LogService.LOG_INFO, "Provider wird gesetzt.");
 							this.setProviderId(barcode);
+							log(LogService.LOG_INFO, "Default-WG setzen.");
+							this.setDefaultProductGroup();
+							log(LogService.LOG_INFO, "Start Titelsuche.");
 							this.findAndRead(barcode);
 						}
 					}
@@ -327,6 +349,14 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 					this.keyListener.keyPressed(event);
 				}
 			}
+		}
+	}
+	
+	private void setDefaultProductGroup()
+	{
+		if (this.position.getProductGroup() == null)
+		{
+			this.position.setProductGroup(this.position.getReceipt().getSettlement().getSalespoint().getCommonSettings().getDefaultProductGroup());
 		}
 	}
 
@@ -452,9 +482,11 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		final ProviderInterface providerInterface = (ProviderInterface) this.providerInterfaceTracker.getService();
 		if (providerInterface != null && providerInterface.isConnect())
 		{
+			log(LogService.LOG_INFO, "Providerservice wird aufgerufen.");
 			final IStatus status = providerInterface.findAndRead(barcode, this.position);
-			if (status.getSeverity() == IStatus.CANCEL)
+			if (!this.isPositionComplete() && status.getSeverity() == IStatus.CANCEL)
 			{
+				log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
 				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
 						.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
 						MessageDialog.BUTTON_OK);

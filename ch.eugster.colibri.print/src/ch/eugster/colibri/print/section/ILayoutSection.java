@@ -3,6 +3,7 @@ package ch.eugster.colibri.print.section;
 import java.util.Collection;
 import java.util.Date;
 
+import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.print.IPrintable;

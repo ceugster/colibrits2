@@ -251,7 +251,10 @@ public class Code128 extends AbstractBarcode
 						ExternalProductGroup.class);
 				final ExternalProductGroup externalProductGroup = epgQuery.selectByProviderAndCode(providerInterface.getProviderId(),
 						this.getProductGroupCode());
-				product.setExternalProductGroup(externalProductGroup);
+				if (externalProductGroup != null)
+				{
+					product.setExternalProductGroup(externalProductGroup);
+				}
 
 				final TaxCodeMappingQuery tcmQuery = (TaxCodeMappingQuery) persistenceService.getCacheService().getQuery(TaxCodeMapping.class);
 				final TaxCodeMapping taxCodeMapping = tcmQuery.selectTaxCodeMappingByProviderAndCode(providerInterface.getProviderId(), this.getTaxCode());

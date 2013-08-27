@@ -1,7 +1,10 @@
 package ch.eugster.colibri.persistence.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -61,8 +64,7 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 	private Map<String, Printout> printouts = new HashMap<String, Printout>();
 
 	@OneToMany(mappedBy = "receiptPrinterSettings")
-	@MapKey(name = "salespoint")
-	private Map<Salespoint, SalespointReceiptPrinterSettings> salespointReceiptPrinters = new HashMap<Salespoint, SalespointReceiptPrinterSettings>();
+	private Collection<SalespointReceiptPrinterSettings> salespointReceiptPrinters = new Vector<SalespointReceiptPrinterSettings>();
 
 	protected ReceiptPrinterSettings()
 	{
@@ -116,10 +118,17 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 
 	public SalespointReceiptPrinterSettings getSalespointReceiptPrinter(final Salespoint salespoint)
 	{
-		return this.salespointReceiptPrinters.get(salespoint);
+		for (SalespointReceiptPrinterSettings setting : this.salespointReceiptPrinters)
+		{
+			if (setting.getSalespoint().getId().equals(salespoint.getId()))
+			{
+				return setting;
+			}
+		}
+		return null;
 	}
 
-	public Map<Salespoint, SalespointReceiptPrinterSettings> getSalespointReceiptPrinters()
+	public Collection<SalespointReceiptPrinterSettings> getSalespointReceiptPrinters()
 	{
 		return this.salespointReceiptPrinters;
 	}

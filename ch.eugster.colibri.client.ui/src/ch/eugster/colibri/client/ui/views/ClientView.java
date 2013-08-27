@@ -113,6 +113,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	private ReceiptChangeMediator receiptChangeMediator;
 
 	private Salespoint salespoint;
+	
+	private long lastFailoverMessage;
 
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
@@ -126,6 +128,11 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		return this.salespoint;
 	}
 
+	public void updateSalespoint(Salespoint salespoint)
+	{
+		this.salespoint = salespoint;
+	}
+	
 	@Override
 	public void createPartControl(final Composite parent)
 	{
@@ -261,23 +268,28 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
 		{
 			Boolean showFailoverMessage = (Boolean) event.getProperty("show.failover.message");
-			if (showFailoverMessage != null && showFailoverMessage.booleanValue())
+			Boolean force = (Boolean) event.getProperty("force");
+			if ((force != null && force.booleanValue()) || (showFailoverMessage != null && showFailoverMessage.booleanValue()))
 			{
-				showFailoverMessage = false;
 				final String message = (String) event.getProperty("message");
 				if (message != null)
 				{
-					MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-							.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
-					dialog.setMessage(message);
-					dialog.pack();
-					dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
-					dialog.setVisible(true);
+					long now = GregorianCalendar.getInstance().getTimeInMillis();
+					if (lastFailoverMessage <= now - 3600)
+					{
+						lastFailoverMessage = now;
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+										.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
+						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
+						dialog.setMessage(message);
+						dialog.pack();
+						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
+						dialog.setVisible(true);
+					}
 				}
 			}
 			this.updateProviderMessage(event);
-//			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-//					.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
 		}
 		else
 		{

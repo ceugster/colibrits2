@@ -152,6 +152,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 			parameters[0] = button;
 			parameters[1] = editor;
 			menu = (KeyPopupMenu) constructor.newInstance(parameters);
+			button.setInstalledMenu(menu);
 		}
 		catch (final Exception e)
 		{

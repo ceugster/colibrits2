@@ -311,6 +311,7 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/Activator.
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/AdminProfilePerspective.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/buttons/ProfileEditorFailOverButton.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/buttons/ProfileEditorNormalButton.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/dialogs/CurrencyComboViewerDialog.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/dialogs/PaymentTypeComboViewerDialog.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/dialogs/ProductGroupComboViewerDialog.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/composites/AlignComposite.java -text
@@ -359,6 +360,7 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/Paym
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/ProductGroupPopupMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/ResetToStandardMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/RestitutionPopupMenu.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectCurrencyMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectCustomerPopupMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectImageMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectPaymentTypeMenuItem.java -text
@@ -548,6 +550,7 @@ ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/editors/TableViewerB
 ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/editors/TableViewerSorter.java -text
 ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/filters/PaymentTypeChangeOnlyViewerFilter.java -text
 ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/filters/ProductGroupTypeViewerFilter.java -text
+ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/filters/UsedCurrenciesOnlyViewerFilter.java -text
 ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/handlers/AbstractPersistenceClientHandler.java -text
 ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/handlers/OpenAdminHandler.java -text
 ch.eugster.colibri.admin.ui/src/ch/eugster/colibri/admin/ui/handlers/OpenClientHandler.java -text
@@ -939,7 +942,6 @@ ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplication.ja
 ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplicationActionBarAdvisor.java -text
 ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplicationWorkbenchAdvisor.java -text
 ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplicationWorkbenchWindowAdvisor.java -text
-ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/PerspectiveSwitcherMenu.java -text
 ch.eugster.colibri.display.feature/.project -text
 ch.eugster.colibri.display.feature/build.properties -text
 ch.eugster.colibri.display.feature/feature.xml -text

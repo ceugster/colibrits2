@@ -18,11 +18,13 @@ import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Printout;
 import ch.eugster.colibri.persistence.model.PrintoutArea;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
+import ch.eugster.colibri.persistence.model.Stock;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.PrintoutQuery;
@@ -140,6 +142,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 				Boolean force = (Boolean) event.getProperty("force") == null ? Boolean.FALSE : (Boolean) event.getProperty("force");
 				if (this.printout.isAutomaticPrint() || force.equals(Boolean.TRUE))
 				{
+					log(LogService.LOG_INFO, IPrintable.class.getName() + " wird gedruckt auf " + this.context.getProperties().get("component.name"));
 					final IPrintable printable = (IPrintable) event.getProperty(IPrintable.class.getName());
 					if (printable != null)
 					{
@@ -162,20 +165,37 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 								{
 									Boolean property = (Boolean) event.getProperty("open.drawer");
 									boolean openDrawer = property == null ? false : property.booleanValue();
+									log(LogService.LOG_INFO, "Schublade öffnen: " + Boolean.valueOf(openDrawer).toString());
 									if (openDrawer)
 									{
 										if (printable instanceof Receipt)
 										{
 											Receipt receipt = (Receipt) printable;
-											Collection<Payment> payments = receipt.getPayments();
-											for (Payment payment : payments)
+											Stock[] stocks = receipt.getSettlement().getSalespoint().getStocks().toArray(new Stock[0]);
+											Currency[] open = new Currency[stocks.length];
+											for (int i = 0; i < stocks.length; i++)
 											{
-												if (payment.getPaymentType().isOpenCashdrawer())
+												Collection<Payment> payments = receipt.getPayments();
+												for (Payment payment : payments)
 												{
-													this.getReceiptPrinterService().openDrawer(payment.getPaymentType());
-													break;
+													if (payment.getPaymentType().getCurrency().getId().equals(stocks[i].getPaymentType().getCurrency().getId()))
+													{
+														if (payment.getPaymentType().isOpenCashdrawer())
+														{
+															open[i] = payment.getPaymentType().getCurrency();
+														}
+													}
 												}
 											}
+											for (Currency currency : open)
+											{
+												if (currency != null)
+												{
+													this.getReceiptPrinterService().openDrawer(currency);
+													log(LogService.LOG_INFO, "Schublade " + currency.getCode() + " geöffnet.");
+												}
+											}
+
 										}
 									}
 									Integer copies = (Integer) event.getProperty("copies");
@@ -185,6 +205,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 									}
 									for (int i = 0; i < copies.intValue(); i++)
 									{
+										log(LogService.LOG_INFO, "Drucken " + i);
 										this.printDocument(printable);
 									}
 								}
@@ -243,10 +264,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 	@Override
 	public void testDocument(final ILayoutType layoutType, final Printout printout)
 	{
-		if (this.isReady())
-		{
-			layoutType.testDocument(printout);
-		}
+		layoutType.testDocument(printout);
 	}
 
 	protected void activate(final ComponentContext context)
@@ -470,4 +488,11 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 		return String.format("%1$-" + n + "s", s);
 	}
 
+	private void log(int level, String message)
+	{
+		if (logService != null)
+		{
+			logService.log(level, message);
+		}
+	}
 }

@@ -13,7 +13,11 @@ import java.awt.GridLayout;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.swing.JPanel;
@@ -21,6 +25,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.eclipse.core.runtime.Status;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -33,12 +42,17 @@ import ch.eugster.colibri.client.ui.events.StateChangeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Key;
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Tab;
 import ch.eugster.colibri.persistence.model.TaxRate;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.model.key.KeyType;
+import ch.eugster.colibri.persistence.model.print.IPrintable;
+import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class ConfigurablePanel extends JPanel implements IConfigurable, StateChangeListener, DisposeListener
@@ -335,6 +349,26 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 						if (ConfigurablePanel.this.tabbedPane.getSelectedIndex() == i)
 						{
 							ConfigurablePanel.this.tabbedPane.setForegroundAt(i, ConfigurablePanel.this.fgSelected);
+							if (ConfigurablePanel.this.userPanel.getReceiptWrapper().getReceipt() != null)
+							{
+								String title = ConfigurablePanel.this.tabbedPane.getTitleAt(i);
+								PersistenceService service = persistenceServiceTracker.getService();
+								PaymentTypeQuery query = (PaymentTypeQuery) service.getCacheService().getQuery(PaymentType.class);
+								Collection<PaymentType> paymentTypes = query.selectByCode(title);
+								if (!paymentTypes.isEmpty())
+								{
+									Receipt receipt = ConfigurablePanel.this.userPanel.getReceiptWrapper().getReceipt();
+									Payment payment = Payment.newInstance(receipt);
+									PaymentType paymentType = paymentTypes.iterator().next();
+									payment.setPaymentType(paymentType);
+									ConfigurablePanel.this.userPanel.getPaymentWrapper().replacePayment(payment);
+									if (receipt.getPositions().size() > 0)
+									{
+										Position[] positions = receipt.getPositions().toArray(new Position[0]);
+										sendEvent(positions[positions.length - 1]);
+									}
+								}
+							}
 						}
 						else
 						{
@@ -353,5 +387,38 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 			}
 
 		}
+	}
+	
+	private void sendEvent(final Position position)
+	{
+		ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+		try
+		{
+			tracker.open();
+			final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
+			if (eventAdmin != null)
+			{
+				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), "ch/eugster/colibri/client/add/position", position));
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+	}
+
+	private Event getEvent(ServiceReference<EventAdmin> reference, final String topics, final Position position)
+	{
+		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
+		properties.put(EventConstants.BUNDLE_ID,
+				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.SERVICE, reference);
+		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(IPrintable.class.getName(), position);
+		properties.put("status", Status.OK_STATUS);
+		return new Event(topics, properties);
 	}
 }

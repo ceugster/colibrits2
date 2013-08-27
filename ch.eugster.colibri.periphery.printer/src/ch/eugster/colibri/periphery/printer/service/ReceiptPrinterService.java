@@ -1,6 +1,6 @@
 package ch.eugster.colibri.periphery.printer.service;
 
-import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Salespoint;
 
@@ -12,7 +12,7 @@ public interface ReceiptPrinterService
 
 	void cutPaper(int linesBeforeCut);
 
-	void openDrawer(PaymentType paymentType);
+	void openDrawer(Currency currency);
 	
 	ReceiptPrinterSettings createReceiptPrinterSettings();
 	
@@ -48,5 +48,10 @@ public interface ReceiptPrinterService
 				throw new RuntimeException("Invalid drawer");
 			}
 		}
+	}
+
+	public enum Size
+	{
+		NORMAL, DOUBLE_WIDTH, DOUBLE_HEIGHT, DOUBLE_WIDTH_AND_HEIGHT;
 	}
 }

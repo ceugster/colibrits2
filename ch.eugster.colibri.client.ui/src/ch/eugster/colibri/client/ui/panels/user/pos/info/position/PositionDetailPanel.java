@@ -29,6 +29,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.plaf.BorderUIResource;
 
+import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.client.ui.actions.ClearAction;
 import ch.eugster.colibri.client.ui.actions.DiscountAction;
 import ch.eugster.colibri.client.ui.actions.DownAction;
@@ -38,7 +39,6 @@ import ch.eugster.colibri.client.ui.actions.UpAction;
 import ch.eugster.colibri.client.ui.actions.UserPanelProfileAction;
 import ch.eugster.colibri.client.ui.buttons.PositionButton;
 import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
-import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.client.ui.panels.user.PositionWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.CurrentTax;
@@ -159,38 +159,44 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 	{
 		if (event.getSource() instanceof Position)
 		{
-			final Position position = (Position) event.getSource();
-			if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_PRODUCT))
+			if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_SEARCH_VALUE) && event.getNewValue() != null && event.getNewValue().toString().startsWith(Barcode.PREFIX_CUSTOMER))
 			{
-				this.updateProductLabel(position);
 			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_SEARCH_VALUE))
+			else
 			{
-				this.updateProductLabel(position);
-			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_CURRENT_TAX))
-			{
-				this.updateTaxLabel((CurrentTax) event.getNewValue());
-			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_DISCOUNT))
-			{
-				this.updateDiscountLabel(((Double) event.getNewValue()).doubleValue());
-			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_OPTION))
-			{
-				this.updateOptionLabel(position.getProductGroup(), (Option) event.getNewValue());
-			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_PRICE))
-			{
-				this.updatePriceLabel(((Double) event.getNewValue()).doubleValue());
-			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP))
-			{
-				this.updateProductLabel(position);
-			}
-			else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_QUANTITY))
-			{
-				this.updateQuantityLabel(((Integer) event.getNewValue()).intValue());
+				final Position position = (Position) event.getSource();
+				if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_PRODUCT))
+				{
+					this.updateProductLabel(position);
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_SEARCH_VALUE))
+				{
+					this.updateProductLabel(position);
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_CURRENT_TAX))
+				{
+					this.updateTaxLabel((CurrentTax) event.getNewValue());
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_DISCOUNT))
+				{
+					this.updateDiscountLabel(((Double) event.getNewValue()).doubleValue());
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_OPTION))
+				{
+					this.updateOptionLabel(position.getProductGroup(), (Option) event.getNewValue());
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_PRICE))
+				{
+					this.updatePriceLabel(((Double) event.getNewValue()).doubleValue());
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP))
+				{
+					this.updateProductLabel(position);
+				}
+				else if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_QUANTITY))
+				{
+					this.updateQuantityLabel(((Integer) event.getNewValue()).intValue());
+				}
 			}
 		}
 		else if (event.getSource() instanceof PositionChangeMediator)

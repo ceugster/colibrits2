@@ -263,7 +263,7 @@ public class Display extends AbstractEntity implements IReplicatable
 	public void setSalespoint(final Salespoint salespoint)
 	{
 		this.propertyChangeSupport.firePropertyChange("salespoint", salespoint, this.salespoint = salespoint);
-		if (salespoint.getCustomerDisplaySettings() != null)
+		if (salespoint != null && salespoint.getCustomerDisplaySettings() != null)
 		{
 			this.setCustomerDisplaySettings(salespoint.getCustomerDisplaySettings().getCustomerDisplaySettings());
 		}

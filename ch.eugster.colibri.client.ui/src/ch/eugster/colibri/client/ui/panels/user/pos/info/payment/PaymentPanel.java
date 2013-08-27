@@ -103,8 +103,12 @@ public class PaymentPanel extends ProfilePanel implements TableModelListener, Ac
 									userPanel.getReceiptWrapper().clearPayments();
 									if (userPanel.getReceiptWrapper().getReceipt().getId() != null)
 									{
-										userPanel.getReceiptWrapper().getReceipt().setDeleted(true);
-										userPanel.getReceiptWrapper().storeReceipt();
+										for (Payment payment : userPanel.getReceiptWrapper().getReceipt().getPayments())
+										{
+											payment.setDeleted(true);
+										}
+//										userPanel.getReceiptWrapper().getReceipt().setDeleted(true);
+//										userPanel.getReceiptWrapper().storeReceipt();
 									}
 									model.fireTableDataChanged();
 //								}

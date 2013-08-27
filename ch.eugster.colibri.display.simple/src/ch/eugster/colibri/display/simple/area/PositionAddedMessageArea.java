@@ -31,8 +31,8 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 	public String getDefaultPattern()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("CCCCCCCCCCCCC NNNNNN\n");
-		builder = builder.append("Total LLLLLLLLLLLLLL");
+		builder = builder.append("AAAAAAAAAAA NNNNNNNN\n");
+		builder = builder.append("Total   WWW FFFFFFFF");
 		return builder.toString();
 	}
 
@@ -70,31 +70,47 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 
 	public enum Key implements IKey
 	{
-		C, M, E, B, N, P, R, T, O, A, L, F;
+		A, B, C, E, F, L, M, N, O, P, R, T, W;
 
 		public String label()
 		{
 			switch (this)
 			{
-				case C:
+				case A:
 				{
-					return "Warengruppe/Barcode";
-				}
-				case M:
-				{
-					return "Menge";
-				}
-				case E:
-				{
-					return "Einzelpreis";
+					return "Artikelbezeichnung";
 				}
 				case B:
 				{
 					return "Bruttobetrag";
 				}
+				case C:
+				{
+					return "Warengruppe/Barcode";
+				}
+				case E:
+				{
+					return "Einzelpreis";
+				}
+				case F:
+				{
+					return "Gesamtbetrag FW";
+				}
+				case L:
+				{
+					return "Gesamtbetrag LW";
+				}
+				case M:
+				{
+					return "Menge";
+				}
 				case N:
 				{
 					return "Nettobetrag";
+				}
+				case O:
+				{
+					return "Optionscode";
 				}
 				case P:
 				{
@@ -108,21 +124,9 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 				{
 					return "Mehrwertsteuercode";
 				}
-				case O:
+				case W:
 				{
-					return "Optionscode";
-				}
-				case A:
-				{
-					return "Artikelbezeichnung";
-				}
-				case L:
-				{
-					return "Gesamtbetrag LW";
-				}
-				case F:
-				{
-					return "Gesamtbetrag FW";
+					return "Währungscode";
 				}
 				default:
 				{
@@ -142,97 +146,157 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 
 				switch (this)
 				{
-					case C:
+				case A:
+				{
+					String code = null;
+					if (!position.getReceipt().getForeignCurrency().getId().equals(position.getReceipt().getDefaultCurrency().getId()))
+					{
+						code = position.getReceipt().getForeignCurrency().getCode();
+					}
+					String value = "";
+					if (code == null)
 					{
 						if (position.getProduct() == null)
 						{
-							return layoutArea.replaceMarker(position.getProductGroup().getName(), marker, true);
+							StringBuilder builder = new StringBuilder();
+							if (position.getSearchValue() != null && position.getSearchValue().length() > 0)
+							{
+								builder = builder.append(position.getSearchValue());
+							}
+							builder = builder.append(" "  + position.getProductGroup().getName());
+							value = builder.toString().trim();
 						}
 						else
 						{
-							return layoutArea.replaceMarker(position.getProduct().getCode(), marker, true);
-						}
-					}
-					case M:
-					{
-						final String quantity = PositionAddedMessageArea.quantityFormatter.format(position.getQuantity());
-						return layoutArea.replaceMarker(quantity, marker, false);
-					}
-					case E:
-					{
-						PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
-						final String price = PositionAddedMessageArea.amountFormatter.format(position.getPrice());
-						return layoutArea.replaceMarker(price, marker, false);
-					}
-					case B:
-					{
-						PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
-						final String amountBrut = PositionAddedMessageArea.amountFormatter.format(position.getAmount(
-								Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.BRUTTO));
-						return layoutArea.replaceMarker(amountBrut, marker, false);
-					}
-					case N:
-					{
-						PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
-						final String amountNet = PositionAddedMessageArea.amountFormatter.format(position.getAmount(
-								Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
-						return layoutArea.replaceMarker(amountNet, marker, false);
-					}
-					case P:
-					{
-						PositionAddedMessageArea.percentFormatter.setMaximumFractionDigits(1);
-						final String percent = PositionAddedMessageArea.percentFormatter.format(Math.abs(position.getDiscount()));
-						return layoutArea.replaceMarker(percent, marker, false);
-					}
-					case R:
-					{
-						PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
-						final String discount = PositionAddedMessageArea.amountFormatter.format(position.getAmount(
-								Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.DISCOUNT));
-						return layoutArea.replaceMarker(discount, marker, false);
-					}
-					case T:
-					{
-						return layoutArea.replaceMarker(position.getCurrentTax().getTax().getTaxRate().getCode(), marker, false);
-					}
-					case O:
-					{
-						return layoutArea.replaceMarker(position.getOption().toCode(), marker, false);
-					}
-					case A:
-					{
-						if (position.getProduct() != null)
-						{
-							Collection<ProductGroupMapping> mappings = position.getProductGroup().getProductGroupMappings(position.getProvider());
-							for (ProductGroupMapping mapping : mappings)
+							if (position.getProduct().getInvoiceNumber() != null && position.getProduct().getInvoiceNumber().length() > 0)
 							{
-								if (!mapping.isDeleted())
+								value = "Rg" + position.getProduct().getInvoiceNumber().substring(0, marker.length() - 6) + " bez";
+							}
+							else
+							{
+								Collection<ProductGroupMapping> mappings = position.getProductGroup().getProductGroupMappings(position.getProvider());
+								for (ProductGroupMapping mapping : mappings)
 								{
-									final String code = mapping.getExternalProductGroup().getCode();
-									return layoutArea.replaceMarker(code + " " + position.getProduct().getAuthorAndTitleShortForm(), marker, true);
+									if (!mapping.isDeleted())
+									{
+										code = mapping.getExternalProductGroup().getCode();
+										String text = position.getProduct().getTitleAndAuthorShortForm();
+										if (text == null || text.isEmpty())
+										{
+											value = position.getCode();
+										}
+										else
+										{
+											value = text + " " + code;
+										}
+									}
 								}
 							}
 						}
-						return layoutArea.replaceMarker("", marker, true);
 					}
-					case L:
+					else
 					{
-						PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
-						final String total = PositionAddedMessageArea.amountFormatter.format(position.getReceipt().getPositionAmount(
-								Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
-						return layoutArea.replaceMarker(total, marker, false);
+						int length = marker.length() - 1 - code.length();
+						if (position.getProductGroup().getCode().length() > length)
+						{
+							value = position.getProductGroup().getCode().substring(0, length) + " " + code;
+						}
+						else
+						{
+							value = position.getProductGroup().getCode();
+							for (int i = 0; i < length; i++)
+							{
+								value = value + " ";
+							}
+							value = value + code;
+						}
 					}
-					case F:
+					return layoutArea.replaceMarker(value, marker, true);
+				}
+				case B:
+				{
+					PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
+					final String amountBrut = PositionAddedMessageArea.amountFormatter.format(position.getAmount(
+							Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.BRUTTO));
+					return layoutArea.replaceMarker(amountBrut, marker, false);
+				}
+				case C:
+				{
+					if (position.getProduct() == null)
 					{
-						PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
-						final String total = PositionAddedMessageArea.amountFormatter.format(position.getReceipt().getPositionAmount(
-								Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO));
-						return layoutArea.replaceMarker(total, marker, false);
+						return layoutArea.replaceMarker(position.getProductGroup().getName(), marker, true);
 					}
-					default:
+					else
 					{
-						throw new RuntimeException("invalid key");
+						return layoutArea.replaceMarker(position.getProduct().getCode(), marker, true);
 					}
+				}
+				case E:
+				{
+					PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
+					final String price = PositionAddedMessageArea.amountFormatter.format(position.getPrice());
+					return layoutArea.replaceMarker(price, marker, false);
+				}
+				case F:
+				{
+					PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
+					final String total = PositionAddedMessageArea.amountFormatter.format(position.getReceipt().getPositionAmount(
+							Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO));
+					return layoutArea.replaceMarker(total, marker, false);
+				}
+				case L:
+				{
+					PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
+					final String total = PositionAddedMessageArea.amountFormatter.format(position.getReceipt().getPositionAmount(
+							Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO));
+					return layoutArea.replaceMarker(total, marker, false);
+				}
+				case M:
+				{
+					final String quantity = PositionAddedMessageArea.quantityFormatter.format(position.getQuantity());
+					return layoutArea.replaceMarker(quantity, marker, false);
+				}
+				case N:
+				{
+					PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getForeignCurrency().getCurrency());
+					final String amountNet = PositionAddedMessageArea.amountFormatter.format(position.getAmount(
+							Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO));
+					return layoutArea.replaceMarker(amountNet, marker, false);
+				}
+				case O:
+				{
+					return layoutArea.replaceMarker(position.getOption().toCode(), marker, false);
+				}
+				case P:
+				{
+					PositionAddedMessageArea.percentFormatter.setMaximumFractionDigits(1);
+					final String percent = PositionAddedMessageArea.percentFormatter.format(Math.abs(position.getDiscount()));
+					return layoutArea.replaceMarker(percent, marker, false);
+				}
+				case R:
+				{
+					PositionAddedMessageArea.amountFormatter.setCurrency(position.getReceipt().getDefaultCurrency().getCurrency());
+					final String discount = PositionAddedMessageArea.amountFormatter.format(position.getAmount(
+							Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.DISCOUNT));
+					return layoutArea.replaceMarker(discount, marker, false);
+				}
+				case T:
+				{
+					return layoutArea.replaceMarker(position.getCurrentTax().getTax().getTaxRate().getCode(), marker, false);
+				}
+				case W:
+				{
+					String code = "";
+					if (!position.getReceipt().getForeignCurrency().getId().equals(position.getReceipt().getDefaultCurrency().getId()))
+					{
+						code = position.getReceipt().getForeignCurrency().getCode();
+					}
+					return layoutArea.replaceMarker(code, marker, false);
+				}
+				default:
+				{
+					throw new RuntimeException("invalid key");
+				}
 				}
 			}
 			return marker;

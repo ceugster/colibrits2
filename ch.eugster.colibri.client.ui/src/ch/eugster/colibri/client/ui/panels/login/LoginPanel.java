@@ -42,6 +42,7 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.panels.MainPanel;
 import ch.eugster.colibri.client.ui.panels.TitleProvider;
 import ch.eugster.colibri.persistence.model.Profile;
+import ch.eugster.colibri.persistence.model.Role;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.queries.UserQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -137,8 +138,9 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 					final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 					if (persistenceService != null)
 					{
+						persistenceService.getCacheService().clearCache();
 						final UserQuery query = (UserQuery) persistenceService.getCacheService().getQuery(User.class);
-						final User user = query.findByPosLogin(new Integer(String.valueOf(this.display.getPassword())));
+						User user = query.findByPosLogin(new Integer(String.valueOf(this.display.getPassword())));
 						if (user == null)
 						{
 							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.profile, "Login ungültig",

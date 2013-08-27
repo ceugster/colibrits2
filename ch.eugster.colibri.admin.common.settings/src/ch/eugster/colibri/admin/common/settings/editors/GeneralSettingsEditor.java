@@ -80,6 +80,8 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 	
 	private Button allowTestSettlement;
 
+	private Button forceCashCheck;
+
 	private Button maximizedClientWindow;
 
 	private Button forceSettlement;
@@ -188,10 +190,11 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		this.transferRepeatDelay.setSelection(commonSettings.getTransferRepeatDelay());
 		this.transferReceiptCount.setSelection(commonSettings.getTransferReceiptCount());
 		
-		this.allowTestSettlement.setSelection(commonSettings.isAllowTestSettlement());
-		
 		this.maximizedClientWindow.setSelection(commonSettings.isMaximizedClientWindow());
+
 		this.forceSettlement.setSelection(commonSettings.isForceSettlement());
+		this.allowTestSettlement.setSelection(commonSettings.isAllowTestSettlement());
+		this.forceCashCheck.setSelection(commonSettings.isForceCashCheck());
 		
 		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
 		for (Bundle bundle : bundles)
@@ -245,10 +248,11 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		commonSettings.setTransferRepeatDelay(this.transferRepeatDelay.getSelection());
 		commonSettings.setTransferReceiptCount(this.transferReceiptCount.getSelection());
 		
+		commonSettings.setForceSettlement(this.forceSettlement.getSelection());
 		commonSettings.setAllowTestSettlement(this.allowTestSettlement.getSelection());
+		commonSettings.setForceCashCheck(this.forceCashCheck.getSelection());
 
 		commonSettings.setMaximizedClientWindow(this.maximizedClientWindow.getSelection());
-		commonSettings.setForceSettlement(this.forceSettlement.getSelection());
 		
 		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
 		for (Bundle bundle : bundles)
@@ -1074,10 +1078,10 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 	{
 		final Composite composite = this.formToolkit.createComposite(parent);
 		composite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-		composite.setLayout(new GridLayout(3, false));
+		composite.setLayout(new GridLayout());
 
 		forceSettlement = formToolkit.createButton(composite, "Kassenabschluss erzwingen", SWT.CHECK);
-		forceSettlement.setLayoutData(new GridData());
+		forceSettlement.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		forceSettlement.addSelectionListener(new SelectionListener()
 		{
 			@Override
@@ -1096,6 +1100,23 @@ public class GeneralSettingsEditor extends AbstractEntityEditor<CommonSettings>
 		this.allowTestSettlement = this.formToolkit.createButton(composite,
 				"Provisorischen Abschluss erlauben", SWT.CHECK);
 		this.allowTestSettlement.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				this.widgetSelected(e);
+			}
+
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				GeneralSettingsEditor.this.setDirty(true);
+			}
+		});
+
+		this.forceCashCheck = this.formToolkit.createButton(composite,
+				"Kassensturz erzwingen", SWT.CHECK);
+		this.forceCashCheck.addSelectionListener(new SelectionListener()
 		{
 			@Override
 			public void widgetDefaultSelected(final SelectionEvent e)

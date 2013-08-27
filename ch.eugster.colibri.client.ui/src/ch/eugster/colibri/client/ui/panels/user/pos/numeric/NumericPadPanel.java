@@ -49,7 +49,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 	public static final String ID = "ch.eugster.colibri.ui.user.swing.number.pad.panel";
 
 	private static final String[] positionProperties = new String[] 
-			{ PositionWrapper.KEY_POSITION }; 
+			{ PositionWrapper.KEY_POSITION, PositionWrapper.KEY_PROPERTY_SEARCH_VALUE }; 
 
 	private final Collection<ActionListener> actionListeners = new ArrayList<ActionListener>();
 
@@ -256,23 +256,29 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 	{
 		if (event.getSource() instanceof Position)
 		{
+			StringBuilder label = new StringBuilder();
 			Position position = (Position) event.getSource();
 			if (position.getProductGroup() == null)
 			{
-				this.displayLabel.setText("WG / Barcode");
+				label = label.append("WG");
 			}
-			else if (position.getQuantity() == 0)
+			if (position.getSearchValue() == null || position.getSearchValue().length() == 0)
 			{
-				this.displayLabel.setText("Menge");
+				label = label.append(label.length() > 0 ? " / Barcode" : "Barcode");
+			}
+			if (position.getQuantity() == 0)
+			{
+				label = label.append(label.length() > 0 ? " / Menge" : "Menge");
 			}
 			else if (position.getPrice() == 0D)
 			{
-				this.displayLabel.setText("Preis");
+				label = label.append(label.length() > 0 ? " / Preis" : "Preis");
 			}
 			else if (position.getCurrentTax() == null)
 			{
-				this.displayLabel.setText("MWST");
+				label = label.append(label.length() > 0 ? " / MWST" : "MWST");
 			}
+			this.displayLabel.setText(label.toString());
 		}
 		else if (event.getSource() instanceof PositionChangeMediator)
 		{

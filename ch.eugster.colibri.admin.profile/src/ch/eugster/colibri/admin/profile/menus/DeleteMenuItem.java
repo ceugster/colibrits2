@@ -32,7 +32,8 @@ public class DeleteMenuItem extends MenuItem implements ActionListener
 	public void actionPerformed(final ActionEvent event)
 	{
 		this.button.getKeys()[1].setDeleted(true);
-		this.button.remove(this);
+		this.button.remove(this.button.getInstalledMenu());
+		this.button.setInstalledMenu(null);
 		this.button.update(new Point(this.button.getKeys()[1].getTabRow(), this.button.getKeys()[1].getTabCol()));
 	}
 }

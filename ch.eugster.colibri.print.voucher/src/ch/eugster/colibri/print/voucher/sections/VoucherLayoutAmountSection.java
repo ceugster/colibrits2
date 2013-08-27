@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
 
+import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -26,7 +27,11 @@ public class VoucherLayoutAmountSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("\n");
-		builder = builder.append("Wert:                        WWW VVVVVVVVV\n");
+//		builder = builder.append(getFontSize(ReceiptPrinterService.Size.DOUBLE_HEIGHT));
+		builder = builder.append("             G U T S C H E I N\n");
+		builder = builder.append("             *****************\n");
+		builder = builder.append("               WWW VVVVVVVVV\n");
+//		builder = builder.append(getFontSize(ReceiptPrinterService.Size.NORMAL));
 		builder = builder.append("\n");
 		return builder.toString();
 	}

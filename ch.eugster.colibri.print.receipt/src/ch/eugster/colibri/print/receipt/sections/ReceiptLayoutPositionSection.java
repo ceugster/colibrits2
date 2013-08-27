@@ -240,30 +240,6 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 		return true;
 	}
 
-	// private Collection<String> prepareArea(final Position position)
-	// {
-	// final Collection<String> area = new ArrayList<String>();
-	// final double amount =
-	// position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-	// Position.AmountType.NETTO);
-	// if ((amount != 0D) ||
-	// this.getPrintOption(AreaType.DETAIL).equals(PrintOption.ALWAYS))
-	// {
-	// final Collection<String> lines = this.getAdaptedDetailPattern(position,
-	// this.getPattern(AreaType.DETAIL));
-	// final String[] markers = this.getMarkers(AreaType.DETAIL, lines);
-	// for (String line : lines)
-	// {
-	// for (final String marker : markers)
-	// {
-	// line = this.replace(AreaType.DETAIL, position, marker, line);
-	// }
-	// area.add(line);
-	// }
-	// }
-	// return area;
-	// }
-
 	private final boolean isTotalDiscountLine(final String line)
 	{
 		final Collection<String> markers = new ArrayList<String>();
@@ -417,7 +393,14 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 						}
 						else
 						{
-							return layoutSection.replaceMarker(position.getProduct().getCode(), marker, true);
+							if (position.getProduct().getInvoiceNumber() != null && position.getProduct().getInvoiceNumber().length() > 0)
+							{
+								return layoutSection.replaceMarker("Rg " + position.getProduct().getInvoiceNumber() + " bez.", marker, true);
+							}
+							else
+							{
+								return layoutSection.replaceMarker(position.getProduct().getCode(), marker, true);
+							}
 						}
 					}
 					case W:

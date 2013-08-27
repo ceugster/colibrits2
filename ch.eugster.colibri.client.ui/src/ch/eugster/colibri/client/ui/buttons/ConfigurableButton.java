@@ -33,7 +33,6 @@ import ch.eugster.colibri.client.ui.actions.SelectCustomerAction;
 import ch.eugster.colibri.client.ui.actions.ShowCoinCounterPanelAction;
 import ch.eugster.colibri.client.ui.actions.ShowCurrentReceiptListAction;
 import ch.eugster.colibri.client.ui.actions.ShutdownAction;
-import ch.eugster.colibri.client.ui.actions.StoreReceiptAction;
 import ch.eugster.colibri.client.ui.actions.StoreReceiptExpressAction;
 import ch.eugster.colibri.client.ui.actions.StoreReceiptShorthandAction;
 import ch.eugster.colibri.client.ui.actions.TaxRateAction;
@@ -106,10 +105,25 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 		{
 			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
+			if (this.failOver)
+			{
+				ConfigurableAction action = (ConfigurableAction) this.getAction();
+				if (action.getKey().getKeyType().equals(KeyType.FUNCTION))
+				{
+					
+					action.setEnabled(action.getKey().getFunctionType().isFailOverEnabled());
+				}
+			}
 		}
 		else
 		{
 			this.update(false);
+			ConfigurableAction action = (ConfigurableAction) this.getAction();
+			if (action.getKey().getKeyType().equals(KeyType.FUNCTION))
+			{
+				
+				action.setEnabled(true);
+			}
 		}
 	}
 

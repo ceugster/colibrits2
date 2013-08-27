@@ -4,7 +4,7 @@ import org.osgi.service.component.ComponentContext;
 
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.printer.service.AbstractReceiptPrinterService;
-import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
 
@@ -53,7 +53,7 @@ public class DummyReceiptPrinterService extends AbstractReceiptPrinterService
 	}
 
 	@Override
-	public void openDrawer(PaymentType paymentType) 
+	public void openDrawer(Currency currency) 
 	{
 	}
 

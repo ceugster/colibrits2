@@ -112,73 +112,82 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 					/*
 					 * Nur verbuchen, wenn Flag isBookProvider gesetzt
 					 */
-					if (position.isProviderBooked())
+					try
 					{
-						/*
-						 * Wenn die Position im Provider bereits verbucht ist, kann nur
-						 * noch eine Rückbuchung über das Stornieren einer Rechnung
-						 * erfolgen.
-						 */
-						if (position.getReceipt().getState().equals(Receipt.State.REVERSED))
+						if (position.isProviderBooked())
 						{
-							if (position.getProduct() == null)
+							/*
+							 * Wenn die Position im Provider bereits verbucht ist, kann nur
+							 * noch eine Rückbuchung über das Stornieren einer Rechnung
+							 * erfolgen.
+							 */
+							if (position.getReceipt().getState().equals(Receipt.State.REVERSED))
 							{
-								log(LogService.LOG_INFO, "Rückbuchung " + position.getProductGroup().getCode() + ".");
-								status = this.reverseProductGroup(position);
-							}
-							else
-							{
-								if (position.getOption().equals(Position.Option.ARTICLE)
-										|| position.getOption().equals(Position.Option.ORDERED))
+								if (position.getProduct() == null)
 								{
-									log(LogService.LOG_INFO, "Rückbuchung " + position.getProduct().getCode() + ".");
-									status = this.reverseArticle(position);
+									log(LogService.LOG_INFO, "Rückbuchung " + position.getProductGroup().getCode() + ".");
+									status = this.reverseProductGroup(position);
 								}
-							}
-						}
-					}
-					else
-					{
-						/*
-						 * Wenn die Position im Provider noch nicht verbucht ist, dann
-						 * muss sie nun erfolgen, vorausgesetzt, der Status des Belegs
-						 * ist <code>Receipt.Type.SAVED</code>
-						 */
-						if (position.getReceipt().getState().equals(Receipt.State.SAVED))
-						{
-							if (position.getProduct() == null)
-							{
-								log(LogService.LOG_INFO, "Verbuche Warengruppe " + position.getProductGroup().getCode() + ".");
-								status = this.sellProductGroup(position);
-							}
-							else
-							{
-								switch (position.getOption())
+								else
 								{
-									case ARTICLE:
+									if (position.getOption().equals(Position.Option.ARTICLE)
+											|| position.getOption().equals(Position.Option.ORDERED))
 									{
-										log(LogService.LOG_INFO, "Verbuche Artikel " + position.getProduct().getCode() + ".");
-										status = this.sellArticle(position);
-										break;
-									}
-									case ORDERED:
-									{
-										log(LogService.LOG_INFO, "Verbuche Bestellung " + position.getOrder() + ".");
-										status = this.storeOrder(position);
-										break;
-									}
-									case PAYED_INVOICE:
-									{
-										log(LogService.LOG_INFO, "Verbuche bezahlte Rechnung " + position.getProduct().getInvoiceNumber() + ".");
-										status = this.payInvoice(position);
-										break;
+										log(LogService.LOG_INFO, "Rückbuchung " + position.getProduct().getCode() + ".");
+										status = this.reverseArticle(position);
 									}
 								}
 							}
 						}
+						else
+						{
+							/*
+							 * Wenn die Position im Provider noch nicht verbucht ist, dann
+							 * muss sie nun erfolgen, vorausgesetzt, der Status des Belegs
+							 * ist <code>Receipt.Type.SAVED</code>
+							 */
+							if (position.getReceipt().getState().equals(Receipt.State.SAVED))
+							{
+								if (position.getProduct() == null)
+								{
+									log(LogService.LOG_INFO, "Verbuche Warengruppe " + position.getProductGroup().getCode() + ".");
+									status = this.sellProductGroup(position);
+								}
+								else
+								{
+									switch (position.getOption())
+									{
+										case ARTICLE:
+										{
+											log(LogService.LOG_INFO, "Verbuche Artikel " + position.getProduct().getCode() + ".");
+											status = this.sellArticle(position);
+											break;
+										}
+										case ORDERED:
+										{
+											log(LogService.LOG_INFO, "Verbuche Bestellung " + position.getOrder() + ".");
+											status = this.storeOrder(position);
+											break;
+										}
+										case PAYED_INVOICE:
+										{
+											log(LogService.LOG_INFO, "Verbuche bezahlte Rechnung " + position.getProduct().getInvoiceNumber() + ".");
+											status = this.payInvoice(position);
+											break;
+										}
+									}
+								}
+							}
+						}
 					}
-		
-					this.close();
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					finally
+					{
+						this.close();
+					}
 				}
 			}
 		}
@@ -225,7 +234,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 
-	private IStatus payInvoice(final Position position)
+	private IStatus payInvoice(final Position position) throws Exception
 	{
 		IStatus status = this.setProviderValues(position);
 		if (status.getSeverity() == IStatus.OK)
@@ -257,7 +266,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 
-	private IStatus reverseArticle(final Position position)
+	private IStatus reverseArticle(final Position position) throws Exception
 	{
 		IStatus status = this.setProviderValues(position);
 		if (status.getSeverity() == IStatus.OK)
@@ -344,7 +353,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 
-	private IStatus sellArticle(final Position position)
+	private IStatus sellArticle(final Position position) throws Exception
 	{
 		IStatus status = this.setProviderValues(position);
 		if (status.getSeverity() == IStatus.OK)
@@ -390,7 +399,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 
-	private IStatus sellProductGroup(final Position position)
+	private IStatus sellProductGroup(final Position position) throws Exception
 	{
 		this.setProviderValues(position);
 
@@ -528,7 +537,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 	
-	private IStatus doDelAbholfach(Position position, IStatus status)
+	private IStatus doDelAbholfach(Position position, IStatus status) throws Exception
 	{
 		if (status.getSeverity() == IStatus.OK)
 		{
@@ -550,7 +559,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 	
-	private IStatus storeOrder(final Position position)
+	private IStatus storeOrder(final Position position) throws Exception
 	{
 //		final LogService logService = (LogService) this.logServiceTracker.getService();
 		IStatus status = this.setProviderValues(position);
@@ -562,13 +571,13 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		return status;
 	}
 
-	private void updateCustomerAccount(final Position position)
+	private void updateCustomerAccount(final Position position) throws Exception
 	{
 		if (position.getReceipt().getCustomer() != null)
 		{
 			if (position.getReceipt().getCustomer().getHasAccount())
 			{
-				position.getReceipt().getCustomer().setAccount(((Double)this.getGalserve().nkundkonto()).doubleValue());
+				position.getReceipt().getCustomer().setAccount(((Integer)this.getGalserve().nkundkonto()).intValue());
 			}
 		}
 	}

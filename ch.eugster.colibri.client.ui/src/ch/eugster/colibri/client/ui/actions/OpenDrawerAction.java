@@ -14,8 +14,8 @@ import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Key;
-import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class OpenDrawerAction extends ConfigurableAction implements DisposeListener
@@ -42,13 +42,22 @@ public class OpenDrawerAction extends ConfigurableAction implements DisposeListe
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		ReceiptPrinterService service = (ReceiptPrinterService) this.receiptPrinterServiceTracker.getService();
-		if (service != null)
+		String componentName = this.getUserPanel().getSalespoint().getReceiptPrinterSettings().getComponentName();
+		Object[] objects = this.receiptPrinterServiceTracker.getServices();
+		if (objects != null)
 		{
-			service.openDrawer(getPaymentType());
-
+			for (Object object : objects)
+			{
+				if (object instanceof ReceiptPrinterService)
+				{
+					ReceiptPrinterService service = (ReceiptPrinterService) object;
+					if (service.getReceiptPrinterSettings().getComponentName().equals(componentName))
+					{
+						service.openDrawer(getCurrency());
+					}
+				}
+			}
 		}
-		this.userPanel.getPositionDetailPanel().getQuantityButton();
 	}
 
 	@Override
@@ -58,15 +67,26 @@ public class OpenDrawerAction extends ConfigurableAction implements DisposeListe
 		this.receiptPrinterServiceTracker.close();
 	}
 
-	public PaymentType getPaymentType()
+	public Currency getCurrency()
 	{
-		PaymentType paymentType = null;
+		Currency currency = null;
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			paymentType = (PaymentType) persistenceService.getCacheService().find(PaymentType.class, this.key.getParentId());
+			currency = (Currency) persistenceService.getCacheService().find(Currency.class, this.key.getParentId());
 		}
-
-		return paymentType;
+		return currency;
 	}
+	
+//	public PaymentType getPaymentType()
+//	{
+//		PaymentType paymentType = null;
+//		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+//		if (persistenceService != null)
+//		{
+//			paymentType = (PaymentType) persistenceService.getCacheService().find(PaymentType.class, this.key.getParentId());
+//		}
+//
+//		return paymentType;
+//	}
 }

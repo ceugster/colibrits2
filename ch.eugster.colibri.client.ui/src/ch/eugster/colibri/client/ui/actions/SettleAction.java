@@ -92,44 +92,55 @@ public class SettleAction extends ProfileAction implements EventHandler
 				settlement.setDetails(this.getSettlementDetails(settlement));
 				settlement.setMoneys(this.getSettlementMoney(settlement));
 				settlement.setReceiptCount(service.countReceipts(settlement));
-				
-				if (settlement.getReceiptCount() == 0L && settlement.getMoneys().size() == 0)
+				settlement.setReversedReceipts(service.getReversedReceipts(settlement));
+
+				if (settlement.getReceiptCount() == 0L && settlement.getMoneys().size() == 0 && settlement.getReversedReceipts().size() == 0)
 				{
 					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.profile,
 							"Keine Vorgänge", "Es stehen keine Vorgänge zur Durchführung an.",
 							MessageDialog.TYPE_INFORMATION);
+					return;
 				}
-				else
+				if (this.coinCounterPanel.getUserPanel().getSalespoint().isForceCashCheck())
 				{
-					SettlementService.State state = SettlementService.State.DEFINITIVE;
-					if (coinCounterPanel.getUserPanel().getSalespoint().getCommonSettings().isAllowTestSettlement())
+					if (settlement.getReceiptCount() > 0L && this.coinCounterPanel.getCountMoneySum() == 0D)
 					{
-						int result = MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.profile,
-								"Provisorischer Abschluss", "Wollen Sie einen provisorischen Abschluss vornehmen?",
-								MessageDialog.TYPE_QUESTION, new int[] { MessageDialog.BUTTON_NO, MessageDialog.BUTTON_YES,
-										MessageDialog.BUTTON_CANCEL }, MessageDialog.BUTTON_CANCEL);
-						if (result == MessageDialog.BUTTON_CANCEL)
-						{
-							return;
-						}
-						else
-						{
-							state = result == MessageDialog.BUTTON_NO ? SettlementService.State.DEFINITIVE
-									: SettlementService.State.PROVISIONAL;
-						}
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), this.profile,
+								"Kassensturz", "Vor dem Abschluss müssen Sie den Kassensturz vornehmen.",
+								MessageDialog.TYPE_INFORMATION);
+						return;
 					}
-					settlement = service.settle(settlement, state);
-					if (state.equals(SettlementService.State.DEFINITIVE))
-					{
-						Salespoint salespoint = service.updateSettlement(settlement.getSalespoint());
-						this.coinCounterPanel.getUserPanel().setSalespoint(salespoint);
-						this.coinCounterPanel.clear();
-						this.coinCounterPanel.getUserPanel().fireStateChange(
-								new StateChangeEvent(coinCounterPanel.getUserPanel().getCurrentState(),
-										UserPanel.State.POSITION_INPUT));
-					}
-					printSettlement(settlement);
 				}
+
+				SettlementService.State state = SettlementService.State.DEFINITIVE;
+				if (coinCounterPanel.getUserPanel().getSalespoint().getCommonSettings().isAllowTestSettlement())
+				{
+					int result = MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.profile,
+							"Provisorischer Abschluss", "Wollen Sie einen provisorischen Abschluss vornehmen?",
+							MessageDialog.TYPE_QUESTION, new int[] { MessageDialog.BUTTON_NO, MessageDialog.BUTTON_YES,
+									MessageDialog.BUTTON_CANCEL }, MessageDialog.BUTTON_CANCEL);
+					if (result == MessageDialog.BUTTON_CANCEL)
+					{
+						return;
+					}
+					else
+					{
+						state = result == MessageDialog.BUTTON_NO ? SettlementService.State.DEFINITIVE
+								: SettlementService.State.PROVISIONAL;
+					}
+				}
+				settlement = service.settle(settlement, state);
+				if (state.equals(SettlementService.State.DEFINITIVE))
+				{
+					Salespoint salespoint = service.updateSettlement(settlement.getSalespoint());
+					this.coinCounterPanel.getUserPanel().setSalespoint(salespoint);
+//						this.coinCounterPanel.getUserPanel().getReceiptWrapper().prepareReceipt();
+					this.coinCounterPanel.clear();
+					this.coinCounterPanel.getUserPanel().fireStateChange(
+							new StateChangeEvent(coinCounterPanel.getUserPanel().getCurrentState(),
+									UserPanel.State.POSITION_INPUT));
+				}
+				printSettlement(settlement);
 			}
 		}
 		catch (Exception e)

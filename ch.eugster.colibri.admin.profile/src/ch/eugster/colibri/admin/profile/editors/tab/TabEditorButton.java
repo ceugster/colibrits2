@@ -32,6 +32,8 @@ public class TabEditorButton extends HTMLButton
 {
 	public static final long serialVersionUID = 0l;
 
+	protected KeyPopupMenu installedMenu;
+	
 	protected boolean failOver;
 
 	protected Key[] keys;
@@ -60,6 +62,16 @@ public class TabEditorButton extends HTMLButton
 	{
 		super();
 		this.update(place);
+	}
+	
+	public KeyPopupMenu getInstalledMenu()
+	{
+		return this.installedMenu;
+	}
+
+	public void setInstalledMenu(KeyPopupMenu menu)
+	{
+		this.installedMenu = menu;
 	}
 
 	/*

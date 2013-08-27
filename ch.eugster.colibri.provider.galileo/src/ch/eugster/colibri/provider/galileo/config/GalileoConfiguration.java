@@ -1,5 +1,7 @@
 package ch.eugster.colibri.provider.galileo.config;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -274,7 +276,16 @@ public class GalileoConfiguration implements ProviderConfiguration
 		{
 			if (this.equals(DATABASE_PATH))
 			{
-				return "C:/Comeliv/Galileo/Data/Galidata.dbc";
+				String hostname = "C:";
+				try 
+				{
+					InetAddress addr = InetAddress.getLocalHost();
+					hostname = "//" + addr.getHostName();
+				} 
+				catch (UnknownHostException e) 
+				{
+				}
+				return hostname + "/Comeliv/Galileo/Data/Galidata.dbc";
 			}
 			else if (this.equals(KEEP_CONNECTION))
 			{

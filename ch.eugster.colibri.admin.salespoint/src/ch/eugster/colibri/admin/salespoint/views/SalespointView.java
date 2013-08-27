@@ -5,7 +5,6 @@ import java.text.NumberFormat;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -319,7 +318,16 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) 
 			{
-				viewer.refresh();
+				if (entity instanceof Salespoint)
+				{
+					viewer.refresh();
+				}
+				else if (entity instanceof Stock)
+				{
+					Stock stock = (Stock) entity;
+					stock.getSalespoint().addStock(stock);
+					viewer.refresh(stock.getSalespoint());
+				}
 				return Status.OK_STATUS;
 			}
 		};

@@ -43,15 +43,15 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 	{
 		return userPanel;
 	}
+	
+	public Key getKey()
+	{
+		return key;
+	}
 
 	@Override
 	public final void stateChange(final StateChangeEvent event)
 	{
-		if (this.key.getFunctionType() == FunctionType.FUNCTION_LOGOUT)
-		{
-			System.out.println();
-		}
-
 		setEnabled(getState(event));
 		firePropertyChange("state", event.getOldState(), event.getNewState());
 	}
@@ -71,7 +71,14 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 				}
 				else
 				{
-					state = false;
+//					if (this.button != null)
+//					{
+//						state = !this.button.isFailOver();
+//					}
+//					else
+//					{
+						state = true;
+//					}
 				}
 			}
 			else
@@ -86,5 +93,6 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 	@Override
 	public void handleEvent(Event event) 
 	{
+		System.out.println();
 	}
 }

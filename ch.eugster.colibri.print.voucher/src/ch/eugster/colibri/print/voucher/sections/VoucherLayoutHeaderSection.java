@@ -128,7 +128,8 @@ public class VoucherLayoutHeaderSection extends AbstractLayoutSection
 					}
 					case N:
 					{
-						final String number = receipt.getNumber() == null ? "" : receipt.getNumber().toString();
+						simpleIntegerFormatter.setMinimumIntegerDigits(marker.length());
+						final String number = receipt.getNumber() == null ? "" : simpleIntegerFormatter.format(receipt.getNumber());
 						return layoutSection.replaceMarker(number, marker, false);
 					}
 					case D:

@@ -44,7 +44,12 @@ public abstract class KeyPopupMenu extends PopupMenu implements MouseListener
 	public void mouseReleased(MouseEvent event)
 	{
 		if (event.isPopupTrigger())
-			KeyPopupMenu.this.show(event.getComponent(), event.getX(), event.getY());
+		{
+			if (this.getParent() != null)
+			{
+				KeyPopupMenu.this.show(event.getComponent(), event.getX(), event.getY());
+			}
+		}
 	}
 	
 	@Override

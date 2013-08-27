@@ -11,6 +11,7 @@ import java.util.Date;
 
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.User;
@@ -53,6 +54,33 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 	public int getAreaHeight(final AreaType areaType)
 	{
 		return 48;
+	}
+
+	protected char[] getFontSize(ReceiptPrinterService.Size size) 
+	{
+		switch(size)
+		{
+		case NORMAL:
+		{
+			return new char[] { 29, 33, 0};
+		}
+		case DOUBLE_WIDTH:
+		{
+			return new char[] { 29, 33, 16};
+		}
+		case DOUBLE_HEIGHT:
+		{
+			return new char[] { 29, 33, 1};
+		}
+		case DOUBLE_WIDTH_AND_HEIGHT:
+		{
+			return new char[] { 29, 33, 17};
+		}
+		default:
+		{
+			return new char[] { 29, 33, 0};
+		}
+		}
 	}
 
 	@Override

@@ -482,6 +482,9 @@ public class PrintoutEditor extends AbstractEntityEditor<Printout> implements Ev
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
+				PrintoutEditorInput input = (PrintoutEditorInput) PrintoutEditor.this.getEditorInput();
+				PrintService printService = (PrintService) input.getAdapter(PrintService.class);
+
 				final Printout printout = (Printout) PrintoutEditor.this.getEditorInput().getAdapter(Printout.class);
 				final ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> receiptPrinterTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle()
 						.getBundleContext(), ReceiptPrinterService.class, null);
@@ -496,52 +499,39 @@ public class PrintoutEditor extends AbstractEntityEditor<Printout> implements Ev
 								.getService(receiptPrinterReference);
 						if (receiptPrinterService != null)
 						{
-							final ServiceTracker<PrintService, PrintService> printTracker = new ServiceTracker<PrintService, PrintService>(Activator.getDefault().getBundle()
-									.getBundleContext(), PrintService.class, null);
-							printTracker.open();
-							final ServiceReference<PrintService>[] printReferences = printTracker.getServiceReferences();
-							for (final ServiceReference<PrintService> printReference : printReferences)
+							final ILayoutSectionType[] layoutSectionTypes = PrintoutEditor.this.layoutType
+									.getLayoutSectionTypes();
+							for (final ILayoutSectionType layoutSectionType : layoutSectionTypes)
 							{
-								if (printReference.getProperty("component.name").equals(printout.getPrintoutType()))
+								final ILayoutSection layoutSection = layoutSectionType.getLayoutSection();
+								for (final AreaType areaType : AreaType.values())
 								{
-									final PrintService printService = (PrintService) printTracker
-											.getService(printReference);
-									final ILayoutSectionType[] layoutSectionTypes = PrintoutEditor.this.layoutType
-											.getLayoutSectionTypes();
-									for (final ILayoutSectionType layoutSectionType : layoutSectionTypes)
+									if (layoutSection.hasArea(areaType))
 									{
-										final ILayoutSection layoutSection = layoutSectionType.getLayoutSection();
-										for (final AreaType areaType : AreaType.values())
+										final StyledText pattern = PrintoutEditor.this.getStyledText(
+												layoutSectionType, areaType);
+										if (pattern != null)
 										{
-											if (layoutSection.hasArea(areaType))
+											layoutSection.setPattern(areaType, pattern.getText());
+										}
+										final RadioGroupViewer viewer = PrintoutEditor.this
+												.getRadioGroupViewer(layoutSectionType, areaType);
+										if (viewer != null)
+										{
+											final StructuredSelection ssel = (StructuredSelection) viewer
+													.getSelection();
+											if (ssel.getFirstElement() instanceof PrintOption)
 											{
-												final StyledText pattern = PrintoutEditor.this.getStyledText(
-														layoutSectionType, areaType);
-												if (pattern != null)
-												{
-													layoutSection.setPattern(areaType, pattern.getText());
-												}
-												final RadioGroupViewer viewer = PrintoutEditor.this
-														.getRadioGroupViewer(layoutSectionType, areaType);
-												if (viewer != null)
-												{
-													final StructuredSelection ssel = (StructuredSelection) viewer
-															.getSelection();
-													if (ssel.getFirstElement() instanceof PrintOption)
-													{
-														layoutSection.setPrintOption(areaType,
-																((PrintOption) ssel.getFirstElement()));
-													}
-												}
+												layoutSection.setPrintOption(areaType,
+														((PrintOption) ssel.getFirstElement()));
 											}
 										}
-										layoutSectionType.setColumnCount(receiptPrinterService
-												.getReceiptPrinterSettings().getCols());
 									}
-									printService.testDocument(PrintoutEditor.this.layoutType, printout);
 								}
+								layoutSectionType.setColumnCount(receiptPrinterService
+										.getReceiptPrinterSettings().getCols());
 							}
-							printTracker.close();
+							printService.testDocument(PrintoutEditor.this.layoutType, printout);
 						}
 					}
 				}

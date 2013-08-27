@@ -105,11 +105,6 @@ public class DatabaseWizardMigrationPage extends WizardPage
 
 		this.colibriPropertiesPath = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		this.colibriPropertiesPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final File file = new File(DatabaseWizardMigrationPage.STANDARD_COLIBRI_XML_PATH);
-		if (file.exists())
-		{
-			this.colibriPropertiesPath.setText(file.getAbsolutePath());
-		}
 		this.colibriPropertiesPath.addModifyListener(new ModifyListener()
 		{
 			@Override
@@ -121,7 +116,6 @@ public class DatabaseWizardMigrationPage extends WizardPage
 					DatabaseWizardMigrationPage.this.setPageComplete(DatabaseWizardMigrationPage.this.checkOldColibri(file));
 				}
 			}
-
 		});
 
 		this.selectColibriPropertiesPath = new Button(composite, SWT.PUSH);
@@ -252,6 +246,12 @@ public class DatabaseWizardMigrationPage extends WizardPage
 			}
 		});
 		viewerColumn.setEditingSupport(new HostEditingSupport(this.salespointViewer));
+
+		final File file = new File(DatabaseWizardMigrationPage.STANDARD_COLIBRI_XML_PATH);
+		if (file.exists())
+		{
+			this.colibriPropertiesPath.setText(file.getAbsolutePath());
+		}
 
 		this.setPageComplete(this.validatePage());
 

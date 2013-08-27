@@ -95,6 +95,11 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 										PositionListPanel.this.profile, title, message, MessageDialog.TYPE_QUESTION) == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 								{
 									final PositionListModel model = (PositionListModel) table.getModel();
+									if (userPanel.getReceiptWrapper().getReceipt().getId() != null)
+									{
+										userPanel.getReceiptWrapper().getReceipt().setDeleted(true);
+										userPanel.getReceiptWrapper().storeReceipt();
+									}
 									Receipt receipt = userPanel.getReceiptWrapper().prepareReceipt();
 									userPanel.getPositionWrapper().preparePosition(receipt);
 									userPanel.getPaymentWrapper().preparePayment(receipt);
@@ -186,7 +191,7 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 		final DefaultTableColumnModel columnModel = new DefaultTableColumnModel();
 		for (final TableColumn tableColumn : positionListModel.getTableColumns())
 		{
-			tableColumn.setCellRenderer(new PositionListCellRenderer(userPanel, Color.BLACK, Color.RED, Color.GREEN));
+			tableColumn.setCellRenderer(new PositionListCellRenderer(userPanel, Color.BLACK, Color.RED, Color.RED));
 			columnModel.addColumn(tableColumn);
 		}
 
@@ -216,6 +221,7 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 			int stringWidth = fm.stringWidth(title);
 			for (int j = 0; j < table.getRowCount(); j++)
 			{
+				table.getColumnModel().getColumn(i).getCellRenderer().getTableCellRendererComponent(table, table.getValueAt(j, i), false, false, j, i);
 				final String val = table.getValueAt(j, i).toString();
 				if (fm.stringWidth(val) + 6 > stringWidth)
 				{

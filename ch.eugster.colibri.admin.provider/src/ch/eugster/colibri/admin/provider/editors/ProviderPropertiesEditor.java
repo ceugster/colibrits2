@@ -372,7 +372,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 							final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 							gridData.horizontalSpan = 2;
 
-							final Text text = this.formToolkit.createText(composite, "");
+							final Text text = this.formToolkit.createText(composite, property.label2());
 							text.setData("key", property.key());
 							text.setLayoutData(gridData);
 							text.addModifyListener(this);
@@ -381,7 +381,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 						}
 						else if (property.control().equals(FileDialog.class.getName()))
 						{
-							final Text text = this.formToolkit.createText(composite, "");
+							final Text text = this.formToolkit.createText(composite, property.label2());
 							text.setData("key", property.key());
 							text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 							text.addModifyListener(this);
@@ -431,7 +431,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 							final GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
 							layoutData.horizontalSpan = 2;
 
-							final Button button = this.formToolkit.createButton(composite, property.label(), SWT.CHECK);
+							final Button button = this.formToolkit.createButton(composite, property.label2(), SWT.CHECK);
 							button.setLayoutData(layoutData);
 							button.setData("key", property.key());
 							button.addSelectionListener(new SelectionListener()
@@ -515,7 +515,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 													for (IProperty property : properties.values())
 													{
 														Property localProperty = new Property(property.control(), property
-																.filter(), property.key(), property.label(), property.value());
+																.filter(), property.key(), property.label(), property.label2(), property.value());
 														Control control = controls.get(property.key());
 														if (control instanceof Text)
 														{
@@ -614,7 +614,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 							final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 							gridData.horizontalSpan = 2;
 
-							final Text text = this.formToolkit.createText(composite, "");
+							final Text text = this.formToolkit.createText(composite, property.label2());
 							text.setData("key", property.key());
 							text.setLayoutData(gridData);
 							text.addModifyListener(this);
@@ -646,7 +646,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 						}
 						else if (property.control().equals(FileDialog.class.getName()))
 						{
-							final Text text = this.formToolkit.createText(composite, "");
+							final Text text = this.formToolkit.createText(composite, property.label2());
 							text.setData("key", property.key());
 							text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 							text.addModifyListener(this);
@@ -695,7 +695,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 							final GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
 							layoutData.horizontalSpan = 2;
 
-							final Button button = this.formToolkit.createButton(composite, property.label(), SWT.CHECK);
+							final Button button = this.formToolkit.createButton(composite, property.label2(), SWT.CHECK);
 							button.setLayoutData(layoutData);
 							button.setData("key", property.key());
 							button.addSelectionListener(new SelectionListener()
@@ -843,14 +843,16 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 
 		private final String label;
 
+		private final String label2;
 		private String value;
 
-		public Property(String control, String[] filter, String key, String label, String value)
+		public Property(String control, String[] filter, String key, String label, String label2, String value)
 		{
 			this.control = control;
 			this.filter = filter;
 			this.key = key;
 			this.label = label;
+			this.label2 = label2;
 			this.value = value;
 		}
 
@@ -879,6 +881,12 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 
 		@Override
 		public String label()
+		{
+			return label;
+		}
+
+		@Override
+		public String label2()
 		{
 			return label;
 		}

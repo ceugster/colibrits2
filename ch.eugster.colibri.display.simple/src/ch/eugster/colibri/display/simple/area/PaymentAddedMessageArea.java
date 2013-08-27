@@ -4,12 +4,12 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Currency;
 
 import ch.eugster.colibri.display.area.AbstractLayoutArea;
 import ch.eugster.colibri.display.area.IKey;
 import ch.eugster.colibri.display.area.ILayoutArea;
 import ch.eugster.colibri.display.area.ILayoutAreaType;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -28,8 +28,8 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 	public String getDefaultPattern()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("AAAAAAAAAA LLLLLLLLL\n");
-		builder = builder.append("XXXXXX    OOOOOOOOOO");
+		builder = builder.append("AAAAAAAA WWW FFFFFFF\n");
+		builder = builder.append("XXXXXXXX RRR PPPPPPPP");
 		return builder.toString();
 	}
 
@@ -67,7 +67,7 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 
 	public enum Key implements IKey
 	{
-		A, L, F, S, T, O, P, X;
+		A, L, F, S, T, O, P, R, W, X;
 
 		@Override
 		public String label()
@@ -102,6 +102,14 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 				{
 					return "Offen/Zurück Betrag FW";
 				}
+				case R:
+				{
+					return "Rückgeldwährung";
+				}
+				case W:
+				{
+					return "Zahlungswährung";
+				}
 				case X:
 				{
 					return "Text Offen/Zurück";
@@ -113,10 +121,17 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 			}
 		}
 
-		private String format(Currency currency, double amount)
+		private String format(Currency currency, Receipt receipt, double amount)
 		{
-			PaymentAddedMessageArea.amountFormatter.setMaximumFractionDigits(PaymentAddedMessageArea.amountFormatter.getCurrency().getDefaultFractionDigits());
-			PaymentAddedMessageArea.amountFormatter.setMinimumFractionDigits(PaymentAddedMessageArea.amountFormatter.getCurrency().getDefaultFractionDigits());
+			if (!currency.equals(receipt.getDefaultCurrency()))
+			{
+				PaymentAddedMessageArea.amountFormatter.setCurrency(currency.getCurrency());
+			}
+			else
+			{
+				PaymentAddedMessageArea.amountFormatter.setMaximumFractionDigits(PaymentAddedMessageArea.amountFormatter.getCurrency().getDefaultFractionDigits());
+				PaymentAddedMessageArea.amountFormatter.setMinimumFractionDigits(PaymentAddedMessageArea.amountFormatter.getCurrency().getDefaultFractionDigits());
+			}
 			return PaymentAddedMessageArea.amountFormatter.format(amount);
 		}
 		
@@ -135,34 +150,52 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 					}
 					case L:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency().getCurrency(), payment.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case F:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency().getCurrency(), payment.getAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY));
-						return layoutArea.replaceMarker(value, marker, false);
+						if (payment.getReceipt().getForeignCurrency().getId().equals(payment.getReceipt().getDefaultCurrency().getId()))
+						{
+							String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY));
+							return layoutArea.replaceMarker(value, marker, false);
+						}
+						else
+						{
+							String value = format(payment.getReceipt().getForeignCurrency(), payment.getReceipt(), payment.getAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY));
+							return layoutArea.replaceMarker(value, marker, false);
+						}
 					}
 					case S:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency().getCurrency(), payment.getReceipt().getPositionAmount(
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getReceipt().getPositionAmount(
 								Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case T:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency().getCurrency(), payment.getReceipt().getPositionAmount(
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getReceipt().getPositionAmount(
 								Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO));
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case O:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency().getCurrency(), payment.getReceipt().getDifference());
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getReceipt().getDifference());
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case P:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency().getCurrency(), payment.getReceipt().getFCDifference());
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getReceipt().getFCDifference());
+						return layoutArea.replaceMarker(value, marker, false);
+					}
+					case R:
+					{
+						String value = payment.getReceipt().getDefaultCurrency().getCode();
+						return layoutArea.replaceMarker(value, marker, false);
+					}
+					case W:
+					{
+						String value = payment.getReceipt().getForeignCurrency().getCode();
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case X:

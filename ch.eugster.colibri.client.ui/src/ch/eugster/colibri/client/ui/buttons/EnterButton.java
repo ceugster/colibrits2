@@ -30,6 +30,7 @@ public class EnterButton extends NumericPadButton implements PropertyChangeListe
 		super(action, userPanel, profile);
 		addActionListener(this.userPanel.getValueDisplay());
 		new PositionChangeMediator(this.userPanel, this, positionProperties);
+		userPanel.getPositionWrapper().addPropertyChangeListener(this);
 	}
 
 	@Override
@@ -42,6 +43,68 @@ public class EnterButton extends NumericPadButton implements PropertyChangeListe
 	{
 		setText(text);
 		return true;
+	}
+
+//	private boolean testForCurrentPaymentComplete()
+//	{
+//		if (userPanel.getPaymentWrapper().isPaymentComplete())
+//		{
+////			setText("Einfügen");
+//			return true;
+//		}
+//		else
+//		{
+//			return false;
+//		}
+//	}
+
+	private boolean testForCurrentPositionComplete()
+	{
+		if (userPanel.getPositionWrapper().isPositionComplete())
+		{
+			// this.setText("Einfügen");
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	private boolean testForProductGroup()
+	{
+		return userPanel.getPositionWrapper().isPositionEmpty();
+	}
+
+	private boolean testForPrice()
+	{
+		if (userPanel.getPositionWrapper().doesPositionNeedPrice())
+		{
+//			final double maxRange = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxPriceRange());
+//			final double price = Math.abs(userPanel.getValueDisplay().testAmount());
+//			if (price == 0D || (maxRange > 0 && price > maxRange))
+//			{
+				setText("Preis");
+				return true;
+//			}
+		}
+		return false;
+	}
+
+	private boolean testForQuantity()
+	{
+		if (userPanel.getPositionWrapper().doesPositionNeedQuantity())
+		{
+			final int maxRange = Math.abs(userPanel.getMainTabbedPane().getSetting().getMaxQuantityRange());
+			final int quantity = Math.abs(userPanel.getValueDisplay().testQuantity());
+			if ((maxRange == 0) || ((quantity > 0) && (quantity <= maxRange)))
+			{
+				setText("Menge");
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private boolean testForSelectedPaymentInList()
@@ -62,18 +125,63 @@ public class EnterButton extends NumericPadButton implements PropertyChangeListe
 			{
 				if (testForSelectedPositionInList())
 				{
-					this.updateLabel("Aktualisieren");
+					if (testForQuantity())
+					{
+						this.updateLabel("Menge");
+					}
+					else if (testForPrice())
+					{
+						this.updateLabel("Preis");
+					}
+					else
+					{
+						this.updateLabel("Aktualisieren");
+					}
 				}
 				else
 				{
-					this.updateLabel("Zahlungen");
+					if (testForCurrentPositionComplete())
+					{
+						this.updateLabel("Zahlungen");
+					}
+					else
+					{
+						if (testForProductGroup())
+						{
+							this.updateLabel("Zahlungen");
+						}
+						else if (testForQuantity())
+						{
+							this.updateLabel("Menge");
+						}
+						else if (testForPrice())
+						{
+							this.updateLabel("Preis");
+						}
+						else
+						{
+							this.updateLabel("Zahlungen");
+						}
+					}
+					// System.out.println();
 				}
 			}
 			else if (userPanel.getCurrentState().equals(UserPanel.State.PAYMENT_INPUT))
 			{
-				if (!testForSelectedPaymentInList())
+				if (testForSelectedPaymentInList())
 				{
-					setText("Positionen");
+					// TODO
+				}
+				else
+				{
+//					if (testForCurrentPaymentComplete())
+//					{
+//						this.updateLabel("Einfügen");
+//					}
+//					else
+//					{
+						setText("Positionen");
+//					}
 				}
 			}
 		}

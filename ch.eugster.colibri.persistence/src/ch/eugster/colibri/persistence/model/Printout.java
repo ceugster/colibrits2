@@ -266,7 +266,7 @@ public class Printout extends AbstractEntity implements IReplicatable
 	public void setSalespoint(final Salespoint salespoint)
 	{
 		this.propertyChangeSupport.firePropertyChange("salespoint", salespoint, this.salespoint = salespoint);
-		if (salespoint.getReceiptPrinterSettings() != null)
+		if (salespoint != null && salespoint.getReceiptPrinterSettings() != null)
 		{
 			this.setReceiptPrinterSettings(salespoint.getReceiptPrinterSettings().getReceiptPrinterSettings());
 		}
