@@ -28,6 +28,20 @@ public class Activator extends AbstractUIPlugin
 
 	public static final String IMAGE_GEARWHEEL = "image.gearwheel";
 
+	public static final String IMAGE_GEARWHEEL_GREEN = "image.gearwheel.green";
+
+	public static final String IMAGE_GEARWHEEL_RED = "image.gearwheel.red";
+
+	public static final String IMAGE_GEARWHEEL_BLUE = "image.gearwheel.blue";
+
+	public static final String IMAGE_GEARWHEEL_KARMESIN = "image.gearwheel.karmesin";
+
+	public static final String IMAGE_GEARWHEEL_LILA = "image.gearwheel.lila";
+
+	public static final String IMAGE_GEARWHEEL_ORANGE = "image.gearwheel.orange";
+
+	public static final String IMAGE_GEARWHEEL_YELLOW = "image.gearwheel.yellow";
+
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
 	// The shared instance
@@ -50,6 +64,14 @@ public class Activator extends AbstractUIPlugin
 		imageRegistry.put(Activator.IMAGE_REGISTER, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/register_16.png")));
 		imageRegistry.put(Activator.IMAGE_BULP, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gluehbirne_16.png")));
 		imageRegistry.put(Activator.IMAGE_GEARWHEEL, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gearwheel_16.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_GREEN, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_green.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_RED, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_red.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_BLUE, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_blue.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_KARMESIN, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_karmesin.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_LILA, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_lila.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_ORANGE, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_orange.png")));
+		imageRegistry.put(Activator.IMAGE_GEARWHEEL_YELLOW, ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/gear_wheel_yellow.png")));
+		imageRegistry.put("loader", ImageDescriptor.createFromURL(this.getBundle().getEntry("/icons/ajaxloader.gif")));
 	}
 
 	/*

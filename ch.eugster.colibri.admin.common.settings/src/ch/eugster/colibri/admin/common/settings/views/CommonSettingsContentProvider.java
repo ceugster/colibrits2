@@ -6,86 +6,93 @@
  */
 package ch.eugster.colibri.admin.common.settings.views;
 
-import java.util.Collection;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
-import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
-import ch.eugster.colibri.voucher.client.VoucherService;
+import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
+import ch.eugster.colibri.provider.service.ProviderUpdater;
 
 public class CommonSettingsContentProvider implements ITreeContentProvider
 {
-	private ProviderPropertyParent providerPropertyParent;
-
-	private GeneralSettingsParent generalSettingsParent;
-
-	private VoucherServiceParent voucherServiceParent;
+	private ProviderUpdaterParent providerUpdaterParent;
 	
 	@Override
 	public void dispose()
 	{
 	}
+	
 
 	@Override
 	public Object[] getChildren(final Object parent)
 	{
-		final Collection<Object> items = new Vector<Object>();
-
-		this.generalSettingsParent = new GeneralSettingsParent();
-		items.add(this.generalSettingsParent);
-
-		final ServiceTracker<ProviderInterface, ProviderInterface> tracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(), ProviderInterface.class,
-				null)
+		List<Object> entries = new ArrayList<Object>();
+		if (parent instanceof TreeViewer)
 		{
-
-			@Override
-			public ProviderInterface addingService(ServiceReference<ProviderInterface> reference) {
-				ProviderInterface service = this.getService(reference);
-				CommonSettingsContentProvider.this.providerPropertyParent = new ProviderPropertyParent();
-				items.add(CommonSettingsContentProvider.this.providerPropertyParent);
-				return service;
-			}
-
-			@Override
-			public void removedService(ServiceReference<ProviderInterface> reference,
-					ProviderInterface service) {
-				items.remove(CommonSettingsContentProvider.this.providerPropertyParent);
-				super.removedService(reference, service);
-			}
-			
-		};
-		tracker.open();
-
-		final ServiceTracker<VoucherService, VoucherService> voucherTracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(), VoucherService.class, null)
+			entries.add(new GeneralSettingsParent());
+			this.providerUpdaterParent = new ProviderUpdaterParent();
+			entries.add(this.providerUpdaterParent);
+		}
+		if (parent instanceof ProviderUpdaterParent)
 		{
-
-			@Override
-			public VoucherService addingService(ServiceReference<VoucherService> reference) {
-				VoucherService service = this.getService(reference);
-				CommonSettingsContentProvider.this.voucherServiceParent = new VoucherServiceParent();
-				items.add(CommonSettingsContentProvider.this.voucherServiceParent);
-				return service;
-			}
-
-			@Override
-			public void removedService(ServiceReference<VoucherService> reference,
-					VoucherService service) {
-				items.remove(CommonSettingsContentProvider.this.voucherServiceParent);
-				super.removedService(reference, service);
-			}
-		};
-		voucherTracker.open();
-		
-		return items.toArray(new Object[0]);
+			entries.addAll(getProviderUpdateSchedulers());
+			entries.addAll(getProviderUpdaters());
+		}
+		return entries.toArray(new Object[0]);
 	}
 
+	private List<Object> getProviderUpdaters()
+	{
+		List<Object> entries = new ArrayList<Object>();
+		ServiceTracker<ProviderUpdater, ProviderUpdater> tracker = new ServiceTracker<ProviderUpdater, ProviderUpdater>(Activator.getDefault().getBundle().getBundleContext(), ProviderUpdater.class, null);
+		tracker.open();
+		try
+		{
+			Object[] services = tracker.getServices();
+			if (services instanceof Object[])
+			{
+				for (Object service : services)
+				{
+					entries.add(service);
+				}
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+		return entries;
+	}
+	
+	private List<Object> getProviderUpdateSchedulers()
+	{
+		List<Object> entries = new ArrayList<Object>();
+		ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler> tracker = new ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler>(Activator.getDefault().getBundle().getBundleContext(), ProviderUpdateScheduler.class, null);
+		tracker.open();
+		try
+		{
+			Object[] services = tracker.getServices();
+			if (services instanceof Object[])
+			{
+				for (Object service : services)
+				{
+					entries.add(service);
+				}
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+		return entries;
+	}
+	
 	@Override
 	public Object[] getElements(final Object element)
 	{
@@ -97,7 +104,7 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 	{
 		if (child instanceof ProviderProperty)
 		{
-			return this.providerPropertyParent;
+			return this.providerUpdaterParent;
 		}
 		return null;
 	}
@@ -105,9 +112,23 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 	@Override
 	public boolean hasChildren(final Object parent)
 	{
-		if (parent instanceof PersistenceService)
+		if (parent instanceof TreeViewer)
 		{
 			return true;
+		}
+		if (parent instanceof ProviderUpdaterParent)
+		{
+			ServiceTracker<ProviderUpdater, ProviderUpdater> tracker = new ServiceTracker<ProviderUpdater, ProviderUpdater>(Activator.getDefault().getBundle().getBundleContext(), ProviderUpdater.class, null);
+			tracker.open();
+			try
+			{
+				Object[] services = tracker.getServices();
+				return services == null ? false : services.length > 0;
+			}
+			finally
+			{
+				tracker.close();
+			}
 		}
 		return false;
 	}
@@ -130,19 +151,15 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 		String getName();
 	}
 
-	public class ProviderPropertyParent implements Parent
+	public class ProviderUpdaterParent implements Parent
 	{
-		public String getName()
+		public ProviderUpdaterParent()
 		{
-			return "Warenbewirtschaftung";
 		}
-	}
 
-	public class VoucherServiceParent implements Parent
-	{
 		public String getName()
 		{
-			return "eGutschein";
+			return "Schnittstellen";
 		}
 	}
 }

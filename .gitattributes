@@ -4,7 +4,15 @@ ch.eugster.colibri.admin.common.settings/.project -text
 ch.eugster.colibri.admin.common.settings/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.admin.common.settings/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.common.settings/build.properties -text
+ch.eugster.colibri.admin.common.settings/icons/ajaxloader.gif -text
 ch.eugster.colibri.admin.common.settings/icons/books.gif -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_blue.png -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_green.png -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_karmesin.png -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_lila.png -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_orange.png -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_red.png -text
+ch.eugster.colibri.admin.common.settings/icons/gear_wheel_yellow.png -text
 ch.eugster.colibri.admin.common.settings/icons/gearwheel_16.png -text
 ch.eugster.colibri.admin.common.settings/icons/gluehbirne_16.png -text
 ch.eugster.colibri.admin.common.settings/icons/gluehbirne_grey_16.png -text

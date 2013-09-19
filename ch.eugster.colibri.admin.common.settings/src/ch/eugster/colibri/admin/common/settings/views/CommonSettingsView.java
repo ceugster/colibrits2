@@ -1,6 +1,5 @@
 package ch.eugster.colibri.admin.common.settings.views;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -20,18 +19,16 @@ import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.admin.common.settings.editors.GeneralSettingsEditor;
 import ch.eugster.colibri.admin.common.settings.editors.GeneralSettingsEditorInput;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.GeneralSettingsParent;
-import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.ProviderPropertyParent;
-import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.VoucherServiceParent;
 import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditor;
 import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditorInput;
 import ch.eugster.colibri.admin.ui.views.AbstractEntityView;
-import ch.eugster.colibri.admin.voucher.webservice.editors.VoucherWebservicePropertiesEditor;
-import ch.eugster.colibri.admin.voucher.webservice.editors.VoucherWebservicePropertiesEditorInput;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderConfigurator;
+import ch.eugster.colibri.provider.service.ProviderUpdater;
+import ch.eugster.colibri.provider.voucher.VoucherService;
 import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
-import ch.eugster.colibri.voucher.client.VoucherService;
 
 @SuppressWarnings("rawtypes")
 public class CommonSettingsView extends AbstractEntityView implements IDoubleClickListener
@@ -79,7 +76,7 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 				VoucherService.class, null);
 		this.voucherServiceTracker.open();
 		
-		viewer.setInput(new Object());
+		viewer.setInput(viewer);
 	}
 
 	@Override
@@ -96,17 +93,19 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 	{
 		final ISelection selection = event.getSelection();
 		final Object object = ((IStructuredSelection) selection).getFirstElement();
-		if (object instanceof ProviderPropertyParent)
+		if (object instanceof ProviderUpdater)
 		{
-			this.editProviderProperties();
+			ProviderUpdater updater = (ProviderUpdater) object;
+			this.editProviderProperties(updater);
 		}
 		else if (object instanceof GeneralSettingsParent)
 		{
 			this.editGeneralSettings();
 		}
-		else if (object instanceof VoucherServiceParent)
+		else if (object instanceof ProviderUpdateScheduler)
 		{
-			this.editVoucherService();
+			ProviderUpdateScheduler scheduler = (ProviderUpdateScheduler) object;
+			this.editSchedulerSettings(scheduler);
 		}
 	}
 
@@ -133,56 +132,46 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		}
 	}
 
-	public void editVoucherService()
+	public void editSchedulerSettings(ProviderUpdateScheduler scheduler)
 	{
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			VoucherService voucherService = (VoucherService) voucherServiceTracker.getService();
-			if (voucherService != null)
+			CommonSettings settings = (CommonSettings) persistenceService.getServerService().find(CommonSettings.class,
+					Long.valueOf(1L));
+			if (settings == null)
 			{
-				try
-				{
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-							.openEditor(new VoucherWebservicePropertiesEditorInput(persistenceService, voucherService), VoucherWebservicePropertiesEditor.ID, true);
-				}
-				catch (final PartInitException e)
-				{
-					e.printStackTrace();
-				}
+				settings = CommonSettings.newInstance();
+			}
+			try
+			{
+				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+						.openEditor(new ProviderPropertiesEditorInput(persistenceService, scheduler), ProviderPropertiesEditor.ID, true);
+			}
+			catch (final PartInitException e)
+			{
+				e.printStackTrace();
 			}
 		}
 	}
 
-	public void editProviderProperties()
+	public void editProviderProperties(ProviderUpdater providerUpdater)
 	{
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			final ProviderConfigurator configurator = (ProviderConfigurator) this.providerConfiguratorTracker
-					.getService();
-			if (configurator == null)
+			try
 			{
-				final MessageDialog dialog = new MessageDialog(this.getSite().getShell(), "Warenbewirtschaftung", null,
-						"Die Kasse hat keine Anbindung an eine Warenbewirtschaftung.", MessageDialog.INFORMATION,
-						new String[] { "OK" }, 0);
-				dialog.open();
+				PlatformUI
+						.getWorkbench()
+						.getActiveWorkbenchWindow()
+						.getActivePage()
+						.openEditor(new ProviderPropertiesEditorInput(persistenceService, providerUpdater),
+								ProviderPropertiesEditor.ID, true);
 			}
-			else
+			catch (final PartInitException e)
 			{
-				try
-				{
-					PlatformUI
-							.getWorkbench()
-							.getActiveWorkbenchWindow()
-							.getActivePage()
-							.openEditor(new ProviderPropertiesEditorInput(persistenceService, configurator),
-									ProviderPropertiesEditor.ID, true);
-				}
-				catch (final PartInitException e)
-				{
-					e.printStackTrace();
-				}
+				e.printStackTrace();
 			}
 		}
 	}
