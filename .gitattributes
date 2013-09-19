@@ -987,6 +987,16 @@ ch.eugster.colibri.display/src/ch/eugster/colibri/display/area/ILayoutAreaType.j
 ch.eugster.colibri.display/src/ch/eugster/colibri/display/area/ILayoutType.java -text
 ch.eugster.colibri.display/src/ch/eugster/colibri/display/service/AbstractDisplayService.java -text
 ch.eugster.colibri.display/src/ch/eugster/colibri/display/service/DisplayService.java -text
+ch.eugster.colibri.drivers.derby/.classpath -text
+ch.eugster.colibri.drivers.derby/.project -text
+ch.eugster.colibri.drivers.derby/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.drivers.derby/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.drivers.derby/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.drivers.derby/build.properties -text
+ch.eugster.colibri.drivers.derby/lib/derby.jar -text
+ch.eugster.colibri.drivers.derby/lib/derbyclient.jar -text
+ch.eugster.colibri.drivers.derby/lib/derbynet.jar -text
+ch.eugster.colibri.drivers.derby/lib/derbytools.jar -text
 ch.eugster.colibri.encryption.feature/.project -text
 ch.eugster.colibri.encryption.feature/build.properties -text
 ch.eugster.colibri.encryption.feature/feature.xml -text
