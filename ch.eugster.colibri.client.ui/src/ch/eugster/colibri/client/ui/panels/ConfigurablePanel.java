@@ -357,9 +357,10 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 								Collection<PaymentType> paymentTypes = query.selectByCode(title);
 								if (!paymentTypes.isEmpty())
 								{
-									Receipt receipt = ConfigurablePanel.this.userPanel.getReceiptWrapper().getReceipt();
-									Payment payment = Payment.newInstance(receipt);
 									PaymentType paymentType = paymentTypes.iterator().next();
+									Receipt receipt = ConfigurablePanel.this.userPanel.getReceiptWrapper().getReceipt();
+									receipt.setForeignCurrency(paymentType.getCurrency());
+									Payment payment = Payment.newInstance(receipt);
 									payment.setPaymentType(paymentType);
 									ConfigurablePanel.this.userPanel.getPaymentWrapper().replacePayment(payment);
 									if (receipt.getPositions().size() > 0)

@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,15 +30,22 @@ import ch.eugster.colibri.client.ui.events.PositionChangeEvent;
 import ch.eugster.colibri.client.ui.events.PositionChangeListener;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
 import ch.eugster.colibri.client.ui.panels.user.pos.numeric.ValueDisplay;
+import ch.eugster.colibri.persistence.model.Payment;
+import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.Position.AmountType;
+import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.Receipt.QuotationType;
 import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderIdService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
-import ch.eugster.colibri.voucher.client.VoucherService;
+import ch.eugster.colibri.provider.voucher.VoucherService;
+import ch.eugster.colibri.provider.voucher.VoucherService.Result;
 
 public class PositionWrapper implements PropertyChangeListener, DisposeListener
 {
@@ -105,11 +113,16 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private final ValueDisplay valueDisplay;
 
+	private UserPanel userPanel;
+
+	private NumberFormat currencyFormatter;
+	
 	public PositionWrapper(final UserPanel userPanel, final ValueDisplay valueDisplay)
 	{
 		this.valueDisplay = valueDisplay;
 
-		userPanel.addKeyListener(new KeyAdapter()
+		this.userPanel = userPanel;
+		this.userPanel.addKeyListener(new KeyAdapter()
 		{
 			@Override
 			public void keyPressed(final KeyEvent e)
@@ -117,6 +130,8 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				PositionWrapper.this.keyPressed(e);
 			}
 		});
+
+		currencyFormatter = DecimalFormat.getCurrencyInstance();
 
 		new ReceiptChangeMediator(userPanel, this, this.propertyNames);
 
@@ -295,8 +310,139 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			{
 				if (input.startsWith("GCD"))
 				{
-					log(LogService.LOG_INFO, "eGutschein eingelesen.");
-					checkBalance(input);
+					log(LogService.LOG_INFO, "eGutschein gescant.");
+					log(LogService.LOG_INFO, "Prüfe eGutschein Service Verfügbarkeit...");
+					ServiceTracker<VoucherService, VoucherService> tracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(), VoucherService.class, null);
+					tracker.open();
+					try
+					{
+						VoucherService service = tracker.getService();
+						if (service == null)
+						{
+							log(LogService.LOG_INFO, "eGutschein Service nicht verfügbar.");
+							final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+									.getReceipt().getSettlement().getSalespoint().getProfile(), "Service nicht verfügbar",
+									new int[] { MessageDialog.BUTTON_OK }, 0);
+							dialog.setMessage("Der Service für die Bearbeitung von eGutscheinen ist nicht verfügbar.");
+							dialog.pack();
+							dialog.setVisible(true);
+						}
+						else
+						{
+							currencyFormatter.setCurrency(userPanel.getSalespoint().getPaymentType().getCurrency().getCurrency());
+							log(LogService.LOG_INFO, "eGutschein Service verfügbar.");
+							if (userPanel.getCurrentState().equals(UserPanel.State.POSITION_INPUT))
+							{
+								double amount = this.getPosition().getAmount(QuotationType.DEFAULT_CURRENCY, AmountType.NETTO);
+								if (amount > 0)
+								{
+									log(LogService.LOG_INFO, "Das eGutschein-Konto für " + input + " soll mit " + currencyFormatter.format(amount) + " aufgeladen werden.");
+									Result result = service.getAccountBalance(input);
+									if (result.isOK())
+									{
+										log(LogService.LOG_INFO, "Verfügbarer Betrag: " + currencyFormatter.format(result.getAmount()) + ".");
+										PersistenceService persistenceService = persistenceServiceTracker.getService();
+										if (persistenceService != null)
+										{
+											this.position.setProductGroup(this.getDefaultVoucherProductGroup());
+											this.position.setBookProvider(true);
+											this.position.setProviderBooked(false);
+											this.position.setProviderState(ProviderState.OPEN);
+											this.position.setProvider(service.getProviderId());
+											if (this.position.getQuantity() == 0)
+											{
+												this.position.setQuantity(1);
+											}
+											this.position.setSearchValue(input);
+										}
+									}
+									else
+									{
+										final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+												.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
+												new int[] { MessageDialog.BUTTON_OK }, 0);
+										dialog.setMessage(result.getErrorMessage());
+										dialog.pack();
+										dialog.setVisible(true);
+									}
+								}
+								else
+								{
+									log(LogService.LOG_INFO, "Ungültiger Betrag für die Aufladung.");
+									final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+											.getReceipt().getSettlement().getSalespoint().getProfile(), "Ungültiger Betrag",
+											new int[] { MessageDialog.BUTTON_OK }, 0);
+									dialog.setMessage("Der Betrag von " + currencyFormatter.format(amount) + " ist ungültig.\n\n Sie müssen einen Betrag grösser als " + currencyFormatter.format(0D) + " eingeben.");
+									dialog.pack();
+									dialog.setVisible(true);
+								}
+							}
+							else if (userPanel.getCurrentState().equals(UserPanel.State.PAYMENT_INPUT))
+							{
+								log(LogService.LOG_INFO, "Das eGutschein-Konto für " + input + " soll belastet werden.");
+								Result result = service.getAccountBalance(input);
+								if (result.isOK())
+								{
+									double balanceAmount = result.getAmount();
+									double paymentAmount = this.userPanel.getPaymentWrapper().getPayment().getAmount();
+									if (paymentAmount == 0D)
+									{
+										paymentAmount = this.userPanel.getReceiptWrapper().getReceiptDifference();
+									}
+									if (Math.abs(paymentAmount) <= Math.abs(balanceAmount))
+									{
+										result = service.reserveAmount(input, paymentAmount);
+										if (result.isOK())
+										{
+											Payment payment = this.userPanel.getPaymentWrapper().getPayment();
+											payment.setBookProvider(true);
+											payment.setProviderId(service.getProviderId());
+											payment.setCode(input);
+											payment.setProviderBooked(false);
+											payment.setProviderState(ProviderState.RESERVED);
+											payment.setAmount(paymentAmount);
+											payment.setBack(false);
+											payment.setPaymentType(getDefaultVoucherPaymentType());
+											this.userPanel.getPaymentWrapper().replacePayment(payment);
+										}
+										else
+										{
+											log(LogService.LOG_INFO, "Fehler " + result.getErrorCode() + ": " + result.getErrorMessage());
+											final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+													.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
+													new int[] { MessageDialog.BUTTON_OK }, 0);
+											dialog.setMessage(result.getErrorMessage());
+											dialog.pack();
+											dialog.setVisible(true);
+										}
+									}
+									else
+									{
+										log(LogService.LOG_INFO, "Der Bezahlungsbetrag ist nicht gedeckt (verfügbarer Betrag: " + currencyFormatter.format(paymentAmount) + ", Verfügbarer Betrag: " + currencyFormatter.format(balanceAmount) + ").");
+										final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+												.getReceipt().getSettlement().getSalespoint().getProfile(), "Ungültiger Betrag",
+												new int[] { MessageDialog.BUTTON_OK }, 0);
+										dialog.setMessage("Der Betrag von " + currencyFormatter.format(paymentAmount) + " ist nicht gedeckt.\n\nEs sind maximal " + currencyFormatter.format(balanceAmount) + " verfügbar.");
+										dialog.pack();
+										dialog.setVisible(true);
+									}
+								}
+								else
+								{
+									final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+											.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
+											new int[] { MessageDialog.BUTTON_OK }, 0);
+									dialog.setMessage(result.getErrorMessage());
+									dialog.pack();
+									dialog.setVisible(true);
+								}
+							}
+						}
+					}
+					finally
+					{
+						tracker.close();
+					}
 				}
 				else
 				{
@@ -360,45 +506,6 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		}
 	}
 
-	private void checkBalance(String code)
-	{
-		ServiceTracker<VoucherService, VoucherService> tracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(), VoucherService.class, null);
-		tracker.open();
-		VoucherService service = tracker.getService();
-		if (service == null)
-		{
-			final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-					.getReceipt().getSettlement().getSalespoint().getProfile(), "Service nicht verfügbar",
-					new int[] { MessageDialog.BUTTON_OK }, 0);
-			dialog.setMessage("Der Service für die Abfrage von eGutscheinen ist nicht verfügbar.");
-			dialog.pack();
-			dialog.setVisible(true);
-		}
-		else
-		{
-			try
-			{
-				double value = service.getAccountBalance(code);
-				final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-						.getReceipt().getSettlement().getSalespoint().getProfile(), "Kontostand " + code,
-						new int[] { MessageDialog.BUTTON_OK }, 0);
-				dialog.setMessage("Der aktuelle Kontostand beträgt " + NumberFormat.getNumberInstance().format(value) + ".");
-				dialog.pack();
-				dialog.setVisible(true);
-			}
-			catch (Exception e)
-			{
-				final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-						.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler während der Abfrage",
-						new int[] { MessageDialog.BUTTON_OK }, 0);
-				dialog.setMessage("Während der Abfrage ist ein Fehler aufgetreten.\n\n" + e.getLocalizedMessage());
-				dialog.pack();
-				dialog.setVisible(true);
-			}
-		}
-		tracker.close();
-	}
-	
 	public Position preparePosition(final Receipt receipt)
 	{
 		final Position newPosition = Position.newInstance(receipt);
@@ -547,6 +654,16 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			}
 		}
 		return barcode;
+	}
+	
+	private ProductGroup getDefaultVoucherProductGroup()
+	{
+		return this.userPanel.getSalespoint().getCommonSettings().getDefaultVoucherProductGroup();
+	}
+
+	private PaymentType getDefaultVoucherPaymentType()
+	{
+		return this.userPanel.getSalespoint().getCommonSettings().getDefaultVoucherPaymentType();
 	}
 
 	private boolean verifyOrderedNotYetScanned(final Barcode barcode)

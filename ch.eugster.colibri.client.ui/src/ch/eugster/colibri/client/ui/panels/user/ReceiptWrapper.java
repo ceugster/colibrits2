@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -37,12 +36,15 @@ import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
+import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.Receipt.QuotationType;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.rules.LocalDatabaseRule;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.voucher.VoucherService;
 
 public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 {
@@ -82,6 +84,8 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	private final ServiceTracker<EventAdmin, EventAdmin> eventServiceTracker;
 
+	private final ServiceTracker<VoucherService, VoucherService> voucherServiceTracker;
+
 	private final UserPanel userPanel;
 
 	private Receipt receipt;
@@ -109,6 +113,10 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		this.eventServiceTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(),
 				EventAdmin.class, null);
 		this.eventServiceTracker.open();
+
+		this.voucherServiceTracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(),
+				VoucherService.class, null);
+		this.voucherServiceTracker.open();
 	}
 
 	public void addReceiptChangeListener(final ReceiptChangeListener listener)
@@ -136,7 +144,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		this.providerInterfaceTracker.close();
 		this.persistenceServiceTracker.close();
 		this.eventServiceTracker.close();
-
+		this.voucherServiceTracker.close();
 		this.receiptChangeListeners.clear();
 	}
 
@@ -184,13 +192,48 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 	{
 		this.receipt.setState(Receipt.State.PARKED);
 		this.receipt.setNumber(this.userPanel.getSalespoint().getNextParkedReceiptNumber());
+		updateVoucherProvider();
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			persistenceService.getCacheService().merge(this.receipt);
 		}
 	}
-
+	
+	private void updateVoucherProvider()
+	{
+		VoucherService service = voucherServiceTracker.getService();
+		if (service != null)
+		{
+			Collection<Position> positions = receipt.getPositions();
+			for (Position position : positions)
+			{
+				if (position.getProvider() != null && position.getProvider().equals(service.getProviderId()))
+				{
+					if (!position.isDeleted() && position.getProviderState().equals(ProviderState.RESERVED))
+					{
+						VoucherService.Result result = service.cancelReservedAmount(position.getProvider(), position.getAmount(QuotationType.DEFAULT_CURRENCY, AmountType.NETTO));
+						position.setProviderState(result.isOK() ? ProviderState.OPEN : position.getProviderState());
+					}
+					position.setDeleted(true);
+				}
+			}
+			Collection<Payment> payments = receipt.getPayments();
+			for (Payment payment : payments)
+			{
+				if (payment.getProviderId() != null && payment.getProviderId().equals(service.getProviderId()))
+				{
+					if (!payment.isDeleted() && payment.getProviderState().equals(ProviderState.RESERVED))
+					{
+						VoucherService.Result result = service.cancelReservedAmount(payment.getProviderId(), payment.getAmount(QuotationType.DEFAULT_CURRENCY));
+						payment.setProviderState(result.isOK() ? ProviderState.OPEN : payment.getProviderState());
+					}
+					payment.setDeleted(true);
+				}
+			}
+		}
+	}
+	
 	public Receipt prepareReceipt()
 	{
 		final Receipt oldReceipt = this.receipt;

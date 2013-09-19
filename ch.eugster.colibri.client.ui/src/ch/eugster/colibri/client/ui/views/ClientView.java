@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -69,6 +70,7 @@ import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.product.Customer;
@@ -77,9 +79,12 @@ import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
+import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.provider.configuration.IProperty;
+import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderIdService;
 import ch.eugster.colibri.provider.service.ProviderInterface;
 
@@ -115,6 +120,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	private Salespoint salespoint;
 	
 	private long lastFailoverMessage;
+	
+	private Long frequency = null;
 
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
@@ -262,11 +269,42 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		return this.receiptChangeMediator;
 	}
 
+	private String getMessageFrequency()
+	{
+		Map<String, IProperty> properties = ProviderUpdateScheduler.SchedulerProperty.asMap();
+		PersistenceService persistenceService = persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
+			Collection<ProviderProperty> providerProperties = query.selectByProvider(ProviderUpdateScheduler.SchedulerProperty.SCHEDULER_COUNT.providerId());
+			for (ProviderProperty providerProperty : providerProperties)
+			{
+				IProperty property = properties.get(providerProperty.getKey());
+				if (property != null)
+				{
+					property.setPersistedProperty(providerProperty);
+				}
+			}
+		}
+		return properties.get(ProviderUpdateScheduler.SchedulerProperty.SCHEDULER_FAILOVER_MESSAGE_FREQUENCY.key()).value();
+	}
+	
 	@Override
 	public void handleEvent(final Event event)
 	{
 		if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
 		{
+			if (frequency == null)
+			{
+				try
+				{
+					frequency = Long.valueOf(getMessageFrequency()).longValue() * 60000;
+				}
+				catch(NumberFormatException e)
+				{
+					frequency = 3600000L;
+				}
+			}
 			Boolean showFailoverMessage = (Boolean) event.getProperty("show.failover.message");
 			Boolean force = (Boolean) event.getProperty("force");
 			if ((force != null && force.booleanValue()) || (showFailoverMessage != null && showFailoverMessage.booleanValue()))
@@ -275,17 +313,17 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				if (message != null)
 				{
 					long now = GregorianCalendar.getInstance().getTimeInMillis();
-					if (lastFailoverMessage <= now - 3600)
+					if (lastFailoverMessage <= now - frequency)
 					{
 						lastFailoverMessage = now;
 						MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
 										.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
-						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
-						dialog.setMessage(message);
-						dialog.pack();
-						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
-						dialog.setVisible(true);
+//						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+//								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
+//						dialog.setMessage(message);
+//						dialog.pack();
+//						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
+//						dialog.setVisible(true);
 					}
 				}
 			}
@@ -332,6 +370,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				if (this.providerInformation != null)
 				{
+					frequency = 0L;
 					if (this.providerServiceTracker.getService() != null)
 					{
 						if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
@@ -479,45 +518,25 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				else
 				{
-					final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-								.getService();
-					if (persistenceService != null)
+					long count = countProviderUpdates(salespoint);
+					if (topic == null || topic.equals(ProviderInterface.Topic.ARTICLE_UPDATE))
 					{
-						final PositionQuery query = (PositionQuery) persistenceService.getCacheService().getQuery(
-								Position.class);
-						final long count = query.countProviderUpdates();
-						if (topic == null || topic.equals(ProviderInterface.Topic.ARTICLE_UPDATE))
+						if ((status == null) || (status.getSeverity() == IStatus.OK))
 						{
-							if ((status == null) || (status.getSeverity() == IStatus.OK))
-							{
-								if (count > 0)
-								{
-									status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING, Activator.PLUGIN_ID,
-											"Zu verbuchen: " + count);
-								}
-								if (status.getSeverity() == IStatus.OK)
-								{
-									ClientView.this.providerInformation.setErrorImage(null);
-									ClientView.this.providerInformation.setErrorText(null);
-									ClientView.this.providerInformation.setText("Zu verbuchen: 0");
-									ClientView.this.providerInformation.setImage(registry.get("ok"));
-								}
-								else if (status.getSeverity() == IStatus.WARNING)
-								{
-									ClientView.this.providerInformation.setErrorImage(null);
-									ClientView.this.providerInformation.setErrorText(null);
-									ClientView.this.providerInformation.setText(status.getMessage());
-									ClientView.this.providerInformation.setImage(registry.get("exclamation"));
-								}
-							}
+							status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING, Activator.PLUGIN_ID,
+									"Zu verbuchen: " + count);
+							ClientView.this.providerInformation.setErrorImage(null);
+							ClientView.this.providerInformation.setErrorText(null);
+							ClientView.this.providerInformation.setText(status.getMessage());
+							ClientView.this.providerInformation.setImage(registry.get(status.getSeverity() == IStatus.OK ? "ok" : "exclamation"));
 						}
-						else
-						{
-							ClientView.this.providerInformation.setImage(null);
-							ClientView.this.providerInformation.setText(null);
-							ClientView.this.providerInformation.setErrorText(status.getMessage());
-							ClientView.this.providerInformation.setErrorImage(registry.get("error"));
-						}
+					}
+					else
+					{
+						ClientView.this.providerInformation.setImage(null);
+						ClientView.this.providerInformation.setText(null);
+						ClientView.this.providerInformation.setErrorText(status.getMessage());
+						ClientView.this.providerInformation.setErrorImage(registry.get("error"));
 					}
 				}
 				return Status.OK_STATUS;
@@ -526,6 +545,23 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		uiJob.schedule();
 	}
 
+	private long countProviderUpdates(Salespoint salespoint)
+	{
+		long count = 0L;
+		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			PositionQuery query = (PositionQuery) persistenceService.getServerService().getQuery(Position.class);
+			count = query.countProviderUpdates(salespoint);
+			if (count == 0L)
+			{
+				query = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
+				count = query.countProviderUpdates(salespoint, false);
+			}
+		}
+		return count;
+	}
+	
 	private String checkReferenceCurrency(Salespoint salespoint)
 	{
 		String msg = "Es wurde noch keine Referenzwährung definiert\n";
@@ -607,9 +643,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			}
 			else
 			{
-				final PositionQuery query = (PositionQuery) persistenceService.getCacheService().getQuery(
-						Position.class);
-				final long counted = query.countProviderUpdates();
+				final long counted = countProviderUpdates(salespoint);
 				count = Long.valueOf(counted).toString();
 				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
 				this.providerInformation.setText(provider.getName() + ": " + count);
