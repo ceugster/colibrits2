@@ -126,7 +126,8 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.equinox.preferences"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.core.jobs"/>
-      <import plugin="ch.eugster.colibri.voucher.client"/>
+      <import plugin="ch.eugster.colibri.provider.scheduler"/>
+      <import plugin="ch.eugster.colibri.provider.voucher"/>
    </requires>
 
    <plugin
@@ -215,13 +216,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <plugin
          id="ch.eugster.colibri.admin.provider"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="ch.eugster.colibri.admin.voucher.webservice"
          download-size="0"
          install-size="0"
          version="0.0.0"
