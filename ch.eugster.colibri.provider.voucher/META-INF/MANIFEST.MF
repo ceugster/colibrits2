@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Gutschein Web Service Client API
+Bundle-SymbolicName: ch.eugster.colibri.provider.voucher;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: ch.eugster.colibri.provider.voucher
+Import-Package: ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.provider.configuration,
+ ch.eugster.colibri.provider.service,
+ org.eclipse.core.runtime;version="3.4.0"
+Bundle-ActivationPolicy: lazy
