@@ -10,7 +10,6 @@ import ch.eugster.colibri.display.area.IKey;
 import ch.eugster.colibri.display.area.ILayoutArea;
 import ch.eugster.colibri.display.area.ILayoutAreaType;
 import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 
@@ -31,7 +30,7 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 	public String getDefaultPattern()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("AAAAAAAAAAA NNNNNNNN\n");
+		builder = builder.append("AAAAAAA WWW NNNNNNNN\n");
 		builder = builder.append("Total   WWW FFFFFFFF");
 		return builder.toString();
 	}
@@ -148,70 +147,31 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 				{
 				case A:
 				{
-					String code = null;
-					if (!position.getReceipt().getForeignCurrency().getId().equals(position.getReceipt().getDefaultCurrency().getId()))
-					{
-						code = position.getReceipt().getForeignCurrency().getCode();
-					}
 					String value = "";
-					if (code == null)
+					StringBuilder builder = new StringBuilder();
+					if (position.getProduct() == null)
 					{
-						if (position.getProduct() == null)
+						if (position.getSearchValue() != null && position.getSearchValue().length() > 0)
 						{
-							StringBuilder builder = new StringBuilder();
-							if (position.getSearchValue() != null && position.getSearchValue().length() > 0)
-							{
-								builder = builder.append(position.getSearchValue());
-							}
-							builder = builder.append(" "  + position.getProductGroup().getName());
-							value = builder.toString().trim();
+							builder = builder.append(position.getSearchValue());
 						}
 						else
 						{
-							if (position.getProduct().getInvoiceNumber() != null && position.getProduct().getInvoiceNumber().length() > 0)
-							{
-								value = "Rg" + position.getProduct().getInvoiceNumber().substring(0, marker.length() - 6) + " bez";
-							}
-							else
-							{
-								Collection<ProductGroupMapping> mappings = position.getProductGroup().getProductGroupMappings(position.getProvider());
-								for (ProductGroupMapping mapping : mappings)
-								{
-									if (!mapping.isDeleted())
-									{
-										code = mapping.getExternalProductGroup().getCode();
-										String text = position.getProduct().getTitleAndAuthorShortForm();
-										if (text == null || text.isEmpty())
-										{
-											value = position.getCode();
-										}
-										else
-										{
-											value = text + " " + code;
-										}
-									}
-								}
-							}
+							builder = builder.append(position.getProductGroup().getName());
 						}
 					}
 					else
 					{
-						int length = marker.length() - 1 - code.length();
-						if (position.getProductGroup().getCode().length() > length)
+						if (position.getProduct().getInvoiceNumber() != null && position.getProduct().getInvoiceNumber().length() > 0)
 						{
-							value = position.getProductGroup().getCode().substring(0, length) + " " + code;
+							builder = builder.append("Rg" + position.getProduct().getInvoiceNumber() + " bez");
 						}
 						else
 						{
-							value = position.getProductGroup().getCode();
-							for (int i = 0; i < length; i++)
-							{
-								value = value + " ";
-							}
-							value = value + code;
+							builder = builder.append(position.getProduct().getTitleAndAuthorShortForm());
 						}
 					}
-					return layoutArea.replaceMarker(value, marker, true);
+					return layoutArea.replaceMarker(builder.toString().trim(), marker, true);
 				}
 				case B:
 				{

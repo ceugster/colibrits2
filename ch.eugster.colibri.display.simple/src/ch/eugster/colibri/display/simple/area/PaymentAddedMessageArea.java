@@ -29,7 +29,7 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("AAAAAAAA WWW FFFFFFF\n");
-		builder = builder.append("XXXXXXXX RRR PPPPPPPP");
+		builder = builder.append("XXXXXXXX RRR PPPPPPP");
 		return builder.toString();
 	}
 
@@ -185,7 +185,10 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 					}
 					case P:
 					{
-						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), payment.getReceipt().getFCDifference());
+						double positions = payment.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+						double payments = payment.getReceipt().getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
+						double difference = Math.abs(positions - payments);
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), difference);
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case R:
@@ -200,7 +203,10 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 					}
 					case X:
 					{
-						String text = payment.getReceipt().getDifference() <= 0D ? "Offen" : "Zurück";
+						double positions = payment.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+						double payments = payment.getReceipt().getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
+						double difference = positions - payments;
+						String text = difference > 0D ? "Offen" : "Zurück";
 						return layoutArea.replaceMarker(text, marker, true);
 					}
 					default:
