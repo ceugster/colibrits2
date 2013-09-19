@@ -12,9 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.List;
 
@@ -701,38 +703,37 @@ public class DatabaseMigrator extends AbstractConfigurator
 				query = new QueryByCriteria(Setting.class, criteria);
 				final ch.eugster.pos.db.Setting setting = (ch.eugster.pos.db.Setting) broker.getObjectByQuery(query);
 
-				ProviderProperty prop = ProviderProperty.newInstance();
-				prop.setKey("galileo.database.path");
-				prop.setProvider("ch.eugster.colibri.provider.galileo");
-				prop.setValue(setting.path == null ? "" : setting.path);
-				this.getEntityManager().getTransaction().begin();
-				this.getEntityManager().merge(prop);
-				this.getEntityManager().getTransaction().commit();
-
-				prop = ProviderProperty.newInstance();
-				prop.setKey("galileo.keep.connection");
-				prop.setProvider("ch.eugster.colibri.provider.galileo");
-				prop.setValue(Boolean.toString(setting.hold));
-				this.getEntityManager().getTransaction().begin();
-				this.getEntityManager().merge(prop);
-				this.getEntityManager().getTransaction().commit();
-
-				prop = ProviderProperty.newInstance();
-				prop.setKey("galileo.bibwin.path");
-				prop.setProvider("ch.eugster.colibri.provider.galileo");
-				prop.setValue(setting.cdPath == null ? "C:/Dokumente und Einstellungen/All Users/Anwendungsdaten/bibwin/bibwin.ini"
-						: setting.cdPath);
-				this.getEntityManager().getTransaction().begin();
-				this.getEntityManager().merge(prop);
-				this.getEntityManager().getTransaction().commit();
-
-				prop = ProviderProperty.newInstance();
-				prop.setKey("galileo.search.cd");
-				prop.setProvider("ch.eugster.colibri.provider.galileo");
-				prop.setValue(Boolean.toString(setting.searchCd));
-				this.getEntityManager().getTransaction().begin();
-				this.getEntityManager().merge(prop);
-				this.getEntityManager().getTransaction().commit();
+				String path = getGalileoPath(setting.path);
+				if (path != null)
+				{
+					ProviderProperty prop = ProviderProperty.newInstance();
+					prop.setKey("galileo.database.path");
+					prop.setProvider("ch.eugster.colibri.provider.galileo");
+					prop.setValue(setting.path, setting.path);
+					this.getEntityManager().getTransaction().begin();
+					this.getEntityManager().merge(prop);
+					this.getEntityManager().getTransaction().commit();
+				}
+				if (!setting.use)
+				{
+					ProviderProperty prop = ProviderProperty.newInstance();
+					prop.setKey("galileo.connect");
+					prop.setProvider("ch.eugster.colibri.provider.galileo");
+					prop.setValue(Boolean.toString(setting.use), Boolean.toString(setting.use));
+					this.getEntityManager().getTransaction().begin();
+					this.getEntityManager().merge(prop);
+					this.getEntityManager().getTransaction().commit();
+				}
+				if (setting.hold)
+				{
+					ProviderProperty prop = ProviderProperty.newInstance();
+					prop.setKey("galileo.keep.connection");
+					prop.setProvider("ch.eugster.colibri.provider.galileo");
+					prop.setValue(Boolean.toString(setting.hold), Boolean.toString(setting.hold));
+					this.getEntityManager().getTransaction().begin();
+					this.getEntityManager().merge(prop);
+					this.getEntityManager().getTransaction().commit();
+				}
 			}
 			monitor.worked(1);
 		}
@@ -749,126 +750,27 @@ public class DatabaseMigrator extends AbstractConfigurator
 
 		return status;
 	}
-
-	// private IStatus migrateReceipts(final IProgressMonitor monitor, final int
-	// count, final PersistenceBroker broker)
-	// {
-	// IStatus status = Status.OK_STATUS;
-	//
-	// monitor.beginTask("Belege werden übernommen...", count);
-	// try
-	// {
-	// final Currency defaultCurrency =
-	// CommonSettingsQueryService.getQueryService(entityManager).find(Long.valueOf(1L))
-	// .getReferenceCurrency();
-	// final Currency foreignCurrency =
-	// CurrencyQueryService.getQueryService(entityManager).selectByCode("EUR");
-	//
-	// final Query query = new QueryByCriteria(ch.eugster.pos.db.Receipt.class);
-	// final Iterator<ch.eugster.pos.db.Receipt> receipts =
-	// broker.getIteratorByQuery(query);
-	//
-	// User user = null;
-	// Settlement settlement = null;
-	// Salespoint salespoint = null;
-	// while (receipts.hasNext())
-	// {
-	// final ch.eugster.pos.db.Receipt source = receipts.next();
-	// Receipt receipt =
-	// ReceiptQueryService.getQueryService(entityManager).find(source.getId());
-	// if (receipt == null)
-	// {
-	// if ((user == null) || !user.getId().equals(source.getUserId()))
-	// {
-	// user =
-	// UserQueryService.getQueryService(entityManager).find(source.getUserId());
-	// }
-	//
-	// if ((settlement == null) ||
-	// !settlement.getSettled().equals(source.settlement))
-	// {
-	// if ((salespoint == null) ||
-	// !salespoint.getId().equals(source.getSalespointId()))
-	// {
-	// salespoint =
-	// SalespointQueryService.getQueryService(entityManager).find(source.getSalespointId());
-	// }
-	//
-	// SettlementQueryService.getQueryService(entityManager).selectBySalespointAndSettled(salespoint,
-	// source.settlement);
-	// }
-	// if (settlement == null)
-	// {
-	// settlement = Settlement.newInstance(salespoint);
-	// settlement.setSettled(source.settlement);
-	// }
-	//
-	// receipt = Receipt.newInstance(settlement, user);
-	// receipt.setBookkeepingTransaction(0);
-	// receipt.setCustomerCode(source.customerId);
-	// receipt.setDefaultCurrency(defaultCurrency);
-	// receipt.setDefaultCurrencyQuotation(defaultCurrency.getQuotation());
-	// receipt.setDefaultCurrencyRoundFactor(defaultCurrency.getRoundFactor());
-	// receipt.setDeleted(source.deleted);
-	// receipt.setForeignCurrency(foreignCurrency);
-	// receipt.setForeignCurrencyQuotation(foreignCurrency.getQuotation());
-	// receipt.setForeignCurrencyRoundFactor(foreignCurrency.getRoundFactor());
-	// receipt.setId(source.getId());
-	// receipt.setNumber(Long.valueOf(source.number));
-	// switch (source.status)
-	// {
-	// case 0:
-	// receipt.setState(Receipt.State.EMPTY);
-	// break;
-	// case 1:
-	// receipt.setState(Receipt.State.EMPTY);
-	// break;
-	// case 2:
-	// receipt.setState(Receipt.State.PARKED);
-	// break;
-	// case 3:
-	// receipt.setState(Receipt.State.REVERSED);
-	// break;
-	// case 4:
-	// receipt.setState(Receipt.State.SAVED);
-	// break;
-	// }
-	// receipt.setTimestamp(source.timestamp.getTime());
-	// final long transactionId = source.transactionId == null ? 0l :
-	// source.transactionId.longValue();
-	// receipt.setTransaction(transactionId);
-	// receipt.setUpdate(0);
-	//
-	// final Collection<ch.eugster.pos.db.Position> positions =
-	// source.positions;
-	// for (final ch.eugster.pos.db.Position position : positions)
-	// {
-	// receipt.addPosition(copyPosition(receipt, position));
-	// }
-	//
-	// final Collection<ch.eugster.pos.db.Payment> payments = source.payments;
-	// for (final ch.eugster.pos.db.Payment payment : payments)
-	// {
-	// receipt.addPayment(copyPayment(receipt, payment));
-	// }
-	//
-	// ReceiptQueryService.getQueryService(entityManager).merge(receipt);
-	// }
-	// monitor.worked(1);
-	// }
-	// }
-	// catch (final Exception e)
-	// {
-	// status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-	// "Bei der Übernahme der Belege ist ein Fehler aufgetreten.", e);
-	// log(status);
-	// }
-	// finally
-	// {
-	// monitor.done();
-	// }
-	// return status;
-	// }
+	
+	private String getGalileoPath(String oldPath)
+	{
+		if (oldPath == null)
+		{
+			return null;
+		}
+		String newPath = null;
+		String hostname = "C:";
+		try 
+		{
+			InetAddress addr = InetAddress.getLocalHost();
+			hostname = "//" + addr.getHostName();
+		} 
+		catch (UnknownHostException e) 
+		{
+			return newPath;
+		}
+		newPath = hostname + "/Comeliv/Galileo/Data/Galidata.dbc";
+		return oldPath.equals(newPath) ? null : newPath;
+	}
 
 	@SuppressWarnings("rawtypes")
 	private IStatus migrateCurrencies(final IProgressMonitor monitor, final PersistenceBroker broker)

@@ -26,6 +26,7 @@ import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseConfigurator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseMigrator;
 import ch.eugster.colibri.persistence.connection.service.PersistenceServiceImpl;
+import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.replication.service.ReplicationService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.pos.db.Salespoint;
@@ -175,6 +176,7 @@ public class DatabaseWizard extends Wizard
 					.getPage("select.connection.wizard.page");
 			if ((selectPage == null) || selectPage.addNewConnection())
 			{
+				User.setLoginUser(User.newInstance());
 				Activator.getDefault().startPersistenceService();
 				final DatabaseWizardConnectionPage connectionWizardPage = (DatabaseWizardConnectionPage) this
 						.getPage("connection.wizard.page");
@@ -198,10 +200,17 @@ public class DatabaseWizard extends Wizard
 				}
 				ServiceTracker<ReplicationService, ReplicationService> tracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle().getBundleContext(), ReplicationService.class, null);
 				tracker.open();
-				ReplicationService service = tracker.getService();
-				if (service != null)
+				try
 				{
-					service.replicate(this.getShell(), true);
+					ReplicationService service = tracker.getService();
+					if (service != null)
+					{
+						service.replicate(this.getShell(), true);
+					}
+				}
+				finally
+				{
+					tracker.close();
 				}
 			}
 		}
