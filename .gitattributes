@@ -338,6 +338,7 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/ta
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/KeyTypeContentProvider.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/KeyTypeLabelProvider.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/ProductGroupLabelProvider.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/StoreReceiptLabelProvider.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/TabEditor.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/TabEditorButton.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/editors/tab/TabEditorInput.java -text

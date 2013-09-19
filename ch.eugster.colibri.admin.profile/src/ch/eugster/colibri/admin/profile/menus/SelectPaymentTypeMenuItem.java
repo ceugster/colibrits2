@@ -67,34 +67,39 @@ public class SelectPaymentTypeMenuItem extends MenuItem implements ActionListene
 				final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 						PersistenceService.class, null);
 				serviceTracker.open();
-
-				final PersistenceService persistenceService = (PersistenceService) serviceTracker.getService();
-				if (persistenceService != null)
+				try
 				{
-					PaymentType paymentType = null;
-					final Long id = SelectPaymentTypeMenuItem.this.button.getKeys()[1].getParentId();
-					if (id != null)
+					final PersistenceService persistenceService = (PersistenceService) serviceTracker.getService();
+					if (persistenceService != null)
 					{
-						paymentType = (PaymentType) persistenceService.getServerService().find(PaymentType.class, id);
-					}
-
-					final PaymentTypeComboViewerDialog dialog = new PaymentTypeComboViewerDialog(Display.getCurrent().getActiveShell(),
-							paymentType, SelectPaymentTypeMenuItem.this.labelProvider, SelectPaymentTypeMenuItem.this.filters,
-							SelectPaymentTypeMenuItem.this.dialogLabelText);
-					if (dialog.open() == Window.OK)
-					{
-						if (dialog.getSelection() != null)
+						PaymentType paymentType = null;
+						final Long id = SelectPaymentTypeMenuItem.this.button.getKeys()[1].getParentId();
+						if (id != null)
 						{
-							paymentType = dialog.getSelection();
-							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setParentId(paymentType.getId());
-							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setDeleted(false);
-							SelectPaymentTypeMenuItem.this.button.getKeys()[1].setLabel(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION.toCode() + "<br>"
-									+ paymentType.getCode() + " " + paymentType.getCurrency().getCode());
-							SelectPaymentTypeMenuItem.this.button.update(SelectPaymentTypeMenuItem.this.editor.getFailOverState());
+							paymentType = (PaymentType) persistenceService.getServerService().find(PaymentType.class, id);
+						}
+	
+						final PaymentTypeComboViewerDialog dialog = new PaymentTypeComboViewerDialog(Display.getCurrent().getActiveShell(),
+								paymentType, SelectPaymentTypeMenuItem.this.labelProvider, SelectPaymentTypeMenuItem.this.filters,
+								SelectPaymentTypeMenuItem.this.dialogLabelText);
+						if (dialog.open() == Window.OK)
+						{
+							if (dialog.getSelection() != null)
+							{
+								paymentType = dialog.getSelection();
+								SelectPaymentTypeMenuItem.this.button.getKeys()[1].setParentId(paymentType.getId());
+								SelectPaymentTypeMenuItem.this.button.getKeys()[1].setDeleted(false);
+								SelectPaymentTypeMenuItem.this.button.getKeys()[1].setLabel(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION.toCode() + "<br>"
+										+ paymentType.getCode() + " " + paymentType.getCurrency().getCode());
+								SelectPaymentTypeMenuItem.this.button.update(SelectPaymentTypeMenuItem.this.editor.getFailOverState());
+							}
 						}
 					}
 				}
-				serviceTracker.close();
+				finally
+				{
+					serviceTracker.close();
+				}
 				return Status.OK_STATUS;
 			}
 		};

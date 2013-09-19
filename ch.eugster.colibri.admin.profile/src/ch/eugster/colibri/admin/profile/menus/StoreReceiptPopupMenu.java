@@ -9,7 +9,7 @@ package ch.eugster.colibri.admin.profile.menus;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ViewerFilter;
 
-import ch.eugster.colibri.admin.profile.editors.tab.DrawerLabelProvider;
+import ch.eugster.colibri.admin.profile.editors.tab.StoreReceiptLabelProvider;
 import ch.eugster.colibri.admin.profile.editors.tab.TabEditor;
 import ch.eugster.colibri.admin.profile.editors.tab.TabEditorButton;
 import ch.eugster.colibri.admin.ui.filters.PaymentTypeChangeOnlyViewerFilter;
@@ -33,7 +33,7 @@ public class StoreReceiptPopupMenu extends KeyPopupMenu
 		/*
 		 * Währung
 		 */
-		final LabelProvider labelProvider = new DrawerLabelProvider();
+		final LabelProvider labelProvider = new StoreReceiptLabelProvider();
 		final ViewerFilter[] filters = new ViewerFilter[] { new DeletedEntityViewerFilter(), new PaymentTypeChangeOnlyViewerFilter() };
 		this.add(new SelectPaymentTypeMenuItem(editor, button, "Wechselgeld...", "action.change", labelProvider, filters, "Währung"));
 
