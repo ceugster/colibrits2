@@ -33,7 +33,6 @@ import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.User;
-import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
 public class PositionQuery extends AbstractQuery<Position>
@@ -54,9 +53,15 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.select(deleted.and(parked.and(value)));
 	}
 
-	public long countProviderUpdates()
+	public long countProviderUpdates(Salespoint salespoint, boolean transferred)
 	{
-		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
+		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+		if (!transferred)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
+		}
+		
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
@@ -67,9 +72,14 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(update.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
-		final Expression states = deleted.and(saved.or(reversed));
+		final Expression states = expression.and(deleted).and(saved.or(reversed));
 		final long value = this.count(states);
 		return value;
+	}
+
+	public long countProviderUpdates(Salespoint salespoint)
+	{
+		return countProviderUpdates(salespoint, true);
 	}
 
 	public Collection<SettlementPosition> selectPositions(final Salespoint[] salespoints, Calendar[] dateRange)
@@ -119,9 +129,11 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.getInternalDetails(this.selectInternalsBySalespointsAndDateRange(salespoints, dateRange), null);
 	}
 
-	public Collection<Position> selectProviderUpdates(final int maxRows)
+	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, final int maxRows)
 	{
-		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
+		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
@@ -132,7 +144,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(update.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
-		final Expression states = deleted.and(saved.or(reversed));
+		final Expression states = expression.and(deleted).and(saved.or(reversed));
 		final Collection<Position> positions = this.select(states, maxRows);
 		return positions;
 	}

@@ -46,6 +46,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -161,6 +162,11 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Basic
 	@Column(name = "po_provider")
 	private String provider;
+
+	@Basic
+	@Column(name = "po_provider_state")
+	@Enumerated(EnumType.ORDINAL)
+	private ProviderState providerState;
 
 	@Basic
 	@Column(name = "po_book_provider")
@@ -688,6 +694,16 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	public Long getOtherId()
 	{
 		return otherId;
+	}
+
+	public ProviderState getProviderState() 
+	{
+		return providerState;
+	}
+
+	public void setProviderState(ProviderState providerState) 
+	{
+		this.propertyChangeSupport.firePropertyChange("providerState", this.providerState, this.providerState = providerState);
 	}
 
 	public static double getAmount(double amount, double quotation1, double quotation2, final double roundFactor)

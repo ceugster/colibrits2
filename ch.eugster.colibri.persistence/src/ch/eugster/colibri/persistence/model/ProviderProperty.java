@@ -1,8 +1,12 @@
 package ch.eugster.colibri.persistence.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -15,6 +19,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKey;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
@@ -43,6 +49,10 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 	@JoinColumn(name = "pp_sp_id", referencedColumnName = "sp_id")
 	private Salespoint salespoint;
 
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "pp_pp_id", referencedColumnName = "pp_id")
+	private ProviderProperty parent;
+
 	@Basic
 	@Column(name = "pp_key")
 	private String key;
@@ -50,6 +60,10 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 	@Basic
 	@Column(name = "pp_value")
 	private String value;
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
+	@MapKey(name = "salespoint")
+	private Map<Salespoint, ProviderProperty> properties = new HashMap<Salespoint, ProviderProperty>();
 
 	protected ProviderProperty()
 	{
@@ -64,6 +78,13 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 	protected ProviderProperty(final String provider, final Salespoint salespoint)
 	{
 		this.provider = provider;
+		this.salespoint = salespoint;
+	}
+
+	protected ProviderProperty(final String provider, ProviderProperty parent, final Salespoint salespoint)
+	{
+		this.provider = provider;
+		this.parent = parent;
 		this.salespoint = salespoint;
 	}
 
@@ -88,9 +109,40 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 		return this.salespoint;
 	}
 
+	public String getValue(String defaultValue)
+	{
+		if (this.isDeleted())
+		{
+			if (this.getParent() != null)
+			{
+				return this.getParent().getValue(defaultValue);
+			}
+			else
+			{
+				return defaultValue;
+			}
+		}
+		else
+		{
+			return this.value == null ? defaultValue : this.value;
+		}
+	}
+
 	public String getValue()
 	{
 		return this.value;
+	}
+
+	public String getParentValue(String defaultValue)
+	{
+		if (this.getParent() != null)
+		{
+			return this.getParent().getValue(defaultValue);
+		}
+		else
+		{
+			return defaultValue;
+		}
 	}
 
 	@Override
@@ -114,9 +166,46 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("salespoint", this.salespoint, this.salespoint = salespoint);
 	}
 
-	public void setValue(final String value)
+	public void setValue(final String value, String defaultValue)
 	{
-		this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = value);
+		if (this.parent == null)
+		{
+			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = value.equals(defaultValue) ? null : value);
+		}
+		else
+		{
+			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = parent.getValue(defaultValue).equals(defaultValue) ? null : value);
+		}
+	}
+
+	public ProviderProperty getParent() 
+	{
+		return parent;
+	}
+
+	public void setParent(ProviderProperty parent) 
+	{
+		this.propertyChangeSupport.firePropertyChange("parent", this.parent, this.parent = parent);
+	}
+
+	public Map<Salespoint, ProviderProperty> getProperties() 
+	{
+		return properties;
+	}
+
+	public void addProperty(ProviderProperty property) 
+	{
+		this.propertyChangeSupport.firePropertyChange("properties", this.properties, this.properties.put(property.getSalespoint(), property));
+	}
+
+	public void removeProperty(ProviderProperty property) 
+	{
+		this.propertyChangeSupport.firePropertyChange("properties", this.properties, this.properties.remove(property.getProvider()));
+	}
+
+	public void getProperty(Salespoint salespoint) 
+	{
+		this.properties.get(salespoint);
 	}
 
 	public static ProviderProperty newInstance()
@@ -132,5 +221,10 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 	public static ProviderProperty newInstance(final String provider, final Salespoint salespoint)
 	{
 		return (ProviderProperty) AbstractEntity.newInstance(new ProviderProperty(provider, salespoint));
+	}
+
+	public static ProviderProperty newInstance(final String provider, ProviderProperty parent, final Salespoint salespoint)
+	{
+		return (ProviderProperty) AbstractEntity.newInstance(new ProviderProperty(provider, parent, salespoint));
 	}
 }

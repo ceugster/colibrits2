@@ -12,6 +12,7 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -59,9 +60,32 @@ public class Payment extends AbstractEntity implements IPrintable
 	private double foreignCurrencyQuotation;
 
 	@Basic
-	@Column(name = "pa_back")
+	@Column(name = "pa_provider_id", columnDefinition = "VARCHAR(255)")
+	private String providerId;
+
+	@Basic
+	@Column(name = "pa_code", columnDefinition = "VARCHAR(255)")
+	private String code;
+
+	@Basic
+	@Column(name = "pa_book_provider", columnDefinition="SMALLINT")
+	@Convert("booleanConverter")
+	private boolean bookProvider;
+
+	@Basic
+	@Column(name = "pa_provider_booked", columnDefinition="SMALLINT")
+	@Convert("booleanConverter")
+	private boolean providerBooked;
+
+	@Basic
+	@Column(name = "pa_back", columnDefinition="SMALLINT")
 	@Convert("booleanConverter")
 	private boolean back;
+
+	@Basic
+	@Column(name = "pa_provider_state", columnDefinition="INTEGER")
+	@Enumerated
+	private ProviderState providerState;
 
 	private Payment()
 	{
@@ -167,6 +191,50 @@ public class Payment extends AbstractEntity implements IPrintable
 	public void setReceipt(final Receipt receipt)
 	{
 		this.propertyChangeSupport.firePropertyChange("receipt", this.receipt, this.receipt = receipt);
+	}
+
+	public String getProviderId() {
+		return providerId;
+	}
+
+	public void setProviderId(String providerId) 
+	{
+		this.propertyChangeSupport.firePropertyChange("providerId", this.providerId, this.providerId = providerId);
+	}
+
+	public boolean isBookProvider() {
+		return bookProvider;
+	}
+
+	public void setBookProvider(boolean bookProvider) 
+	{
+		this.propertyChangeSupport.firePropertyChange("bookProvider", this.bookProvider, this.bookProvider = bookProvider);
+	}
+
+	public boolean isProviderBooked() {
+		return providerBooked;
+	}
+
+	public void setProviderBooked(boolean providerBooked) 
+	{
+		this.propertyChangeSupport.firePropertyChange("providerBooked", this.providerBooked, this.providerBooked = providerBooked);
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.propertyChangeSupport.firePropertyChange("code", this.code, this.code = code);
+	}
+
+	public ProviderState getProviderState() {
+		return providerState;
+	}
+
+	public void setProviderState(ProviderState providerState) 
+	{
+		this.propertyChangeSupport.firePropertyChange("providerState", this.providerState, this.providerState = providerState);
 	}
 
 	private double inverseQuotation(final Receipt.QuotationType quotationType)

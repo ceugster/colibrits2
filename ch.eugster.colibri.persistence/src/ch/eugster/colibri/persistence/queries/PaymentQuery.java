@@ -27,6 +27,26 @@ import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 
 public class PaymentQuery extends AbstractQuery<Payment>
 {
+	public Collection<Payment> selectVoucherUpdates(final Salespoint salespoint, String providerId, final int maxRows)
+	{
+		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+
+		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
+		saved = saved.and(update.and(new ExpressionBuilder().get("providerBooked").equal(false)));
+
+		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
+		reversed = reversed.and(update.and(new ExpressionBuilder().get("providerBooked").equal(true)));
+
+		final Expression states = expression.and(deleted).and(saved.or(reversed));
+		final Collection<Payment> payments = this.select(states, maxRows);
+		return payments;
+	}
+
 	private Collection<ReportQueryResult> selectPaymentsBySettlement(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());

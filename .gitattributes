@@ -1327,6 +1327,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Display.
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DisplayArea.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Entity.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ExternalProductGroup.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/IProperty.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/IReplicatable.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Key.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Money.java -text
@@ -1340,6 +1341,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductG
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductGroupMapping.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Profile.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProviderProperty.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProviderState.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Receipt.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ReceiptPrinterSettings.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Role.java -text

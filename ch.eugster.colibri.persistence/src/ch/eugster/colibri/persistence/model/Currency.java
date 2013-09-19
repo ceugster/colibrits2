@@ -227,4 +227,10 @@ public class Currency extends AbstractEntity implements IReplicatable
 		return Math.floor((targetCurrencyAmount / targetCurrencyRoundFactor) + (0.5 + ROUND_FACTOR))
 				* targetCurrencyRoundFactor;
 	}
+	
+	public static double change(Currency source, Currency target, double sourceAmount)
+	{
+		double targetAmount = (sourceAmount / source.quotation);
+		return targetAmount;
+	}
 }

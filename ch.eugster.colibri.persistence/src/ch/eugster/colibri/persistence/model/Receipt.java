@@ -356,7 +356,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 		final Position[] positions = this.getPositions().toArray(new Position[0]);
 		for (final Position position : positions)
 		{
-			if (!position.isDeleted() && position.getOption().equals(Position.Option.PAYED_INVOICE))
+			if (!position.isDeleted() && position.getOption() != null && position.getOption().equals(Position.Option.PAYED_INVOICE))
 			{
 				payedInvoices.add(position);
 			}
@@ -794,9 +794,9 @@ public class Receipt extends AbstractEntity implements IPrintable
 			}
 			else if (!this.foreignCurrency.getId().equals(foreignCurrency.getId()))
 			{
-				if (!foreignCurrency.getId().equals(
-						this.settlement.getSalespoint().getPaymentType().getCurrency().getId()))
-				{
+//				if (!foreignCurrency.getId().equals(
+//						this.settlement.getSalespoint().getPaymentType().getCurrency().getId()))
+//				{
 					for (final Stock stock : this.settlement.getSalespoint().getStocks())
 					{
 						if (stock.getPaymentType().getCurrency().getId().equals(foreignCurrency.getId()))
@@ -807,7 +807,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 							this.setForeignCurrencyRoundFactor(this.getForeignCurrency().getRoundFactor());
 						}
 					}
-				}
+//				}
 			}
 		}
 	}

@@ -155,8 +155,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 	private SalespointReceiptPrinterSettings receiptPrinterSettings;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "salespoint")
-	@MapKey(name = "key")
-	private Map<String, ProviderProperty> providerProperties = new HashMap<String, ProviderProperty>();
+	private Collection<ProviderProperty> providerProperties = new Vector<ProviderProperty>();
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "salespoint")
 	@MapKey(name = "printoutType")
@@ -300,7 +299,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 		return this.proposalTax;
 	}
 
-	public Map<String, ProviderProperty> getProviderProperties()
+	public Collection<ProviderProperty> getProviderProperties()
 	{
 		return this.providerProperties;
 	}
@@ -339,15 +338,9 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 				this.printouts.put(printout.getPrintoutType(), printout));
 	}
 
-	public void putProviderProperties(final Map<String, ProviderProperty> providerProperties)
+	public void addProviderProperties(final ProviderProperty providerProperty)
 	{
-		this.providerProperties = providerProperties;
-	}
-
-	public void putProviderProperty(final ProviderProperty salespointProviderProperty)
-	{
-		this.propertyChangeSupport.firePropertyChange("providerProperties", this.providerProperties,
-				this.providerProperties.put(salespointProviderProperty.getKey(), salespointProviderProperty));
+		this.providerProperties.add(providerProperty);
 	}
 
 	public void removeProviderProperty(final ProviderProperty providerProperty)
@@ -472,12 +465,6 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 	public void setProposalTax(final Tax proposalTax)
 	{
 		this.propertyChangeSupport.firePropertyChange("proposalTax", this.proposalTax, this.proposalTax = proposalTax);
-	}
-
-	public void setProviderProperties(final Map<String, ProviderProperty> salespointProviderProperties)
-	{
-		this.propertyChangeSupport.firePropertyChange("providerProperties", this.providerProperties,
-				this.providerProperties = salespointProviderProperties);
 	}
 
 	public void setReceiptPrinterSettings(final SalespointReceiptPrinterSettings receiptPrinterSettings)

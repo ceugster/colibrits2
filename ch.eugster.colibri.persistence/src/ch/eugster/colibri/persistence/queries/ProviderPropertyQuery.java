@@ -59,27 +59,27 @@ public class ProviderPropertyQuery extends AbstractQuery<ProviderProperty>
 		return properties;
 	}
 
-	public Map<String, ProviderProperty> selectByProviderAsMap(final String provider, final Map<String, String> defaults)
-	{
-		final Map<String, ProviderProperty> properties = new HashMap<String, ProviderProperty>();
-		final Collection<ProviderProperty> collection = this.selectByProviderAndSalespoint(provider, null);
-		for (final ProviderProperty property : collection)
-		{
-			properties.put(property.getKey(), property);
-		}
-		final String[] keys = defaults.keySet().toArray(new String[0]);
-		for (final String key : keys)
-		{
-			if (properties.get(key) == null)
-			{
-				final ProviderProperty property = ProviderProperty.newInstance(provider);
-				property.setKey(key);
-				property.setValue(defaults.get(key));
-				properties.put(key, property);
-			}
-		}
-		return properties;
-	}
+//	public Map<String, ProviderProperty> selectByProviderAsMap(final String provider, final Map<String, String> defaults)
+//	{
+//		final Map<String, ProviderProperty> properties = new HashMap<String, ProviderProperty>();
+//		final Collection<ProviderProperty> collection = this.selectByProviderAndSalespoint(provider, null);
+//		for (final ProviderProperty property : collection)
+//		{
+//			properties.put(property.getKey(), property);
+//		}
+//		final String[] keys = defaults.keySet().toArray(new String[0]);
+//		for (final String key : keys)
+//		{
+//			if (properties.get(key) == null)
+//			{
+//				final ProviderProperty property = ProviderProperty.newInstance(provider, prop);
+//				property.setKey(key);
+//				property.setValue(defaults.get(key));
+//				properties.put(key, property);
+//			}
+//		}
+//		return properties;
+//	}
 
 	@Override
 	protected Class<ProviderProperty> getEntityClass()

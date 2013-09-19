@@ -56,6 +56,14 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 	private ProductGroup defaultProductGroup;
 
 	@OneToOne(optional = true)
+	@JoinColumn(name = "cs_vpg_id", referencedColumnName = "pg_id")
+	private ProductGroup defaultVoucherProductGroup;
+
+	@OneToOne(optional = true)
+	@JoinColumn(name = "cs_vpt_id", referencedColumnName = "pt_id")
+	private PaymentType defaultVoucherPaymentType;
+
+	@OneToOne(optional = true)
 	@JoinColumn(name = "cs_pg_payed_invoice_id", referencedColumnName = "pg_id")
 	private ProductGroup payedInvoice;
 
@@ -589,6 +597,26 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 
 	public void setForceCashCheck(boolean forceCashCheck) {
 		this.propertyChangeSupport.firePropertyChange("forceCashCheck", this.forceCashCheck, this.forceCashCheck = forceCashCheck);
+	}
+
+	public ProductGroup getDefaultVoucherProductGroup() 
+	{
+		return defaultVoucherProductGroup;
+	}
+
+	public void setDefaultVoucherProductGroup(ProductGroup defaultVoucherProductGroup) 
+	{
+		this.propertyChangeSupport.firePropertyChange("defaultVoucherProductGroup", this.defaultVoucherProductGroup, this.defaultVoucherProductGroup = defaultVoucherProductGroup);
+	}
+
+	public PaymentType getDefaultVoucherPaymentType() 
+	{
+		return defaultVoucherPaymentType;
+	}
+
+	public void setDefaultVoucherPaymentType(PaymentType defaultVoucherPaymentType) 
+	{
+		this.propertyChangeSupport.firePropertyChange("defaultVoucherPaymentType", this.defaultVoucherPaymentType, this.defaultVoucherPaymentType = defaultVoucherPaymentType);
 	}
 
 	public List<CommonSettingsProperty> getProperties()
