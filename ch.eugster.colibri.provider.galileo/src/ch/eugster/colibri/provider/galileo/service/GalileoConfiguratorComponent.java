@@ -3,7 +3,6 @@ package ch.eugster.colibri.provider.galileo.service;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -12,6 +11,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
+import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.CurrentTax;
@@ -20,6 +20,7 @@ import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.model.TaxType;
@@ -28,14 +29,14 @@ import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
+import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.TaxTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.ProviderTaxCode;
-import ch.eugster.colibri.provider.configuration.SchedulerProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
-import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.Property;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.wgserve.ClassFactory;
 import ch.eugster.colibri.provider.galileo.wgserve.Iwgserve;
 import ch.eugster.colibri.provider.service.ProviderConfigurator;
@@ -68,58 +69,57 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 	private PersistenceService persistenceService;
 
-	private GalileoConfiguration configuration;
-
 	private Collection<String> codesWithError;
 
+	private Map<String, IProperty> properties;
+	
 	public GalileoConfiguratorComponent()
 	{
-		this.configuration = new GalileoConfiguration();
 	}
 
 	@Override
 	public boolean canMap(final CurrentTax currentTax)
 	{
-		return this.configuration.canMap(currentTax);
+		return Activator.getDefault().getConfiguration().canMap(currentTax);
 	}
 
 	@Override
 	public boolean canMap(final Tax tax)
 	{
-		return this.configuration.canMap(tax);
+		return Activator.getDefault().getConfiguration().canMap(tax);
 	}
 
 	@Override
 	public String getImageName()
 	{
-		return this.configuration.getImageName();
+		return Activator.getDefault().getConfiguration().getImageName();
 	}
 
 	@Override
 	public String getName()
 	{
-		return this.configuration.getName();
+		return Activator.getDefault().getConfiguration().getName();
 	}
 
 	@Override
 	public Map<String, IProperty> getProperties()
 	{
-		final Map<String, IProperty> properties = new HashMap<String, IProperty>();
-		for (final IProperty property : Property.values())
+		if (this.properties == null)
 		{
-			properties.put(property.key(), property);
+			updateProperties();
 		}
-		for (final IProperty property : SchedulerProperty.values())
-		{
-			properties.put(property.key(), property);
-		}
-		return properties;
+		return this.properties;
+	}
+	
+	public Map<String, IProperty> getDefaultProperties()
+	{
+		return GalileoConfiguration.GalileoProperty.asMap();
 	}
 
 	@Override
 	public String getProviderId()
 	{
-		return this.configuration.getProviderId();
+		return Activator.getDefault().getConfiguration().getProviderId();
 	}
 	
 	public boolean isConnect()
@@ -184,16 +184,43 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 	private void updateProperties()
 	{
-		this.configuration = new GalileoConfiguration();
-
-		final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getServerService().getQuery(
-				ProviderProperty.class);
-		final Map<String, ProviderProperty> properties = query.selectByProviderAsMap(
-				this.configuration.getProviderId(), this.configuration.getDefaultPropertiesAsMap());
-
-		this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
-		String value = properties.get(Property.CONNECT.key()).getValue();
-		this.connect = Boolean.valueOf(value).booleanValue();
+		final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+				PersistenceService.class, null);
+		serviceTracker.open();
+		try
+		{
+			Map<String, IProperty> properties = GalileoConfiguration.GalileoProperty.asMap();
+			final PersistenceService persistenceService = (PersistenceService) serviceTracker.getService();
+			if (persistenceService != null)
+			{
+				final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
+						.getQuery(ProviderProperty.class);
+				Map<String, ProviderProperty>  providerProperties = query.selectByProviderAsMap(Activator.getDefault().getConfiguration().getProviderId());
+				for (final ProviderProperty providerProperty : providerProperties.values())
+				{
+					IProperty property = properties.get(providerProperty.getKey());
+					property.setPersistedProperty(providerProperty);
+				}
+				final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
+						Salespoint.class);
+				Salespoint salespoint = salespointQuery.getCurrentSalespoint();
+				if (salespoint != null)
+				{
+					providerProperties = query.selectByProviderAndSalespointAsMap(Activator.getDefault().getConfiguration().getProviderId(), salespoint);
+					for (final ProviderProperty providerProperty : providerProperties.values())
+					{
+						IProperty property = properties.get(providerProperty.getKey());
+						property.setPersistedProperty(providerProperty);
+					}
+				}
+				this.database = properties.get(GalileoProperty.DATABASE_PATH.key()).value();
+				this.connect = Boolean.valueOf(properties.get(GalileoProperty.CONNECT.key()).value()).booleanValue();
+			}
+		}
+		finally
+		{
+			serviceTracker.close();
+		}
 	}
 	
 	private IStatus start(IStatus status)
@@ -210,7 +237,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		catch (final Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-					" Die Verbindung zu " + this.configuration.getName() + " konnte nicht hergestellt werden.", e);
+					" Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " konnte nicht hergestellt werden.", e);
 			e.printStackTrace();
 		}
 		return status;
@@ -326,19 +353,19 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		{
 			final ExternalProductGroupQuery query = (ExternalProductGroupQuery) this.persistenceService
 					.getServerService().getQuery(ExternalProductGroup.class);
-			externalProductGroup = query.selectByProviderAndCode(this.configuration.getProviderId(), group.getCode());
+			externalProductGroup = query.selectByProviderAndCode(Activator.getDefault().getConfiguration().getProviderId(), group.getCode());
 			if (externalProductGroup == null)
 			{
 				this.notMapped = true;
 				this.inserted = true;
-				externalProductGroup = ExternalProductGroup.newInstance(this.configuration.getProviderId());
+				externalProductGroup = ExternalProductGroup.newInstance(Activator.getDefault().getConfiguration().getProviderId());
 				final ProductGroup productGroup = this.getProductGroup(group);
 				if (productGroup != null)
 				{
 					final ProductGroupMapping productGroupMapping = ProductGroupMapping.newInstance(productGroup,
 							externalProductGroup);
 					externalProductGroup.setProductGroupMapping(productGroupMapping);
-					Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(this.configuration.getProviderId());
+					Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(Activator.getDefault().getConfiguration().getProviderId());
 					for (ProductGroupMapping mapping : mappings)
 					{
 						if (!mapping.isDeleted())
@@ -540,7 +567,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			}
 			else
 			{
-				Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(this.configuration.getProviderId());
+				Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(Activator.getDefault().getConfiguration().getProviderId());
 				for (ProductGroupMapping mapping : mappings)
 				{
 					if (!mapping.isDeleted())

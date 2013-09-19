@@ -5,8 +5,6 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator
 {
-	public static final String PLUGIN_ID = "ch.eugster.colibri.provider.scheduler";
-
 	private static Activator activator;
 
 	private BundleContext context;

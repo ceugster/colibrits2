@@ -8,8 +8,8 @@ import org.eclipse.core.runtime.IStatus;
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.configuration.IProperty;
 
 public interface ProviderInterface extends ProviderService
 {
@@ -27,7 +27,7 @@ public interface ProviderInterface extends ProviderService
 
 	IStatus updateProvider(Position position);
 
-	IStatus checkConnection(Map<String, IProperty> properties);
+	IStatus checkConnection(Map<String, ProviderProperty> properties);
 
 	IStatus checkTaxCodes(PersistenceService service);
 	

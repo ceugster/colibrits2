@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="ch.eugster.colibri.provider.scheduler">
    <implementation class="ch.eugster.colibri.provider.scheduler.ProviderUpdateSchedulerComponent"/>
-   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="persistenceService" policy="static" unbind="unsetPersistenceService"/>
    <service>
       <provide interface="ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler"/>
    </service>
-   <reference bind="setProviderInterface" cardinality="1..1" interface="ch.eugster.colibri.provider.service.ProviderInterface" name="providerInterface" policy="static" unbind="unsetProviderInterface"/>
+   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="persistenceService" policy="static" unbind="unsetPersistenceService"/>
+   <reference bind="addProviderUpdater" cardinality="1..n" interface="ch.eugster.colibri.provider.service.ProviderUpdater" name="providerUpdater" policy="static" unbind="removeProviderUpdater"/>
    <reference bind="setEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
 </scr:component>

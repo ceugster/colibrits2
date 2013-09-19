@@ -24,9 +24,10 @@ import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
-import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.Property;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.service.ProviderInterface;
 
 public class CustomerServer
@@ -136,42 +137,40 @@ public class CustomerServer
 		final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
 		serviceTracker.open();
-
-		final PersistenceService persistenceService = (PersistenceService) serviceTracker.getService();
-		if (persistenceService != null)
+		try
 		{
-			Map<String, ProviderProperty> properties = null;
-			final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
-					Salespoint.class);
-			Salespoint salespoint = salespointQuery.getCurrentSalespoint();
-			if (salespoint != null)
+			Map<String, IProperty> properties = GalileoConfiguration.GalileoProperty.asMap();
+			final PersistenceService persistenceService = (PersistenceService) serviceTracker.getService();
+			if (persistenceService != null)
 			{
-				if (salespoint.isLocalProviderProperties())
+				final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
+						.getQuery(ProviderProperty.class);
+				Map<String, ProviderProperty>  providerProperties = query.selectByProviderAsMap(configuration.getProviderId());
+				for (final ProviderProperty providerProperty : providerProperties.values())
 				{
-					properties = salespoint.getProviderProperties();
+					IProperty property = properties.get(providerProperty.getKey());
+					property.setPersistedProperty(providerProperty);
 				}
-				else
+				final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
+						Salespoint.class);
+				Salespoint salespoint = salespointQuery.getCurrentSalespoint();
+				if (salespoint != null)
 				{
-					final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
-							.getQuery(ProviderProperty.class);
-					properties = query.selectByProviderAsMap(configuration.getProviderId());
-				}
-
-				for (final Property property : Property.values())
-				{
-					ProviderProperty providerProperty = properties.get(property.key());
-					if (providerProperty == null)
+					providerProperties = query.selectByProviderAndSalespointAsMap(configuration.getProviderId(), salespoint);
+					for (final ProviderProperty providerProperty : providerProperties.values())
 					{
-						providerProperty = ProviderProperty.newInstance(configuration.getProviderId());
-						providerProperty.setKey(property.key());
-						providerProperty.setValue(property.value());
+						IProperty property = properties.get(providerProperty.getKey());
+						property.setPersistedProperty(providerProperty);
 					}
 				}
-
-				this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
-				this.keepConnection = Boolean.parseBoolean(properties.get(Property.KEEP_CONNECTION.key()).getValue());
-				this.connect = Boolean.parseBoolean(properties.get(Property.CONNECT.key()).getValue());
+				this.database = properties.get(GalileoProperty.DATABASE_PATH.key()).value();
+				this.connect = Boolean.valueOf(properties.get(GalileoProperty.CONNECT.key()).value()).booleanValue();
+				this.keepConnection = Boolean.valueOf(properties.get(GalileoProperty.KEEP_CONNECTION.key()).value()).booleanValue();
 			}
+		}
+		finally
+		{
+			serviceTracker.close();
 		}
 	}
 

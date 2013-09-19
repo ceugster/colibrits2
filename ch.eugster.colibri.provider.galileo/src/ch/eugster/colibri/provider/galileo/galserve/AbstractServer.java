@@ -17,8 +17,6 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import com4j.ComException;
-
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
 import ch.eugster.colibri.persistence.model.CommonSettings;
@@ -43,16 +41,19 @@ import ch.eugster.colibri.persistence.queries.TaxQuery;
 import ch.eugster.colibri.persistence.queries.TaxRateQuery;
 import ch.eugster.colibri.persistence.queries.TaxTypeQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
-import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.Property;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.service.ProviderInterface;
+
+import com4j.ComException;
 
 public abstract class AbstractServer implements IServer
 {
 	private Igdserve galserve;
 
-	private GalileoConfiguration configuration;
+	private GalileoConfiguration configuration = new GalileoConfiguration();
 
 	private String database;
 
@@ -432,7 +433,7 @@ public abstract class AbstractServer implements IServer
 		{
 			galserve.do_NClose();
 			status = new Status(IStatus.OK, Activator.PLUGIN_ID,
-					"Die Verbindung zur Warenbewirtschaftung Galileo konnte erfolgreich hergestellt werden.");
+					"Die Verbindung zur Warenbewirtschaftung Galileo wurde erfolgreich hergestellt.");
 		}
 		else
 		{
@@ -504,8 +505,6 @@ public abstract class AbstractServer implements IServer
 
 		this.status = new Status(IStatus.OK, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
 
-		this.configuration = new GalileoConfiguration();
-
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
 				LogService.class, null);
 		this.logServiceTracker.open();
@@ -533,44 +532,34 @@ public abstract class AbstractServer implements IServer
 
 	protected void updateProperties()
 	{
+		Map<String, IProperty> properties = GalileoConfiguration.GalileoProperty.asMap();
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			Map<String, ProviderProperty> properties = null;
+			final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
+					.getQuery(ProviderProperty.class);
+			Map<String, ProviderProperty>  providerProperties = query.selectByProviderAsMap(this.configuration.getProviderId());
+			for (final ProviderProperty providerProperty : providerProperties.values())
+			{
+				IProperty property = properties.get(providerProperty.getKey());
+				property.setPersistedProperty(providerProperty);
+			}
 			final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
 					Salespoint.class);
 			Salespoint salespoint = salespointQuery.getCurrentSalespoint();
 			if (salespoint != null)
 			{
-				if (salespoint.isLocalProviderProperties())
+				providerProperties = query.selectByProviderAndSalespointAsMap(this.configuration.getProviderId(), salespoint);
+				for (final ProviderProperty providerProperty : providerProperties.values())
 				{
-					properties = salespoint.getProviderProperties();
+					IProperty property = properties.get(providerProperty.getKey());
+					property.setPersistedProperty(providerProperty);
 				}
-				else
-				{
-					final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
-							.getQuery(ProviderProperty.class);
-					properties = query.selectByProviderAsMap(this.configuration.getProviderId());
-				}
-
-				for (final Property property : Property.values())
-				{
-					ProviderProperty providerProperty = properties.get(property.key());
-					if (providerProperty == null)
-					{
-						providerProperty = ProviderProperty.newInstance(this.configuration.getProviderId());
-						providerProperty.setKey(property.key());
-						providerProperty.setValue(property.value());
-						properties.put(property.key(), providerProperty);
-					}
-				}
-
-				this.database = properties.get(Property.DATABASE_PATH.key()).getValue();
-				this.keepConnection = Boolean.parseBoolean(properties.get(Property.KEEP_CONNECTION.key()).getValue());
-				this.connect = Boolean.valueOf(properties.get(Property.CONNECT.key()).getValue());
 			}
+			this.database = properties.get(GalileoProperty.DATABASE_PATH.key()).value();
+			this.connect = Boolean.valueOf(properties.get(GalileoProperty.CONNECT.key()).value()).booleanValue();
+			this.keepConnection = Boolean.valueOf(properties.get(GalileoProperty.KEEP_CONNECTION.key()).value()).booleanValue();
 		}
-
 	}
 	
 	protected void close()

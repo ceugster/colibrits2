@@ -190,11 +190,11 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.drivers.sqlserver.featrue" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.drivers.mysql.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.drivers.postgresql.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.voucher.client.feature" version="1.0.0.qualifier"/>
-      <feature id="ch.eugster.colibri.voucher.client.webservice.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.product.full.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.time.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.periphery.display.serial.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.provider.voucher.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.provider.voucher.webservice.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>

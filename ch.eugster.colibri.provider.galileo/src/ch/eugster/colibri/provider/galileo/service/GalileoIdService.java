@@ -15,13 +15,13 @@ public class GalileoIdService implements ProviderIdService
 	@Override
 	public GalileoConfiguration getConfiguration()
 	{
-		return new GalileoConfiguration();
+		return Activator.getDefault().getConfiguration();
 	}
 
 	@Override
 	public IProperty[] getProperties()
 	{
-		return GalileoConfiguration.Property.values();
+		return GalileoConfiguration.GalileoProperty.values();
 	}
 
 	@Override

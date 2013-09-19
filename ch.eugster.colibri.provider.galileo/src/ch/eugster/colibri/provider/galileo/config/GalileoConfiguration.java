@@ -3,19 +3,23 @@ package ch.eugster.colibri.provider.galileo.config;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import ch.eugster.colibri.persistence.model.CurrentTax;
+import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
+import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
+import ch.eugster.colibri.provider.configuration.IProperty.AvailableControl;
+import ch.eugster.colibri.provider.configuration.IProperty.Section;
 import ch.eugster.colibri.provider.configuration.ProviderConfiguration;
-import ch.eugster.colibri.provider.configuration.SchedulerProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 
 public class GalileoConfiguration implements ProviderConfiguration
@@ -33,74 +37,9 @@ public class GalileoConfiguration implements ProviderConfiguration
 	}
 
 	@Override
-	public String[] getAllDefaultPropertyValues()
-	{
-		final Collection<String> values = new ArrayList<String>();
-		IProperty[] properties = Property.values();
-		for (int i = 0; i < properties.length; i++)
-		{
-			values.add(properties[i].value());
-		}
-		properties = SchedulerProperty.values();
-		for (int i = 0; i < properties.length; i++)
-		{
-			values.add(properties[i].value());
-		}
-		return values.toArray(new String[0]);
-	}
-
-	@Override
-	public Map<String, String> getDefaultPropertiesAsMap()
-	{
-		final Map<String, String> map = new HashMap<String, String>();
-		final IProperty[] properties = Property.values();
-		for (final IProperty property : properties)
-		{
-			map.put(property.key(), property.value());
-		}
-		return map;
-	}
-
-	@Override
-	public String[] getDefaultPropertyValues()
-	{
-		final Property[] properties = Property.values();
-		final String[] values = new String[properties.length];
-		for (int i = 0; i < values.length; i++)
-		{
-			values[i] = properties[i].value();
-		}
-		return values;
-	}
-
-	@Override
-	public String[] getDefaultSchedulerPropertyValues()
-	{
-		final IProperty[] properties = SchedulerProperty.values();
-		final String[] values = new String[properties.length];
-		for (int i = 0; i < values.length; i++)
-		{
-			values[i] = properties[i].value();
-		}
-		return values;
-	}
-
-	@Override
 	public String getImageName()
 	{
 		return "galileo.png";
-	}
-
-	@Override
-	public String[] getKeys()
-	{
-		final Property[] properties = Property.values();
-		final String[] keys = new String[properties.length];
-		for (int i = 0; i < keys.length; i++)
-		{
-			keys[i] = properties[i].key();
-		}
-		return keys;
 	}
 
 	@Override
@@ -113,27 +52,6 @@ public class GalileoConfiguration implements ProviderConfiguration
 	public String getProviderId()
 	{
 		return Activator.PLUGIN_ID;
-	}
-
-	@Override
-	public int getReceiptsPerSchedule()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long getSchedulerDelay()
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long getSchedulerPeriod()
-	{
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	@Override
@@ -152,129 +70,158 @@ public class GalileoConfiguration implements ProviderConfiguration
 		return false;
 	}
 
-	public enum Property implements IProperty
+	public enum GalileoProperty implements IProperty
 	{
 		DATABASE_PATH, CONNECT, KEEP_CONNECTION;
 
+		private ProviderProperty persistedProperty;
+		
 		public static Map<String, IProperty> asMap()
 		{
 			Map<String, IProperty> map = new HashMap<String, IProperty>();
-			for (IProperty property : values())
+			for (IProperty property : GalileoProperty.values())
 			{
 				map.put(property.key(), property);
 			}
 			return map;
 		}
 
+		public static IProperty[] properties(Section section)
+		{
+			List<IProperty> properties = new ArrayList<IProperty>();
+			for (GalileoProperty property : GalileoProperty.values())
+			{
+				if (property.section().equals(section))
+				{
+					properties.add(property);
+				}
+			}
+			return properties.toArray(new IProperty[0]);
+		}
+		
 		@Override
 		public String control()
 		{
-			if (this.equals(DATABASE_PATH))
+			switch(this)
 			{
-				return FileDialog.class.getName();
-			}
-			else if (this.equals(KEEP_CONNECTION))
+			case DATABASE_PATH:
 			{
-				return Button.class.getName();
+				return AvailableControl.FILE_DIALOG.controlName();
 			}
-			else if (this.equals(CONNECT))
+			case KEEP_CONNECTION:
 			{
-				return Button.class.getName();
+				return AvailableControl.BUTTON.controlName();
 			}
-			else
+			case CONNECT:
+			{
+				return AvailableControl.BUTTON.controlName();
+			}
+			default:
 			{
 				throw new RuntimeException("Invalid key");
+			}
 			}
 		}
 
 		@Override
 		public String[] filter()
 		{
-			if (this.equals(DATABASE_PATH))
+			switch(this)
+			{
+			case DATABASE_PATH:
 			{
 				return new String[] { "galidata.dbc", "*.dbc" };
 			}
-			else if (this.equals(KEEP_CONNECTION))
+			default:
 			{
-				return null;
+				return  null;
 			}
-			else if (this.equals(CONNECT))
-			{
-				return null;
-			}
-			else
-			{
-				throw new RuntimeException("Invalid key");
 			}
 		}
 
 		@Override
 		public String key()
 		{
-			if (this.equals(DATABASE_PATH))
+			switch(this)
+			{
+			case DATABASE_PATH:
 			{
 				return "galileo.database.path";
 			}
-			else if (this.equals(KEEP_CONNECTION))
+			case KEEP_CONNECTION:
 			{
 				return "galileo.keep.connection";
 			}
-			else if (this.equals(CONNECT))
+			case CONNECT:
 			{
 				return "galileo.connect";
 			}
-			else
+			default:
 			{
 				throw new RuntimeException("Invalid key");
+			}
 			}
 		}
 
 		@Override
 		public String label()
 		{
-			if (this.equals(DATABASE_PATH))
+			switch(this)
+			{
+			case DATABASE_PATH:
 			{
 				return "Datenbankpfad";
 			}
-			else if (this.equals(KEEP_CONNECTION))
+			case KEEP_CONNECTION:
 			{
 				return "Verbindung aufrechterhalten";
 			}
-			else if (this.equals(CONNECT))
+			case CONNECT:
 			{
 				return "Verbindung verwenden";
 			}
-			else
+			default:
 			{
 				throw new RuntimeException("Invalid key");
+			}
 			}
 		}
 
 		@Override
 		public String label2()
 		{
-			if (this.equals(DATABASE_PATH))
+			switch(this)
+			{
+			case KEEP_CONNECTION:
+			{
+				return "(galserve, wgserve, kundenserver)";
+			}
+			case CONNECT:
+			{
+				return "(galserve, wgserve, kundenserver)";
+			}
+			default:
 			{
 				return "";
 			}
-			else if (this.equals(KEEP_CONNECTION))
-			{
-				return "(galserve, wgserve, kundenserver)";
-			}
-			else if (this.equals(CONNECT))
-			{
-				return "(galserve, wgserve, kundenserver)";
-			}
-			else
-			{
-				throw new RuntimeException("Invalid key");
 			}
 		}
 
 		@Override
 		public String value()
 		{
-			if (this.equals(DATABASE_PATH))
+			if (this.persistedProperty != null && !this.persistedProperty.isDeleted())
+			{
+				return this.persistedProperty.getValue(defaultValue());
+			}
+			return defaultValue();
+		}
+
+		public String defaultValue()
+		{
+			switch(this)
+			{
+			case DATABASE_PATH:
 			{
 				String hostname = "C:";
 				try 
@@ -287,19 +234,187 @@ public class GalileoConfiguration implements ProviderConfiguration
 				}
 				return hostname + "/Comeliv/Galileo/Data/Galidata.dbc";
 			}
-			else if (this.equals(KEEP_CONNECTION))
+			case KEEP_CONNECTION:
 			{
 				return Boolean.toString(false);
 			}
-			else if (this.equals(CONNECT))
+			case CONNECT:
 			{
 				return Boolean.toString(true);
 			}
-			else
+			default:
 			{
 				throw new RuntimeException("Invalid key");
 			}
+			}
 		}
+
+		@Override
+		public Class<?> valueType() 
+		{
+			switch(this)
+			{
+			case DATABASE_PATH:
+			{
+				return String.class;
+			}
+			case KEEP_CONNECTION:
+			{
+				return Boolean.class;
+			}
+			case CONNECT:
+			{
+				return Boolean.class;
+			}
+			default:
+			{
+				throw new RuntimeException("Invalid property");
+			}
+			}
+		}
+
+		@Override
+		public Properties controlProperties() 
+		{
+			return new Properties();
+		}
+
+		@Override
+		public void setPersistedProperty(
+				ProviderProperty persistedProperty) 
+		{
+			if (this.persistedProperty == null || this.persistedProperty.isDeleted() || this.persistedProperty.getSalespoint() == null)
+			{
+				this.persistedProperty = persistedProperty;
+			}
+		}
+
+		@Override
+		public boolean isDefaultValue(String value) 
+		{
+			return this.defaultValue().equals(value);
+		}
+
+		@Override
+		public ProviderProperty getPersistedProperty() 
+		{
+			return persistedProperty;
+		}
+
+		@Override
+		public String value(org.eclipse.swt.widgets.Control control) 
+		{
+			for (AvailableControl availableControl : AvailableControl.values())
+			{
+				if (availableControl.controlName().equals(control.getClass().getName()))
+				{
+					return availableControl.value(control);
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public Section section() 
+		{
+			return GalileoSection.GALILEO;
+		}
+
+		@Override
+		public org.eclipse.swt.widgets.Control createControl(Composite parent, FormToolkit formToolkit, IDirtyable dirtyable, int cols) 
+		{
+			for (AvailableControl availableControl : AvailableControl.values())
+			{
+				if (availableControl.controlName().equals(this.control()))
+				{
+					return availableControl.create(parent, formToolkit, this, dirtyable, cols);
+				}
+			}
+			return null;
+		}
+
+//		@Override
+//		public void set(String value) 
+//		{
+//			if (this.persistedProperty == null || this.persistedProperty)
+//			{
+//				persistedProperty = ProviderProperty.newInstance(new GalileoConfiguration().getProviderId());
+//			}
+//			if (this.persistedProperty.getSalespoint() == null)
+//			persistedProperty.setKey(this.key());
+//			persistedProperty.setValue(value);
+//		}
+//
+//		@Override
+//		public void set(String value, Salespoint salespoint) 
+//		{
+//			if (this.persistedProperty == null)
+//			{
+//				persistedProperty = ProviderProperty.newInstance(new GalileoConfiguration().getProviderId(), salespoint);
+//			}
+//			persistedProperty.setKey(this.key());
+//			persistedProperty.setValue(value);
+//		}
+
+		@Override
+		public void set(org.eclipse.swt.widgets.Control control, String value) 
+		{
+			for (AvailableControl availableControl : AvailableControl.values())
+			{
+				if (availableControl.controlName().equals(control.getClass().getName()))
+				{
+					availableControl.value(control, value);
+				}
+			}
+		}
+
+		@Override
+		public String providerId() 
+		{
+			return Activator.getDefault().getBundle().getSymbolicName();
+		}
+
+//		@Override
+//		public void update(String value) 
+//		{
+//			if (this.persistedProperty == null)
+//			{
+//				this.persistedProperty = ProviderProperty.newInstance(new GalileoConfiguration().getProviderId());
+//				this.persistedProperty.setKey(this.key());
+//				this.persistedProperty.setValue(value);
+//			}
+//		}
 	}
 
+	public enum GalileoSection implements Section
+	{
+		GALILEO;
+		
+		public String title()
+		{
+			return "Galileo";
+		}
+		
+		public int columns()
+		{
+			int cols = 0;
+			for (IProperty property : properties())
+			{
+				for (AvailableControl control : AvailableControl.values())
+				{
+					if (control.controlName().equals(property.control()))
+					{
+						cols = Math.max(cols, control.columns(property));
+					}
+				}
+			}
+			return cols;
+		}
+
+		@Override
+		public IProperty[] properties() 
+		{
+			return GalileoProperty.properties(this);
+		}
+	}
 }

@@ -1,5 +1,6 @@
 package ch.eugster.colibri.provider.galileo.service;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.osgi.service.component.ComponentContext;
@@ -8,6 +9,7 @@ import org.osgi.service.log.LogService;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
+import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.ProviderConfiguration;
@@ -30,7 +32,7 @@ public class GalileoCacheProviderPropertySelector implements ProviderPropertySel
 	@Override
 	public IProperty[] getProperties()
 	{
-		return GalileoConfiguration.Property.values();
+		return GalileoConfiguration.GalileoProperty.values();
 	}
 
 	@Override
@@ -40,37 +42,41 @@ public class GalileoCacheProviderPropertySelector implements ProviderPropertySel
 	}
 
 	@Override
-	public Map<String, ProviderProperty> getProviderProperties()
+	public Map<String, IProperty> getProviderProperties()
 	{
-		return this.getProviderProperties(null);
+		Map<String, IProperty> properties = null;
+		SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getServerService().getQuery(Salespoint.class);
+		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
+		if (salespoint != null)
+		{
+			properties = getProviderProperties(salespoint);
+		}
+		else
+		{
+			properties = GalileoConfiguration.GalileoProperty.asMap();
+			ProviderPropertyQuery providerPropertyQuery = (ProviderPropertyQuery) persistenceService.getServerService().getQuery(ProviderProperty.class);
+			Collection<ProviderProperty> providerProperties = providerPropertyQuery.selectByProvider(this.getProviderId());
+			for (ProviderProperty providerProperty : providerProperties)
+			{
+				IProperty property = properties.get(providerProperty.getKey());
+				property.setPersistedProperty(providerProperty);
+			}
+		}
+		return properties;
 	}
 
 	@Override
-	public Map<String, ProviderProperty> getProviderProperties(final Salespoint salespoint)
+	public Map<String, IProperty> getProviderProperties(final Salespoint salespoint)
 	{
-		final ProviderPropertyQuery service = (ProviderPropertyQuery) this.persistenceService.getCacheService()
-				.getQuery(ProviderProperty.class);
-
-		final Map<String, ProviderProperty> providerProperties = service.selectByProviderAsMap(this.getProviderId());
-
-		if (salespoint instanceof Salespoint)
+		Map<String, IProperty> properties = GalileoConfiguration.GalileoProperty.asMap();
+		ProviderPropertyQuery providerPropertyQuery = (ProviderPropertyQuery) persistenceService.getServerService().getQuery(ProviderProperty.class);
+		Collection<ProviderProperty> providerProperties = providerPropertyQuery.selectByProviderAndSalespoint(this.getProviderId(), salespoint);
+		for (ProviderProperty providerProperty : providerProperties)
 		{
-			final Map<String, ProviderProperty> providerSalespointProperties = service
-					.selectByProviderAndSalespointAsMap(this.getProviderId(), salespoint);
-			if (providerProperties.size() != providerSalespointProperties.size())
-			{
-				final IProperty[] properties = GalileoConfiguration.Property.values();
-				for (final IProperty property : properties)
-				{
-					final ProviderProperty providerProperty = providerSalespointProperties.get(property.key());
-					if (providerProperty != null)
-					{
-						providerProperties.put(property.key(), providerProperty);
-					}
-				}
-			}
+			IProperty property = properties.get(providerProperty.getKey());
+			property.setPersistedProperty(providerProperty);
 		}
-		return providerProperties;
+		return properties;
 	}
 
 	public void setLogService(final LogService logService)

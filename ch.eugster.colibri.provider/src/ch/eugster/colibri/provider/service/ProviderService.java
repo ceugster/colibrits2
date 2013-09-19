@@ -18,5 +18,7 @@ public interface ProviderService
 
 	Map<String, IProperty> getProperties();
 
+	Map<String, IProperty> getDefaultProperties();
+
 	String getProviderId();
 }

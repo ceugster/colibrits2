@@ -4,6 +4,7 @@
    <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
    <service>
       <provide interface="ch.eugster.colibri.provider.service.ProviderInterface"/>
+      <provide interface="ch.eugster.colibri.provider.service.ProviderUpdater"/>
    </service>
    <reference bind="setEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
 </scr:component>

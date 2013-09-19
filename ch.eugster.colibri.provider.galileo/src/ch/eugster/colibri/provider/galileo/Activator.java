@@ -5,6 +5,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -18,6 +20,8 @@ public class Activator extends AbstractUIPlugin
 
 	// The shared instance
 	private static Activator plugin;
+
+	private GalileoConfiguration configuration;
 
 	/**
 	 * The constructor
@@ -82,4 +86,12 @@ public class Activator extends AbstractUIPlugin
 		return Activator.plugin;
 	}
 
+	public GalileoConfiguration getConfiguration()
+	{
+		if (this.configuration == null)
+		{
+			this.configuration = new GalileoConfiguration();
+		}
+		return this.configuration;
+	}
 }

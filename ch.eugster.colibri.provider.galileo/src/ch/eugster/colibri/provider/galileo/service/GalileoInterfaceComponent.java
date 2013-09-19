@@ -18,15 +18,19 @@ import org.osgi.service.log.LogService;
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
 import ch.eugster.colibri.persistence.model.CurrentTax;
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
+import ch.eugster.colibri.provider.configuration.IProperty.Section;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoSection;
 import ch.eugster.colibri.provider.galileo.galserve.FindArticleServerCom4j;
 import ch.eugster.colibri.provider.galileo.galserve.IFindArticleServer;
 import ch.eugster.colibri.provider.galileo.galserve.IUpdateProviderServer;
@@ -34,18 +38,15 @@ import ch.eugster.colibri.provider.galileo.galserve.UpdateProviderServerCom4j;
 import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
 import ch.eugster.colibri.provider.galileo.service.GalileoConfiguratorComponent.GalileoTaxCode;
 import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderUpdater;
 
-public class GalileoInterfaceComponent implements ProviderInterface
+public class GalileoInterfaceComponent implements ProviderInterface, ProviderUpdater
 {
 	private LogService logService;
 
 	private EventAdmin eventAdmin;
 
 	private ComponentContext context;
-
-	private GalileoConfiguration configuration;
-
-//	private IArticleServer articleServer;
 
 	private IFindArticleServer findArticleServer;
 
@@ -64,13 +65,13 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	@Override
 	public boolean canMap(final CurrentTax currentTax)
 	{
-		return this.configuration.canMap(currentTax);
+		return Activator.getDefault().getConfiguration().canMap(currentTax);
 	}
 
 	@Override
 	public boolean canMap(final Tax tax)
 	{
-		return this.configuration.canMap(tax);
+		return Activator.getDefault().getConfiguration().canMap(tax);
 	}
 	
 	public boolean isConnect()
@@ -107,25 +108,25 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	@Override
 	public String getImageName()
 	{
-		return this.configuration.getImageName();
+		return Activator.getDefault().getConfiguration().getImageName();
 	}
 
 	@Override
 	public String getName()
 	{
-		return this.configuration.getName();
+		return Activator.getDefault().getConfiguration().getName();
 	}
 
 	@Override
 	public Map<String, IProperty> getProperties()
 	{
-		return GalileoConfiguration.Property.asMap();
+		return GalileoConfiguration.GalileoProperty.asMap();
 	}
 
 	@Override
 	public String getProviderId()
 	{
-		return this.configuration.getProviderId();
+		return Activator.getDefault().getConfiguration().getProviderId();
 	}
 
 	@Override
@@ -182,18 +183,18 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	}
 	
 	@Override
-	public IStatus checkConnection(Map<String, IProperty> properties)
+	public IStatus checkConnection(Map<String, ProviderProperty> properties)
 	{
-		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + configuration.getName() + " konnte hergestellt werden.");
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " wurde erfolgreich hergestellt.");
 		if (getFindArticleServer().isConnect())
 		{
-			IProperty property = properties.get(GalileoConfiguration.Property.DATABASE_PATH.key());
-			status = this.getFindArticleServer().checkConnection(property.value());
+			ProviderProperty property = properties.get(GalileoConfiguration.GalileoProperty.DATABASE_PATH.key());
+			status = this.getFindArticleServer().checkConnection(property.getValue(GalileoConfiguration.GalileoProperty.DATABASE_PATH.value()));
 			if (status.getSeverity() == IStatus.OK)
 			{
 				if (getUpdateProviderServer().isConnect())
 				{
-					status = this.getUpdateProviderServer().checkConnection(property.value());
+					status = this.getUpdateProviderServer().checkConnection(property.getValue(GalileoConfiguration.GalileoProperty.DATABASE_PATH.value()));
 				}
 			}
 		}
@@ -203,7 +204,6 @@ public class GalileoInterfaceComponent implements ProviderInterface
 	protected void activate(final ComponentContext componentContext)
 	{
 		this.context = componentContext;
-		this.configuration = new GalileoConfiguration();
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
@@ -334,7 +334,7 @@ public class GalileoInterfaceComponent implements ProviderInterface
 			properties.put(EventConstants.EXCEPTION, status.getException());
 			properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage() == null ? "" : status.getException().getMessage());
 		}
-		properties.put("message", "Die Verbindung zu " + configuration.getName() + " konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
+		properties.put("message", "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
 		properties.put("status", status);
 		properties.put("force", Boolean.valueOf(force));
 		for (ProviderInterface.Topic t : ProviderInterface.Topic.values())
@@ -439,5 +439,35 @@ public class GalileoInterfaceComponent implements ProviderInterface
 		}
 		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID, "");
 		return status;
+	}
+
+	@Override
+	public IStatus updateProvider(Payment payment) 
+	{
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	public Map<String, IProperty> getDefaultProperties() 
+	{
+		return GalileoConfiguration.GalileoProperty.asMap();
+	}
+
+	@Override
+	public boolean canCheckConnection() 
+	{
+		return true;
+	}
+
+	@Override
+	public boolean isSalespointSpecificPossible() 
+	{
+		return true;
+	}
+
+	@Override
+	public Section[] getSections() 
+	{
+		return GalileoSection.values();
 	}
 }
