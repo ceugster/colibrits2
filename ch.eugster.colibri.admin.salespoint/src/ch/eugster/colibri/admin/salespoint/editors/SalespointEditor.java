@@ -12,7 +12,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -34,7 +38,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -50,6 +53,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -87,10 +91,12 @@ import ch.eugster.colibri.persistence.queries.ReceiptPrinterSettingsQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.TaxQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
-import ch.eugster.colibri.provider.service.ProviderConfigurator;
+import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
+import ch.eugster.colibri.provider.service.ProviderUpdater;
 
-public class SalespointEditor extends AbstractEntityEditor<Salespoint>
+public class SalespointEditor extends AbstractEntityEditor<Salespoint> implements IDirtyable
 {
 	public static final String ID = "ch.eugster.colibri.admin.salespoint.editor";
 
@@ -140,8 +146,6 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 
 	private Spinner customerDisplayRows;
 
-//	private Spinner customerDisplayDelay;
-	
 	private Button useIndividualExport;
 	
 	private Button export;
@@ -150,21 +154,19 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 
 	private Button exportSelector;
 	
-	private Button useSalespointSpecificProviderProperties;
-
-	private IProperty[] providerProperties;
-
-	private Map<String, ProviderProperty> salespointProviderProperties;
-
-	private Map<String, ProviderProperty> defaultProviderProperties;
-
-	private final Map<String, Control> providerPropertyControls = new HashMap<String, Control>();
-
 	private ScrolledForm scrolledForm;
+
+	private Map<String, Button> useSalespointSpecificProviderProperties = new HashMap<String, Button>();
+	
+	private Map<String, Map<String, IProperty>> providerProperties = new HashMap<String, Map<String, IProperty>>();
+	
+	private final Map<String, Map<String, Control>> providerPropertyControls = new HashMap<String, Map<String, Control>>();
 
 	private final ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private final ServiceTracker<ProviderConfigurator, ProviderConfigurator> providerConfiguratorTracker;
+	private final ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler> providerUpdateSchedulerTracker;
+
+	private final ServiceTracker<ProviderUpdater, ProviderUpdater> providerUpdaterTracker;
 
 	private final ServiceTracker<CustomerDisplayService, CustomerDisplayService> customerDisplayServiceTracker;
 
@@ -176,8 +178,10 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(context, PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
-		this.providerConfiguratorTracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(context, ProviderConfigurator.class, null);
-		this.providerConfiguratorTracker.open();
+		this.providerUpdaterTracker = new ServiceTracker<ProviderUpdater, ProviderUpdater>(context, ProviderUpdater.class, null);
+		this.providerUpdaterTracker.open();
+		this.providerUpdateSchedulerTracker = new ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler>(context, ProviderUpdateScheduler.class, null);
+		this.providerUpdateSchedulerTracker.open();
 		this.receiptPrinterServiceTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(context, ReceiptPrinterService.class, null);
 		this.receiptPrinterServiceTracker.open();
 		this.customerDisplayServiceTracker = new ServiceTracker<CustomerDisplayService, CustomerDisplayService>(context, CustomerDisplayService.class, null);
@@ -194,7 +198,8 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		
 		this.receiptPrinterServiceTracker.close();
 		this.customerDisplayServiceTracker.close();
-		this.providerConfiguratorTracker.close();
+		this.providerUpdateSchedulerTracker.close();
+		this.providerUpdaterTracker.close();
 		this.persistenceServiceTracker.close();
 
 		super.dispose();
@@ -203,72 +208,99 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 	@Override
 	public void postDelete(final AbstractEntity entity)
 	{
-		if (entity instanceof Salespoint)
+		UIJob job = new UIJob("") 
 		{
-			final Salespoint salespoint = (Salespoint) entity;
-			if (salespoint.equals(this.getEditorInput().getAdapter(Salespoint.class)))
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) 
 			{
-				this.dispose();
+				if (entity instanceof Salespoint)
+				{
+					final Salespoint salespoint = (Salespoint) entity;
+					if (salespoint.equals(getEditorInput().getAdapter(Salespoint.class)))
+					{
+						dispose();
+					}
+				}
+				else if (entity instanceof Profile)
+				{
+					profiles.remove(entity);
+				}
+				if (entity instanceof Tax)
+				{
+					taxes.remove(entity);
+				}
+				else if (entity instanceof ReceiptPrinterSettings)
+				{
+					receiptPrinterViewer.remove(entity);
+				}
+				else if (entity instanceof CustomerDisplaySettings)
+				{
+					customerDisplayViewer.remove(entity);
+				}
+				return Status.OK_STATUS;
 			}
-		}
-		else if (entity instanceof Profile)
-		{
-			this.profiles.remove(entity);
-		}
-		if (entity instanceof Tax)
-		{
-			this.taxes.remove(entity);
-		}
-		else if (entity instanceof ReceiptPrinterSettings)
-		{
-			this.receiptPrinterViewer.remove(entity);
-		}
-		else if (entity instanceof CustomerDisplaySettings)
-		{
-			this.customerDisplayViewer.remove(entity);
-		}
+		};
+		job.schedule();
 	}
 
 	@Override
 	public void postUpdate(final AbstractEntity entity)
 	{
-		if (entity instanceof Profile)
+		UIJob job = new UIJob("") 
 		{
-			this.profiles.refresh(entity);
-		}
-		if (entity instanceof Tax)
-		{
-			this.taxes.refresh(entity);
-		}
-		else if (entity instanceof ReceiptPrinterSettings)
-		{
-			this.receiptPrinterViewer.refresh(entity);
-		}
-		else if (entity instanceof CustomerDisplaySettings)
-		{
-			this.customerDisplayViewer.refresh(entity);
-		}
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) 
+			{
+				if (entity instanceof Profile)
+				{
+					profiles.refresh(entity);
+				}
+				if (entity instanceof Tax)
+				{
+					taxes.refresh(entity);
+				}
+				else if (entity instanceof ReceiptPrinterSettings)
+				{
+					receiptPrinterViewer.refresh(entity);
+				}
+				else if (entity instanceof CustomerDisplaySettings)
+				{
+					customerDisplayViewer.refresh(entity);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 
 	@Override
 	public void postPersist(final AbstractEntity entity)
 	{
-		if (entity instanceof Profile)
+		UIJob job = new UIJob("") 
 		{
-			this.profiles.add(entity);
-		}
-		if (entity instanceof Tax)
-		{
-			this.taxes.add(entity);
-		}
-		else if (entity instanceof CustomerDisplaySettings)
-		{
-			this.customerDisplayViewer.add(entity);
-		}
-		else if (entity instanceof ReceiptPrinterSettings)
-		{
-			this.receiptPrinterViewer.add(entity);
-		}
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) 
+			{
+				if (entity instanceof Profile)
+				{
+					profiles.add(entity);
+				}
+				if (entity instanceof Tax)
+				{
+					taxes.add(entity);
+				}
+				else if (entity instanceof CustomerDisplaySettings)
+				{
+					customerDisplayViewer.add(entity);
+				}
+				else if (entity instanceof ReceiptPrinterSettings)
+				{
+					receiptPrinterViewer.add(entity);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
 	}
 
 	@Override
@@ -292,19 +324,32 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.scrolledForm = scrolledForm;
 
 		this.createSalespointSection(scrolledForm);
-		this.createProviderSection(scrolledForm);
 		this.createProfileAndCurrencySection(scrolledForm);
 		this.createProposalSection(scrolledForm);
 		
-		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
-		for (Bundle bundle : bundles)
+		ProviderUpdateScheduler scheduler = providerUpdateSchedulerTracker.getService();
+		if (scheduler != null)
 		{
-			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			for (IProperty.Section section : scheduler.getSections())
 			{
-				this.createExportSection(scrolledForm);
-				break;
+				this.createSchedulerSection(scrolledForm, section, scheduler);
 			}
 		}
+		
+		ServiceReference<ProviderUpdater>[] references = providerUpdaterTracker.getServiceReferences();
+		for (ServiceReference<ProviderUpdater> reference : references)
+		{
+			ProviderUpdater providerUpdater = providerUpdaterTracker.getService(reference);
+			if (providerUpdater!= null)
+			{
+				for (IProperty.Section section : providerUpdater.getSections())
+				{
+					this.createProviderSection(scrolledForm, section, providerUpdater);
+				}
+			}
+		}
+
+		loadProviderPropertyValues();
 		
 		if ((this.receiptPrinterServiceTracker.getServices() != null)
 				&& (this.receiptPrinterServiceTracker.getServices().length > 0))
@@ -315,6 +360,16 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 				&& (this.customerDisplayServiceTracker.getServices().length > 0))
 		{
 			this.createCustomerDisplayPeripherySection(scrolledForm);
+		}
+
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.export"))
+			{
+				this.createExportSection(scrolledForm);
+				break;
+			}
 		}
 
 		EntityMediator.addListener(Profile.class, this);
@@ -388,8 +443,6 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		this.allowTestSettlement.setSelection(salespoint.isAllowTestSettlement());
 		this.forceCashCheck.setSelection(salespoint.isForceCashCheck());
 		
-		this.loadProviderValues(salespoint);
-
 		if (salespoint.getProfile() == null)
 		{
 			this.profiles.setSelection(new StructuredSelection());
@@ -465,6 +518,8 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 			}
 		}
 
+		this.loadProviderPropertyValues();
+		
 		this.setDirty(false);
 	}
 
@@ -505,18 +560,16 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 			}
 		}
 
-		final ProviderConfigurator providerConfigurator = (ProviderConfigurator) this.providerConfiguratorTracker
-				.getService();
-		if (providerConfigurator != null)
+		ServiceReference<ProviderUpdater>[] references = providerUpdaterTracker.getServiceReferences();
+		for (ServiceReference<ProviderUpdater> reference : references)
 		{
-			final boolean useLocalProviderProperties = this.useSalespointSpecificProviderProperties.getSelection();
-			salespoint.setLocalProviderProperties(useLocalProviderProperties);
-			if (useLocalProviderProperties)
+			ProviderUpdater providerUpdater = providerUpdaterTracker.getService(reference);
+			if (providerUpdater != null)
 			{
-				this.saveSalespointSpecificProviderProperties(providerConfigurator);
+				saveProviderProperties(providerUpdater);
 			}
 		}
-
+		
 		StructuredSelection ssel = (StructuredSelection) this.profiles.getSelection();
 		final Profile newProfile = (Profile) ssel.getFirstElement();
 		final Profile oldProfile = salespoint.getProfile();
@@ -806,7 +859,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		return section;
 	}
 
-	private Section createProviderSection(final ScrolledForm scrolledForm)
+	private Section createProviderSection(final ScrolledForm scrolledForm, IProperty.Section propertySection, ProviderUpdater providerUpdater)
 	{
 		final ColumnLayoutData layoutData = new ColumnLayoutData();
 		layoutData.widthHint = 200;
@@ -817,8 +870,33 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 				| ExpandableComposite.COMPACT | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
 		section.setLayoutData(layoutData);
 		section.setLayout(sectionLayout);
-		section.setText("Warenbewirtschaftung");
-		section.setClient(this.fillProviderSection(section));
+		section.setText(propertySection.title());
+		section.setClient(this.fillProviderSection(section, propertySection, providerUpdater));
+		section.addExpansionListener(new ExpansionAdapter()
+		{
+			@Override
+			public void expansionStateChanged(final ExpansionEvent e)
+			{
+				SalespointEditor.this.scrolledForm.reflow(true);
+			}
+		});
+
+		return section;
+	}
+
+	private Section createSchedulerSection(final ScrolledForm scrolledForm, IProperty.Section propertySection, ProviderUpdateScheduler scheduler)
+	{
+		final ColumnLayoutData layoutData = new ColumnLayoutData();
+		layoutData.widthHint = 200;
+		final TableWrapLayout sectionLayout = new TableWrapLayout();
+		sectionLayout.numColumns = 1;
+
+		final Section section = this.formToolkit.createSection(scrolledForm.getBody(), ExpandableComposite.EXPANDED
+				| ExpandableComposite.COMPACT | ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
+		section.setLayoutData(layoutData);
+		section.setLayout(sectionLayout);
+		section.setText(propertySection.title());
+		section.setClient(this.fillSchedulerSection(section, propertySection, scheduler));
 		section.addExpansionListener(new ExpansionAdapter()
 		{
 			@Override
@@ -1454,203 +1532,115 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		return composite;
 	}
 
-	private final Control fillProviderSection(final Section parent)
+	private final Control fillProviderSection(final Section parent, IProperty.Section propertySection, final ProviderUpdater providerUpdater)
 	{
+		initializeProperties(providerUpdater);
+		
 		final Composite composite = this.formToolkit.createComposite(parent);
 		composite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-		composite.setLayout(new GridLayout(4, false));
+		composite.setLayout(new GridLayout(propertySection.columns(), false));
 
-		final ProviderConfigurator providerConfigurator = (ProviderConfigurator) this.providerConfiguratorTracker
-				.getService();
-		if (providerConfigurator == null)
+		GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
+		layoutData.horizontalSpan = propertySection.columns();
+
+		Button button = this.formToolkit.createButton(composite,
+				"Kassenspezifische Einstellungen verwenden", SWT.CHECK);
+		button.setLayoutData(layoutData);
+		button.addSelectionListener(new SelectionListener()
 		{
-			this.formToolkit.createLabel(composite, "Keine Warenbewirtschaftung eingerichtet.");
-		}
-		else
-		{
-			if (providerConfigurator != null)
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
 			{
-				GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
-				layoutData.horizontalSpan = 4;
+				this.widgetSelected(e);
+			}
 
-				this.useSalespointSpecificProviderProperties = this.formToolkit.createButton(composite,
-						"Kassenspezifische Einstellungen verwenden", SWT.CHECK);
-				this.useSalespointSpecificProviderProperties.setLayoutData(layoutData);
-				this.useSalespointSpecificProviderProperties.addSelectionListener(new SelectionListener()
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				final boolean selected = ((Button) e.getSource()).getSelection();
+				final Map<String, Control> controlsMap = SalespointEditor.this.providerPropertyControls.get(providerUpdater.getProviderId());
+				final Collection<Control> controls = controlsMap.values();
+				for (final Control control : controls)
 				{
-					@Override
-					public void widgetDefaultSelected(final SelectionEvent e)
-					{
-						this.widgetSelected(e);
-					}
-
-					@Override
-					public void widgetSelected(final SelectionEvent e)
-					{
-						final Salespoint salespoint = (Salespoint) SalespointEditor.this.getEditorInput().getAdapter(
-								Salespoint.class);
-						final boolean selected = ((Button) e.getSource()).getSelection();
-						final Map<String, Control> controlsMap = SalespointEditor.this.providerPropertyControls;
-						final Collection<Control> controls = controlsMap.values();
-						for (final Control control : controls)
-						{
-							control.setEnabled(selected);
-							if (selected)
-							{
-								SalespointEditor.this.loadSalespointSpecificProviderPropertyValues(salespoint);
-							}
-							else
-							{
-								SalespointEditor.this.loadDefaultProviderPropertyValues();
-							}
-						}
-					}
-
-				});
-
-				final Salespoint salespoint = (Salespoint) this.getEditorInput().getAdapter(Salespoint.class);
-				final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker
-						.getService();
-				if (persistenceService != null)
-				{
-					final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getServerService()
-							.getQuery(ProviderProperty.class);
-					this.defaultProviderProperties = query.selectByProviderAsMap(providerConfigurator.getProviderId());
-					this.salespointProviderProperties = query.selectByProviderAndSalespointAsMap(
-							providerConfigurator.getProviderId(), salespoint);
-
-					this.providerProperties = providerConfigurator.getProperties().values().toArray(new IProperty[0]);
-					if ((this.providerProperties != null) && (this.providerProperties.length > 0))
-					{
-						for (final IProperty property : this.providerProperties)
-						{
-							layoutData = new GridData();
-							layoutData.widthHint = 16;
-
-							Label label = this.formToolkit.createLabel(composite, "   ");
-							label.setLayoutData(layoutData);
-
-							if (property.control().equals(Text.class.getName()))
-							{
-								label = this.formToolkit.createLabel(composite, property.label());
-								label.setLayoutData(new GridData());
-
-								layoutData = new GridData(GridData.FILL_HORIZONTAL);
-								layoutData.horizontalSpan = 2;
-
-								final Text text = this.formToolkit.createText(composite, "");
-								text.setData("key", property.key());
-								text.setLayoutData(layoutData);
-								text.addModifyListener(new ModifyListener()
-								{
-									@Override
-									public void modifyText(final ModifyEvent event)
-									{
-										final Text text = (Text) event.getSource();
-										text.setData("value", text.getText());
-										SalespointEditor.this.setDirty(true);
-									}
-								});
-								this.providerPropertyControls.put(property.key(), text);
-
-							}
-							else if (property.control().equals(FileDialog.class.getName()))
-							{
-								label = this.formToolkit.createLabel(composite, property.label());
-								label.setLayoutData(new GridData());
-
-								final Text text = this.formToolkit.createText(composite, "");
-								text.setData("key", property.key());
-								text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-								text.addModifyListener(new ModifyListener()
-								{
-									@Override
-									public void modifyText(final ModifyEvent event)
-									{
-										final Text text = (Text) event.getSource();
-										text.setData("value", text.getText());
-										SalespointEditor.this.setDirty(true);
-									}
-								});
-								this.providerPropertyControls.put(property.key(), text);
-
-								final Button button = this.formToolkit.createButton(composite, "...", SWT.PUSH);
-								button.setLayoutData(new GridData());
-								button.setData("key", property.key());
-								button.setData("filter", property.filter());
-								button.setData("name", property.label());
-								button.addSelectionListener(new SelectionListener()
-								{
-									@Override
-									public void widgetDefaultSelected(final SelectionEvent event)
-									{
-										this.widgetSelected(event);
-									}
-
-									@Override
-									public void widgetSelected(final SelectionEvent event)
-									{
-										final FileDialog dialog = new FileDialog(SalespointEditor.this.getSite()
-												.getShell());
-										final Button button = (Button) event.getSource();
-										final String key = (String) button.getData("key");
-										final Text text = (Text) SalespointEditor.this.providerPropertyControls
-												.get(key);
-										dialog.setFileName(text.getText());
-										final String[] filter = (String[]) button.getData("filter");
-										dialog.setFilterExtensions(filter);
-										dialog.setFilterIndex(0);
-										final String name = (String) button.getData("name");
-										dialog.setText(name);
-										dialog.setFilterPath(null);
-										final String value = dialog.open();
-										if ((value != null) && (value.length() > 0))
-										{
-											text.setData("value", value);
-											SalespointEditor.this.setDirty(true);
-										}
-									}
-								});
-								this.providerPropertyControls.put(property.key() + ".dialog", button);
-							}
-							else if (property.control().equals(Button.class.getName()))
-							{
-								label = this.formToolkit.createLabel(composite, "");
-								label.setLayoutData(new GridData());
-
-								layoutData = new GridData(GridData.FILL_HORIZONTAL);
-								layoutData.horizontalSpan = 2;
-
-								final Button button = this.formToolkit.createButton(composite, property.label(),
-										SWT.CHECK);
-								button.setLayoutData(layoutData);
-								button.setData("key", property.key());
-								button.addSelectionListener(new SelectionListener()
-								{
-									@Override
-									public void widgetDefaultSelected(final SelectionEvent event)
-									{
-										this.widgetSelected(event);
-									}
-
-									@Override
-									public void widgetSelected(final SelectionEvent event)
-									{
-										final Button button = (Button) event.getSource();
-										button.setData("value", Boolean.toString(button.getSelection()));
-										SalespointEditor.this.setDirty(true);
-									}
-								});
-								this.providerPropertyControls.put(property.key(), button);
-							}
-						}
-					}
+					control.setEnabled(selected);
 				}
 			}
+
+		});
+		this.useSalespointSpecificProviderProperties.put(providerUpdater.getProviderId(), button);
+		
+		Map<String, IProperty> properties = this.providerProperties.get(providerUpdater.getProviderId());
+		for (final IProperty property : properties.values())
+		{
+			Control control = property.createControl(composite, this.formToolkit, this, propertySection.columns());
+			if (control != null)
+			{
+				Map<String, Control> controls = this.providerPropertyControls.get(providerUpdater.getProviderId());
+				if (controls == null)
+				{
+					controls = new HashMap<String, Control>();
+					this.providerPropertyControls.put(providerUpdater.getProviderId(), controls);
+				}
+				controls.put(property.key(), control);
+			}
 		}
-
 		this.formToolkit.paintBordersFor(composite);
+		return composite;
+	}
 
+	private final Control fillSchedulerSection(final Section parent, IProperty.Section propertySection, final ProviderUpdateScheduler scheduler)
+	{
+		initializeProperties(scheduler);
+		
+		final Composite composite = this.formToolkit.createComposite(parent);
+		composite.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+		composite.setLayout(new GridLayout(propertySection.columns(), false));
+
+		GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
+		layoutData.horizontalSpan = propertySection.columns();
+
+		Button button = this.formToolkit.createButton(composite,
+				"Kassenspezifische Einstellungen verwenden", SWT.CHECK);
+		button.setLayoutData(layoutData);
+		button.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				this.widgetSelected(e);
+			}
+
+			@Override
+			public void widgetSelected(final SelectionEvent e)
+			{
+				final boolean selected = ((Button) e.getSource()).getSelection();
+				final Map<String, Control> controlsMap = SalespointEditor.this.providerPropertyControls.get(scheduler.getProviderId());
+				final Collection<Control> controls = controlsMap.values();
+				for (final Control control : controls)
+				{
+					control.setEnabled(selected);
+				}
+			}
+
+		});
+		this.useSalespointSpecificProviderProperties.put(scheduler.getProviderId(), button);
+		
+		Map<String, IProperty> properties = this.providerProperties.get(scheduler.getProviderId());
+		for (final IProperty property : properties.values())
+		{
+			Control control = property.createControl(composite, this.formToolkit, this, propertySection.columns());
+			if (control != null)
+			{
+				Map<String, Control> controls = this.providerPropertyControls.get(scheduler.getProviderId());
+				if (controls == null)
+				{
+					controls = new HashMap<String, Control>();
+					this.providerPropertyControls.put(scheduler.getProviderId(), controls);
+				}
+				controls.put(property.key(), control);
+			}
+		}
+		this.formToolkit.paintBordersFor(composite);
 		return composite;
 	}
 
@@ -1728,25 +1718,21 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 						{
 							salespointReceiptPrinter = receiptPrinter.getSalespointReceiptPrinter(salespoint);
 						}
-						if (salespointReceiptPrinter == null)
+						String port = receiptPrinter.getPort();
+						String converter = receiptPrinter.getConverter();
+						int cols = receiptPrinter.getCols();
+						int linesBeforeCut = receiptPrinter.getLinesBeforeCut();
+						if (salespointReceiptPrinter != null)
 						{
-							SalespointEditor.this.receiptPrinterPort.setText(receiptPrinter.getPort() == null ? ""
-									: receiptPrinter.getPort() == null ? "" : receiptPrinter.getPort());
-							SalespointEditor.this.receiptPrinterConverter.setText(receiptPrinter.getConverter() == null ? ""
-									: receiptPrinter.getConverter() == null ? "" : receiptPrinter.getConverter());
-							SalespointEditor.this.receiptPrinterCols.setSelection(receiptPrinter.getCols());
-							SalespointEditor.this.receiptPrinterLinesBeforeCut.setSelection(receiptPrinter.getLinesBeforeCut());
+							port = salespointReceiptPrinter.getPort();
+							converter = salespointReceiptPrinter.getConverter();
+							cols = salespointReceiptPrinter.getCols();
+							linesBeforeCut = salespointReceiptPrinter.getLinesBeforeCut();
 						}
-						else
-						{
-							SalespointEditor.this.receiptPrinterPort.setText(salespointReceiptPrinter.getPort() == null ? ""
-									: receiptPrinter.getPort() == null ? "" : receiptPrinter.getPort());
-							SalespointEditor.this.receiptPrinterConverter.setText(salespointReceiptPrinter
-									.getConverter() == null ? "" : receiptPrinter.getConverter());
-							SalespointEditor.this.receiptPrinterCols.setSelection(salespointReceiptPrinter.getCols());
-							SalespointEditor.this.receiptPrinterLinesBeforeCut.setSelection(salespointReceiptPrinter
-									.getLinesBeforeCut());
-						}
+						SalespointEditor.this.receiptPrinterPort.setText(port == null ? "" : port);
+						SalespointEditor.this.receiptPrinterConverter.setText(converter == null ? "" : converter);
+						SalespointEditor.this.receiptPrinterCols.setSelection(cols);
+						SalespointEditor.this.receiptPrinterLinesBeforeCut.setSelection(linesBeforeCut);
 						SalespointEditor.this.setDirty(true);
 					}
 				});
@@ -2081,19 +2067,6 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		return msg;
 	}
 
-	private final Map<String, ProviderProperty> getExistingSalespointSpecificProviderProperties(
-			final Salespoint salespoint)
-	{
-		final Map<String, ProviderProperty> properties = new HashMap<String, ProviderProperty>();
-		final ProviderProperty[] providerProperties = salespoint.getProviderProperties().values()
-				.toArray(new ProviderProperty[0]);
-		for (final ProviderProperty providerProperty : providerProperties)
-		{
-			properties.put(providerProperty.getKey(), providerProperty);
-		}
-		return properties;
-	}
-
 	private Message getNoPaymentTypeSelectedMessage()
 	{
 		Message msg = null;
@@ -2145,143 +2118,219 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint>
 		return msg;
 	}
 
-	private void loadDefaultProviderPropertyValues()
+//	private void updateControls(ProviderUpdater providerUpdater, boolean salespointSpecific)
+//	{
+//		final Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
+//				.getAdapter(Salespoint.class);
+//		Map<String, ProviderProperty> persistedProperties = salespoint.getProviderProperties();
+//		Map<String, IProperty> properties = this.providerProperties.get(providerUpdater.getProviderId());
+//		Map<String, Control> controls = this.providerPropertyControls.get(providerUpdater.getProviderId());
+//		for (IProperty property : properties.values())
+//		{
+//			String value = property.value();
+//			ProviderProperty persistedProperty = null;
+//			if (salespointSpecific)
+//			{
+//				persistedProperty = persistedProperties.get(property.key());
+//				value = persistedProperty == null ? property.value() : persistedProperty.getValue();
+//			}
+//			final Control control = controls.get(property.key());
+//			if (property.control().equals(Text.class.getName()))
+//			{
+//				final Text text = (Text) control;
+//				text.setText(value);
+//				text.setEnabled(salespointSpecific);
+//			}
+//			else if (property.control().equals(FileDialog.class.getName()))
+//			{
+//				final Text text = (Text) control;
+//				text.setText(value);
+//				text.setEnabled(salespointSpecific);
+//				final Button button = (Button) controls.get(property.key() + ".dialog");
+//				button.setEnabled(salespointSpecific);
+//			}
+//			else if (property.control().equals(Button.class.getName()))
+//			{
+//				final Button button = (Button) control;
+//				button.setSelection(Boolean.valueOf(value).booleanValue());
+//				button.setEnabled(salespointSpecific);
+//			}
+//			else if (property.control().equals(Spinner.class.getName()))
+//			{
+//				final Spinner spinner = (Spinner) control;
+//				spinner.setSelection(Integer.valueOf(value).intValue());
+//				spinner.setEnabled(salespointSpecific);
+//			}
+//		}
+//	}
+
+	private void initializeProperties(ProviderUpdateScheduler scheduler)
 	{
-		for (final IProperty p : this.providerProperties)
+		Map<String, IProperty> properties = this.providerProperties.get(scheduler.getProviderId());
+		if (properties == null)
 		{
-			final ProviderProperty defaultProperty = this.defaultProviderProperties.get(p.key());
-			if (defaultProperty != null)
-			{
-				final Control control = this.providerPropertyControls.get(p.key());
-				if (p.control().equals(Text.class.getName()))
-				{
-					final Text text = (Text) control;
-					text.setText(defaultProperty.getValue());
-					text.setEnabled(false);
-				}
-				if (p.control().equals(FileDialog.class.getName()))
-				{
-					final Text text = (Text) control;
-					text.setText(defaultProperty.getValue());
-					text.setEnabled(false);
-					final Button button = (Button) this.providerPropertyControls.get(p.key() + ".dialog");
-					button.setEnabled(false);
-				}
-				else if (p.control().equals(Button.class.getName()))
-				{
-					final Button button = (Button) control;
-					button.setSelection(Boolean.valueOf(defaultProperty.getValue()));
-					button.setEnabled(false);
-				}
-			}
+			properties = ProviderUpdateScheduler.SchedulerProperty.asMap();
+			this.providerProperties.put(scheduler.getProviderId(), properties);
 		}
 	}
 
-	private void loadProviderValues(final Salespoint salespoint)
+	private void initializeProperties(ProviderUpdater updater)
 	{
-		final ProviderConfigurator providerConfigurator = (ProviderConfigurator) this.providerConfiguratorTracker
-				.getService();
-		if (providerConfigurator != null)
+		Map<String, IProperty> properties = this.providerProperties.get(updater.getProviderId());
+		if (properties == null)
 		{
-			this.useSalespointSpecificProviderProperties.setSelection(salespoint.isLocalProviderProperties());
-
-			final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker
-					.getService();
-			if (persistenceService != null)
-			{
-				final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getServerService()
-						.getQuery(ProviderProperty.class);
-				this.defaultProviderProperties = query.selectByProviderAsMap(providerConfigurator.getProviderId());
-				this.salespointProviderProperties = this.getExistingSalespointSpecificProviderProperties(salespoint);
-
-				if (this.useSalespointSpecificProviderProperties.getSelection())
-				{
-					this.loadSalespointSpecificProviderPropertyValues(salespoint);
-				}
-				else
-				{
-					this.loadDefaultProviderPropertyValues();
-				}
-			}
+			properties = updater.getDefaultProperties();
+			this.providerProperties.put(updater.getProviderId(), properties);
 		}
 	}
 
-	private void loadSalespointSpecificProviderPropertyValues(final Salespoint salespoint)
+	private Collection<ProviderProperty> getProviderProperties(String providerId)
 	{
-		for (final IProperty p : this.providerProperties)
+		Collection<ProviderProperty> properties = new ArrayList<ProviderProperty>();
+		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
 		{
-			final ProviderProperty property = this.salespointProviderProperties.get(p.key());
-			final ProviderProperty defaultProperty = this.defaultProviderProperties.get(p.key());
-			if (property != null)
-			{
-				if (!property.isDeleted())
-				{
-					property.setDeleted(false);
-				}
-			}
-
-			final String value = property == null ? (defaultProperty == null ? p.value() : defaultProperty.getValue())
-					: property.getValue();
-			final Control control = this.providerPropertyControls.get(p.key());
-			if (p.control().equals(Text.class.getName()))
-			{
-				final Text text = (Text) control;
-				text.setText(value);
-				text.setEnabled(true);
-			}
-			if (p.control().equals(FileDialog.class.getName()))
-			{
-				final Text text = (Text) control;
-				text.setText(value);
-				text.setEnabled(true);
-				final Button button = (Button) this.providerPropertyControls.get(p.key() + ".dialog");
-				button.setEnabled(true);
-			}
-			else if (p.control().equals(Button.class.getName()))
-			{
-				final Button button = (Button) control;
-				button.setSelection(Boolean.valueOf(value));
-				button.setEnabled(true);
-			}
+			ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getServerService().getQuery(ProviderProperty.class);
+			properties = query.selectByProvider(providerId);
 		}
+		return properties;
 	}
-
-	private void saveSalespointSpecificProviderProperties(final ProviderConfigurator providerConfigurator)
+	
+	private void loadProviderPropertyValues()
 	{
 		final Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
 				.getAdapter(Salespoint.class);
+		Collection<ProviderProperty> providerProperties = salespoint.getProviderProperties();
 
-		for (final IProperty p : this.providerProperties)
+		for (ProviderProperty providerProperty : providerProperties)
 		{
-			ProviderProperty property = this.salespointProviderProperties.get(p.key());
-			if (property == null)
+			Map<String, IProperty> properties = this.providerProperties.get(providerProperty.getProvider());
+			IProperty property = properties.get(providerProperty.getKey());
+			if (property != null)
 			{
-				String value = null;
-				final Control control = this.providerPropertyControls.get(p.key());
-				if (control instanceof Text)
-				{
-					value = ((Text) control).getText();
-				}
-				else if (control instanceof Button)
-				{
-					value = (Boolean.toString(((Button) control).getSelection()));
-				}
-				property = ProviderProperty.newInstance(providerConfigurator.getProviderId(), salespoint);
-				property.setKey(p.key());
-				property.setProvider(providerConfigurator.getProviderId());
-				property.setValue(value);
-				salespoint.putProviderProperty(property);
+				property.setPersistedProperty(providerProperty);
 			}
-			else
+		}
+		Set<String> keys = this.providerProperties.keySet();
+		for (String key : keys)
+		{
+			boolean salespointSpecific = false;
+			Collection<ProviderProperty> persistedProperties = getProviderProperties(key);
+			for (ProviderProperty persistedProperty : persistedProperties)
 			{
-				final Control control = this.providerPropertyControls.get(p.key());
-				if (control instanceof Text)
+				Map<String, IProperty> properties = this.providerProperties.get(key);
+				IProperty property = properties.get(persistedProperty.getKey());
+				if (property != null)
 				{
-					property.setValue(((Text) control).getText());
+					property.setPersistedProperty(persistedProperty);
 				}
-				else if (control instanceof Button)
+			}
+			Map<String, IProperty> properties = this.providerProperties.get(key);
+			for (IProperty property : properties.values())
+			{
+				if (property.getPersistedProperty() != null && !property.getPersistedProperty().isDeleted())
 				{
-					property.setValue(Boolean.toString(((Button) control).getSelection()));
+					salespointSpecific = true;
+					break;
+				}
+			}
+			Button button = this.useSalespointSpecificProviderProperties.get(key);
+			button.setSelection(salespointSpecific);
+
+			Map<String, Control> controls = this.providerPropertyControls.get(key);
+			if (controls != null)
+			{
+				Set<String> propertyKeys = controls.keySet();
+				for (String propertyKey : propertyKeys)
+				{
+					IProperty property = properties.get(propertyKey);
+					Control control = controls.get(propertyKey);
+					property.set(control, property.value());
+					control.setEnabled(salespointSpecific);
+				}
+			}
+		}
+	}
+
+	private ProviderProperty getParentProperty(String providerId, String key, ProviderProperty persistedProperty)
+	{
+		if (persistedProperty != null && persistedProperty.getSalespoint() == null)
+		{
+			return persistedProperty;
+		}
+		PersistenceService service = persistenceServiceTracker.getService();
+		if (service != null)
+		{
+			ProviderPropertyQuery query = (ProviderPropertyQuery) service.getServerService().getQuery(ProviderProperty.class);
+			Map<String, ProviderProperty> properties = query.selectByProviderAsMap(providerId);
+			return properties.get(key);
+		}
+		return null;
+	}
+	
+	private void saveProviderProperties(final ProviderUpdater providerUpdater)
+	{
+		final Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
+				.getAdapter(Salespoint.class);
+		Set<String> providerKeys = providerProperties.keySet();
+		for (String providerKey : providerKeys)
+		{
+			Map<String, IProperty> properties = providerProperties.get(providerKey);
+			Set<String> propertyKeys = properties.keySet();
+			for (String propertyKey : propertyKeys)
+			{
+				IProperty property = properties.get(propertyKey);
+				Map<String, Control> controls = this.providerPropertyControls.get(providerKey);
+				if (controls != null)
+				{
+					Control control = controls.get(propertyKey);
+					String value = property.value(control);
+					ProviderProperty parent = getParentProperty(providerKey, property.key(), property.getPersistedProperty());
+					ProviderProperty providerProperty = property.getPersistedProperty();
+					if (property.isDefaultValue(value))
+					{
+						if (providerProperty != null && providerProperty.getSalespoint() != null)
+						{
+							providerProperty.setDeleted(true);
+						}
+					}
+					else
+					{
+						if (providerProperty == null)
+						{
+							providerProperty = ProviderProperty.newInstance(providerKey, parent, salespoint);
+							providerProperty.setKey(property.key());
+							providerProperty.setValue(value, property.defaultValue());
+							property.setPersistedProperty(providerProperty);
+							salespoint.addProviderProperties(providerProperty);
+						}
+						if (providerProperty.getSalespoint() == null)
+						{
+							if (!providerProperty.getValue(property.defaultValue()).equals(value))
+							{
+								providerProperty = ProviderProperty.newInstance(providerKey, parent, salespoint);
+								providerProperty.setKey(property.key());
+								providerProperty.setValue(value, property.defaultValue());
+								property.setPersistedProperty(providerProperty);
+								salespoint.addProviderProperties(providerProperty);
+							}
+						}
+						else
+						{
+							if (providerProperty.getParentValue(property.defaultValue()).equals(value))
+							{
+								providerProperty.setDeleted(true);
+							}
+							else
+							{
+								if (providerProperty.isDeleted())
+								{
+									providerProperty.setDeleted(false);
+								}
+								providerProperty.setValue(value, property.defaultValue());
+							}
+						}
+					}
 				}
 			}
 		}
