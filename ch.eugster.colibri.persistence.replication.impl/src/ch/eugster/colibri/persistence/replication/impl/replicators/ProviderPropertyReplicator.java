@@ -82,7 +82,7 @@ public class ProviderPropertyReplicator extends AbstractEntityReplicator<Provide
 		target = super.replicate(source, target);
 		target.setKey(source.getKey());
 		target.setProvider(source.getProvider());
-		target.setValue(source.getValue());
+		target.setValue(source.getValue(), source.getValue());
 		target.setSalespoint(source.getSalespoint());
 		return target;
 	}

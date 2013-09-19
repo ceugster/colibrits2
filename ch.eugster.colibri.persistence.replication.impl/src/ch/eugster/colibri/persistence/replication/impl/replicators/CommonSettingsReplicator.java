@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Currency;
+import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -151,17 +152,31 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 			productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class,
 					source.getDefaultProductGroup().getId());
 		}
+		ProductGroup voucherProductGroup = null;
+		if (source.getDefaultVoucherProductGroup() != null)
+		{
+			voucherProductGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class,
+					source.getDefaultVoucherProductGroup().getId());
+		}
 		ProductGroup payedInvoice = null;
 		if (source.getPayedInvoice() != null)
 		{
 			payedInvoice = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class,
 					source.getPayedInvoice().getId());
 		}
+		PaymentType voucherPaymentType = null;
+		if (source.getDefaultVoucherPaymentType() != null)
+		{
+			voucherPaymentType = (PaymentType) this.persistenceService.getCacheService().find(PaymentType.class,
+					source.getDefaultVoucherPaymentType().getId());
+		}
 
 		target = super.replicate(source, target);
 		target.setAddress(source.getAddress());
 		target.setAllowTestSettlement(source.isAllowTestSettlement());
 		target.setDefaultProductGroup(productGroup);
+		target.setDefaultVoucherPaymentType(voucherPaymentType);
+		target.setDefaultVoucherProductGroup(voucherProductGroup);
 		target.setExport(source.isExport());
 		target.setExportPath(source.getExportPath());
 		target.setForceSettlement(source.isForceSettlement());

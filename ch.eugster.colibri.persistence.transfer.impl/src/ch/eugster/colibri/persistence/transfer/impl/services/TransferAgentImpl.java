@@ -287,6 +287,10 @@ public class TransferAgentImpl implements TransferAgent
 				PaymentType.class, source.getPaymentType().getId());
 
 		final Payment target = Payment.newInstance(receipt);
+		target.setBookProvider(source.isBookProvider());
+		target.setProviderBooked(source.isProviderBooked());
+		target.setProviderId(source.getProviderId());
+		target.setProviderState(source.getProviderState());
 		target.setAmount(source.getAmount());
 		target.setBack(source.isBack());
 		target.setDeleted(source.isDeleted());
@@ -335,6 +339,7 @@ public class TransferAgentImpl implements TransferAgent
 		target.setFromStock(source.isFromStock());
 		target.setProvider(source.getProvider());
 		target.setProviderBooked(source.isProviderBooked());
+		target.setProviderState(source.getProviderState());
 		return target;
 	}
 
