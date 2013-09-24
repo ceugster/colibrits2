@@ -24,10 +24,10 @@ import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditorInput;
 import ch.eugster.colibri.admin.ui.views.AbstractEntityView;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderConfigurator;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
 import ch.eugster.colibri.provider.voucher.VoucherService;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
 @SuppressWarnings("rawtypes")
@@ -102,9 +102,9 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		{
 			this.editGeneralSettings();
 		}
-		else if (object instanceof ProviderUpdateScheduler)
+		else if (object instanceof UpdateScheduler)
 		{
-			ProviderUpdateScheduler scheduler = (ProviderUpdateScheduler) object;
+			UpdateScheduler scheduler = (UpdateScheduler) object;
 			this.editSchedulerSettings(scheduler);
 		}
 	}
@@ -132,7 +132,7 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		}
 	}
 
-	public void editSchedulerSettings(ProviderUpdateScheduler scheduler)
+	public void editSchedulerSettings(UpdateScheduler scheduler)
 	{
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
