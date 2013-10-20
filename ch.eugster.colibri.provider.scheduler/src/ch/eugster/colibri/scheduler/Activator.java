@@ -1,4 +1,4 @@
-package ch.eugster.colibri.provider.scheduler;
+package ch.eugster.colibri.scheduler;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;

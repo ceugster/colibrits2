@@ -1,4 +1,4 @@
-package ch.eugster.colibri.provider.scheduler.service;
+package ch.eugster.colibri.scheduler.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +13,11 @@ import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.IProperty.Section;
-import ch.eugster.colibri.provider.scheduler.Activator;
+import ch.eugster.colibri.scheduler.Activator;
 
-public interface ProviderUpdateScheduler
+public interface UpdateScheduler
 {
+	public static final String SCHEDULE_TOPIC = "ch/eugster/colibri/scheduler/updated";
 	String getName();
 
 	Section[] getSections();

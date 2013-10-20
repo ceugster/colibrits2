@@ -1600,11 +1600,11 @@ ch.eugster.colibri.provider.scheduler/.classpath -text
 ch.eugster.colibri.provider.scheduler/.project -text
 ch.eugster.colibri.provider.scheduler/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.provider.scheduler/META-INF/MANIFEST.MF -text
-ch.eugster.colibri.provider.scheduler/OSGI-INF/provider-scheduler-component.xml -text
+ch.eugster.colibri.provider.scheduler/OSGI-INF/component.xml -text
 ch.eugster.colibri.provider.scheduler/build.properties -text
-ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/provider/scheduler/Activator.java -text
-ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/provider/scheduler/ProviderUpdateSchedulerComponent.java -text
-ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/provider/scheduler/service/ProviderUpdateScheduler.java -text
+ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/scheduler/Activator.java -text
+ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/scheduler/UpdateSchedulerComponent.java -text
+ch.eugster.colibri.provider.scheduler/src/ch/eugster/colibri/scheduler/service/UpdateScheduler.java -text
 ch.eugster.colibri.provider.voucher.feature/.project -text
 ch.eugster.colibri.provider.voucher.feature/build.properties -text
 ch.eugster.colibri.provider.voucher.feature/feature.xml -text
