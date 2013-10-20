@@ -200,7 +200,6 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 						
 						start.setEnabled(false);
 						printReport(report, dataSource, parameters);
-						start.setEnabled(true);
 					}
 					catch (IOException ex)
 					{

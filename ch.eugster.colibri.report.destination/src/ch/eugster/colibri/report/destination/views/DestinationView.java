@@ -98,12 +98,12 @@ public class DestinationView extends ViewPart implements ISelectionProvider
 
 		});
 
+		getSite().setSelectionProvider(this);
+
 		ReportService.Destination destination = ReportService.Destination.values()[this.settings.getInt("selected.destination")];
 		ReportService.Format format = ReportService.Format.values()[this.settings.getInt("selected.format")];
 		StructuredSelection ssel = new StructuredSelection(new Object[] { destination, format });
 		setSelection(ssel);
-
-		getSite().setSelectionProvider(this);
 	}
 
 	private void fireSelectionChanged()

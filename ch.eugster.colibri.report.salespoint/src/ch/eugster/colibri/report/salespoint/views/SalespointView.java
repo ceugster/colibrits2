@@ -342,8 +342,6 @@ public class SalespointView extends ViewPart
 			}
 		};
 		this.persistenceServiceTracker.open();
-
-		getSite().setSelectionProvider(this.viewer);
 	}
 
 	private Salespoint[] getSelectedSalespoints(Salespoint[] salespoints)
