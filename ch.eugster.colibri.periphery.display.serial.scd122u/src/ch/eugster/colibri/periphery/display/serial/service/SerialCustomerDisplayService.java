@@ -29,7 +29,6 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	@Override
 	public void displayText(final int timerDelay, final String text)
 	{
-		System.out.println(text + " " + timerDelay);
 		if (timerDelay == 0L)
 		{
 			this.displayText(text);

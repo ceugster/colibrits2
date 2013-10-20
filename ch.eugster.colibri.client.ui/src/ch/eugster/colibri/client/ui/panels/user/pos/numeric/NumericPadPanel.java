@@ -6,6 +6,7 @@
 package ch.eugster.colibri.client.ui.panels.user.pos.numeric;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -28,15 +29,11 @@ import ch.eugster.colibri.client.ui.actions.EnterAction;
 import ch.eugster.colibri.client.ui.actions.NumericPadAction;
 import ch.eugster.colibri.client.ui.buttons.EnterButton;
 import ch.eugster.colibri.client.ui.buttons.NumericPadButton;
-import ch.eugster.colibri.client.ui.events.PositionChangeEvent;
 import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
 import ch.eugster.colibri.client.ui.panels.user.PositionWrapper;
-import ch.eugster.colibri.client.ui.panels.user.ReceiptWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
-import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
-import ch.eugster.colibri.persistence.model.Position.Option;
 
 /**
  * 
@@ -129,10 +126,12 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 
 	private void configureDisplay(final Profile profile, final int textAlign, final String text)
 	{
+		this.display.setFont(getFont().deriveFont(userPanel.getProfile().getInputNameLabelFontStyle(), userPanel.getProfile().getInputNameLabelFontSize()));
+		this.display.setOpaque(true);
+		this.display.setForeground(new java.awt.Color(userPanel.getProfile().getInputNameLabelFg()));
+		this.display.setBackground(new java.awt.Color(userPanel.getProfile().getInputNameLabelBg()));
+//		this.display.setBorder(new EmptyBorder(2, 2, 2, 2));
 		this.display.setBorder(BorderUIResource.getEtchedBorderUIResource());
-		this.display.setFont(this.display.getFont().deriveFont(profile.getValueLabelFontStyle(), profile.getValueLabelFontSize()));
-		this.display.setBackground(new java.awt.Color(profile.getValueLabelBg()));
-		this.display.setForeground(new java.awt.Color(profile.getValueLabelFg()));
 		this.display.setHorizontalAlignment(textAlign);
 	}
 
@@ -161,10 +160,10 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 		 * Display Area
 		 */
 		displayLabel = new JLabel("WG / Barcode");
-		displayLabel.setFont(displayLabel.getFont().deriveFont(profile.getNameLabelFontStyle(), profile.getNameLabelFontSize()));
+		displayLabel.setFont(displayLabel.getFont().deriveFont(profile.getInputNameLabelFontStyle(), profile.getInputNameLabelFontSize()));
 		displayLabel.setOpaque(true);
-		displayLabel.setForeground(new java.awt.Color(profile.getNameLabelFg()));
-		displayLabel.setBackground(new java.awt.Color(profile.getNameLabelBg()));
+		displayLabel.setForeground(new java.awt.Color(profile.getInputNameLabelFg()));
+		displayLabel.setBackground(new java.awt.Color(profile.getInputNameLabelBg()));
 		displayLabel.setBorder(new EmptyBorder(2, 2, 2, 2));
 
 		this.configureDisplay(profile, SwingConstants.LEADING, "");
@@ -279,12 +278,14 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 				label = label.append(label.length() > 0 ? " / MWST" : "MWST");
 			}
 			this.displayLabel.setText(label.toString());
+			this.displayLabel.setForeground(Color.red);
 		}
 		else if (event.getSource() instanceof PositionChangeMediator)
 		{
 			if (event.getNewValue() instanceof Position)
 			{
 				this.displayLabel.setText("WG / Barcode");
+				this.displayLabel.setForeground(new java.awt.Color(userPanel.getProfile().getValueLabelFg()));
 			}
 		}
 	}

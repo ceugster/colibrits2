@@ -102,7 +102,7 @@ public class PrintLastReceiptAction extends ConfigurableAction implements Dispos
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
 				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));

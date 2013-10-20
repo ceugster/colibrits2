@@ -46,7 +46,6 @@ public class InsertReceiptService
 
 	protected void activate(ComponentContext componentContext)
 	{
-		System.out.println("Service " + componentContext.getProperties().get("component.name") + " aktiviert.");
 
 	}
 
@@ -58,8 +57,6 @@ public class InsertReceiptService
 		}
 		prepare();
 
-		long receipts = settlementService.countReceipts(salespoint.getSettlement());
-		System.out.println(" " + receipts + " receipts...");
 		Settlement settlement = settlementService
 				.settle(salespoint.getSettlement(), SettlementService.State.DEFINITIVE);
 
@@ -71,7 +68,6 @@ public class InsertReceiptService
 
 		settlement.getSalespoint().setSettlement(settlement);
 		salespoint = settlementService.updateSettlement(salespoint);
-		System.out.println("OK");
 	}
 
 	private void prepare()
@@ -255,9 +251,7 @@ public class InsertReceiptService
 
 	protected void deactivate(ComponentContext componentContext)
 	{
-		System.out.println("Service " + componentContext.getProperties().get("component.name") + " deaktiviert.");
 	}
-
 	protected void setPersistenceService(PersistenceService persistenceService)
 	{
 		this.persistenceService = persistenceService;

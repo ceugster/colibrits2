@@ -174,7 +174,7 @@ public class SettleAction extends ProfileAction implements EventHandler
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext());
 		properties.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, tracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID, tracker.getServiceReference().getProperty("component.id"));
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));

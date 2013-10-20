@@ -42,8 +42,7 @@ import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.service.ProviderIdService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderQuery;
 import ch.eugster.colibri.provider.voucher.VoucherService;
 import ch.eugster.colibri.provider.voucher.VoucherService.Result;
 
@@ -101,9 +100,9 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private Position position;
 
-	private final ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker;
+	private final ServiceTracker<ProviderQuery, ProviderQuery> providerQueryTracker;
 
-	private final ServiceTracker<ProviderIdService, ProviderIdService> providerIdServiceTracker;
+//	private final ServiceTracker<ProviderIdService, ProviderIdService> providerIdServiceTracker;
 
 	private final ServiceTracker<BarcodeVerifier, BarcodeVerifier> barcodeVerifierTracker;
 
@@ -143,13 +142,13 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				BarcodeVerifier.class, null);
 		this.barcodeVerifierTracker.open();
 
-		this.providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderInterface.class, null);
-		this.providerInterfaceTracker.open();
+		this.providerQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().getBundle().getBundleContext(),
+				ProviderQuery.class, null);
+		this.providerQueryTracker.open();
 
-		this.providerIdServiceTracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderIdService.class, null);
-		this.providerIdServiceTracker.open();
+//		this.providerIdServiceTracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle().getBundleContext(),
+//				ProviderIdService.class, null);
+//		this.providerIdServiceTracker.open();
 
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
@@ -188,8 +187,8 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	public void dispose()
 	{
 		this.persistenceServiceTracker.close();
-		this.providerIdServiceTracker.close();
-		this.providerInterfaceTracker.close();
+//		this.providerIdServiceTracker.close();
+		this.providerQueryTracker.close();
 		this.logServiceTracker.close();
 	}
 
@@ -308,7 +307,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			final String input = this.valueDisplay.readAndInitDisplay();
 			if ((input != null) && (input.length() > 0))
 			{
-				if (input.startsWith("GCD"))
+				if (input.startsWith(Barcode.PREFIX_VOUCHER))
 				{
 					log(LogService.LOG_INFO, "eGutschein gescant.");
 					log(LogService.LOG_INFO, "Prüfe eGutschein Service Verfügbarkeit...");
@@ -509,13 +508,13 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	public Position preparePosition(final Receipt receipt)
 	{
 		final Position newPosition = Position.newInstance(receipt);
-		final ProviderIdService providerIdService = (ProviderIdService) this.providerIdServiceTracker.getService();
-		if (providerIdService != null)
+		final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
+		if (providerQuery != null)
 		{
-			if (providerIdService.getConfiguration().updateLocalItems())
+			if (providerQuery.getConfiguration().updateLocalItems())
 			{
-				newPosition.setProvider(providerIdService.getProviderId());
-				newPosition.setBookProvider(providerIdService.getConfiguration().updateLocalItems());
+				newPosition.setProvider(providerQuery.getProviderId());
+				newPosition.setBookProvider(providerQuery.getConfiguration().updateLocalItems());
 			}
 		}
 		return replacePosition(newPosition);
@@ -586,11 +585,11 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private void findAndRead(final Barcode barcode)
 	{
-		final ProviderInterface providerInterface = (ProviderInterface) this.providerInterfaceTracker.getService();
-		if (providerInterface != null && providerInterface.isConnect())
+		final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
+		if (providerQuery!= null && providerQuery.isConnect())
 		{
 			log(LogService.LOG_INFO, "Providerservice wird aufgerufen.");
-			final IStatus status = providerInterface.findAndRead(barcode, this.position);
+			final IStatus status = providerQuery.findAndRead(barcode, this.position);
 			if (!this.isPositionComplete() && status.getSeverity() == IStatus.CANCEL)
 			{
 				log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
@@ -626,10 +625,10 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private void setProviderId(final Barcode barcode)
 	{
-		final ProviderIdService providerIdService = (ProviderIdService) this.providerIdServiceTracker.getService();
-		if (providerIdService != null)
+		final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
+		if (providerQuery != null)
 		{
-			this.position.setProvider(providerIdService.getProviderId());
+			this.position.setProvider(providerQuery.getProviderId());
 			this.position.setBookProvider(true);
 		}
 	}
@@ -648,6 +647,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 					if (barcode != null)
 					{
 						barcode.updatePosition(position);
+//						position.setSearchValue(barcode.getCode());
 						break;
 					}
 				}
@@ -674,7 +674,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			Collection<Position> positions = this.getPosition().getReceipt().getPositions();
 			for (final Position position : positions)
 			{
-				if (position.getSearchValue().equals(barcode.getCode()) && (position != this.getPosition()))
+				if (position.getSearchValue() != null && position.getSearchValue().equals(barcode.getCode()) && (position != this.getPosition()))
 				{
 					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.position.getReceipt()
 							.getSettlement().getSalespoint().getProfile(), "Bereits erfasst", "Der Abholfachbeleg "

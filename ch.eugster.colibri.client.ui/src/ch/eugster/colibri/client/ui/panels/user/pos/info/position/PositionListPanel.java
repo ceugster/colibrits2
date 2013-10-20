@@ -9,6 +9,7 @@ package ch.eugster.colibri.client.ui.panels.user.pos.info.position;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FontMetrics;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -36,7 +37,6 @@ import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.panels.user.pos.info.position.PositionListModel.Column;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
-import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.ui.panels.ProfilePanel;
 
 public class PositionListPanel extends ProfilePanel implements TableModelListener, ActionListener, StateChangeListener
@@ -79,9 +79,9 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 					{
 						if (table.getRowCount() > 0)
 						{
+							final PositionListModel model = (PositionListModel) table.getModel();
 							if (table.getSelectedRow() > -1)
 							{
-								final PositionListModel model = (PositionListModel) table.getModel();
 								final Position position = model.getPosition(table.convertRowIndexToModel(table.getSelectedRow()));
 								userPanel.getReceiptWrapper().getReceipt().removePosition(position);
 								model.fireTableRowsDeleted(table.convertRowIndexToModel(table.getSelectedRow()), table.convertRowIndexToModel(table.getSelectedRow()));
@@ -91,18 +91,17 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 							{
 								final String title = "Beleg verwerfen";
 								final String message = "Soll der aktuelle Beleg verworfen werden?";
-								if (ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(),
-										PositionListPanel.this.profile, title, message, MessageDialog.TYPE_QUESTION) == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
+								Frame frame = Activator.getDefault().getFrame();
+								Profile profile = PositionListPanel.this.userPanel.getProfile();
+								if (ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(frame,
+										profile, title, message, MessageDialog.TYPE_QUESTION) == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 								{
-									final PositionListModel model = (PositionListModel) table.getModel();
 									if (userPanel.getReceiptWrapper().getReceipt().getId() != null)
 									{
 										userPanel.getReceiptWrapper().getReceipt().setDeleted(true);
 										userPanel.getReceiptWrapper().storeReceipt();
 									}
-									Receipt receipt = userPanel.getReceiptWrapper().prepareReceipt();
-									userPanel.getPositionWrapper().preparePosition(receipt);
-									userPanel.getPaymentWrapper().preparePayment(receipt);
+									userPanel.prepareReceipt();
 									model.fireTableDataChanged();
 								}
 							}

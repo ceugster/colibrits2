@@ -325,7 +325,6 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		}
 		else if (propId == IEditorPart.PROP_INPUT)
 		{
-			System.out.println(this.scrolledForm.getSize().x);
 		}
 	}
 

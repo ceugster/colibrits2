@@ -44,6 +44,8 @@ public class Activator extends AbstractUIPlugin
 
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
+	private LogService logService;
+	
 	// The shared instance
 	private static Activator plugin;
 
@@ -90,10 +92,15 @@ public class Activator extends AbstractUIPlugin
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		this.logServiceTracker.open();
 
-		final LogService log = (LogService) this.logServiceTracker.getService();
-		if (log != null)
+		logService = this.logServiceTracker.getService();
+		log(LogService.LOG_INFO, "Bundle " + context.getBundle().getSymbolicName() + " gestartet.");
+	}
+
+	public void log(int level, String message)
+	{
+		if (this.logServiceTracker != null)
 		{
-			log.log(LogService.LOG_INFO, Activator.PLUGIN_ID + ".plugin gestartet");
+			this.logService.log(level, message);
 		}
 	}
 
@@ -107,14 +114,9 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		final LogService log = (LogService) this.logServiceTracker.getService();
-		if (log != null)
-		{
-			log.log(LogService.LOG_INFO, Activator.PLUGIN_ID + ".plugin gestoppt");
-		}
+		log(LogService.LOG_INFO, "Bundle " + context.getBundle().getSymbolicName() + " gestoppt.");
 
 		this.logServiceTracker.close();
-
 		Activator.plugin = null;
 		super.stop(context);
 	}

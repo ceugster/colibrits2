@@ -26,7 +26,7 @@ import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderQuery;
 
 /**
  * @author ceugster
@@ -44,7 +44,7 @@ public class Code128 extends AbstractBarcode
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker;
+	private ServiceTracker<ProviderQuery, ProviderQuery> providerQueryTracker;
 
 	/**
 	 * 
@@ -227,8 +227,8 @@ public class Code128 extends AbstractBarcode
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().context, PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
 
-		this.providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().context, ProviderInterface.class, null);
-		this.providerInterfaceTracker.open();
+		this.providerQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().context, ProviderQuery.class, null);
+		this.providerQueryTracker.open();
 
 		position.setSearchValue(this.getCode());
 		Product product = position.getProduct();
@@ -244,12 +244,12 @@ public class Code128 extends AbstractBarcode
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if ((persistenceService != null))
 		{
-			final ProviderInterface providerInterface = (ProviderInterface) this.providerInterfaceTracker.getService();
-			if (providerInterface != null)
+			final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
+			if (providerQuery!= null)
 			{
 				final ExternalProductGroupQuery epgQuery = (ExternalProductGroupQuery) persistenceService.getCacheService().getQuery(
 						ExternalProductGroup.class);
-				final ExternalProductGroup externalProductGroup = epgQuery.selectByProviderAndCode(providerInterface.getProviderId(),
+				final ExternalProductGroup externalProductGroup = epgQuery.selectByProviderAndCode(providerQuery.getProviderId(),
 						this.getProductGroupCode());
 				if (externalProductGroup != null)
 				{
@@ -257,7 +257,7 @@ public class Code128 extends AbstractBarcode
 				}
 
 				final TaxCodeMappingQuery tcmQuery = (TaxCodeMappingQuery) persistenceService.getCacheService().getQuery(TaxCodeMapping.class);
-				final TaxCodeMapping taxCodeMapping = tcmQuery.selectTaxCodeMappingByProviderAndCode(providerInterface.getProviderId(), this.getTaxCode());
+				final TaxCodeMapping taxCodeMapping = tcmQuery.selectTaxCodeMappingByProviderAndCode(providerQuery.getProviderId(), this.getTaxCode());
 				if (taxCodeMapping != null)
 				{
 					position.setCurrentTax(taxCodeMapping.getTax().getCurrentTax());

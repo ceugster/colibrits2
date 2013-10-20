@@ -8,20 +8,16 @@ package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.progress.UIJob;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
-import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderQuery;
 
 public class SelectCustomerAction extends ConfigurableAction implements DisposeListener
 {
@@ -59,15 +55,15 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 //			public IStatus runInUIThread(final IProgressMonitor monitor)
 //			{
 //				IStatus status = Status.CANCEL_STATUS;
-				final ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
-						ProviderInterface.class, null);
-				providerInterfaceTracker.open();
+				final ServiceTracker<ProviderQuery, ProviderQuery> ProviderQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().getBundle().getBundleContext(),
+						ProviderQuery.class, null);
+				ProviderQueryTracker.open();
 				try
 				{
-					final ProviderInterface providerInterface = (ProviderInterface) providerInterfaceTracker.getService();
-					if (providerInterface != null)
+					final ProviderQuery ProviderQuery = (ProviderQuery) ProviderQueryTracker.getService();
+					if (ProviderQuery != null)
 					{
-						IStatus status = providerInterface.selectCustomer(userPanel.getPositionWrapper().getPosition(), getProductGroup());
+						IStatus status = ProviderQuery.selectCustomer(userPanel.getPositionWrapper().getPosition(), getProductGroup());
 						if (status.getSeverity() == IStatus.OK)
 						{
 							userPanel.getPositionListPanel().getModel().actionPerformed(event);
@@ -81,7 +77,7 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 				}
 				finally
 				{
-					providerInterfaceTracker.close();
+					ProviderQueryTracker.close();
 				}
 //				return status;
 //			}

@@ -89,7 +89,7 @@ public class PrintReceiptAction extends UserPanelProfileAction implements ListSe
 		final Dictionary<String, Object> eventProps = new Hashtable<String, Object>();
 		eventProps.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
 		eventProps.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
-		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		eventProps.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
 		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		eventProps.put(IPrintable.class.getName(), receipt);

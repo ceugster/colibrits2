@@ -6,9 +6,12 @@
  */
 package ch.eugster.colibri.client.ui.panels.user.pos.info.display;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import ch.eugster.colibri.client.ui.actions.DeleteAction;
 import ch.eugster.colibri.client.ui.events.PaymentChangeMediator;
 import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
@@ -23,7 +26,7 @@ import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 
-public abstract class DisplayPanel extends ch.eugster.colibri.ui.panels.DisplayPanel implements PropertyChangeListener
+public abstract class DisplayPanel extends ch.eugster.colibri.ui.panels.DisplayPanel implements PropertyChangeListener, ActionListener
 {
 	public static final long serialVersionUID = 0l;
 
@@ -145,6 +148,15 @@ public abstract class DisplayPanel extends ch.eugster.colibri.ui.panels.DisplayP
 		receiptChangeMediator = new ReceiptChangeMediator(this.userPanel, this, receiptProperties);
 
 		EntityMediator.addListener(Profile.class, this);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) 
+	{
+		if (e.getActionCommand().equals(DeleteAction.ACTION_COMMAND))
+		{
+			this.display(this.userPanel.getReceiptWrapper().getReceipt());
+		}
 	}
 
 }

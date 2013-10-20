@@ -32,9 +32,7 @@ public class ReceiptParkingAction extends ConfigurableAction
 		else
 		{
 			userPanel.getReceiptWrapper().parkReceipt();
-			Receipt receipt = userPanel.getReceiptWrapper().prepareReceipt();
-			userPanel.getPositionWrapper().preparePosition(receipt);
-			userPanel.getPaymentWrapper().preparePayment(receipt);
+			userPanel.prepareReceipt();
 			userPanel.fireStateChange(new StateChangeEvent(userPanel.getCurrentState(), UserPanel.State.PAYMENT_INPUT));
 			userPanel.fireStateChange(new StateChangeEvent(userPanel.getCurrentState(), UserPanel.State.POSITION_INPUT));
 		}

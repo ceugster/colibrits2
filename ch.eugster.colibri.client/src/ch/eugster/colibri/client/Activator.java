@@ -19,13 +19,10 @@ public class Activator extends AbstractUIPlugin
 
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
+	private LogService logService;
+	
 	// The shared instance
 	private static Activator plugin;
-
-	public LogService getLogService()
-	{
-		return (LogService) this.logServiceTracker.getService();
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -56,11 +53,8 @@ public class Activator extends AbstractUIPlugin
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		this.logServiceTracker.open();
 
-		final LogService logService = this.logServiceTracker.getService();
-		if (logService != null)
-		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
-		}
+		logService = this.logServiceTracker.getService();
+		log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
 	}
 
 	/*
@@ -73,12 +67,7 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		final LogService logService = this.logServiceTracker.getService();
-		if (logService != null)
-		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
-		}
-
+		log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 		this.logServiceTracker.close();
 		Activator.plugin = null;
 		super.stop(context);
@@ -92,5 +81,13 @@ public class Activator extends AbstractUIPlugin
 	public static Activator getDefault()
 	{
 		return Activator.plugin;
+	}
+	
+	public void log(int level, String message)
+	{
+		if (logService != null)
+		{
+			logService.log(level, message);
+		}
 	}
 }

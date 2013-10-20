@@ -866,6 +866,7 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/login/ILogo
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/login/LoginEvent.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/login/LoginPanel.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/login/LogoutEvent.java -text
+ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/status/StatusPanel.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/PaymentWrapper.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/PositionWrapper.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/ReceiptWrapper.java -text
@@ -908,6 +909,7 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settle
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settlement/MoneyRow.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settlement/VoucherRow.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/views/ClientView.java -text
+ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/views/TimeDisplayContribution.java -text
 ch.eugster.colibri.client/.classpath -text
 ch.eugster.colibri.client/.project -text
 ch.eugster.colibri.client/.settings/org.eclipse.pde.core.prefs -text

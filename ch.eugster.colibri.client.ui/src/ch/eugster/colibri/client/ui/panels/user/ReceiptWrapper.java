@@ -43,7 +43,6 @@ import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.rules.LocalDatabaseRule;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
 import ch.eugster.colibri.provider.voucher.VoucherService;
 
 public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
@@ -76,7 +75,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	private final ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private final ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker;
+//	private final ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker;
 
 	private final ServiceTracker<BarcodeVerifier, BarcodeVerifier> barcodeVerifierTracker;
 
@@ -102,9 +101,9 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
 
-		this.providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderInterface.class, null);
-		this.providerInterfaceTracker.open();
+//		this.providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
+//				ProviderInterface.class, null);
+//		this.providerInterfaceTracker.open();
 
 		this.barcodeVerifierTracker = new ServiceTracker<BarcodeVerifier, BarcodeVerifier>(Activator.getDefault().getBundle().getBundleContext(),
 				BarcodeVerifier.class, null);
@@ -141,7 +140,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 	{
 		this.receiptPrinterTracker.close();
 		this.barcodeVerifierTracker.close();
-		this.providerInterfaceTracker.close();
+//		this.providerInterfaceTracker.close();
 		this.persistenceServiceTracker.close();
 		this.eventServiceTracker.close();
 		this.voucherServiceTracker.close();
@@ -234,17 +233,15 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		}
 	}
 	
-	public Receipt prepareReceipt()
+	Receipt prepareReceipt()
 	{
-		final Receipt oldReceipt = this.receipt;
+		if (this.receipt != null)
+		{
+			this.receipt.removePropertyChangeListener("customer", this);
+		}
 		final Receipt newReceipt = Receipt.newInstance(this.userPanel.getSalespoint().getSettlement(),
 				this.userPanel.getUser());
-		if (oldReceipt != null)
-		{
-			oldReceipt.removePropertyChangeListener("customer", this);
-		}
 		newReceipt.addPropertyChangeListener("customer", this);
-		this.fireReceiptChangeEvent(new ReceiptChangeEvent(oldReceipt, newReceipt));
 		this.receipt = newReceipt;
 		return this.receipt;
 	}
@@ -277,7 +274,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	public void setDiscount(final double discount)
 	{
-		final Collection<Position> positions = this.receipt.getAllPositions();
+		final Collection<Position> positions = this.receipt.getPositions();
 		for (final Position position : positions)
 		{
 			if (position.getQuantity() > 0 && position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
@@ -285,16 +282,23 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				position.setDiscount(discount);
 			}
 		}
+//		this.userPanel.getPositionWrapper().preparePosition(this.receipt);
 		this.fireReceiptChangeEvent(new ReceiptChangeEvent(null, this.receipt));
 	}
-
+	
 	public void storeReceipt()
+	{
+		this.storeReceipt(false);
+	}
+
+	public void storeReceipt(final boolean deleted)
 	{
 		Job job = new Job("Storing Receipt...")
 		{
 			@Override
 			public IStatus run(IProgressMonitor monitor) 
 			{
+				ReceiptWrapper.this.receipt.setDeleted(deleted);
 				ReceiptWrapper.this.receipt.setState(Receipt.State.SAVED);
 				ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getSalespoint().getNextReceiptNumber());
 
@@ -303,26 +307,25 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				{
 ////					Long receiptId = ReceiptWrapper.this.receipt.getId();
 					ReceiptWrapper.this.receipt = (Receipt) persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
-					ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
-					
-////					if (receiptId == null)
-////					{
-						ReceiptWrapper.this.prepareReceipt();
-						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
-						ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
-						ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
-								UserPanel.State.POSITION_INPUT));
-////					}
+					if (!ReceiptWrapper.this.receipt.isDeleted())
+					{
+						ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
+					}
+					ReceiptWrapper.this.prepareReceipt();
+					ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
+					ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
+					ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
+							UserPanel.State.POSITION_INPUT));
 				}
 				return Status.OK_STATUS;
 			}
 		};
 		job.setRule(LocalDatabaseRule.getRule());
-		job.setPriority(Job.SHORT);
+		job.setPriority(Job.INTERACTIVE);
 		job.schedule();
 	}
 
-	private void fireReceiptChangeEvent(final ReceiptChangeEvent event)
+	public void fireReceiptChangeEvent(final ReceiptChangeEvent event)
 	{
 		final ReceiptChangeListener[] listeners = this.receiptChangeListeners.toArray(new ReceiptChangeListener[0]);
 		for (final ReceiptChangeListener listener : listeners)
@@ -346,7 +349,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
 				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));

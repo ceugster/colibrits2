@@ -1,5 +1,9 @@
 package ch.eugster.colibri.admin.common.settings.views;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -137,20 +141,28 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			CommonSettings settings = (CommonSettings) persistenceService.getServerService().find(CommonSettings.class,
-					Long.valueOf(1L));
-			if (settings == null)
+			if (persistenceService.getServerService().isConnected())
 			{
-				settings = CommonSettings.newInstance();
+				CommonSettings settings = (CommonSettings) persistenceService.getServerService().find(CommonSettings.class,
+						Long.valueOf(1L));
+				if (settings != null)
+				{
+					try
+					{
+						PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+								.openEditor(new ProviderPropertiesEditorInput(persistenceService, scheduler), ProviderPropertiesEditor.ID, true);
+						return;
+					}
+					catch (final PartInitException e)
+					{
+						IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+						ErrorDialog.openError(this.getSite().getShell(), "Fehler", "Der Editor konnte nicht geöffnet werden.", status);
+					}
+				}
 			}
-			try
+			else
 			{
-				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-						.openEditor(new ProviderPropertiesEditorInput(persistenceService, scheduler), ProviderPropertiesEditor.ID, true);
-			}
-			catch (final PartInitException e)
-			{
-				e.printStackTrace();
+				MessageDialog.open(MessageDialog.ERROR, this.getSite().getShell(), "Verbindungsfehler", "Es besteht keine Verbindung zum Datenbankserver.", SWT.None);
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Currency;
 
 import ch.eugster.colibri.display.area.AbstractLayoutArea;
 import ch.eugster.colibri.display.area.IKey;
@@ -30,8 +31,8 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 	public String getDefaultPattern()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("AAAAAAA WWW NNNNNNNN\n");
-		builder = builder.append("Total   WWW FFFFFFFF");
+		builder = builder.append("YYYYYYYYYYYYYYYYYYYY\n");
+		builder = builder.append("ZZZZZZZZZZZZZZZZZZZZ");
 		return builder.toString();
 	}
 
@@ -69,7 +70,7 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 
 	public enum Key implements IKey
 	{
-		A, B, C, E, F, L, M, N, O, P, R, T, W;
+		A, B, C, E, F, L, M, N, O, P, R, T, W, Y, Z;
 
 		public String label()
 		{
@@ -127,6 +128,14 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 				{
 					return "Währungscode";
 				}
+				case Y:
+				{
+					return "1. Zeile (fix definiert)";
+				}
+				case Z:
+				{
+					return "2. Zeile (fix definiert)";
+				}
 				default:
 				{
 					throw new RuntimeException("invalid key");
@@ -147,7 +156,6 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 				{
 				case A:
 				{
-					String value = "";
 					StringBuilder builder = new StringBuilder();
 					if (position.getProduct() == null)
 					{
@@ -253,6 +261,42 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 					}
 					return layoutArea.replaceMarker(code, marker, false);
 				}
+				case Y:
+				{
+					Currency currency = position.getReceipt().getForeignCurrency().getCurrency();
+					amountFormatter.setCurrency(currency);
+					amountFormatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+					amountFormatter.setMinimumFractionDigits(currency.getDefaultFractionDigits());
+					double amount = position.getAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+					String amountText = amountFormatter.format(amount);
+					if (!position.getReceipt().getForeignCurrency().getId().equals(position.getReceipt().getDefaultCurrency().getId()))
+					{
+						amountText = currency.getCurrencyCode() + " " + amountText;
+					}
+					int articleTextLen = marker.length() - amountText.length();
+					String articleText = getText(position, articleTextLen);
+					String value = articleText + amountText;
+					value = layoutArea.replaceMarker(value, marker, true);
+					return value;
+				}
+				case Z:
+				{
+					Currency currency = position.getReceipt().getForeignCurrency().getCurrency();
+					amountFormatter.setCurrency(currency);
+					amountFormatter.setMaximumFractionDigits(currency.getDefaultFractionDigits());
+					amountFormatter.setMinimumFractionDigits(currency.getDefaultFractionDigits());
+					double amount = position.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+					String amountText = amountFormatter.format(amount);
+					if (!position.getReceipt().getForeignCurrency().getId().equals(position.getReceipt().getDefaultCurrency().getId()))
+					{
+						amountText = currency.getCurrencyCode() + " " + amountText;
+					}
+					int articleTextLen = marker.length() - amountText.length();
+					String articleText = pad("Total", articleTextLen);
+					String value = articleText + amountText;
+					value = layoutArea.replaceMarker(value, marker, true);
+					return value;
+				}
 				default:
 				{
 					throw new RuntimeException("invalid key");
@@ -260,6 +304,44 @@ public class PositionAddedMessageArea extends AbstractLayoutArea implements ILay
 				}
 			}
 			return marker;
+		}
+		
+		private String getText(Position position, int minLength)
+		{
+			String value = null;
+			if (position.getProduct() == null)
+			{
+				if (position.getSearchValue() == null)
+				{
+					value = position.getProductGroup().getName().trim();
+				}
+				else
+				{
+					value = position.getCode().trim();
+				}
+			}
+			else
+			{
+				value = position.getProduct().getTitleAndAuthorShortForm().trim();
+			}
+			return pad(value, minLength);
+		}
+		
+		private String pad(String value, int minLength)
+		{
+			if (value.length() > minLength)
+			{
+				return value.substring(0, minLength - 1) + " ";
+			}
+			else
+			{
+				StringBuilder padding = new StringBuilder();
+				for (int i = value.length(); i < minLength; i++)
+				{
+					padding = padding.append(" ");
+				}
+				return value + padding.toString();
+			}
 		}
 	}
 }

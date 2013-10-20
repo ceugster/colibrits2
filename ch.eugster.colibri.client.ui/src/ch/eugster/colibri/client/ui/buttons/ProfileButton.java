@@ -17,7 +17,7 @@ import org.osgi.service.event.EventHandler;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.persistence.events.EntityMediator;
 import ch.eugster.colibri.persistence.model.Profile;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderService;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 import ch.eugster.colibri.ui.buttons.AbstractProfileButton;
 
@@ -66,7 +66,7 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = ProviderInterface.Topic.topics();
+		final String[] topics = ProviderService.Topic.topics();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);

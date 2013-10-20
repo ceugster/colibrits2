@@ -13,13 +13,10 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import javax.swing.JLabel;
+import javax.swing.border.EmptyBorder;
 
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.code.Barcode;
@@ -38,16 +35,19 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 
 	private String value = "";
 
+	private UserPanel userPanel;
+	
 	private UserPanel.State state;
 
-	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+//	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
 	
-	private EventAdmin eventAdmin;
+//	private EventAdmin eventAdmin;
 	
 	public ValueDisplay(final UserPanel userPanel, final String value)
 	{
 		super(value);
-		userPanel.addKeyListener(new KeyAdapter()
+		this.userPanel = userPanel;
+		this.userPanel.addKeyListener(new KeyAdapter()
 		{
 			@Override
 			public void keyPressed(final KeyEvent e)
@@ -57,13 +57,13 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 		});
 		this.initDisplay();
 		this.addPropertyChangeListener(this);
-		this.eventAdminTracker.open();
-		this.eventAdmin = eventAdminTracker.getService();
+//		this.eventAdminTracker.open();
+//		this.eventAdmin = eventAdminTracker.getService();
 	}
 	
 	public void finalize()
 	{
-		eventAdminTracker.close();
+//		eventAdminTracker.close();
 	}
 
 	public void actionPerformed(final ActionEvent e)

@@ -59,7 +59,7 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 	protected boolean getState(final StateChangeEvent event)
 	{
 		UserPanel.State newState = event.getNewState();
-		boolean state = newState.configurableActionState();
+		boolean state = newState == null ? false : newState.configurableActionState();
 		if (state)
 		{
 			if (key.getKeyType().equals(KeyType.FUNCTION))
@@ -93,6 +93,5 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 	@Override
 	public void handleEvent(Event event) 
 	{
-		System.out.println();
 	}
 }

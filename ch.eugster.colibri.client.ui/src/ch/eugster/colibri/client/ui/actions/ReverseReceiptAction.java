@@ -15,7 +15,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import org.osgi.service.event.EventAdmin;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -27,10 +26,9 @@ import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.RoleProperty;
-import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderQuery;
 
 public class ReverseReceiptAction extends UserPanelProfileAction implements ListSelectionListener, TableModelListener
 {
@@ -110,16 +108,16 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 	private String getProviderInterfaceMessage()
 	{
 		String message = null;
-		final ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle()
-				.getBundleContext(), ProviderInterface.class, null);
-		providerInterfaceTracker.open();
-		final ProviderInterface providerInterface = (ProviderInterface) providerInterfaceTracker.getService();
-		if (providerInterface != null)
+		final ServiceTracker<ProviderQuery, ProviderQuery> providerQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().getBundle()
+				.getBundleContext(), ProviderQuery.class, null);
+		providerQueryTracker.open();
+		final ProviderQuery providerQuery = (ProviderQuery) providerQueryTracker.getService();
+		if (providerQuery != null)
 		{
-			message = "Bitte stellen Sie sicher, dass die Rückbuchung in " + providerInterface.getName()
+			message = "Bitte stellen Sie sicher, dass die Rückbuchung in " + providerQuery.getName()
 					+ " manuell vorgenommen wird:\n";
 		}
-		providerInterfaceTracker.close();
+		providerQueryTracker.close();
 		return message;
 	}
 

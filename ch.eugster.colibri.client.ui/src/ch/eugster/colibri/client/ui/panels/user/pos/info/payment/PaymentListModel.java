@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -133,8 +132,9 @@ public class PaymentListModel extends AbstractTableModel implements ActionListen
 	@Override
 	public int getRowCount()
 	{
-		return userPanel.getReceiptWrapper().getReceipt().getPayments() == null ? 0 : userPanel.getReceiptWrapper()
+		int rowCount = userPanel.getReceiptWrapper().getReceipt().getPayments() == null ? 0 : userPanel.getReceiptWrapper()
 				.getReceipt().getPayments().size();
+		return rowCount;
 	}
 
 	public PaymentListSelectionModel getSelectionListModel()
@@ -192,7 +192,7 @@ public class PaymentListModel extends AbstractTableModel implements ActionListen
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
 				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, reference);
 		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
@@ -221,13 +221,11 @@ public class PaymentListModel extends AbstractTableModel implements ActionListen
 
 	private void addPayment(final Payment newPayment)
 	{
-		Receipt receipt = newPayment.getReceipt();
-		final Collection<Payment> payments = receipt.getPayments();
-		payments.add(newPayment);
-		final int row = payments.size() - 1;
+		newPayment.getReceipt().addPayment(newPayment);
+		final int row = newPayment.getReceipt().getPayments().size() - 1;
 		fireTableRowsInserted(row, row);
 		displayPayment(newPayment);
-		userPanel.getPaymentWrapper().preparePayment(receipt);
+		userPanel.getPaymentWrapper().preparePayment(newPayment.getReceipt());
 	}
 
 	private void createTableColumns()

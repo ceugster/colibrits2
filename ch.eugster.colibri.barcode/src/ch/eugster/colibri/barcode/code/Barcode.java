@@ -15,6 +15,8 @@ public interface Barcode
 	public static final String PREFIX_CUSTOMER = "992";
 	
 	public static final String PREFIX_EBOOK = "E";
+	
+	public static final String PREFIX_VOUCHER = "GCD";
 
 	String getCode();
 

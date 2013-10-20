@@ -1,8 +1,10 @@
 package ch.eugster.colibri.client.app;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
@@ -52,6 +54,7 @@ public class ClientApplication implements IApplication
 	
 	private void replicate(Display display)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Suche Service für die Replikation...");
 		final ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle()
 				.getBundleContext(), ReplicationService.class, null);
 		try
@@ -61,8 +64,19 @@ public class ClientApplication implements IApplication
 			final ReplicationService replicationService = replicationServiceTracker.getService();
 			if (replicationService != null)
 			{
+				Activator.getDefault().log(LogService.LOG_INFO, "Service für die Replikation gefunden.");
 				Shell shell = new Shell(display);
-				replicationService.replicate(shell, false);
+				Activator.getDefault().log(LogService.LOG_INFO, "Starte Replikation...");
+				IStatus status = replicationService.replicate(shell, false);
+				if (status.getSeverity() == IStatus.ERROR)
+				{
+					Activator.getDefault().log(LogService.LOG_INFO, "Replikation erfolgreich durchgeführt.");
+					MessageDialog.open(MessageDialog.ERROR, shell, "Replikationsfehler", status.getMessage(), SWT.None);
+				}
+				else
+				{
+					Activator.getDefault().log(LogService.LOG_INFO, "Replikation mit Fehler beendet.");
+				}
 			}
 		}
 		finally
@@ -80,16 +94,14 @@ public class ClientApplication implements IApplication
 	@Override
 	public Object start(final IApplicationContext context) throws Exception
 	{
-		final LogService logService = Activator.getDefault().getLogService();
-		if (logService != null)
-		{
-			logService.log(LogService.LOG_INFO, "Anwendung " + ClientApplication.ID + " gestartet");
-		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Starte " + ClientApplication.ID + ".");
 
+		Activator.getDefault().log(LogService.LOG_INFO, "Kreiere Display...");
 		final Display display = PlatformUI.createDisplay();
 		try
 		{
 			int returnCode = IApplication.EXIT_OK;
+			Activator.getDefault().log(LogService.LOG_INFO, "Registriere Anwendungs-Instanz.");
 			if (ApplicationInstanceManager.registerInstance(Activator.PLUGIN_ID))
 			{
 				replicate(display);
@@ -110,10 +122,12 @@ public class ClientApplication implements IApplication
 			}
 			if (returnCode == PlatformUI.RETURN_RESTART)
 			{
+				Activator.getDefault().log(LogService.LOG_INFO, "Restarte Anwendung.");
 				return IApplication.EXIT_RESTART;
 			}
 			else
 			{
+				Activator.getDefault().log(LogService.LOG_INFO, "Öffne Anwendung.");
 				return IApplication.EXIT_OK;
 			}
 		}

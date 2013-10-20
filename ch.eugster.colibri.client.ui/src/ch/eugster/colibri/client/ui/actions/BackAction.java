@@ -6,6 +6,8 @@
  */
 package ch.eugster.colibri.client.ui.actions;
 
+import java.awt.event.ActionEvent;
+
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 
@@ -20,5 +22,11 @@ public class BackAction extends ProfileAction
 	public BackAction(final Profile profile)
 	{
 		super(BackAction.TEXT, BackAction.ACTION_COMMAND, profile);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent event) 
+	{
+		super.actionPerformed(event);
 	}
 }

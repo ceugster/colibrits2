@@ -7,9 +7,7 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -51,10 +49,8 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 		{
 			if (this.userPanel.getValueDisplay().testAmount() != 0d)
 			{
-				System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": price button action performed.");
 				this.userPanel.getPositionDetailPanel().getPriceButton().doClick();
 			}
-			System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": model action started.");
 			this.userPanel.getPositionListPanel().getModel().actionPerformed(event);
 		}
 	}

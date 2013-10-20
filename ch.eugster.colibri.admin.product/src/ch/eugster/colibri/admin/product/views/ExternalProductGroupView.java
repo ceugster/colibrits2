@@ -141,14 +141,17 @@ public class ExternalProductGroupView extends AbstractEntityView implements IDou
 				{
 					final ExternalProductGroup externalProductGroup = (ExternalProductGroup) element;
 					Object[] services = providerTracker.getServices();
-					for (Object object : services)
+					if (services != null)
 					{
-						if (object instanceof ProviderIdService)
+						for (Object object : services)
 						{
-							ProviderIdService service = (ProviderIdService) object;
-							if (service.getProviderId().equals(externalProductGroup.getProvider()))
+							if (object instanceof ProviderIdService)
 							{
-								cell.setText(service.getProviderLabel());
+								ProviderIdService service = (ProviderIdService) object;
+								if (service.getProviderId().equals(externalProductGroup.getProvider()))
+								{
+									cell.setText(service.getProviderLabel());
+								}
 							}
 						}
 					}

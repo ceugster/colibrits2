@@ -468,7 +468,6 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 					nfe.printStackTrace();	
 					}
 				}
-				System.out.println(text.getText());
 			}
 
 			@Override
@@ -491,7 +490,6 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 						
 					}
 				}
-				System.out.println();
 			}});
 		percentage.addModifyListener(new ModifyListener()
 		{

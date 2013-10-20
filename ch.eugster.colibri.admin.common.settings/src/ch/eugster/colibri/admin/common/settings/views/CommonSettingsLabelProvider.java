@@ -7,8 +7,8 @@ import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.GeneralSettingsParent;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.Parent;
 import ch.eugster.colibri.admin.common.settings.views.CommonSettingsContentProvider.ProviderUpdaterParent;
-import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class CommonSettingsLabelProvider extends LabelProvider
 {
@@ -28,7 +28,7 @@ public class CommonSettingsLabelProvider extends LabelProvider
 		{
 			return Activator.getDefault().getImageRegistry().get(Activator.IMAGE_GEARWHEEL_YELLOW);
 		}
-		else if (element instanceof ProviderUpdateScheduler)
+		else if (element instanceof UpdateScheduler)
 		{
 			return Activator.getDefault().getImageRegistry().get(Activator.IMAGE_GEARWHEEL_GREEN);
 		}
@@ -47,9 +47,9 @@ public class CommonSettingsLabelProvider extends LabelProvider
 			ProviderUpdater updater = (ProviderUpdater) element;
 			return updater.getName();
 		}
-		else if (element instanceof ProviderUpdateScheduler)
+		else if (element instanceof UpdateScheduler)
 		{
-			ProviderUpdateScheduler scheduler = (ProviderUpdateScheduler) element;
+			UpdateScheduler scheduler = (UpdateScheduler) element;
 			return scheduler.getName();
 		}
 		return "";

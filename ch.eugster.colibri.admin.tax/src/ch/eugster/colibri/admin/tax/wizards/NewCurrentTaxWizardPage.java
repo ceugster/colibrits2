@@ -207,7 +207,6 @@ public class NewCurrentTaxWizardPage extends AbstractEntityWizardPage
 						nfe.printStackTrace();	
 						}
 					}
-					System.out.println(text.getText());
 				}
 
 				@Override
@@ -230,7 +229,6 @@ public class NewCurrentTaxWizardPage extends AbstractEntityWizardPage
 							
 						}
 					}
-					System.out.println();
 				}});
 			this.newCurrentTaxPercentages[i].addModifyListener(new ModifyListener()
 			{

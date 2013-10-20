@@ -2,6 +2,7 @@ package ch.eugster.colibri.admin.provider.editors;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -299,16 +300,20 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 				@Override
 				public void widgetSelected(SelectionEvent e)
 				{
-					Map<String, ProviderProperty> testProperties = new HashMap<String, ProviderProperty>();
-					Map<String, IProperty> properties = input.getDefaultProperties();
-					for (IProperty property : properties.values())
+					Map<String, IProperty> testProperties = input.getDefaultProperties();
+					Set<String> keys = testProperties.keySet();
+					for (String key : keys)
 					{
-						Control control = controls.get(property.key());
-						String value = property.value(control);
-						ProviderProperty providerProperty = ProviderProperty.newInstance(input.getProviderId());
-						providerProperty.setKey(property.key());
-						providerProperty.setValue(value, property.defaultValue());
-						testProperties.put(property.key(), providerProperty);
+						IProperty property = testProperties.get(key);
+						Control control = controls.get(key);
+						if (control != null)
+						{
+							String value = property.value(control);
+							ProviderProperty providerProperty = ProviderProperty.newInstance(input.getProviderId());
+							providerProperty.setKey(key);
+							providerProperty.setValue(value, property.defaultValue());
+							property.setPersistedProperty(providerProperty);
+						}
 					}
 					IStatus status = input.checkConnection(testProperties);
 					if (status.getSeverity() == IStatus.OK)
@@ -322,6 +327,11 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 						MessageDialog
 						.openWarning(getSite().getShell(), "Verbindungstest",
 								status.getMessage());
+					}
+					for (String key : keys)
+					{
+						IProperty property = testProperties.get(key);
+						property.setPersistedProperty(null);
 					}
 				}
 

@@ -53,10 +53,10 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	public void setCustomerDisplaySettings()
 	{
-		this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getServerService());
+		this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getCacheService());
 		if (this.customerDisplaySettings == null)
 		{
-			this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getCacheService());
+			this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getServerService());
 		}
 		if (this.customerDisplaySettings == null)
 		{

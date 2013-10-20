@@ -35,9 +35,11 @@ public class ReceivedAndRemainderPanel extends JPanel implements StateChangeList
 
 		receivedPanel = new ReceivedPanel(userPanel, profile);
 		this.add(receivedPanel);
-
+		userPanel.getNumericPadPanel().addActionListener(receivedPanel);
+		
 		remainderPanel = new RemainderPanel(userPanel, profile);
 		this.add(remainderPanel);
+		userPanel.getNumericPadPanel().addActionListener(remainderPanel);
 
 		// this.showAlways = profile.isDisplayShowReceivedRemainderAlways();
 	}

@@ -28,8 +28,8 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 	public String getDefaultPattern()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("AAAAAAAA WWW FFFFFFF\n");
-		builder = builder.append("XXXXXXXX RRR PPPPPPP");
+		builder = builder.append("YYYYYYYYYYYYYYYYYYYY\n");
+		builder = builder.append("ZZZZZZZZZZZZZZZZZZZZ");
 		return builder.toString();
 	}
 
@@ -67,7 +67,7 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 
 	public enum Key implements IKey
 	{
-		A, L, F, S, T, O, P, R, W, X;
+		A, L, F, S, T, O, P, R, W, X, Y, Z;
 
 		@Override
 		public String label()
@@ -113,6 +113,14 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 				case X:
 				{
 					return "Text Offen/Zurück";
+				}
+				case Y:
+				{
+					return "1. Zeile (fix definiert)";
+				}
+				case Z:
+				{
+					return "2. Zeile (fix definiert)";
 				}
 				default:
 				{
@@ -188,12 +196,16 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 						double positions = payment.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
 						double payments = payment.getReceipt().getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
 						double difference = Math.abs(positions - payments);
-						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), difference);
+						double newDifference = Currency.change(payment.getReceipt().getDefaultCurrency(), payment.getPaymentType().getCurrency(), difference);
+						String value = format(payment.getReceipt().getDefaultCurrency(), payment.getReceipt(), newDifference);
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case R:
 					{
-						String value = payment.getReceipt().getDefaultCurrency().getCode();
+						double positions = payment.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+						double payments = payment.getReceipt().getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
+						double difference = positions - payments;
+						String value = difference > 0D ? payment.getPaymentType().getCurrency().getCode() : payment.getPaymentType().getCurrency().getCode();
 						return layoutArea.replaceMarker(value, marker, false);
 					}
 					case W:
@@ -209,6 +221,44 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 						String text = difference > 0D ? "Offen" : "Zurück";
 						return layoutArea.replaceMarker(text, marker, true);
 					}
+					case Y:
+					{
+						amountFormatter.setCurrency(payment.getPaymentType().getCurrency().getCurrency());
+						amountFormatter.setMaximumFractionDigits(payment.getPaymentType().getCurrency().getCurrency().getDefaultFractionDigits());
+						amountFormatter.setMinimumFractionDigits(payment.getPaymentType().getCurrency().getCurrency().getDefaultFractionDigits());
+						double amount = payment.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY);
+						String amountText = amountFormatter.format(amount);
+						if (!payment.getPaymentType().getCurrency().getId().equals(payment.getReceipt().getDefaultCurrency().getId()))
+						{
+							amountText = payment.getPaymentType().getCurrency().getCode() + " " + amountText;
+						}
+						int articleTextLen = marker.length() - amountText.length();
+						String articleText = getText(payment, articleTextLen);
+						String value = articleText + amountText;
+						value = layoutArea.replaceMarker(value, marker, true);
+						return value;
+					}
+					case Z:
+					{
+						double positions = payment.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+						double payments = payment.getReceipt().getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
+						double difference = positions - payments;
+						Currency currency = difference <= 0D ? payment.getReceipt().getDefaultCurrency() : payment.getPaymentType().getCurrency();
+						amountFormatter.setCurrency(currency.getCurrency());
+						amountFormatter.setMaximumFractionDigits(currency.getCurrency().getDefaultFractionDigits());
+						amountFormatter.setMinimumFractionDigits(currency.getCurrency().getDefaultFractionDigits());
+						if (difference > 0D)
+						{
+							// Offen in Zahlwährung
+							difference = Currency.change(payment.getReceipt().getDefaultCurrency(), payment.getPaymentType().getCurrency(), difference);
+						}
+						String amountText = amountFormatter.format(Math.abs(difference));
+						amountText = currency.getCode() + " " + amountText;
+						int articleTextLen = marker.length() - amountText.length();
+						String text = difference > 0D ? pad("Offen", articleTextLen) : pad("Zurück", articleTextLen);
+						text = layoutArea.replaceMarker(text + amountText, marker, false);
+						return text;
+					}
 					default:
 					{
 						throw new RuntimeException("Invalid key");
@@ -216,6 +266,28 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 				}
 			}
 			return marker;
+		}
+		private String getText(Payment payment, int minLength)
+		{
+			String text = pad(payment.getPaymentType().getName(), minLength);
+			return text;
+		}
+		
+		private String pad(String value, int minLength)
+		{
+			if (value.length() > minLength)
+			{
+				return value.substring(0, minLength - 1) + " ";
+			}
+			else
+			{
+				StringBuilder padding = new StringBuilder();
+				for (int i = value.length(); i < minLength; i++)
+				{
+					padding = padding.append(" ");
+				}
+				return value + padding.toString();
+			}
 		}
 	}
 

@@ -414,7 +414,7 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
 				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, reference);
 		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));

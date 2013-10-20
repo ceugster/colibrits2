@@ -53,7 +53,7 @@ public class ShowPerspectiveHandler extends AbstractHandler implements IHandler
 								final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 								final String title = "Auswertungen öffnen";
 								final String msg = "Beim Öffnen des Auswertungsfensters ist ein Fehler aufgetreten.";
-								final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e);
+								final Status status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
 								final ErrorDialog dialog = new ErrorDialog(shell, title, msg, status, 0);
 								dialog.open();
 							}
@@ -71,7 +71,7 @@ public class ShowPerspectiveHandler extends AbstractHandler implements IHandler
 						final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 						final String title = "Auswertungen öffnen";
 						final String msg = "Beim Öffnen des Auswertungsfensters ist ein Fehler aufgetreten.";
-						final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e);
+						final Status status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
 						final ErrorDialog dialog = new ErrorDialog(shell, title, msg, status, 0);
 						dialog.open();
 					}

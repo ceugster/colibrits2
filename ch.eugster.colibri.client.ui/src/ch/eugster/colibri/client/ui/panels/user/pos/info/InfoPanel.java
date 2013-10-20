@@ -43,6 +43,7 @@ public class InfoPanel extends JPanel implements StateChangeListener, ActionList
 
 		totalPanel = new TotalPanel(userPanel, profile);
 		displayPanel.add(totalPanel, BorderLayout.CENTER);
+		userPanel.getNumericPadPanel().addActionListener(totalPanel);
 
 		receivedAndRemainderPanel = new ReceivedAndRemainderPanel(userPanel, profile);
 		addStateChangeListener(receivedAndRemainderPanel);

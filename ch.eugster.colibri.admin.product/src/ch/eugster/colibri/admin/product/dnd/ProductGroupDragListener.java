@@ -44,15 +44,12 @@ public class ProductGroupDragListener implements DragSourceListener
 			if (source.getControl().equals(viewer.getTree()))
 			{
 				StructuredSelection ssel = (StructuredSelection) viewer.getSelection();
-				if (ssel.size() == 1)
+				Object[] elements = (Object[]) ssel.toArray();
+				for (Object element : elements)
 				{
-					Object[] elements = (Object[]) ssel.toArray();
-					for (Object element : elements)
+					if (element instanceof ProductGroup)
 					{
-						if (element instanceof ProductGroup)
-						{
-							groups.add((ProductGroup) element);
-						}
+						groups.add((ProductGroup) element);
 					}
 				}
 			}

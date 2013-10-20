@@ -25,6 +25,7 @@
       <import plugin="ch.eugster.colibri.persistence.replication"/>
       <import plugin="ch.eugster.colibri.persistence.transfer"/>
       <import plugin="ch.eugster.colibri.provider"/>
+      <import plugin="ch.eugster.colibri.provider.voucher"/>
       <import plugin="ch.eugster.colibri.ui"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.core.commands"/>
@@ -37,8 +38,7 @@
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.osgi.services" version="3.2.100" match="compatible"/>
-      <import plugin="ch.eugster.colibri.provider.scheduler"/>
-      <import plugin="ch.eugster.colibri.provider.voucher"/>
+      <import plugin="ch.eugster.colibri.scheduler"/>
    </requires>
 
    <plugin

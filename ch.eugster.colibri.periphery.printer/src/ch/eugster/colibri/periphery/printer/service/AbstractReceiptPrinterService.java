@@ -100,7 +100,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		{
 			this.logService.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " aktiviert.");
 		}
-		SalespointQuery query = (SalespointQuery) this.persistenceService.getServerService().getQuery(Salespoint.class);
+		SalespointQuery query = (SalespointQuery) this.persistenceService.getCacheService().getQuery(Salespoint.class);
 		salespoint = query.getCurrentSalespoint();
 	}
 

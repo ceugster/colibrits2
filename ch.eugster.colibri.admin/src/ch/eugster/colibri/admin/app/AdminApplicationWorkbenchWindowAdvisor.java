@@ -159,7 +159,6 @@ public class AdminApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvis
 		{
 			if (true)
 			{
-				System.out.println();
 			}
 			if (!node.getId().startsWith("org.eclipse.equinox.internal.p2.ui."))
 			{

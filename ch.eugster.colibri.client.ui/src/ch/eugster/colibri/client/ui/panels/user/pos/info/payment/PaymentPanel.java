@@ -11,6 +11,7 @@ import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -85,11 +86,9 @@ public class PaymentPanel extends ProfilePanel implements TableModelListener, Ac
 								else
 								{
 									payment.setDeleted(true);
-									userPanel.getReceiptWrapper().storeReceipt();
+//									userPanel.getReceiptWrapper().storeReceipt();
 								}
-
 								model.fireTableRowsDeleted(table.getSelectedRow(), table.getSelectedRow());
-
 							}
 							else
 							{
@@ -230,12 +229,7 @@ public class PaymentPanel extends ProfilePanel implements TableModelListener, Ac
 			tableColumn.setMaxWidth(stringWidth);
 			tableColumn.setPreferredWidth(stringWidth);
 
-			// if (i > 0 && i < ((PaymentListModel)
-			// this.table.getModel()).getColumnNames().length - 1)
 			((DefaultTableCellRenderer) tableColumn.getCellRenderer()).setHorizontalAlignment(PaymentListModel.columnAlignments[i]);
-			// else
-			// ((JLabel)
-			// tableColumn.getCellRenderer()).setHorizontalAlignment(JLabel.LEFT);
 		}
 		table.getColumnModel().getColumn(0).setMinWidth(30);
 		table.getColumnModel().getColumn(0).setMaxWidth(600);

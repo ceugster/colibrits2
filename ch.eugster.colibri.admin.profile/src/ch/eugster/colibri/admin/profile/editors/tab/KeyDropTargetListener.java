@@ -35,12 +35,6 @@ public class KeyDropTargetListener implements DropTargetListener
 	@Override
 	public void dragEnter(final DropTargetDragEvent dtde)
 	{
-		final int a = dtde.getDropAction();
-		if ((a & DnDConstants.ACTION_COPY) != 0)
-		{
-			System.out.println();
-		}
-
 		if (!this.isDragAcceptable(dtde))
 		{
 			dtde.rejectDrag();

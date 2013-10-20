@@ -417,7 +417,7 @@ public class ProductEditor extends AbstractEntityEditor<ProductGroup>
 					option = productGroup.getProductGroupType().getOptions()[0];
 				}
 				this.options.setSelection(new StructuredSelection(option));
-				if (productGroup.getProposalOption().equals(Option.PAYED_INVOICE))
+				if (proposalOption != null && proposalOption.equals(Option.PAYED_INVOICE))
 				{
 					this.options.getCCombo().setEnabled(false);
 				}

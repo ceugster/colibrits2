@@ -30,6 +30,7 @@ import javax.swing.event.ChangeListener;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.StatusLineManager;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.SWT;
@@ -56,6 +57,7 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -84,9 +86,10 @@ import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
-import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderIdService;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderQuery;
+import ch.eugster.colibri.provider.service.ProviderService;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class ClientView extends ViewPart implements IWorkbenchListener, PropertyChangeListener, ChangeListener,
 		EventHandler
@@ -99,13 +102,13 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private ServiceTracker<ProviderInterface, ProviderInterface> providerServiceTracker;
+	private ServiceTracker<ProviderQuery, ProviderQuery> providerQueryTracker;
 
 	private ServiceTracker<EventAdmin, EventAdmin> eventServiceTracker;
 
 	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
-	private StatusLineContributionItem customerInformation;
+//	private StatusLineContributionItem customerInformation;
 
 	private StatusLineContributionItem timeInformation;
 
@@ -243,7 +246,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			this.timer.cancel();
 		}
 		this.eventHandlerServiceRegistration.unregister();
-		this.providerServiceTracker.close();
+		this.providerQueryTracker.close();
 		this.persistenceServiceTracker.close();
 		this.eventServiceTracker.close();
 
@@ -271,12 +274,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private String getMessageFrequency()
 	{
-		Map<String, IProperty> properties = ProviderUpdateScheduler.SchedulerProperty.asMap();
+		Map<String, IProperty> properties = UpdateScheduler.SchedulerProperty.asMap();
 		PersistenceService persistenceService = persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
-			Collection<ProviderProperty> providerProperties = query.selectByProvider(ProviderUpdateScheduler.SchedulerProperty.SCHEDULER_COUNT.providerId());
+			Collection<ProviderProperty> providerProperties = query.selectByProvider(UpdateScheduler.SchedulerProperty.SCHEDULER_COUNT.providerId());
 			for (ProviderProperty providerProperty : providerProperties)
 			{
 				IProperty property = properties.get(providerProperty.getKey());
@@ -286,13 +289,13 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 			}
 		}
-		return properties.get(ProviderUpdateScheduler.SchedulerProperty.SCHEDULER_FAILOVER_MESSAGE_FREQUENCY.key()).value();
+		return properties.get(UpdateScheduler.SchedulerProperty.SCHEDULER_FAILOVER_MESSAGE_FREQUENCY.key()).value();
 	}
 	
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
+		if (event.getTopic().equals(ProviderService.Topic.PROVIDER_FAILOVER.topic()))
 		{
 			if (frequency == null)
 			{
@@ -305,26 +308,24 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					frequency = 3600000L;
 				}
 			}
-			Boolean showFailoverMessage = (Boolean) event.getProperty("show.failover.message");
-			Boolean force = (Boolean) event.getProperty("force");
-			if ((force != null && force.booleanValue()) || (showFailoverMessage != null && showFailoverMessage.booleanValue()))
+//			Boolean force = (Boolean) event.getProperty("force");
+			long now = GregorianCalendar.getInstance().getTimeInMillis();
+			long diff = now - this.lastFailoverMessage;
+			if (diff > frequency)
 			{
+				lastFailoverMessage = now;
 				final String message = (String) event.getProperty("message");
 				if (message != null)
 				{
-					long now = GregorianCalendar.getInstance().getTimeInMillis();
-					if (lastFailoverMessage <= now - frequency)
-					{
-						lastFailoverMessage = now;
-						MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-										.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+									.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
 //						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
 //								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
 //						dialog.setMessage(message);
 //						dialog.pack();
 //						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
 //						dialog.setVisible(true);
-					}
+//					}
 				}
 			}
 			this.updateProviderMessage(event);
@@ -370,18 +371,17 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				if (this.providerInformation != null)
 				{
-					frequency = 0L;
-					if (this.providerServiceTracker.getService() != null)
+					if (this.providerQueryTracker.getService() != null)
 					{
 						if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
 						{
 							this.updateProviderMessage(event);
 						}
-						else if (event.getTopic().equals(ProviderInterface.Topic.ARTICLE_UPDATE.topic()))
+						else if (event.getTopic().equals(ProviderService.Topic.ARTICLE_UPDATE.topic()))
 						{
 							this.updateProviderMessage(event);
 						}
-						else if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic()))
+						else if (event.getTopic().equals(ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic()))
 						{
 							this.updateProviderMessage(event);
 						}
@@ -396,12 +396,14 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	{
 		super.init(site);
 
+		Activator.getDefault().log(LogService.LOG_INFO, "Registriere Anwendungs-Instanz.");
+
 		ClientView.instance = this;
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add(ProviderInterface.Topic.ARTICLE_UPDATE.topic());
-		t.add(ProviderInterface.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic());
-		t.add(ProviderInterface.Topic.PROVIDER_FAILOVER.topic());
+		t.add(ProviderService.Topic.ARTICLE_UPDATE.topic());
+		t.add(ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic());
+		t.add(ProviderService.Topic.PROVIDER_FAILOVER.topic());
 		t.add("ch/eugster/colibri/client/store/receipt");
 		t.add("ch/eugster/colibri/persistence/server/database");
 		t.add("ch/eugster/colibri/print/error");
@@ -418,9 +420,9 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
 
-		this.providerServiceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderInterface.class, null);
-		this.providerServiceTracker.open();
+		this.providerQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().getBundle().getBundleContext(),
+				ProviderQuery.class, null);
+		this.providerQueryTracker.open();
 
 		this.eventServiceTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(),
 				EventAdmin.class, null);
@@ -491,7 +493,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	public void updateProviderMessage(final Event event)
 	{
-		ProviderInterface provider = providerServiceTracker.getService();
+		final ProviderQuery provider = providerQueryTracker.getService();
 		if (provider == null || !provider.isConnect())
 		{
 			return;
@@ -502,12 +504,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			@Override
 			public IStatus runInUIThread(final IProgressMonitor monitor)
 			{
-				ProviderInterface.Topic topic = (ProviderInterface.Topic) event.getProperty("topic");
+				ProviderService.Topic topic = (ProviderService.Topic) event.getProperty("topic");
 				IStatus status = (IStatus) event.getProperty("status");
-				if (status.getMessage().equals("ch/eugster/colibri/client/store/receipt"))
-				{
-					System.out.println();
-				}
 				final ImageRegistry registry = Activator.getDefault().getImageRegistry();
 				if (status.getSeverity() == IStatus.ERROR)
 				{
@@ -518,12 +516,13 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				else
 				{
-					long count = countProviderUpdates(salespoint);
-					if (topic == null || topic.equals(ProviderInterface.Topic.ARTICLE_UPDATE))
+					IStatus transferStatus = (IStatus) event.getProperty("transferStatus");
+					long count = countProviderUpdates(salespoint, provider.getProviderId(), transferStatus);
+					if (topic == null || topic.equals(ProviderService.Topic.ARTICLE_UPDATE))
 					{
 						if ((status == null) || (status.getSeverity() == IStatus.OK))
 						{
-							status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING, Activator.PLUGIN_ID,
+							status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
 									"Zu verbuchen: " + count);
 							ClientView.this.providerInformation.setErrorImage(null);
 							ClientView.this.providerInformation.setErrorText(null);
@@ -542,21 +541,22 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				return Status.OK_STATUS;
 			}
 		};
+		uiJob.setPriority(Job.DECORATE);
 		uiJob.schedule();
 	}
 
-	private long countProviderUpdates(Salespoint salespoint)
+	private long countProviderUpdates(Salespoint salespoint, String providerId, IStatus transferStatus)
 	{
 		long count = 0L;
 		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			PositionQuery query = (PositionQuery) persistenceService.getServerService().getQuery(Position.class);
-			count = query.countProviderUpdates(salespoint);
-			if (count == 0L)
+			PositionQuery query = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
+			count = query.countProviderUpdates(salespoint, providerId, persistenceService.getCacheService().getConnectionType());
+			if (count == 0L && persistenceService.getServerService().isConnected())
 			{
-				query = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
-				count = query.countProviderUpdates(salespoint, false);
+				query = (PositionQuery) persistenceService.getServerService().getQuery(Position.class);
+				count = query.countProviderUpdates(salespoint, providerId, persistenceService.getServerService().getConnectionType());
 			}
 		}
 		return count;
@@ -576,8 +576,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private String checkProviderTaxMapped()
 	{
-		ProviderInterface providerInterface = providerServiceTracker.getService();
-		return providerInterface.checkTaxCodes(persistenceServiceTracker.getService()).getMessage();
+		ProviderQuery ProviderQuery = providerQueryTracker.getService();
+		return ProviderQuery.checkTaxCodes(persistenceServiceTracker.getService()).getMessage();
 	}
 
 	private String checkDefaultProductGroup(Salespoint salespoint)
@@ -614,49 +614,14 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 		EntityMediator.addListener(Salespoint.class, this.mainTabbedPane);
 
-		this.timeInformation = new StatusLineContributionItem("time.information", true, 24);
-		this.timeInformation.setText("");
-		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.timeInformation);
-
-		this.customerInformation = new StatusLineContributionItem("customer.information", true, 48);
-		// this.customerInformation = new
-		// StatusLineContributionItem("customer.information", 48);
-		this.customerInformation.setText("Kunde: ");
-		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.customerInformation);
-
 		String count = "?";
 		Image image = null;
-
-		// this.providerInformation = new
-		// StatusLineContributionItem("provider.information", 32);
-		this.providerInformation = new StatusLineContributionItem("provider.information", true, 32);
-		this.providerInformation.setErrorText("");
-		PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-				.getService();
-		if (persistenceService != null)
-		{
-			ProviderInterface provider = (ProviderInterface) this.providerServiceTracker.getService();
-			if (provider == null || !provider.isConnect())
-			{
-				this.providerInformation.setText("");
-				this.providerInformation.setImage(null);
-			}
-			else
-			{
-				final long counted = countProviderUpdates(salespoint);
-				count = Long.valueOf(counted).toString();
-				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
-				this.providerInformation.setText(provider.getName() + ": " + count);
-				this.providerInformation.setImage(image);
-			}
-		}
-		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.MIDDLE_GROUP, this.providerInformation);
 
 		this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
 		this.transferInformation.setErrorText("");
 		// this.transferInformation = new
 		// StatusLineContributionItem("transfer.information", 36);
-		persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
+		PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			if (!persistenceService.getServerService().isLocal())
@@ -669,7 +634,43 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				this.transferInformation.setImage(image);
 			}
 		}
-		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.MIDDLE_GROUP, this.transferInformation);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.transferInformation);
+
+		// this.providerInformation = new
+		// StatusLineContributionItem("provider.information", 32);
+		this.providerInformation = new StatusLineContributionItem("provider.information", true, 32);
+		this.providerInformation.setErrorText("");
+		persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
+				.getService();
+		if (persistenceService != null)
+		{
+			ProviderQuery provider = (ProviderQuery) this.providerQueryTracker.getService();
+			if (provider == null || !provider.isConnect())
+			{
+				this.providerInformation.setText("");
+				this.providerInformation.setImage(null);
+			}
+			else
+			{
+				final long counted = countProviderUpdates(salespoint, provider.getProviderId(), null);
+				count = Long.valueOf(counted).toString();
+				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
+				this.providerInformation.setText(provider.getName() + ": " + count);
+				this.providerInformation.setImage(image);
+			}
+		}
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.providerInformation);
+
+//		this.customerInformation = new StatusLineContributionItem("customer.information", true, 84);
+//		// this.customerInformation = new
+//		// StatusLineContributionItem("customer.information", 48);
+//		this.customerInformation.setText("Kunde: ");
+//		this.getViewSite().getActionBars().getStatusLineManager().prependToGroup(StatusLineManager.BEGIN_GROUP, this.customerInformation);
+
+		this.timeInformation = new StatusLineContributionItem("time.information", true, 24);
+		this.timeInformation.setText("");
+		this.getViewSite().getActionBars().getStatusLineManager().prependToGroup(StatusLineManager.BEGIN_GROUP, this.timeInformation);
+
 		this.sendEvent("ch/eugster/colibri/client/started");
 		
 		startTimer();
@@ -781,8 +782,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private void updateCustomerLabel(final Object object)
 	{
-		if (this.customerInformation != null)
-		{
+//		if (this.customerInformation != null)
+//		{
 			final UIJob uiJob = new UIJob("set provider message")
 			{
 				@Override
@@ -825,14 +826,16 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 						formatter.setMinimumFractionDigits(2);
 						final String amount = formatter.format(customer.getAccount());
 						builder = builder.append(amount);
+						builder = builder.append(customer.getHasAccount() ? " (Kundenkarte: " + customer.getId().toString() + ")" : " (OHNE KUNDENKARTE)");
 					}
-
-					ClientView.this.customerInformation.setText(builder.toString());
+					String text = builder.toString();
+//					ClientView.this.customerInformation.setText(text);
+					ClientView.this.getSite().getShell().setText(ClientView.this.mainTabbedPane.prepareTitle() + " :: " + text);
 					return Status.OK_STATUS;
 				}
 			};
 			uiJob.schedule();
-		}
+//		}
 	}
 
 	private void updateTransferMessage(final Event event)
@@ -900,7 +903,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
 				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));

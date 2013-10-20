@@ -63,7 +63,6 @@ public abstract class AbstractLayoutArea implements ILayoutArea
 			for (int i = 0; i < min; i++)
 			{
 				lines[i] = lines[i].replace("\r", "");
-				System.out.println("Vorher:  '" + lines[i] + "'");
 				if (lines[i].length() > this.getLayoutAreaType().getColumnCount())
 				{
 					lines[i] = lines[i].substring(0, this.getLayoutAreaType().getColumnCount());
@@ -72,7 +71,6 @@ public abstract class AbstractLayoutArea implements ILayoutArea
 				{
 					lines[i] = AbstractLayoutType.padRight(lines[i], this.layoutAreaType.getColumnCount());
 				}
-				System.out.println("Nachher: '" + lines[i] + "'");
 				result.add(lines[i]);
 			}
 		}

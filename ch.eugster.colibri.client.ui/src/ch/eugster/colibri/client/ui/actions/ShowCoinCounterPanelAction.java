@@ -15,6 +15,7 @@ import java.util.Hashtable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.internal.resolver.UserState;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
@@ -112,16 +113,43 @@ public class ShowCoinCounterPanelAction extends ConfigurableAction implements Ev
 	@Override
 	public void handleEvent(Event event)
 	{
-		final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
+		if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
 		{
-			@Override
-			public IStatus runInUIThread(final IProgressMonitor monitor)
+			Object property = event.getProperty("status");
+			if (property instanceof IStatus)
 			{
-				ShowCoinCounterPanelAction.this.setEnabled(countRemainingReceipts() == 0);
-				return Status.OK_STATUS;
+				IStatus status = (IStatus) property;
+				if (status.getSeverity() == IStatus.ERROR)
+				{
+					this.setEnabled(false);
+				}
+				else
+				{
+					UserPanel.State state = getUserPanel().getCurrentState();
+					if (state != null)
+					{
+						boolean enabled = !state.equals(UserPanel.State.LOCKED);
+						this.setEnabled(enabled && countRemainingReceipts() == 0);
+					}
+				}
 			}
-		};
-		uiJob.schedule();
+		}
+//
+//		final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
+//		{
+//			@Override
+//			public IStatus runInUIThread(final IProgressMonitor monitor)
+//			{
+//				UserPanel.State state = getUserPanel().getCurrentState();
+//				if (state != null)
+//				{
+//					boolean enabled = !state.equals(UserPanel.State.LOCKED);
+//					ShowCoinCounterPanelAction.this.setEnabled(enabled && countRemainingReceipts() == 0);
+//				}
+//				return Status.OK_STATUS;
+//			}
+//		};
+//		uiJob.schedule();
 	}
 
 	@Override

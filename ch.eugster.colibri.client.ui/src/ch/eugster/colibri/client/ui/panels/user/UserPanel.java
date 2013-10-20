@@ -33,6 +33,7 @@ import ch.eugster.colibri.client.ui.actions.DiscountAction;
 import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeEvent;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
+import ch.eugster.colibri.client.ui.events.ReceiptChangeEvent;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.events.StateChangeListener;
@@ -145,6 +146,15 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		this.restitutionPrintCount = count;
 	}
 	
+	public void prepareReceipt()
+	{
+		Receipt oldReceipt = this.receiptWrapper.getReceipt();
+		Receipt newReceipt = this.receiptWrapper.prepareReceipt();
+		this.positionWrapper.preparePosition(newReceipt);
+		this.paymentWrapper.preparePayment(newReceipt);
+		this.receiptWrapper.fireReceiptChangeEvent(new ReceiptChangeEvent(oldReceipt, newReceipt));
+	}
+	
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
@@ -177,6 +187,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 							messageType) == MessageDialog.BUTTON_YES)
 					{
 						this.getReceiptWrapper().setDiscount(discount);
+						return;
 					}
 				}
 			}
@@ -285,9 +296,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 	public void setSalespoint(Salespoint salespoint)
 	{
 		ClientView.getClientView().updateSalespoint(salespoint);
-		Receipt receipt = this.receiptWrapper.prepareReceipt();
-		this.positionWrapper.preparePosition(receipt);
-		this.paymentWrapper.preparePayment(receipt);
+		this.prepareReceipt();
 	}
 
 	@Override
@@ -628,9 +637,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 
 		new ReceiptChangeMediator(this, this, new String[] { "customerCode" });
 
-		Receipt receipt = this.receiptWrapper.prepareReceipt();
-		this.positionWrapper.preparePosition(receipt);
-		this.paymentWrapper.preparePayment(receipt);
+		this.prepareReceipt();
 
 		this.addStateChangeListener(this);
 		this.addStateChangeListener(this.valueDisplay);

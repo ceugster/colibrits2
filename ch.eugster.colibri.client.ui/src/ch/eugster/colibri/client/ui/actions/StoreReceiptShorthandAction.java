@@ -51,25 +51,33 @@ public class StoreReceiptShorthandAction extends ConfigurableAction implements P
 					Long.valueOf(key.getParentId()));
 		}
 		this.persistenceServiceTracker.close();
+		userPanel.getNumericPadPanel().addActionListener(this);
 	}
 
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		final double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
-		if (difference != 0d)
+		if (event.getActionCommand().equals(this.getActionCommand()))
 		{
-			final Payment payment = this.userPanel.getPaymentWrapper().preparePayment(
-					this.userPanel.getReceiptWrapper().getReceipt());
-			payment.setPaymentType(this.paymentType);
-			payment.setAmount(difference, Receipt.QuotationType.REFERENCE_CURRENCY,
-					Receipt.QuotationType.FOREIGN_CURRENCY);
-			payment.setBack(difference < 0d);
-			this.userPanel.getReceiptWrapper().getReceipt().addPayment(payment);
+			final double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
+			if (difference != 0d)
+			{
+				final Payment payment = this.userPanel.getPaymentWrapper().preparePayment(
+						this.userPanel.getReceiptWrapper().getReceipt());
+				payment.setPaymentType(this.paymentType);
+				payment.setAmount(difference, Receipt.QuotationType.REFERENCE_CURRENCY,
+						Receipt.QuotationType.FOREIGN_CURRENCY);
+				payment.setBack(difference < 0d);
+				this.userPanel.getReceiptWrapper().getReceipt().addPayment(payment);
+			}
+			if (this.userPanel.getReceiptWrapper().isReceiptBalanced())
+			{
+				this.userPanel.getReceiptWrapper().storeReceipt();
+			}
 		}
-		if (this.userPanel.getReceiptWrapper().isReceiptBalanced())
+		else if (event.getActionCommand().equals(DeleteAction.ACTION_COMMAND))
 		{
-			this.userPanel.getReceiptWrapper().storeReceipt();
+			this.setEnabled(shouldEnable());
 		}
 	}
 

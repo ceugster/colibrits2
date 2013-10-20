@@ -229,6 +229,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 			this.percentualCharge.setValue(paymentType.getPercentualCharge());
 			this.fixCharge.setValue(paymentType.getFixCharge());
 			this.percentualCharge.getControl().setEnabled(chargeType.equals(ChargeType.PERCENTUAL));
+			this.fixCharge.getControl().setEnabled(chargeType.equals(ChargeType.AMOUNT));
 		}
 		this.setDirty(false);
 	}
@@ -445,7 +446,9 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 				PaymentEditor.this.setDirty(true);
 			}
 		});
-
+		combo.setEnabled(paymentType.getId() == null);
+		this.formToolkit.adapt(combo);
+		
 		final Currency[] currencies = this.selectCurrencies();
 		this.currencies = new ComboViewer(combo);
 		this.currencies.setContentProvider(new CurrencyContentProvider());
@@ -453,7 +456,6 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 		this.currencies.setFilters(new ViewerFilter[] { new DeletedEntityViewerFilter() });
 		this.currencies.setSorter(new CurrencySorter());
 		this.currencies.setInput(currencies);
-		this.currencies.getCCombo().setEnabled(paymentType.getId() == null);
 
 		layoutData = new TableWrapData();
 		layoutData.grabHorizontal = false;
@@ -571,7 +573,9 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 
 		CCombo combo = new CCombo(composite, SWT.READ_ONLY | SWT.FLAT);
 		combo.setLayoutData(layoutData);
+		combo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
 		combo.setCursor(combo.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
+		this.formToolkit.adapt(combo);
 		
 		productGroupViewer = new ComboViewer(combo);
 		productGroupViewer.setContentProvider(new ArrayContentProvider());
@@ -611,6 +615,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 				{
 					ChargeType chargeType = (ChargeType) event.widget.getData("charge.type");
 					percentualCharge.getControl().setEnabled(chargeType.equals(ChargeType.PERCENTUAL));
+					fixCharge.getControl().setEnabled(chargeType.equals(ChargeType.AMOUNT));
 					PaymentEditor.this.setDirty(true);
 				}
 			});

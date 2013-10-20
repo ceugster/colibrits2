@@ -7,7 +7,6 @@
 package ch.eugster.colibri.client.ui.panels.user.receipts;
 
 import java.awt.BorderLayout;
-import java.awt.FontMetrics;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -236,37 +234,44 @@ public class CurrentReceiptListPanel extends ProfilePanel implements TableModelL
 
 	private void resizeColumns()
 	{
-		final FontMetrics fm = table.getFontMetrics(table.getFont());
+//		final FontMetrics fm = table.getFontMetrics(table.getFont());
 
-		for (int i = 1; i < table.getColumnCount(); i++)
+//		for (int i = 1; i < table.getColumnCount(); i++)
+//		{
+//			final String title = (String) table.getColumnModel().getColumn(i).getHeaderValue();
+//			int stringWidth = fm.stringWidth(title);
+//			for (int j = 0; j < table.getRowCount(); j++)
+//			{
+//				final String val = table.getValueAt(j, i).toString();
+//				if (fm.stringWidth(val) + 6 > stringWidth)
+//				{
+//					stringWidth = fm.stringWidth(val) + 6;
+//				}
+//			}
+//
+//			final TableColumn tableColumn = table.getColumnModel().getColumn(i);
+//			tableColumn.setMinWidth(stringWidth);
+//			tableColumn.setMaxWidth(stringWidth);
+//			tableColumn.setPreferredWidth(stringWidth);
+//
+//			
+//			if ((i > 0) && (i < ((CurrentReceiptListModel) table.getModel()).getColumnNames().length - 1))
+//			{
+//				((JLabel) tableColumn.getCellRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
+//			}
+//			else
+//			{
+//				((JLabel) tableColumn.getCellRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
+//			}
+//		}
+//		table.getColumnModel().getColumn(0).setMinWidth(30);
+//		table.getColumnModel().getColumn(0).setMaxWidth(600);
+		int[] alignments = currentReceiptListModel.getColumnAlignments();
+		for (int i = 0; i < alignments.length; i++)
 		{
-			final String title = (String) table.getColumnModel().getColumn(i).getHeaderValue();
-			int stringWidth = fm.stringWidth(title);
-			for (int j = 0; j < table.getRowCount(); j++)
-			{
-				final String val = table.getValueAt(j, i).toString();
-				if (fm.stringWidth(val) + 6 > stringWidth)
-				{
-					stringWidth = fm.stringWidth(val) + 6;
-				}
-			}
-
 			final TableColumn tableColumn = table.getColumnModel().getColumn(i);
-			tableColumn.setMinWidth(stringWidth);
-			tableColumn.setMaxWidth(stringWidth);
-			tableColumn.setPreferredWidth(stringWidth);
-
-			if ((i > 0) && (i < ((CurrentReceiptListModel) table.getModel()).getColumnNames().length - 1))
-			{
-				((JLabel) tableColumn.getCellRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
-			}
-			else
-			{
-				((JLabel) tableColumn.getCellRenderer()).setHorizontalAlignment(SwingConstants.LEFT);
-			}
+			((JLabel) tableColumn.getCellRenderer()).setHorizontalAlignment(alignments[i]);
 		}
-		table.getColumnModel().getColumn(0).setMinWidth(30);
-		table.getColumnModel().getColumn(0).setMaxWidth(600);
-		table.doLayout();
+//		table.doLayout();
 	}
 }

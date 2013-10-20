@@ -109,10 +109,9 @@ public class ConfigurableEditor extends AbstractEntityEditor<Configurable>
 		{
 			setDirty(true);
 		}
-		else if (propId == IEditorPart.PROP_INPUT)
-		{
-			System.out.println(scrolledForm.getSize().x);
-		}
+//		else if (propId == IEditorPart.PROP_INPUT)
+//		{
+//		}
 	}
 
 	@Override

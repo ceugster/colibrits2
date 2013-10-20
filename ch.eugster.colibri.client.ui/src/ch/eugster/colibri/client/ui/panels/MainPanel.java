@@ -53,8 +53,8 @@ public abstract class MainPanel extends ProfilePanel implements TitleProvider, K
 		}
 	}
 
-	@Override
-	public abstract String getTitle();
+//	@Override
+//	public abstract String getTitle();
 
 	public abstract void initFocus();
 

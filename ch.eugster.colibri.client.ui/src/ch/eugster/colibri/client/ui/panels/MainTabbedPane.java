@@ -35,6 +35,7 @@ import ch.eugster.colibri.client.ui.events.ShutdownListener;
 import ch.eugster.colibri.client.ui.panels.login.ILoginListener;
 import ch.eugster.colibri.client.ui.panels.login.LoginEvent;
 import ch.eugster.colibri.client.ui.panels.login.LoginPanel;
+import ch.eugster.colibri.client.ui.panels.status.StatusPanel;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.views.ClientView;
 import ch.eugster.colibri.display.service.DisplayService;
@@ -50,7 +51,7 @@ import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderUpdater;
 
 public class MainTabbedPane extends JTabbedPane implements ILoginListener, ShutdownListener, ChangeListener,
 		EntityListener
@@ -73,7 +74,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private ServiceTracker<ProviderInterface, ProviderInterface> providerInterfaceTracker;
+	private ServiceTracker<ProviderUpdater, ProviderUpdater> providerUpdaterTracker;
 
 	private State state;
 
@@ -132,16 +133,19 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		this.fg = new java.awt.Color(profile.getTabbedPaneFg());
 		this.bg = new java.awt.Color(profile.getTabbedPaneBg());
 
+		final StatusPanel statusPanel = new StatusPanel(this.getSalespoint().getProfile());
+		this.add("Status", statusPanel);
+
 		final LoginPanel loginPanel = new LoginPanel(this.getSalespoint().getProfile());
 		loginPanel.addLoginListener(this);
 		this.addChangeListener(this);
 		this.add("Anmelden", loginPanel);
 
-		this.providerInterfaceTracker = new ServiceTracker<ProviderInterface, ProviderInterface>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderInterface.class, null)
+		this.providerUpdaterTracker = new ServiceTracker<ProviderUpdater, ProviderUpdater>(Activator.getDefault().getBundle().getBundleContext(),
+				ProviderUpdater.class, null)
 		{
 			@Override
-			public void removedService(final ServiceReference<ProviderInterface> reference, final ProviderInterface service)
+			public void removedService(final ServiceReference<ProviderUpdater> reference, final ProviderUpdater service)
 			{
 				if (!MainTabbedPane.this.state.equals(MainTabbedPane.State.SHUTDOWN))
 				{
@@ -150,8 +154,8 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 				super.removedService(reference, service);
 			}
 		};
-		this.providerInterfaceTracker.open();
-
+		this.providerUpdaterTracker.open();
+		this.setSelectedComponent(loginPanel);
 		this.state = State.RUNNING;
 	}
 
@@ -180,17 +184,27 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private boolean mustSettle(PersistenceService persistenceService)
 	{
-		Salespoint salespoint = (Salespoint) persistenceService.getServerService().find(Salespoint.class, this.getSalespoint().getId());
-		ReceiptQuery query = (ReceiptQuery) persistenceService.getServerService().getQuery(Receipt.class);
-		if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
+		if (persistenceService.getServerService().isConnected())
 		{
-			Calendar today = GregorianCalendar.getInstance();
-			today.set(Calendar.HOUR_OF_DAY, 0);
-			today.set(Calendar.MINUTE, 0);
-			today.set(Calendar.SECOND, 0);
-			today.set(Calendar.MILLISECOND, 0);
-			boolean settle = salespoint.getSettlement().getTimestamp().before(today);
-			return settle;
+			try
+			{
+				Salespoint salespoint = (Salespoint) persistenceService.getServerService().find(Salespoint.class, this.getSalespoint().getId());
+				ReceiptQuery query = (ReceiptQuery) persistenceService.getServerService().getQuery(Receipt.class);
+				if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
+				{
+					Calendar today = GregorianCalendar.getInstance();
+					today.set(Calendar.HOUR_OF_DAY, 0);
+					today.set(Calendar.MINUTE, 0);
+					today.set(Calendar.SECOND, 0);
+					today.set(Calendar.MILLISECOND, 0);
+					boolean settle = salespoint.getSettlement().getTimestamp().before(today);
+					return settle;
+				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		return false;
 	}
@@ -270,15 +284,15 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		return this.version;
 	}
 
-	public void prepareTitle()
+	public String prepareTitle()
 	{
-		StringBuilder builder = new StringBuilder(Version.getTitle() + " v" + getVersion() + Version.getStructureVersion() + " :: " + this.getSalespoint().getName() + " ("
-				+ this.getSalespoint().getHost() + ")");
+		StringBuilder builder = new StringBuilder(Version.getTitle() + " v" + getVersion() + " :: " + this.getSalespoint().getName());
 		if (this.getSelectedComponent() instanceof TitleProvider)
 		{
-			builder = builder.append(" " + ((TitleProvider) this.getSelectedComponent()).getTitle());
+			builder = builder.append(" :: " + ((TitleProvider) this.getSelectedComponent()).getTitle());
 		}
 		this.title = builder.toString();
+		return this.title;
 	}
 
 	@Override
@@ -354,9 +368,9 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		{
 			this.persistenceServiceTracker.close();
 		}
-		if (this.providerInterfaceTracker != null)
+		if (this.providerUpdaterTracker != null)
 		{
-			this.providerInterfaceTracker.close();
+			this.providerUpdaterTracker.close();
 		}
 		if (this.transferServiceTracker != null)
 		{

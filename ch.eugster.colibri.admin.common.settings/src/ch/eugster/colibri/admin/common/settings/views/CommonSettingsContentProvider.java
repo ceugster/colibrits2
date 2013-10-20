@@ -16,8 +16,8 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.common.settings.Activator;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
-import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class CommonSettingsContentProvider implements ITreeContentProvider
 {
@@ -73,7 +73,7 @@ public class CommonSettingsContentProvider implements ITreeContentProvider
 	private List<Object> getProviderUpdateSchedulers()
 	{
 		List<Object> entries = new ArrayList<Object>();
-		ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler> tracker = new ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler>(Activator.getDefault().getBundle().getBundleContext(), ProviderUpdateScheduler.class, null);
+		ServiceTracker<UpdateScheduler, UpdateScheduler> tracker = new ServiceTracker<UpdateScheduler, UpdateScheduler>(Activator.getDefault().getBundle().getBundleContext(), UpdateScheduler.class, null);
 		tracker.open();
 		try
 		{

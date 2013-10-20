@@ -193,6 +193,18 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 	private Button buttonFailOverBgEmpty;
 
 	/*
+	 * Input Label
+	 */
+	private JLabel exampleInputNameLabel;
+
+	private FontSizeComposite inputNameLabelFontSizeComposite;
+
+	private FontStyleComposite inputNameLabelFontStyleComposite;
+
+	private ColorSelector inputNameLabelFg;
+
+	private ColorSelector inputNameLabelBg;
+	/*
 	 * Labels
 	 */
 	private JLabel exampleNameLabel;
@@ -265,7 +277,6 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		}
 		else if (propId == IEditorPart.PROP_INPUT)
 		{
-			System.out.println(this.scrolledForm.getSize().x);
 		}
 	}
 
@@ -284,6 +295,7 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		this.createDisplaySection(scrolledForm);
 		this.createTabSection(scrolledForm);
 		this.createButtonSection(scrolledForm);
+		this.createInputLabelSection(scrolledForm);
 		this.createLabelSection(scrolledForm);
 		this.createListSection(scrolledForm);
 		EntityMediator.addListener(Profile.class, this);
@@ -441,6 +453,18 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		this.exampleFailOverButton.setForeground(fg);
 		this.exampleFailOverButton.setBackground(bg.getRGB() == UIManager.getColor("Button.background").getRGB() ? UIManager
 				.getColor("Button.background") : bg);
+
+		size = profile.getInputNameLabelFontSize();
+		style = profile.getInputNameLabelFontStyle();
+		fg = new java.awt.Color(profile.getNameLabelFg());
+		bg = new java.awt.Color(profile.getNameLabelBg());
+		this.inputNameLabelFontSizeComposite.setSize(size);
+		this.inputNameLabelFontStyleComposite.setStyle(style);
+		this.inputNameLabelFg.setColorValue(new RGB(fg.getRed(), fg.getGreen(), fg.getBlue()));
+		this.inputNameLabelBg.setColorValue(new RGB(bg.getRed(), bg.getGreen(), bg.getBlue()));
+		this.exampleInputNameLabel.setFont(this.exampleNameLabel.getFont().deriveFont(style, size));
+		this.exampleInputNameLabel.setForeground(fg);
+		this.exampleInputNameLabel.setBackground(bg);
 
 		size = profile.getNameLabelFontSize();
 		style = profile.getNameLabelFontStyle();
@@ -630,6 +654,13 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		profile.setButtonFailOverVerticalAlign(this.exampleFailOverButton.getVerticalAlignment());
 		profile.setButtonFailOverFg(this.exampleFailOverButton.getForeground().getRGB());
 		profile.setButtonFailOverBg(this.exampleFailOverButton.getBackground().getRGB());
+		/*
+		 * Input Label
+		 */
+		profile.setInputNameLabelFontSize(this.exampleInputNameLabel.getFont().getSize2D());
+		profile.setInputNameLabelFontStyle(this.exampleInputNameLabel.getFont().getStyle());
+		profile.setInputNameLabelFg(this.exampleInputNameLabel.getForeground().getRGB());
+		profile.setInputNameLabelBg(this.exampleInputNameLabel.getBackground().getRGB());
 		/*
 		 * Name Labels
 		 */
@@ -871,6 +902,31 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		section.setLayout(sectionLayout);
 		section.setText("Erscheinungsbild Beschriftung - Eingaben");
 		section.setClient(this.fillLabelSection(section));
+		section.addExpansionListener(new ExpansionAdapter()
+		{
+			@Override
+			public void expansionStateChanged(final ExpansionEvent e)
+			{
+				ProfileEditor.this.scrolledForm.reflow(true);
+			}
+		});
+
+		return section;
+	}
+
+	private Section createInputLabelSection(final ScrolledForm scrolledForm)
+	{
+		final ColumnLayoutData layoutData = new ColumnLayoutData();
+		layoutData.widthHint = 200;
+		final TableWrapLayout sectionLayout = new TableWrapLayout();
+		sectionLayout.numColumns = 1;
+
+		final Section section = this.formToolkit.createSection(scrolledForm.getBody(), ExpandableComposite.EXPANDED | ExpandableComposite.COMPACT
+				| ExpandableComposite.TITLE_BAR | ExpandableComposite.TWISTIE);
+		section.setLayoutData(layoutData);
+		section.setLayout(sectionLayout);
+		section.setText("Erscheinungsbild Beschriftung Eingabebereich");
+		section.setClient(this.fillInputLabelSection(section));
 		section.addExpansionListener(new ExpansionAdapter()
 		{
 			@Override
@@ -1443,7 +1499,6 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 				final int italic = font.getStyle() & java.awt.Font.ITALIC;
 				final int bold = selection ? java.awt.Font.BOLD : 0;
 				final int newStyle = italic | bold;
-				System.out.println("BOLD Selection: " + selection + ", Old Style: " + font.getStyle() + ", New Style: " + newStyle);
 				for (final DisplayPanel displayPanel : ProfileEditor.this.displayPanels)
 				{
 					displayPanel.setDisplayFont(displayPanel.getDisplayFont().deriveFont(newStyle));
@@ -1463,7 +1518,6 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 				final int bold = font.getStyle() & java.awt.Font.BOLD;
 				final int italic = selection ? java.awt.Font.ITALIC : 0;
 				final int newStyle = italic | bold;
-				System.out.println("ITALIC Selection: " + selection + ", Old Style: " + font.getStyle() + ", New Style: " + newStyle);
 				for (final DisplayPanel displayPanel : ProfileEditor.this.displayPanels)
 				{
 					displayPanel.setDisplayFont(displayPanel.getDisplayFont().deriveFont(newStyle));
@@ -1851,6 +1905,153 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 				final RGB rgb = (RGB) e.getNewValue();
 				final java.awt.Color newColor = new java.awt.Color(rgb.red, rgb.green, rgb.blue);
 				ProfileEditor.this.exampleValueLabelSelected.setBackground(newColor);
+				ProfileEditor.this.propertyChanged(e.getSource(), IEditorPart.PROP_DIRTY);
+			}
+		});
+
+		this.formToolkit.paintBordersFor(composite);
+
+		return composite;
+	}
+
+	private Control fillInputLabelSection(final Section parent)
+	{
+		final TableWrapLayout layout = new TableWrapLayout();
+		layout.numColumns = 1;
+
+		TableWrapData layoutData = new TableWrapData();
+		layoutData.grabHorizontal = true;
+
+		final Composite composite = this.formToolkit.createComposite(parent);
+		composite.setLayoutData(layoutData);
+		composite.setLayout(layout);
+
+		layoutData = new TableWrapData();
+		layoutData.align = TableWrapData.FILL;
+		layoutData.grabHorizontal = false;
+
+		final GridLayout gridLayout = new GridLayout();
+		gridLayout.horizontalSpacing = 0;
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		gridLayout.verticalSpacing = 0;
+
+		final Composite c = this.formToolkit.createComposite(composite, SWT.NONE);
+		c.setLayoutData(layoutData);
+		c.setLayout(gridLayout);
+
+		final GridData gridData = new GridData(GridData.FILL_BOTH);
+		gridData.minimumHeight = 60;
+		gridData.minimumWidth = 180;
+
+		final Composite key = this.formToolkit.createComposite(c, SWT.EMBEDDED);
+		key.setLayoutData(gridData);
+
+		final Frame frame = SWT_AWT.new_Frame(key);
+		frame.setLayout(new java.awt.GridLayout(1, 3));
+
+		this.exampleInputNameLabel = new JLabel("Beschriftung");
+		this.exampleInputNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		this.exampleInputNameLabel.setOpaque(true);
+		this.exampleInputNameLabel.setBorder(BorderUIResource.getEtchedBorderUIResource());
+		frame.add(this.exampleInputNameLabel);
+
+		frame.pack();
+
+		layoutData = new TableWrapData(TableWrapData.FILL);
+		layoutData.align = TableWrapData.FILL;
+
+		final Group inputNameLabelControlGroup = new Group(composite, SWT.None);
+		inputNameLabelControlGroup.setLayoutData(layoutData);
+		inputNameLabelControlGroup.setLayout(new GridLayout(3, false));
+		inputNameLabelControlGroup.setText("Beschriftungen");
+		this.formToolkit.adapt(inputNameLabelControlGroup);
+
+		this.inputNameLabelFontSizeComposite = new FontSizeComposite(inputNameLabelControlGroup, SWT.NONE, 8, 48, 1, 8);
+		this.inputNameLabelFontSizeComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		this.inputNameLabelFontSizeComposite.addSelectionListener(new SelectionListener()
+		{
+			public void widgetDefaultSelected(final SelectionEvent e)
+			{
+				this.widgetSelected(e);
+			}
+
+			public void widgetSelected(final SelectionEvent e)
+			{
+				final int selection = ((Scale) e.getSource()).getSelection();
+				final float size = selection;
+				ProfileEditor.this.exampleInputNameLabel.setFont(ProfileEditor.this.exampleInputNameLabel.getFont().deriveFont(size));
+				ProfileEditor.this.propertyChanged(e.getSource(), IEditorPart.PROP_DIRTY);
+			}
+		});
+		this.formToolkit.adapt(this.inputNameLabelFontSizeComposite);
+
+		this.inputNameLabelFontStyleComposite = new FontStyleComposite(this.formToolkit, inputNameLabelControlGroup, SWT.NONE);
+		this.inputNameLabelFontStyleComposite.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		this.inputNameLabelFontStyleComposite.addBoldListener(new Listener()
+		{
+			public void handleEvent(final Event e)
+			{
+				final Button button = (Button) e.widget;
+				final boolean selection = button.getSelection();
+				final java.awt.Font font = ProfileEditor.this.exampleNameLabel.getFont();
+				final int italic = font.getStyle() & java.awt.Font.ITALIC;
+				final int bold = selection ? java.awt.Font.BOLD : 0;
+				final int newStyle = italic | bold;
+				ProfileEditor.this.exampleInputNameLabel.setFont(ProfileEditor.this.exampleInputNameLabel.getFont().deriveFont(newStyle));
+				ProfileEditor.this.propertyChanged(e.widget, IEditorPart.PROP_DIRTY);
+			}
+		});
+		this.inputNameLabelFontStyleComposite.addItalicListener(new Listener()
+		{
+			public void handleEvent(final Event e)
+			{
+				final Button button = (Button) e.widget;
+				final boolean selection = button.getSelection();
+				final java.awt.Font font = ProfileEditor.this.exampleNameLabel.getFont();
+				final int bold = font.getStyle() & java.awt.Font.BOLD;
+				final int italic = selection ? java.awt.Font.ITALIC : 0;
+				final int newStyle = italic | bold;
+				ProfileEditor.this.exampleInputNameLabel.setFont(ProfileEditor.this.exampleInputNameLabel.getFont().deriveFont(newStyle));
+				ProfileEditor.this.propertyChanged(e.widget, IEditorPart.PROP_DIRTY);
+			}
+		});
+		this.formToolkit.adapt(this.inputNameLabelFontStyleComposite);
+
+		Group colorGroup = new Group(inputNameLabelControlGroup, SWT.NONE);
+		colorGroup.setText("Farben");
+		colorGroup.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		colorGroup.setLayout(new GridLayout(2, false));
+		this.formToolkit.adapt(colorGroup);
+
+		Label label = this.formToolkit.createLabel(colorGroup, "Schrift", SWT.NONE);
+		label.setLayoutData(new GridData());
+
+		this.inputNameLabelFg = new ColorSelector(colorGroup);
+		this.inputNameLabelFg.getButton().setLayoutData(new GridData());
+		this.inputNameLabelFg.addListener(new IPropertyChangeListener()
+		{
+			public void propertyChange(final PropertyChangeEvent e)
+			{
+				final RGB rgb = (RGB) e.getNewValue();
+				final java.awt.Color newColor = new java.awt.Color(rgb.red, rgb.green, rgb.blue);
+				ProfileEditor.this.exampleInputNameLabel.setForeground(newColor);
+				ProfileEditor.this.propertyChanged(e.getSource(), IEditorPart.PROP_DIRTY);
+			}
+		});
+
+		label = this.formToolkit.createLabel(colorGroup, "Hintergrund", SWT.NONE);
+		label.setLayoutData(new GridData());
+
+		this.inputNameLabelBg = new ColorSelector(colorGroup);
+		this.inputNameLabelBg.getButton().setLayoutData(new GridData());
+		this.inputNameLabelBg.addListener(new IPropertyChangeListener()
+		{
+			public void propertyChange(final PropertyChangeEvent e)
+			{
+				final RGB rgb = (RGB) e.getNewValue();
+				final java.awt.Color newColor = new java.awt.Color(rgb.red, rgb.green, rgb.blue);
+				ProfileEditor.this.exampleInputNameLabel.setBackground(newColor);
 				ProfileEditor.this.propertyChanged(e.getSource(), IEditorPart.PROP_DIRTY);
 			}
 		});

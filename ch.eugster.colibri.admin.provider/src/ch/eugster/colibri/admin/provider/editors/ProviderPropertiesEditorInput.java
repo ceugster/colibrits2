@@ -13,8 +13,8 @@ import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
-import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class ProviderPropertiesEditorInput implements IEditorInput
 {
@@ -24,13 +24,13 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 	
 	private ProviderUpdater providerUpdater;
 	
-	private ProviderUpdateScheduler providerUpdateScheduler;
+	private UpdateScheduler updateScheduler;
 	
-	public ProviderPropertiesEditorInput(final PersistenceService persistenceService, ProviderUpdateScheduler providerUpdateScheduler)
+	public ProviderPropertiesEditorInput(final PersistenceService persistenceService, UpdateScheduler updateScheduler)
 	{
 		this.persistenceService = persistenceService;
-		this.providerUpdateScheduler = providerUpdateScheduler;
-		this.properties = initializeProperties(ProviderUpdateScheduler.SchedulerProperty.asMap());
+		this.updateScheduler = updateScheduler;
+		this.properties = initializeProperties(UpdateScheduler.SchedulerProperty.asMap());
 	}
 
 	public ProviderPropertiesEditorInput(final PersistenceService persistenceService, ProviderUpdater providerUpdater)
@@ -57,7 +57,7 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 	
 	public IProperty.Section[] getSections()
 	{
-		return providerUpdateScheduler == null ? providerUpdater.getSections() : providerUpdateScheduler.getSections();
+		return updateScheduler == null ? providerUpdater.getSections() : updateScheduler.getSections();
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 
 	public String getProviderId()
 	{
-		return providerUpdateScheduler == null ? providerUpdater.getProviderId() : providerUpdateScheduler.getProviderId();
+		return updateScheduler == null ? providerUpdater.getProviderId() : updateScheduler.getProviderId();
 	}
 	
 	public Map<String, IProperty> getProperties()
@@ -92,7 +92,7 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 	@Override
 	public String getName()
 	{
-		return providerUpdateScheduler == null ? providerUpdater.getName() : providerUpdateScheduler.getName();
+		return updateScheduler == null ? providerUpdater.getName() : updateScheduler.getName();
 	}
 
 	@Override
@@ -114,17 +114,17 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 
 	public boolean canCheckConnection()
 	{
-		return providerUpdateScheduler == null ? providerUpdater.canCheckConnection() : false;
+		return updateScheduler == null ? providerUpdater.canCheckConnection() : false;
 	}
 
-	public IStatus checkConnection(Map<String, ProviderProperty> properties)
+	public IStatus checkConnection(Map<String, IProperty> properties)
 	{
-		return providerUpdateScheduler == null ? providerUpdater.checkConnection(properties) : Status.OK_STATUS;
+		return updateScheduler == null ? providerUpdater.checkConnection(properties) : Status.OK_STATUS;
 	}
 	
 	public Map<String, IProperty> getDefaultProperties()
 	{
-		return providerUpdateScheduler == null ? providerUpdater.getDefaultProperties() : ProviderUpdateScheduler.SchedulerProperty.asMap();
+		return updateScheduler == null ? providerUpdater.getDefaultProperties() : UpdateScheduler.SchedulerProperty.asMap();
 	}
 
 	public boolean equals(Object other)

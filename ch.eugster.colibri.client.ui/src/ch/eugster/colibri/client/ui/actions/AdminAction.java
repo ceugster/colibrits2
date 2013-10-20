@@ -62,7 +62,7 @@ public final class AdminAction extends ConfigurableAction implements EntityListe
 								final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 								final String title = "Administrator öffnen";
 								final String msg = "Beim Öffnen des Administratorfensters ist ein Fehler aufgetreten.";
-								final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e);
+								final Status status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
 								final ErrorDialog dialog = new ErrorDialog(shell, title, msg, status, 0);
 								dialog.open();
 							}
@@ -80,7 +80,7 @@ public final class AdminAction extends ConfigurableAction implements EntityListe
 						final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 						final String title = "Administrator öffnen";
 						final String msg = "Beim Öffnen des Administratorfensters ist ein Fehler aufgetreten.";
-						final Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e);
+						final Status status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
 						final ErrorDialog dialog = new ErrorDialog(shell, title, msg, status, 0);
 						dialog.open();
 					}

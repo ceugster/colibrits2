@@ -18,6 +18,7 @@ import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.ChargeType;
+import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
@@ -61,8 +62,10 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 					}
 					else
 					{
+						double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
 						Payment payment = Payment.newInstance(this.userPanel.getReceiptWrapper().getReceipt());
 						payment.setPaymentType(this.getPaymentType());
+						payment.setAmount(difference, Receipt.QuotationType.DEFAULT_CURRENCY, Receipt.QuotationType.FOREIGN_CURRENCY);
 						this.userPanel.getPaymentWrapper().replacePayment(payment);
 					}
 				}

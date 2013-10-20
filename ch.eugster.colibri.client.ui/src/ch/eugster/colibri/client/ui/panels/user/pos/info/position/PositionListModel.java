@@ -13,12 +13,10 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -108,13 +106,11 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 				{
 					if (this.selectionListModel.getMinSelectionIndex() == -1)
 					{
-						System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": perform table update.");
 						this.fireTableDataChanged();
 					}
 				}
 				else
 				{
-					System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": perform test table update.");
 					this.testForTableUpdate();
 				}
 			}
@@ -290,7 +286,6 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 				case TAX_CODE:
 				{
 					double percentage = positions[rowIndex].getCurrentTax().getPercentage();
-					System.out.println("" + percentage);
 					percentageFormatter.setMinimumFractionDigits(0);
 					percentageFormatter.setMaximumFractionDigits(2);
 					return percentageFormatter.format(percentage);
@@ -345,8 +340,8 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		if (!this.mergePosition(positions, newPosition))
 		{
 			this.userPanel.getReceiptWrapper().getReceipt().getAllPositions().add(newPosition);
-			Position[] data = this.getModelData();
-			final int row = data.length - 1;
+//			Position[] data = this.getModelData();
+//			final int row = data.length - 1;
 			this.fireTableRowsInserted(0,0);
 			this.userPanel.getPositionWrapper().preparePosition(this.userPanel.getReceiptWrapper().getReceipt());
 		}
@@ -364,7 +359,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
 		properties.put(EventConstants.BUNDLE_ID,
 				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, reference);
 		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
@@ -521,7 +516,6 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 	{
 		if (this.userPanel.getPositionWrapper().isPositionComplete())
 		{
-			System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": perform position add/replace.");
 			final Position newPosition = this.userPanel.getPositionWrapper().getPosition();
 			if (this.selectionListModel.getMinSelectionIndex() > -1)
 			{
@@ -531,7 +525,6 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 			{
 				this.addPosition(newPosition);
 			}
-			System.out.println(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + ": position add/replace performed.");
 		}
 	}
 

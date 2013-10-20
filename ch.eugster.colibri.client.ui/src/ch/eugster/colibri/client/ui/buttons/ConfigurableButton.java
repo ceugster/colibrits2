@@ -44,7 +44,7 @@ import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.model.key.KeyType;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderService;
 import ch.eugster.colibri.ui.buttons.HTMLButton;
 
 public class ConfigurableButton extends HTMLButton implements EntityListener, EventHandler
@@ -67,7 +67,7 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = ProviderInterface.Topic.topics();
+		final String[] topics = ProviderService.Topic.topics();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);
@@ -101,29 +101,21 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals(ProviderInterface.Topic.PROVIDER_FAILOVER.topic()))
+		if (event.getTopic().equals(ProviderService.Topic.PROVIDER_FAILOVER.topic()))
 		{
 			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
-			if (this.failOver)
-			{
-				ConfigurableAction action = (ConfigurableAction) this.getAction();
-				if (action.getKey().getKeyType().equals(KeyType.FUNCTION))
-				{
-					
-					action.setEnabled(action.getKey().getFunctionType().isFailOverEnabled());
-				}
-			}
+////				if (this.failOver)
+////				{
+////					ConfigurableAction action = (ConfigurableAction) this.getAction();
+////					action.setEnabled(action.getState(event));
+////				}
 		}
 		else
 		{
 			this.update(false);
-			ConfigurableAction action = (ConfigurableAction) this.getAction();
-			if (action.getKey().getKeyType().equals(KeyType.FUNCTION))
-			{
-				
-				action.setEnabled(true);
-			}
+//				ConfigurableAction action = (ConfigurableAction) this.getAction();
+//				action.setEnabled(action.getState(event));
 		}
 	}
 

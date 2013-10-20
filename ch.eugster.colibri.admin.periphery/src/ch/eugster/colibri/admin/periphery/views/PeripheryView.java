@@ -88,7 +88,7 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 			PeripheryGroup peripheryGroup = (PeripheryGroup) ssel.getFirstElement();
 			if (this.viewer.getExpandedState(peripheryGroup))
 			{
-				this.viewer.collapseToLevel(peripheryGroup, 0);
+				this.viewer.collapseToLevel(peripheryGroup, TreeViewer.ALL_LEVELS);
 			}
 			else
 			{

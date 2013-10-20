@@ -93,8 +93,8 @@ import ch.eugster.colibri.persistence.queries.TaxQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
-import ch.eugster.colibri.provider.scheduler.service.ProviderUpdateScheduler;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class SalespointEditor extends AbstractEntityEditor<Salespoint> implements IDirtyable
 {
@@ -164,7 +164,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 
 	private final ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private final ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler> providerUpdateSchedulerTracker;
+	private final ServiceTracker<UpdateScheduler, UpdateScheduler> providerUpdateSchedulerTracker;
 
 	private final ServiceTracker<ProviderUpdater, ProviderUpdater> providerUpdaterTracker;
 
@@ -180,7 +180,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		this.persistenceServiceTracker.open();
 		this.providerUpdaterTracker = new ServiceTracker<ProviderUpdater, ProviderUpdater>(context, ProviderUpdater.class, null);
 		this.providerUpdaterTracker.open();
-		this.providerUpdateSchedulerTracker = new ServiceTracker<ProviderUpdateScheduler, ProviderUpdateScheduler>(context, ProviderUpdateScheduler.class, null);
+		this.providerUpdateSchedulerTracker = new ServiceTracker<UpdateScheduler, UpdateScheduler>(context, UpdateScheduler.class, null);
 		this.providerUpdateSchedulerTracker.open();
 		this.receiptPrinterServiceTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(context, ReceiptPrinterService.class, null);
 		this.receiptPrinterServiceTracker.open();
@@ -327,7 +327,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		this.createProfileAndCurrencySection(scrolledForm);
 		this.createProposalSection(scrolledForm);
 		
-		ProviderUpdateScheduler scheduler = providerUpdateSchedulerTracker.getService();
+		UpdateScheduler scheduler = providerUpdateSchedulerTracker.getService();
 		if (scheduler != null)
 		{
 			for (IProperty.Section section : scheduler.getSections())
@@ -884,7 +884,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		return section;
 	}
 
-	private Section createSchedulerSection(final ScrolledForm scrolledForm, IProperty.Section propertySection, ProviderUpdateScheduler scheduler)
+	private Section createSchedulerSection(final ScrolledForm scrolledForm, IProperty.Section propertySection, UpdateScheduler scheduler)
 	{
 		final ColumnLayoutData layoutData = new ColumnLayoutData();
 		layoutData.widthHint = 200;
@@ -1588,7 +1588,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		return composite;
 	}
 
-	private final Control fillSchedulerSection(final Section parent, IProperty.Section propertySection, final ProviderUpdateScheduler scheduler)
+	private final Control fillSchedulerSection(final Section parent, IProperty.Section propertySection, final UpdateScheduler scheduler)
 	{
 		initializeProperties(scheduler);
 		
@@ -2164,12 +2164,12 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 //		}
 //	}
 
-	private void initializeProperties(ProviderUpdateScheduler scheduler)
+	private void initializeProperties(UpdateScheduler scheduler)
 	{
 		Map<String, IProperty> properties = this.providerProperties.get(scheduler.getProviderId());
 		if (properties == null)
 		{
-			properties = ProviderUpdateScheduler.SchedulerProperty.asMap();
+			properties = UpdateScheduler.SchedulerProperty.asMap();
 			this.providerProperties.put(scheduler.getProviderId(), properties);
 		}
 	}

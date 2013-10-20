@@ -22,8 +22,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.actions.BackAction;
 import ch.eugster.colibri.client.ui.actions.DownAction;
+import ch.eugster.colibri.client.ui.actions.LoadParkedReceiptAction;
 import ch.eugster.colibri.client.ui.actions.PrintReceiptAction;
-import ch.eugster.colibri.client.ui.actions.ReverseReceiptAction;
 import ch.eugster.colibri.client.ui.actions.UpAction;
 import ch.eugster.colibri.client.ui.buttons.ProfileButton;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
@@ -118,7 +118,7 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 					this.fireTableDataChanged();
 				}
 			}
-			else if (event.getActionCommand().equals(ReverseReceiptAction.ACTION_COMMAND))
+			else if (event.getActionCommand().equals(LoadParkedReceiptAction.ACTION_COMMAND))
 			{
 				if (this.selectionListModel.getMinSelectionIndex() == -1)
 				{

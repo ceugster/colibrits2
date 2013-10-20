@@ -7,35 +7,25 @@ import java.awt.image.DirectColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
-
-import ch.eugster.colibri.persistence.replication.service.ReplicationService;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class Activator extends AbstractUIPlugin
 {
-
-	// The plug-in ID
-	public static final String PLUGIN_ID = "ch.eugster.colibri.ui"; //$NON-NLS-1$
-
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
+	private LogService logService;
+	
 	private Frame frame;
 
 	// The shared instance
@@ -198,6 +188,14 @@ public class Activator extends AbstractUIPlugin
 		this.frame = frame;
 	}
 
+	public void log(int level, String message)
+	{
+		if (this.logServiceTracker != null)
+		{
+			this.logService.log(level, message);
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -214,11 +212,8 @@ public class Activator extends AbstractUIPlugin
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		this.logServiceTracker.open();
 
-		final LogService log = (LogService) this.logServiceTracker.getService();
-		if (log != null)
-		{
-			log.log(LogService.LOG_INFO, Activator.PLUGIN_ID + ".plugin gestartet.");
-		}
+		logService = (LogService) this.logServiceTracker.getService();
+		log(LogService.LOG_INFO, "Bundle " + context.getBundle().getSymbolicName() + " gestartet.");
 	}
 
 	/*
@@ -231,14 +226,8 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		final LogService log = (LogService) this.logServiceTracker.getService();
-		if (log != null)
-		{
-			log.log(LogService.LOG_INFO, Activator.PLUGIN_ID + ".plugin gestoppt.");
-		}
-
+		log(LogService.LOG_INFO, "Bundle " + context.getBundle().getSymbolicName() + " gestoppt.");
 		this.logServiceTracker.close();
-
 		Activator.plugin = null;
 		super.stop(context);
 	}
