@@ -7,7 +7,7 @@ Bundle-Activator: ch.eugster.colibri.persistence.transfer.impl.Activator
 Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Service-Component: OSGI-INF/transfer-component.xml, OSGI-INF/transfer-scheduler-component.xml
+Service-Component: OSGI-INF/transfer-component.xml
 Import-Package: ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.queries,
  ch.eugster.colibri.persistence.rules,

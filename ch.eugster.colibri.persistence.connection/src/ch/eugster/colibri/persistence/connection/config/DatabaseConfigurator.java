@@ -22,21 +22,27 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
 import org.jdom.Element;
+import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.CommonSettings.HostnameResolver;
+import ch.eugster.colibri.persistence.model.Configurable;
+import ch.eugster.colibri.persistence.model.Configurable.ConfigurableType;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.Money;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
+import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Role;
 import ch.eugster.colibri.persistence.model.RoleProperty;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Stock;
+import ch.eugster.colibri.persistence.model.Tab;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxRate;
 import ch.eugster.colibri.persistence.model.TaxType;
@@ -50,6 +56,8 @@ import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 public class DatabaseConfigurator extends AbstractConfigurator
 {
 	private final Long currencyId;
+
+	private Long payedInvoiceProductGroupId = null;
 
 	public DatabaseConfigurator(final Shell shell, final Element connection, final Long currencyId)
 	{
@@ -115,19 +123,19 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		{
 			try
 			{
-				this.log("Währungen werden eingefügt...");
+				this.log(LogService.LOG_INFO, "Währungen werden eingefügt...");
 				status = this.createCurrencies(new SubProgressMonitor(monitor, 1));
 				monitor.worked(1);
 			}
 			catch (final IOException e)
 			{
 				final String msg = "Beim Auslesen der Währungen aus der lokalen Datenbank (currency.csv) ist ein Fehler aufgetreten.";
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e);
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
 				this.log(status);
 				return status;
 			}
 
-			this.log("Allgemeine Einstellungen werden eingefügt...");
+			this.log(LogService.LOG_INFO, "Allgemeine Einstellungen werden eingefügt...");
 			status = this.createCommonSettings(new SubProgressMonitor(monitor, 1), currencyId);
 			if (monitor.isCanceled())
 			{
@@ -138,7 +146,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Voreingestellte Zahlungsarten werden eingefügt...");
+			this.log(LogService.LOG_INFO, "Voreingestellte Zahlungsarten werden eingefügt...");
 			status = this.createPaymentTypeCash(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -149,7 +157,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Mehrwertsteuern werden eingefügt...");
+			this.log(LogService.LOG_INFO, "Mehrwertsteuern werden eingefügt...");
 			status = this.createTaxes(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -160,7 +168,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Voreingestellte Warengruppe wird eingefügt...");
+			this.log(LogService.LOG_INFO, "Voreingestellte Warengruppe wird eingefügt...");
 			status = this.createDefaultProductGroup(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -171,7 +179,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Warengruppe Bezahlte Rechnungen wird eingefügt...");
+			this.log(LogService.LOG_INFO, "Warengruppe Bezahlte Rechnungen wird eingefügt...");
 			status = this.createPayedInvoiceProductGroup(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -182,8 +190,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Voreingestelltes Kassenprofil wird eingefügt...");
-			status = this.createDefaultProfile(new SubProgressMonitor(monitor, 1));
+			this.log(LogService.LOG_INFO, "Warengruppe Kreditkartengebühr wird eingefügt...");
+			status = this.createChargeProductGroup(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
 				throw new OperationCanceledException();
@@ -193,7 +201,18 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Die Administratorenrolle wird eingefügt...");
+			this.log(LogService.LOG_INFO, "Voreingestelltes Kassenprofil wird eingefügt...");
+			status = this.createDefaultProfile(new SubProgressMonitor(monitor, 1), payedInvoiceProductGroupId);
+			if (monitor.isCanceled())
+			{
+				throw new OperationCanceledException();
+			}
+			if (!status.equals(Status.OK_STATUS))
+			{
+				return status;
+			}
+
+			this.log(LogService.LOG_INFO, "Die Administratorenrolle wird eingefügt...");
 			status = this.createRole(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -204,7 +223,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Benutzer Administrator wird eingefügt...");
+			this.log(LogService.LOG_INFO, "Benutzer Administrator wird eingefügt...");
 			status = this.createUser(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -215,7 +234,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Erste Kasse wird eingefügt...");
+			this.log(LogService.LOG_INFO, "Erste Kasse wird eingefügt...");
 			status = this.createSalespoint(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -226,7 +245,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log("Die Version wird eingefügt...");
+			this.log(LogService.LOG_INFO, "Die Version wird eingefügt...");
 			status = this.createVersion(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -286,6 +305,10 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				commonSettings.setTransferDelay(60000);
 				commonSettings.setTransferRepeatDelay(15000);
 				commonSettings.setTransferReceiptCount(5);
+				commonSettings.setAllowTestSettlement(false);
+				commonSettings.setForceSettlement(true);
+				commonSettings.setMaximizedClientWindow(true);
+				commonSettings.setReceiptNumberFormat("000000");
 			}
 			commonSettings.setReferenceCurrency(currency);
 
@@ -297,7 +320,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der allgemeinen Einstellungen ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -343,7 +366,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Währungen ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -415,7 +438,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Warengruppe ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -455,12 +478,13 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			this.getEntityManager().getTransaction().begin();
 			settings = this.getEntityManager().merge(settings);
 			this.getEntityManager().getTransaction().commit();
+			this.payedInvoiceProductGroupId = productGroup.getId();
 
 			this.updateSequence("pt_id", Long.valueOf(productGroup.getId().longValue() + 1L));
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Warengruppe für Bezahlte Rechnungen ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -470,7 +494,52 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		return status;
 	}
 
-	private IStatus createDefaultProfile(final IProgressMonitor monitor)
+	private IStatus createChargeProductGroup(final IProgressMonitor monitor)
+	{
+		IStatus status = Status.OK_STATUS;
+
+		CommonSettings settings = this.getEntityManager().find(CommonSettings.class, Long.valueOf(1L));
+		final Tax tax = this.getEntityManager().find(Tax.class, Long.valueOf(1L));
+
+		monitor.beginTask("Die Warengruppe für bezahlte Rechnungen wird eingerichtet...", 1);
+		try
+		{
+			ProductGroup productGroup = ProductGroup.newInstance(ProductGroupType.NON_SALES_RELATED, settings);
+			productGroup.setAccount(null);
+			productGroup.setCode("Kreditkartengebühr");
+			productGroup.setDefaultTax(tax);
+			productGroup.setMappingId(null);
+			productGroup.setName("Kreditkartengebühr");
+			productGroup.setPriceProposal(0D);
+			productGroup.setProposalOption(Position.Option.NONE);
+			productGroup.setQuantityProposal(1);
+
+			this.getEntityManager().getTransaction().begin();
+			productGroup = this.getEntityManager().merge(productGroup);
+			this.getEntityManager().getTransaction().commit();
+			monitor.worked(1);
+
+			settings.setPayedInvoice(productGroup);
+
+			this.getEntityManager().getTransaction().begin();
+			settings = this.getEntityManager().merge(settings);
+			this.getEntityManager().getTransaction().commit();
+
+			this.updateSequence("pt_id", Long.valueOf(productGroup.getId().longValue() + 1L));
+		}
+		catch (final Exception e)
+		{
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+					"Beim Einfügen der Warengruppe für Bezahlte Rechnungen ist ein Fehler aufgetreten.", e);
+		}
+		finally
+		{
+			monitor.done();
+		}
+		return status;
+	}
+
+	private IStatus createDefaultProfile(final IProgressMonitor monitor, Long payedInvoiceProductGroupId)
 	{
 		final IStatus status = Status.OK_STATUS;
 		try
@@ -483,6 +552,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				profile.setId(Long.valueOf(1L));
 				profile.initialize();
 				profile.setName("Standard");
+
+				addTabs(profile, payedInvoiceProductGroupId);
 
 				this.getEntityManager().getTransaction().begin();
 				profile = this.getEntityManager().merge(profile);
@@ -498,6 +569,203 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			monitor.done();
 		}
 		return status;
+	}
+	
+	private void addTabs(Profile profile, Long payedInvoiceProductGroupId)
+	{
+		for (Configurable configurable : profile.getConfigurables())
+		{
+			if (configurable.getConfigurableType().equals(ConfigurableType.PRODUCT_GROUP))
+			{
+				Tab tab = Tab.newInstance(configurable);
+				tab.setCols(3);
+				tab.setRows(3);
+				tab.setName("WG 1");
+				tab.setPos(1);
+				configurable.addTab(tab);
+			}
+			else if (configurable.getConfigurableType().equals(ConfigurableType.FUNCTION))
+			{
+				Tab tab = Tab.newInstance(configurable);
+				tab.setCols(3);
+				tab.setRows(3);
+				tab.setName("Fun 1");
+				tab.setPos(1);
+				configurable.addTab(tab);
+				
+				Key key = Key.newInstance(tab);
+				key.setKeyType(KeyType.OPTION);
+				key.setParentId(Long.valueOf(Option.ORDERED.ordinal()));
+				key.setLabel("Besorgung");
+				key.setTabCol(0);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_TOTAL_SALES);
+				key.setLabel("Umsatz");
+				key.setTabCol(1);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_LOCK);
+				key.setLabel("Sperren");
+				key.setTabCol(2);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_RESTITUTION);
+				key.setLabel("Rücknahme");
+				key.setTabCol(0);
+				key.setTabRow(1);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_SHOW_PARKED_RECEIPT_LIST);
+				key.setLabel("Parkieren");
+				key.setTabCol(1);
+				key.setTabRow(1);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_LOGOUT);
+				key.setLabel("Abmelden");
+				key.setTabCol(2);
+				key.setTabRow(1);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_SHOW_CURRENT_RECEIPT_LIST);
+				key.setLabel("Belegliste");
+				key.setTabCol(0);
+				key.setTabRow(2);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_PRINT_LAST_RECEIPT);
+				key.setLabel("Letzen<br>Beleg");
+				key.setTabCol(1);
+				key.setTabRow(2);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_SELECT_CUSTOMER);
+				key.setParentId(this.payedInvoiceProductGroupId);
+				key.setLabel("Kunde");
+				key.setTabCol(2);
+				key.setTabRow(2);
+				tab.addKey(key);
+
+				tab = Tab.newInstance(configurable);
+				tab.setCols(3);
+				tab.setRows(3);
+				tab.setName("Fun 2");
+				tab.setPos(2);
+				configurable.addTab(tab);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.OPTION);
+				key.setParentId(Long.valueOf(Option.ARTICLE.ordinal()));
+				key.setLabel("Lager");
+				key.setTabCol(0);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.TAX_RATE);
+				key.setParentId(Long.valueOf(1L));
+				key.setLabel("Steuerfrei");
+				key.setTabCol(1);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_SHOW_COIN_COUNTER_PANEL);
+				key.setLabel("Abschluss");
+				key.setTabCol(2);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.TAX_RATE);
+				key.setParentId(Long.valueOf(2L));
+				key.setLabel("<html>Red.<br>Steuersatz");
+				key.setTabCol(1);
+				key.setTabRow(1);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_OPEN_DRAWER);
+				key.setParentId(Long.valueOf(22));
+				key.setLabel("<html>Schublade<br>öffnen");
+				key.setTabCol(2);
+				key.setTabRow(1);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.TAX_RATE);
+				key.setParentId(Long.valueOf(3L));
+				key.setLabel("<html>Normaler.<br>Steuersatz");
+				key.setTabCol(1);
+				key.setTabRow(2);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_SHUTDOWN);
+				key.setLabel("Beenden");
+				key.setTabCol(2);
+				key.setTabRow(2);
+				tab.addKey(key);
+
+				tab = Tab.newInstance(configurable);
+				tab.setCols(1);
+				tab.setRows(3);
+				tab.setName("Coupon");
+				tab.setPos(3);
+				configurable.addTab(tab);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION);
+				key.setParentId(Long.valueOf(1L));
+				key.setLabel("Beleg abschliessen");
+				key.setTabCol(0);
+				key.setTabRow(0);
+				tab.addKey(key);
+
+				key = Key.newInstance(tab);
+				key.setKeyType(KeyType.FUNCTION);
+				key.setFunctionType(FunctionType.FUNCTION_STORE_RECEIPT_SHORTHAND_ACTION);
+				key.setParentId(Long.valueOf(1L));
+				key.setLabel("Express abschliessen");
+				key.setTabCol(0);
+				key.setTabRow(1);
+				tab.addKey(key);
+
+//				key = Key.newInstance(tab);
+//				key.setKeyType(KeyType.FUNCTION);
+//				key.setParentId(Long.valueOf(1L));
+//				key.setFunctionType(FunctionType.FUNCTION_STORE_RECEIPT_EXPRESS_ACTION);
+//				key.setLabel("<html><font color=\"#000000\" size=\"1.0em\">Beleg abschliessen<br>Gutschein CHF");
+//				key.setTabCol(0);
+//				key.setTabRow(2);
+//				tab.addKey(key);
+
+			}
+		}
 	}
 
 	private IStatus createPaymentTypeCash(final IProgressMonitor monitor)
@@ -551,7 +819,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 					paymentType.setChange(true);
 					paymentType.setCurrency(currency);
 					paymentType.setCode("BAR " + currency.getCode());
-					paymentType.setName("Bargeld " + currency.getName());
+					paymentType.setName("Bargeld");
 					paymentType.setOpenCashdrawer(true);
 					paymentType.setUndeletable(true);
 
@@ -587,7 +855,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Zahlungsarten ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -677,7 +945,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Administratorenrolle ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -739,7 +1007,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			}
 			catch (final Exception e)
 			{
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 						"Beim Einfügen der Kasse ist ein Fehler aufgetreten.", e);
 			}
 			finally
@@ -922,7 +1190,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			}
 			catch (final Exception e)
 			{
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 						"Beim Einfügen der Mehrwertsteuersätze ist ein Fehler aufgetreten.", e);
 			}
 			finally
@@ -981,7 +1249,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen des Benutzers Administrator ist ein Fehler aufgetreten.", e);
 		}
 		finally
@@ -1014,7 +1282,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Version ist ein Fehler aufgetreten.", e);
 		}
 		finally

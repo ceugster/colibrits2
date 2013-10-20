@@ -47,9 +47,6 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
  */
 public class Activator extends AbstractUIPlugin
 {
-
-	public static final String PLUGIN_ID = "ch.eugster.colibri.persistence.connection"; //$NON-NLS-1$
-
 	private static Activator plugin;
 
 	private ServiceTracker<LogService, LogService> logServiceTracker;
@@ -67,6 +64,8 @@ public class Activator extends AbstractUIPlugin
 	private Document document;
 
 	private Document oldDocument;
+	
+	private LogService logService;
 	
 	/**
 	 * The constructor
@@ -148,7 +147,6 @@ public class Activator extends AbstractUIPlugin
 		{
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			final File root = workspace.getRoot().getRawLocation().toFile();
-			System.out.println(root.getAbsolutePath());
 
 			final File cfgFolder = new File(root.getAbsolutePath() + File.separator
 					+ ConnectionService.CONFIGURATION_DIR);
@@ -180,10 +178,6 @@ public class Activator extends AbstractUIPlugin
 		File cfgFile = null;
 		try
 		{
-			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			final File root = workspace.getRoot().getRawLocation().toFile();
-			System.out.println(root.getAbsolutePath());
-
 			final File cfgFolder = new File(System.getProperty("user.home") + File.separator
 					+ ConnectionService.OJB_MIGRATION_DIR);
 			if (cfgFolder.exists())
@@ -228,12 +222,11 @@ public class Activator extends AbstractUIPlugin
 	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
 	 * )
 	 */
-	public void log(final String message)
+	public void log(int level, final String message)
 	{
-		final LogService logService = (LogService) this.logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, message);
+			logService.log(level, message);
 		}
 	}
 
@@ -266,7 +259,7 @@ public class Activator extends AbstractUIPlugin
 		final String url = properties.get(PersistenceUnitProperties.JDBC_URL).toString();
 		final String username = properties.get(PersistenceUnitProperties.JDBC_USER).toString();
 		final String password = properties.get(PersistenceUnitProperties.JDBC_PASSWORD).toString();
-		Activator.getDefault().log(
+		Activator.getDefault().log(LogService.LOG_INFO, 
 				persistenceUnit + " (Treiber: " + driver + ", URL: " + url + ", Benutzername: " + username
 						+ ", Passwort: " + password + ").");
 	}
@@ -284,7 +277,8 @@ public class Activator extends AbstractUIPlugin
 
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		this.logServiceTracker.open();
-
+		this.logService = logServiceTracker.getService();
+		
 		this.encryptionServiceTracker = new ServiceTracker<EncryptionService, EncryptionService>(context, EncryptionService.class, null);
 		this.encryptionServiceTracker.open();
 
@@ -306,7 +300,7 @@ public class Activator extends AbstractUIPlugin
 			startPersistenceService();
 		}
 
-		this.log("Plugin " + Activator.PLUGIN_ID + " gestartet.");
+		this.log(LogService.LOG_INFO, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestartet.");
 	}
 
 	/*
@@ -319,7 +313,7 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		this.log("Plugin " + Activator.PLUGIN_ID + " gestoppt.");
+		this.log(LogService.LOG_INFO, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestoppt.");
 
 		this.eventAdminTracker.close();
 //		this.persistenceProviderTracker.close();
@@ -334,8 +328,11 @@ public class Activator extends AbstractUIPlugin
 	
 	public void startPersistenceService()
 	{
+		log(LogService.LOG_INFO, "Starte Persistenz Service...");
 		PersistenceService persistenceService = new PersistenceServiceImpl();
+		log(LogService.LOG_INFO, "Registriere Persistenz Service...");
 		getBundle().getBundleContext().registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
+		log(LogService.LOG_INFO, "Persistenz Service registriert.");
 	}
 	
 	@Override
@@ -453,7 +450,7 @@ public class Activator extends AbstractUIPlugin
 			final Properties properties = System.getProperties();
 			properties.setProperty("derby.system.home", cacheFolder.getAbsolutePath());
 			properties.setProperty("derby.locks.deadlockTrace", "true");
-			this.log("Derby home set: " + System.getProperty("derby.system.home"));
+			this.log(LogService.LOG_INFO, "Derby home gesetzt: " + System.getProperty("derby.system.home"));
 		}
 	}
 
@@ -465,6 +462,37 @@ public class Activator extends AbstractUIPlugin
 	public static Activator getDefault()
 	{
 		return Activator.plugin;
+	}
+
+	public int getLogLevel(int statusSeverity)
+	{
+		switch(statusSeverity)
+		{
+		case IStatus.CANCEL:
+		{
+			return LogService.LOG_WARNING;
+		}
+		case IStatus.ERROR:
+		{
+			return LogService.LOG_ERROR;
+		}
+		case IStatus.INFO:
+		{
+			return LogService.LOG_INFO;
+		}
+		case IStatus.OK:
+		{
+			return LogService.LOG_INFO;
+		}
+		case IStatus.WARNING:
+		{
+			return LogService.LOG_WARNING;
+		}
+		default:
+		{
+			return LogService.LOG_INFO;
+		}
+		}
 	}
 
 	public enum ResultType

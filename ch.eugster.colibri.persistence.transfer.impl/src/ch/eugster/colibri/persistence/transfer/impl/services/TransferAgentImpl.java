@@ -1,7 +1,11 @@
 package ch.eugster.colibri.persistence.transfer.impl.services;
 
+import java.util.Collection;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
@@ -30,21 +34,47 @@ public class TransferAgentImpl implements TransferAgent
 
 	private PersistenceService persistenceService;
 
+	private Collection<User> users;
+	
+	public IStatus transfer(IProgressMonitor monitor, int count)
+	{
+		if (!persistenceService.getServerService().isLocal())
+		{
+			Collection<Receipt> receipts = getReceipts(count);
+			return transfer(receipts, new SubProgressMonitor(monitor, receipts.size()));
+		}
+		return Status.OK_STATUS;
+	}
+
 	@Override
-	public IStatus transfer(final int maxResult)
+	public IStatus transfer(Collection<Receipt> cachedReceipts, IProgressMonitor monitor)
 	{
 		IStatus status = Status.OK_STATUS;
-
-		final CacheService cacheService = this.persistenceService.getCacheService();
 		final ServerService serverService = this.persistenceService.getServerService();
-
-		if (!serverService.isLocal() && serverService.isConnected())
+		if (!serverService.isLocal())
 		{
-			final ReceiptQuery queryService = (ReceiptQuery) cacheService.getQuery(Receipt.class);
-			final Receipt[] receipts = queryService.selectTransferables(maxResult).toArray(new Receipt[0]);
-			for (final Receipt receipt : receipts)
+			if (!serverService.isConnected())
 			{
-				status = this.transfer(receipt);
+				serverService.connect();
+			}
+			if (serverService.isConnected())
+			{
+				if (cachedReceipts.size() == 0)
+				{
+					boolean connected = this.persistenceService.getServerService().connect();
+					status = connected ? Status.OK_STATUS : new Status(IStatus.ERROR, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), "");
+				}
+				else
+				{
+					for (final Receipt cachedReceipt : cachedReceipts)
+					{
+						status = this.transfer(cachedReceipt);
+						if (status.getSeverity() == IStatus.ERROR)
+						{
+							return status;
+						}
+					}
+				}
 			}
 		}
 		return status;
@@ -58,7 +88,6 @@ public class TransferAgentImpl implements TransferAgent
 		}
 	}
 
-	@Override
 	public IStatus transfer(Receipt receipt)
 	{
 		IStatus status = Status.OK_STATUS;
@@ -68,7 +97,11 @@ public class TransferAgentImpl implements TransferAgent
 		{
 			if (!serverService.isConnected())
 			{
-				serverService.connect();
+				boolean connected = serverService.connect();
+				if (!connected)
+				{
+					return new Status(IStatus.ERROR, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), "");
+				}
 			}
 			if (serverService.isConnected())
 			{
@@ -222,7 +255,7 @@ public class TransferAgentImpl implements TransferAgent
 		}
 		if (saveSalespoint)
 		{
-			salespoint = (Salespoint) service.merge(salespoint);
+			salespoint = (Salespoint) service.merge(salespoint, true, false);
 		}
 		return salespoint;
 	}
@@ -287,16 +320,17 @@ public class TransferAgentImpl implements TransferAgent
 				PaymentType.class, source.getPaymentType().getId());
 
 		final Payment target = Payment.newInstance(receipt);
-		target.setBookProvider(source.isBookProvider());
-		target.setProviderBooked(source.isProviderBooked());
-		target.setProviderId(source.getProviderId());
-		target.setProviderState(source.getProviderState());
 		target.setAmount(source.getAmount());
 		target.setBack(source.isBack());
+		target.setBookProvider(source.isBookProvider());
+		target.setCode(source.getCode());
 		target.setDeleted(source.isDeleted());
 		target.setForeignCurrencyQuotation(source.getForeignCurrencyQuotation());
 		target.setForeignCurrencyRoundFactor(source.getForeignCurrencyRoundFactor());
 		target.setPaymentType(paymentType);
+		target.setProviderBooked(source.isProviderBooked());
+		target.setProviderId(source.getProviderId());
+		target.setProviderState(source.getProviderState());
 		target.setTimestamp(source.getTimestamp());
 		target.setUpdate(source.getUpdate());
 		target.setVersion(0);
@@ -376,10 +410,18 @@ public class TransferAgentImpl implements TransferAgent
 			source.setTransferred(true);
 			source = (Receipt) this.persistenceService.getCacheService().merge(source, false);
 		}
-		catch (RuntimeException e)
+		catch (Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Speichern des Belegs fehlgeschlagen");
 		}
 		return status;
+	}
+
+	@Override
+	public Collection<Receipt> getReceipts(int max) 
+	{
+		final CacheService cacheService = this.persistenceService.getCacheService();
+		final ReceiptQuery queryService = (ReceiptQuery) cacheService.getQuery(Receipt.class);
+		return queryService.selectTransferables(max);
 	}
 }

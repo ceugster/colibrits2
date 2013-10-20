@@ -106,6 +106,16 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return this.salespoint.getCustomerDisplaySettings();
 	}
 
+//	public void setOtherId(Long otherId)
+//	{
+//		this.otherId = otherId;
+//	}
+//	
+//	public Long getOtherId()
+//	{
+//		return this.otherId;
+//	}
+	
 	public Collection<SettlementDetail> getDetails()
 	{
 		return this.details;

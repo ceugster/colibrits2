@@ -16,7 +16,7 @@ import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.provider.galileo.Activator;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderService;
 
 public class UpdateProviderServerCom4j extends AbstractServer implements IUpdateProviderServer
 {
@@ -103,7 +103,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 								{
 									String msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
 											+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
-									status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg);
+									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
 									log(LogService.LOG_INFO, (msg));
 								}
 							}
@@ -217,7 +217,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 
 	private IStatus galileoTransactionWritten()
 	{
-		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
 		final String msg = "Galileo: Transaktion geschrieben.";
 
 		final Boolean result = (Boolean)this.getGalserve().vtranswrite();
@@ -227,7 +227,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		}
 		else
 		{
-			status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg);
+			status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
 			log(LogService.LOG_INFO, msg + " FEHLER!");
 		}
 
@@ -330,7 +330,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				}
 				else
 				{
-					status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
 					log(LogService.LOG_INFO, status.getMessage());
 				}
 			}
@@ -344,7 +344,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				}
 				else
 				{
-					status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
 						log(LogService.LOG_INFO, status.getMessage());
 				}
 			}
@@ -507,14 +507,14 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 					}
 					catch (NullPointerException e)
 					{
-						status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic(), e);
+						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic(), e);
 					}
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic(), e);
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic(), e);
 		}
 		return status;
 	}
@@ -530,7 +530,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			else
 			{
 				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen).";
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
 				log(LogService.LOG_INFO, msg);
 			}
 		}
@@ -552,7 +552,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			{
 				String error = (String) this.getGalserve().crgerror();
 				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + error + ").";
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
 				log(LogService.LOG_INFO, msg);
 			}
 		}

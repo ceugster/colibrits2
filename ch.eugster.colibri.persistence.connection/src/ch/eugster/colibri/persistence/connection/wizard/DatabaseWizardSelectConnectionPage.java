@@ -1,9 +1,12 @@
 package ch.eugster.colibri.persistence.connection.wizard;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -37,8 +40,6 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 
 	private Font normal;
 
-	private Element selectedConnection;
-
 	private Element currentConnection;
 
 	public DatabaseWizardSelectConnectionPage(final String name)
@@ -54,12 +55,12 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 	@Override
 	public boolean canFlipToNextPage()
 	{
-		final StructuredSelection ssel = (StructuredSelection) this.viewer.getSelection();
-		if (ssel.isEmpty())
-		{
-			return true;
-		}
-		return false;
+//		final StructuredSelection ssel = (StructuredSelection) this.viewer.getSelection();
+//		if (ssel.isEmpty())
+//		{
+//			return true;
+//		}
+		return true;
 	}
 
 	@Override
@@ -92,7 +93,22 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 				final StructuredSelection ssel = (StructuredSelection) event.getSelection();
 				if (!ssel.isEmpty())
 				{
-					DatabaseWizardSelectConnectionPage.this.selectedConnection = (Element) ssel.getFirstElement();
+					DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardSelectConnectionPage.this.getWizard();
+					wizard.setSelectedConnection((Element) ssel.getFirstElement());
+					DatabaseWizardSelectConnectionPage.this.setPageComplete(DatabaseWizardSelectConnectionPage.this.validatePage());
+				}
+			}
+		});
+		this.viewer.addSelectionChangedListener(new ISelectionChangedListener()
+		{
+			@Override
+			public void selectionChanged(final SelectionChangedEvent event)
+			{
+				final StructuredSelection ssel = (StructuredSelection) event.getSelection();
+				if (!ssel.isEmpty())
+				{
+					DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardSelectConnectionPage.this.getWizard();
+					wizard.setSelectedConnection((Element) ssel.getFirstElement());
 					DatabaseWizardSelectConnectionPage.this.setPageComplete(DatabaseWizardSelectConnectionPage.this.validatePage());
 				}
 			}
@@ -107,7 +123,7 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 			{
 				final Element element = (Element) cell.getElement();
 				cell.setText(element.getText());
-				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.currentConnection ? DatabaseWizardSelectConnectionPage.this.bold
 						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
@@ -123,7 +139,7 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 				final String driverName = element.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);
 				final SupportedDriver driver = SupportedDriver.findDriver(driverName);
 				cell.setText(driver.getPlatform());
-				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.currentConnection ? DatabaseWizardSelectConnectionPage.this.bold
 						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
@@ -137,7 +153,7 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 			{
 				final Element element = (Element) cell.getElement();
 				cell.setText(element.getAttributeValue(PersistenceUnitProperties.JDBC_URL));
-				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.currentConnection ? DatabaseWizardSelectConnectionPage.this.bold
 						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
@@ -152,7 +168,7 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 				final Element element = (Element) cell.getElement();
 				final boolean active = element.getParentElement().getName().equals("current");
 				cell.setText(active ? "Ja" : "");
-				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.selectedConnection ? DatabaseWizardSelectConnectionPage.this.bold
+				cell.setFont(element == DatabaseWizardSelectConnectionPage.this.currentConnection ? DatabaseWizardSelectConnectionPage.this.bold
 						: DatabaseWizardSelectConnectionPage.this.normal);
 			}
 		});
@@ -167,6 +183,7 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 			}
 			this.currentConnection = document.getRootElement().getChild("current").getChild("connection");
 			this.viewer.setSelection(new StructuredSelection(new Element[] { this.currentConnection }));
+			((DatabaseWizard) this.getWizard()).setSelectedConnection(this.currentConnection);
 		}
 
 		final Composite buttonComposite = new Composite(composite, SWT.None);
@@ -187,7 +204,9 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
+				DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardSelectConnectionPage.this.getWizard();
 				DatabaseWizardSelectConnectionPage.this.viewer.setSelection(new StructuredSelection());
+				wizard.setSelectedConnection(null);
 				DatabaseWizardSelectConnectionPage.this.setPageComplete(DatabaseWizardSelectConnectionPage.this.validatePage());
 			}
 		});
@@ -206,6 +225,7 @@ public class DatabaseWizardSelectConnectionPage extends WizardPage implements IW
 			@Override
 			public void widgetSelected(final SelectionEvent e)
 			{
+				MessageDialog.openInformation(DatabaseWizardSelectConnectionPage.this.getShell(), "", "Diese Funktion ist nicht aktiv.");
 			}
 		});
 

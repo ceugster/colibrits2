@@ -102,6 +102,10 @@ public class ProfileReplicator extends AbstractEntityReplicator<Profile>
 		target.setDisplayFontSize(source.getDisplayFontSize());
 		target.setDisplayFontStyle(source.getDisplayFontStyle());
 		target.setDisplayShowReceivedRemainderAlways(source.getDisplayShowReceivedRemainderAlways());
+		target.setInputNameLabelBg(source.getInputNameLabelBg());
+		target.setInputNameLabelFg(source.getInputNameLabelFg());
+		target.setInputNameLabelFontSize(source.getInputNameLabelFontSize());
+		target.setInputNameLabelFontStyle(source.getInputNameLabelFontStyle());
 		target.setListBg(source.getListBg());
 		target.setListFg(source.getListFg());
 		target.setListFontSize(source.getListFontSize());

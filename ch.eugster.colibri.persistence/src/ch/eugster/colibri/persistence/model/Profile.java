@@ -156,6 +156,25 @@ public class Profile extends AbstractEntity implements IReplicatable
 	private int buttonFailOverBg;
 
 	/**
+	 * Input Label
+	 */
+	@Basic
+	@Column(name = "pr_input_name_lbl_font_size")
+	private float inputNameLabelFontSize;
+
+	@Basic
+	@Column(name = "pr_input_name_lbl_font_style")
+	private int inputNameLabelFontStyle;
+
+	@Basic
+	@Column(name = "pr_input_name_lbl_fg")
+	private int inputNameLabelFg;
+
+	@Basic
+	@Column(name = "pr_input_name_lbl_bg")
+	private int inputNameLabelBg;
+
+	/**
 	 * Labels
 	 */
 	@Basic
@@ -402,6 +421,26 @@ public class Profile extends AbstractEntity implements IReplicatable
 		return this.valueOf(this.name);
 	}
 
+	public int getInputNameLabelBg()
+	{
+		return this.inputNameLabelBg;
+	}
+
+	public int getInputNameLabelFg()
+	{
+		return this.inputNameLabelFg;
+	}
+
+	public float getInputNameLabelFontSize()
+	{
+		return this.inputNameLabelFontSize;
+	}
+
+	public int getInputNameLabelFontStyle()
+	{
+		return this.inputNameLabelFontStyle;
+	}
+
 	public int getNameLabelBg()
 	{
 		return this.nameLabelBg;
@@ -529,6 +568,13 @@ public class Profile extends AbstractEntity implements IReplicatable
 		this.setButtonFailOverVerticalAlign(SwingConstants.CENTER);
 		this.setButtonFailOverFg(java.awt.Color.BLACK.getRGB());
 		this.setButtonFailOverBg(java.awt.Color.GRAY.getRGB());
+		/*
+		 * Input Labels
+		 */
+		this.setInputNameLabelFontSize(18f);
+		this.setInputNameLabelFontStyle(Font.BOLD);
+		this.setInputNameLabelFg(Color.BLACK.getRGB());
+		this.setInputNameLabelBg(Color.WHITE.getRGB());
 		/*
 		 * Labels
 		 */
@@ -740,6 +786,26 @@ public class Profile extends AbstractEntity implements IReplicatable
 	public void setName(final String name)
 	{
 		this.propertyChangeSupport.firePropertyChange("name", this.name, this.name = name);
+	}
+
+	public void setInputNameLabelBg(final int nameLabelBg)
+	{
+		this.propertyChangeSupport.firePropertyChange("inputNameLabelBg", this.inputNameLabelBg, this.inputNameLabelBg = nameLabelBg);
+	}
+
+	public void setInputNameLabelFg(final int nameLabelFg)
+	{
+		this.propertyChangeSupport.firePropertyChange("inputNameLabelFg", this.inputNameLabelFg, this.inputNameLabelFg = nameLabelFg);
+	}
+
+	public void setInputNameLabelFontSize(final float nameLabelFontSize)
+	{
+		this.propertyChangeSupport.firePropertyChange("inputNameLabelFontSize", this.inputNameLabelFontSize, this.inputNameLabelFontSize = nameLabelFontSize);
+	}
+
+	public void setInputNameLabelFontStyle(final int nameLabelFontStyle)
+	{
+		this.propertyChangeSupport.firePropertyChange("inputNameLabelFontStyle", this.inputNameLabelFontStyle, this.inputNameLabelFontStyle = nameLabelFontStyle);
 	}
 
 	public void setNameLabelBg(final int nameLabelBg)

@@ -139,7 +139,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			final boolean open = this.openDatabase(this.database);
 			if (!open)
 			{
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 						"Die Verbindung zur Warenbewirtschaftung kann nicht hergestellt werden.");
 			}
 
@@ -152,7 +152,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Anfordern der Warengruppen aus Galileo ist ein Fehler aufgetreten.", e);
 		}
 
@@ -162,13 +162,13 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	@Override
 	public IStatus importProductGroups(final IProgressMonitor monitor)
 	{
-		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 				"Die Warengruppen wurden erfolgreich importiert.");
 		if (this.persistenceService == null)
 		{
 			return new Status(
 					IStatus.WARNING,
-					Activator.PLUGIN_ID,
+					Activator.getDefault().getBundle().getSymbolicName(),
 					"Es besteht keine Verbindung zur Datenbank. Bitte versuchen Sie diesen Vorgang, wenn die Verbindung zur Datenbank wiederhergestellt ist.");
 		}
 		else
@@ -236,7 +236,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					" Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " konnte nicht hergestellt werden.", e);
 			e.printStackTrace();
 		}
@@ -264,7 +264,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			final boolean open = this.openDatabase(this.database);
 			if (!open)
 			{
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 						"Die Verbindung zur Warenbewirtschaftung kann nicht hergestellt werden.");
 			}
 
@@ -277,7 +277,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Anfordern der Warengruppen aus Galileo ist ein Fehler aufgetreten.", e);
 		}
 
@@ -287,13 +287,13 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	@Override
 	public IStatus synchronizeProductGroups(final IProgressMonitor monitor)
 	{
-		IStatus status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 				"Die Warengruppen wurden erfolgreich synchronisiert.");
 		if (this.persistenceService == null)
 		{
 			return new Status(
 					IStatus.WARNING,
-					Activator.PLUGIN_ID,
+					Activator.getDefault().getBundle().getSymbolicName(),
 					"Es besteht keine Verbindung zur Datenbank. Bitte versuchen Sie diesen Vorgang, wenn die Verbindung zur Datenbank wiederhergestellt ist.");
 		}
 		else
@@ -432,7 +432,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 		if (codes.length == 0)
 		{
-			status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 					"Es ist keine Aktualisierung der Warengruppen notwendig (Es wurden keine zu aktualisierenden Warengruppen gefunden).");
 		}
 		else
@@ -494,7 +494,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 					msg = msg.append("\n");
 					msg = msg.append("\nEingefügte Warengruppen: " + formatter.format(this.countInserted));
 					msg = msg.append("\nAktualisierte Warengruppen: " + formatter.format(this.countUpdated));
-					status = new Status(IStatus.OK, Activator.PLUGIN_ID, msg.toString());
+					status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), msg.toString());
 				}
 				else
 				{
@@ -504,7 +504,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 					msg = msg.append("\nEingefügte Warengruppen: " + formatter.format(this.countInserted));
 					msg = msg.append("\nAktualisierte Warengruppen: " + formatter.format(this.countUpdated));
 					msg = msg.append("\nManuell zuzuordnen: " + formatter.format(this.countNotMapped) + " !");
-					status = new Status(IStatus.OK, Activator.PLUGIN_ID, msg.toString());
+					status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), msg.toString());
 				}
 			}
 			else
@@ -524,7 +524,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 						msg = msg.append(", ");
 					}
 				}
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg.toString());
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg.toString());
 			}
 		}
 		return status;
@@ -747,11 +747,11 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 				}
 				count++;
 			}
-			status = new Status(IStatus.OK, Activator.PLUGIN_ID, "Die Zuordnung ist abgeschlossen. Es wurden " + count + " Steuersätze geprüft. Es " + (newCodes == 0 ? "mussten keine neuen Codes hinzugefügt werden." : (newCodes == 1 ? "wurde ein Code zugeordnet." : "wurden " + newCodes + " zugeordnet.")));
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Zuordnung ist abgeschlossen. Es wurden " + count + " Steuersätze geprüft. Es " + (newCodes == 0 ? "mussten keine neuen Codes hinzugefügt werden." : (newCodes == 1 ? "wurde ein Code zugeordnet." : "wurden " + newCodes + " zugeordnet.")));
 		}
 		else
 		{
-			status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Die Zuordnung konnte nicht durchgeführt werden, da keine Verbindung zur Datenbank hergestellt werden konnte.");
+			status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), "Die Zuordnung konnte nicht durchgeführt werden, da keine Verbindung zur Datenbank hergestellt werden konnte.");
 		}
 		return status;
 	}

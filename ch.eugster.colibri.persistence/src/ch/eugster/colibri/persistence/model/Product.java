@@ -120,6 +120,50 @@ public class Product extends AbstractEntity
 		{
 			title = title.append(this.getAuthorShortform());
 		}
+		if (title.toString().trim().isEmpty())
+		{
+			title = title.append(this.getCode().trim());
+		}
+		if (title.toString().trim().isEmpty())
+		{
+			if (this.getExternalProductGroup() == null)
+			{
+				title = title.append(this.getPosition().getProductGroup().getName().trim());
+			}
+			else
+			{
+				title = title.append(this.getExternalProductGroup().getProductGroupMapping().getProductGroup().getName().trim());
+			}
+		}
+		return title.toString().trim();
+	}
+
+	public String getTitleAndAuthorShortFormNoCode()
+	{
+		StringBuilder title = new StringBuilder();
+		if (this.getTitle() != null && !this.getTitle().isEmpty())
+		{
+			title = title.append(this.getTitle());
+			if (this.getTitle() != null && !this.getTitle().isEmpty())
+			{
+				title = title.append(", ");
+			}
+		}
+		if (this.getAuthor() != null && !this.getAuthor().isEmpty())
+		{
+			title = title.append(this.getAuthorShortform());
+		}
+		if (title.toString().trim().isEmpty())
+		{
+			if (this.getExternalProductGroup() == null)
+			{
+				title = title.append(this.getPosition().getProductGroup().getName().trim());
+			}
+			else
+			{
+				title = title.append(this.getExternalProductGroup().getProductGroupMapping().getProductGroup().getName().trim());
+			}
+		}
 		return title.toString().trim();
 	}
 

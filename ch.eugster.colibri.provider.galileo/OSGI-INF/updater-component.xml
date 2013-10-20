@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="ch.eugster.colibri.provider.galileo.provider.updater">
+   <implementation class="ch.eugster.colibri.provider.galileo.service.GalileoUpdaterComponent"/>
+   <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="logService" policy="static" unbind="unsetLogService"/>
+   <service>
+      <provide interface="ch.eugster.colibri.provider.service.ProviderUpdater"/>
+   </service>
+   <reference bind="setEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
+   <reference bind="setProviderQuery" cardinality="1..1" interface="ch.eugster.colibri.provider.service.ProviderQuery" name="ProviderQuery" policy="static" unbind="unsetProviderQuery"/>
+   <property name="service.ranking" type="Integer" value="10000"/>
+</scr:component>

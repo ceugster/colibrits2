@@ -45,7 +45,7 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderService;
 
 import com4j.ComException;
 
@@ -432,13 +432,13 @@ public abstract class AbstractServer implements IServer
 		if (galserve.do_NOpen(path))
 		{
 			galserve.do_NClose();
-			status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 					"Die Verbindung zur Warenbewirtschaftung Galileo wurde erfolgreich hergestellt.");
 		}
 		else
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-					"Das Herstellen der Verbindung zur Warenbewirtschaftung Galileo ist fehlgeschlagen.");
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+					ProviderService.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Die Verbindung konnte nicht hergestellt werden."));
 		}
 		galserve.dispose();
 		return status;
@@ -486,7 +486,7 @@ public abstract class AbstractServer implements IServer
 					this.open = this.getGalserve().do_NOpen(this.database);
 					if (!this.open)
 					{
-						this.status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, ProviderInterface.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden."));
+						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden."));
 					}
 				}
 				catch (Exception e)
@@ -503,7 +503,7 @@ public abstract class AbstractServer implements IServer
 	{
 		this.status = Status.OK_STATUS;
 
-		this.status = new Status(IStatus.OK, Activator.PLUGIN_ID, ProviderInterface.Topic.ARTICLE_UPDATE.topic());
+		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
 
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
 				LogService.class, null);
@@ -523,7 +523,7 @@ public abstract class AbstractServer implements IServer
 		}
 		catch (ComException e)
 		{
-			this.status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
 		}
 

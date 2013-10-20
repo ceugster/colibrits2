@@ -1,7 +1,9 @@
 package ch.eugster.colibri.persistence.connection.service;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -303,11 +305,14 @@ public abstract class AbstractConnectionService implements ConnectionService
 	
 	public EntityManagerFactory getEntityManagerFactory()
 	{
-		if (entityManagerFactory == null)
+		if (entityManagerFactory == null || !entityManagerFactory.isOpen())
 		{
 			final Properties properties = this.getProperties();
+			Activator.getDefault().log(LogService.LOG_INFO, "Aktualisiere Datenbankversion...");
 			IStatus status = this.updateDatabase(properties);
+			Activator.getDefault().log(LogService.LOG_INFO, "Kreiere EntityManagerFactory für Datenbank " + properties.getProperty(PersistenceUnitProperties.JDBC_URL) + ".");
 			entityManagerFactory = createEntityManagerFactory(status, properties);
+			Activator.getDefault().log(LogService.LOG_INFO, "EntityManagerFactory für Datenbank kreiert.");
 		}
 		return entityManagerFactory;
 	}
@@ -357,7 +362,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		final Dictionary<String, Object> eventProps = new Hashtable<String, Object>();
 		eventProps.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
 		eventProps.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
-		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
+		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 //		if (this.getPersistenceService().getComponentContext() != null)
 //		{
 //			if (this.getPersistenceService().getComponentContext().getServiceReference() != null)
@@ -400,13 +405,20 @@ public abstract class AbstractConnectionService implements ConnectionService
 	{
 		try
 		{
+			
+			Activator.getDefault().log(LogService.LOG_INFO, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
+			System.out.println("Start creating entityManager: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			this.entityManager = getEntityManagerFactory().createEntityManager(getEntityManagerFactory().getProperties());
+			System.out.println("End creating entityManager: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+			Activator.getDefault().log(LogService.LOG_INFO, "EntityManager kreiert.");
 			this.entityManager.setFlushMode(FlushModeType.COMMIT);
 			CommonSettingsQuery query = (CommonSettingsQuery) this.getQuery(CommonSettings.class);
 			query.findDefault();
 		}
 		catch (Exception e)
 		{
+			System.out.println("Creating entityManager failed: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+			Activator.getDefault().log(LogService.LOG_INFO, "EntityManager konnte nicht kreiert werden.");
 			resetEntityManager(e);
 		}
 		return this.entityManager != null;
@@ -433,9 +445,9 @@ public abstract class AbstractConnectionService implements ConnectionService
 				entityManager.clear();
 				entityManager.close();
 				entityManager = null;
-				this.getPersistenceService().sendEvent(this.getEvent(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Keine Verbindung", throwable)));
 			}
 		}
+		this.getPersistenceService().sendEvent(this.getEvent(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Keine Verbindung", throwable)));
 	}
 	
 	@Override
@@ -476,11 +488,16 @@ public abstract class AbstractConnectionService implements ConnectionService
 		return this.merge(entity, true);
 	}
 
+	@Override
+	public AbstractEntity merge(final AbstractEntity entity, boolean updateTimestamp)
+	{
+		return this.merge(entity, updateTimestamp, true);
+	}
+
 	protected abstract void updateReplicationValue(Entity entity);
 
 	@Override
-	public synchronized AbstractEntity merge(AbstractEntity entity, final boolean updateTimestamp)
-			throws RuntimeException
+	public synchronized AbstractEntity merge(AbstractEntity entity, final boolean updateTimestamp, boolean updateReplicatable)
 	{
 		EntityManager entityManager = this.getEntityManager();
 		if (entityManager != null)
@@ -503,13 +520,13 @@ public abstract class AbstractConnectionService implements ConnectionService
 				catch (Exception e)
 				{
 					e.printStackTrace();
+					if (tx.isActive())
+					{
+						tx.rollback();
+					}
 					if (e instanceof RollbackException)
 					{
 						RollbackException re = (RollbackException) e;
-						if (tx.isActive())
-						{
-							tx.rollback();
-						}
 						if (re.getCause() instanceof DatabaseException)
 						{
 							DatabaseException de = (DatabaseException) re.getCause();
@@ -524,14 +541,13 @@ public abstract class AbstractConnectionService implements ConnectionService
 				}
 				finally
 				{
-					updateReplicationValue(entity);
+					if (updateReplicatable)
+					{
+						updateReplicationValue(entity);
+					}
 //					entityManager.clear();
 //					closeEntityManager(entityManager);
 				}
-			}
-			if (tx.isActive())
-			{
-				System.out.println();
 			}
 		}
 		return entity;
@@ -555,7 +571,6 @@ public abstract class AbstractConnectionService implements ConnectionService
 	}
 
 	public synchronized void persist(final AbstractEntity entity, final boolean updateTimestamp)
-			throws RuntimeException
 	{
 		EntityManager entityManager = this.getEntityManager();
 		if (entityManager != null)
@@ -598,7 +613,6 @@ public abstract class AbstractConnectionService implements ConnectionService
 	}
 
 	public synchronized void remove(final AbstractEntity entity)
-			throws RuntimeException
 	{
 		EntityManager entityManager = this.getEntityManager();
 		if (entityManager != null)
@@ -645,7 +659,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				this.getPersistenceService()
 						.getEventAdmin()
 						.postEvent(
-								this.getEvent(new Status(IStatus.OK, Activator.PLUGIN_ID, properties
+								this.getEvent(new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), properties
 										.getProperty(PersistenceUnitProperties.JDBC_URL))));
 				if (entityManager != null)
 				{

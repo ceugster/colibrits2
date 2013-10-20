@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.wizard.SupportedDriver;
@@ -109,12 +110,12 @@ public class DatabaseMigrator extends AbstractConfigurator
 	{
 		try
 		{
-			Activator.getDefault().log("Start Migration.");
+			Activator.getDefault().log(LogService.LOG_INFO, "Start Migration.");
 			monitor.beginTask("Die Daten aus der Vorgängerversion werden importiert...", 3);
 			monitor.worked(1);
 			if (this.getEntityManager() != null)
 			{
-				Activator.getDefault().log("Verbindung zur Datenbank herstellen.");
+				Activator.getDefault().log(LogService.LOG_INFO, "Verbindung zur Datenbank herstellen.");
 				final PersistenceBroker broker = DatabaseMigrator
 						.createOjbPersistenceBroker(DatabaseMigrator.this.oldDocument);
 				monitor.worked(1);
@@ -199,7 +200,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			final IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			final IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Blöcke ist ein Fehler aufgetreten (Block: " + block.name + ").", e);
 			this.log(status);
 		}
@@ -387,13 +388,12 @@ public class DatabaseMigrator extends AbstractConfigurator
 			}
 			else
 			{
-				System.out.println();
 			}
 			monitor.worked(1);
 		}
 		catch (final Exception e)
 		{
-			final IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			final IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Tastenbelegung ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -444,7 +444,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			final IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			final IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Tabs ist ein Fehler aufgetreten (Tab: " + tab.title + ").", e);
 			this.log(status);
 		}
@@ -546,7 +546,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Profile ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -620,7 +620,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		catch (final Exception e)
 		{
 			e.printStackTrace();
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Einfügen der Benutzerrollen ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -739,7 +739,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Allgmeinen Einstellungen ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -814,7 +814,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Währungen ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -965,7 +965,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Zahlungsarten ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -1165,7 +1165,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Warengruppen ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -1249,7 +1249,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Kassen ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -1334,7 +1334,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Kassen ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -1508,7 +1508,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme Mehrwertsteuern ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -1567,7 +1567,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Bei der Übernahme der Benutzer ist ein Fehler aufgetreten.", e);
 			this.log(status);
 		}
@@ -1673,7 +1673,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 			final File file = FileLocator.getBundleFile(Activator.getDefault().getBundle());
 			path = file.getAbsolutePath() + "/META-INF/OJB.properties";
 			ojbProperties = new File(path);
-			Activator.getDefault().log("Pfad zur Datei mit Datenbankeigenschaften: " + path + ".");
+			Activator.getDefault().log(LogService.LOG_INFO, "Pfad zur Datei mit Datenbankeigenschaften: " + path + ".");
 		}
 		catch (final IOException e)
 		{
@@ -1690,19 +1690,19 @@ public class DatabaseMigrator extends AbstractConfigurator
 			final Element element = colibri.getRootElement().getChild("database").getChild("standard")
 					.getChild("connection");
 			final String driver = element.getAttributeValue("driver");
-			Activator.getDefault().log("Treiber: " + driver + ".");
+			Activator.getDefault().log(LogService.LOG_INFO, "Treiber: " + driver + ".");
 			final String protocol = element.getAttributeValue("protocol");
 			final String subprotocol = element.getAttributeValue("subprotocol");
 			final String host = element.getAttributeValue("host");
 			final String port = element.getAttributeValue("port");
 			final String database = element.getAttributeValue("database");
 			final String url = protocol + ":" + subprotocol + "://" + host + ":" + port + "/" + database;
-			Activator.getDefault().log("URL: " + url + ".");
+			Activator.getDefault().log(LogService.LOG_INFO, "URL: " + url + ".");
 
 			final String username = element.getAttributeValue("username");
-			Activator.getDefault().log("Benutzername: " + username + ".");
+			Activator.getDefault().log(LogService.LOG_INFO, "Benutzername: " + username + ".");
 			final String password = element.getAttributeValue("password");
-			Activator.getDefault().log("Passwort: " + password + ".");
+			Activator.getDefault().log(LogService.LOG_INFO, "Passwort: " + password + ".");
 
 			final ConnectionRepository cr = MetadataManager.getInstance().connectionRepository();
 			final PBKey key = new PBKey("standard", username, password);
@@ -1715,7 +1715,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 			}
 
 			broker = PersistenceBrokerFactory.createPersistenceBroker(key);
-			Activator.getDefault().log("Verbindung hergestellt: " + (broker == null ? "FEHLER" : "OK") + ".");
+			Activator.getDefault().log(LogService.LOG_INFO, "Verbindung hergestellt: " + (broker == null ? "FEHLER" : "OK") + ".");
 		}
 		return broker;
 	}

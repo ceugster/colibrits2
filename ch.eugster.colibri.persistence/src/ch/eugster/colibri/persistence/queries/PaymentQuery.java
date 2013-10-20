@@ -18,12 +18,14 @@ import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementPayment;
 import ch.eugster.colibri.persistence.model.Stock;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
 
 public class PaymentQuery extends AbstractQuery<Payment>
 {
@@ -311,4 +313,57 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		}
 		return details.values();
 	}
+
+	public long countProviderUpdates(Salespoint salespoint, String providerId, ConnectionType connectionType)
+	{
+		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+		if (connectionType.equals(ConnectionType.LOCAL))
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
+		}
+		
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+		Expression provider = new ExpressionBuilder().get("providerId").equal(providerId);
+		provider = provider.and(update);
+
+		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
+		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
+
+		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
+		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
+
+		final Expression states = expression.and(deleted).and(saved.or(reversed));
+		final long value = this.count(states);
+		return value;
+	}
+
+	public Collection<Payment> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows, ConnectionType connectionType)
+	{
+		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+		if (connectionType.equals(ConnectionType.LOCAL))
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
+		}
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+		Expression provider = new ExpressionBuilder().get("providerId").equal(providerId);
+		provider = provider.and(update);
+
+		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
+		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
+
+		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
+		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
+
+		final Expression states = expression.and(deleted).and(saved.or(reversed));
+		final Collection<Payment> payments = this.select(states, maxRows);
+		return payments;
+	}
+
 }

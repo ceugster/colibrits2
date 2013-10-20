@@ -230,7 +230,7 @@ public class Currency extends AbstractEntity implements IReplicatable
 	
 	public static double change(Currency source, Currency target, double sourceAmount)
 	{
-		double targetAmount = (sourceAmount / source.quotation);
+		double targetAmount = sourceAmount / target.quotation;
 		return targetAmount;
 	}
 }

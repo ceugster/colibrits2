@@ -482,7 +482,7 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 		PersistenceService service = tracker.getService();
 		if (service != null)
 		{
-			CommonSettingsQuery query = (CommonSettingsQuery) service.getServerService().getQuery(CommonSettings.class);
+			CommonSettingsQuery query = (CommonSettingsQuery) service.getCacheService().getQuery(CommonSettings.class);
 			CommonSettings settings = query.findDefault();
 			return settings.getAddress();
 		}
@@ -496,7 +496,7 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 		PersistenceService service = tracker.getService();
 		if (service != null)
 		{
-			CommonSettingsQuery query = (CommonSettingsQuery) service.getServerService().getQuery(CommonSettings.class);
+			CommonSettingsQuery query = (CommonSettingsQuery) service.getCacheService().getQuery(CommonSettings.class);
 			CommonSettings settings = query.findDefault();
 			return settings.getTaxNumber();
 		}

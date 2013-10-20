@@ -1,7 +1,5 @@
 package ch.eugster.colibri.persistence.service;
 
-import java.io.File;
-
 import javax.persistence.EntityManager;
 
 import ch.eugster.colibri.persistence.model.AbstractEntity;
@@ -45,6 +43,8 @@ public interface ConnectionService
 
 	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp);
 
+	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp, boolean updateReplicatable);
+
 	void remove(AbstractEntity entity);
 	
 	void persist(AbstractEntity entity);
@@ -67,4 +67,11 @@ public interface ConnectionService
 	boolean connect();
 	
 	int getTimeout();
+	
+	ConnectionType getConnectionType();
+	
+	public enum ConnectionType
+	{
+		LOCAL, SERVER;
+	}
 }

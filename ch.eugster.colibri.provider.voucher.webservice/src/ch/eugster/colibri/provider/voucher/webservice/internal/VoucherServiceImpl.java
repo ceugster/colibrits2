@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.datacontract.schemas._2004._07.GCDService.CFaultEx;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Composite;
@@ -30,8 +31,14 @@ import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Receipt.QuotationType;
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
+import ch.eugster.colibri.persistence.queries.PaymentQuery;
+import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
+import ch.eugster.colibri.persistence.queries.SalespointQuery;
+import ch.eugster.colibri.persistence.service.ConnectionService;
+import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
@@ -49,13 +56,13 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	
 	private LogService logService;
 
-	private ComponentContext context;
-
 	private Map<String, IProperty> properties;
 	
 	private String company;
 	
 	private IService service;
+	
+	private ComponentContext context;
 
 	public void setPersistenceService(PersistenceService service)
 	{
@@ -221,9 +228,11 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 
 	private Result doQuery(Short pin, String code, double amount, Command command, Integer mandator, String company, Integer distribution, Integer business)
 	{
-		Short testPIN = new Short((short) 2927);
+//		Short testPIN = new Short((short) 2927);
+		Short testPIN = null;
 		
 		Result result = null;
+		this.properties = loadProperties();
 		IProperty prop = this.properties.get(VoucherProperty.URL.key());
 		String url = prop.value();
 		prop = this.properties.get(VoucherProperty.USERNAME.key());
@@ -240,18 +249,18 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			}
 			
 			log(LogService.LOG_INFO, "Aufruf von GCD_V1: url=" + url + ";username=" + username + ";password=" + password + ";betrag=" + amount + ";command=" + command.command() + "(" + command.description() + ")" + ";beschreibung=" + command.description() + ";mandant=" + mandator + ";firma=" + company + ";vertrieb=" + distribution + ";geschäft=" + business + ";");
-			String value = service.GCD_V1(username, password, testPIN, code, Double.valueOf(amount).toString(), Command.VERSION_WS.command(), command.description(), mandator, company, distribution, business);
-			if (value.compareTo(MINIMAL_VERSION_WS) < 0)
-			{
-				result = new Result(command, -1, "Die Version des Webservices (" + value + " entspricht nicht der erforderlichen Version (" + MINIMAL_VERSION_WS + ").", context.getBundleContext().getBundle().getSymbolicName(), null);
-				
-			}
-			else
-			{
+//			String value = service.GCD_V1(username, password, testPIN, code, Double.valueOf(amount).toString(), Command.VERSION_WS.command(), command.description(), mandator, company, distribution, business);
+//			if (value.compareTo(MINIMAL_VERSION_WS) < 0)
+//			{
+//				result = new Result(command, -1, "Die Version des Webservices (" + value + " entspricht nicht der erforderlichen Version (" + MINIMAL_VERSION_WS + ").", context.getBundleContext().getBundle().getSymbolicName(), null);
+//				
+//			}
+//			else
+//			{
 				log(LogService.LOG_INFO, "Aufruf von GCD_V1: url=" + url + ";username=" + username + ";password=" + password + ";betrag=" + amount + ";command=" + command.command() + "(" + command.description() + ")" + ";beschreibung=" + command.description() + ";mandant=" + mandator + ";firma=" + company + ";vertrieb=" + distribution + ";geschäft=" + business + ";");
-				value = service.GCD_V1(username, password, testPIN, code, Double.valueOf(amount).toString(), command.command(), command.description(), mandator, company, distribution, business);
+				String value = service.GCD_V1(username, password, testPIN, code, Double.valueOf(amount).toString(), command.command(), command.description(), mandator, company, distribution, business);
 				result = new Result(command, Double.valueOf(value).doubleValue());
-			}
+//			}
 		}
 		catch(CFaultEx e)
 		{
@@ -368,6 +377,211 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	public String getName() 
 	{
 		return "eGutschein";
+	}
+	
+	@Override
+	public boolean doCheckFailover() 
+	{
+		return false;
+	}
+
+	@Override
+	public boolean canCheckConnection() 
+	{
+		return true;
+	}
+
+	@Override
+	public IStatus checkConnection() 
+	{
+		return Status.OK_STATUS;
+	}
+
+	@Override
+	public IStatus checkConnection(Map<String, IProperty> properties) 
+	{
+		IStatus status = new Status(IStatus.OK, context.getBundleContext().getBundle().getSymbolicName(), "Die Verbindung zu " + this.getName() + " wurde erfolgreich hergestellt.");
+		if (Desktop.isDesktopSupported())
+		{
+			IProperty urlProperty = properties.get(VoucherProperty.URL.key());
+			String urlValue = urlProperty.value();
+			try
+			{
+				URI uri = new URI(urlValue);
+				Desktop desktop = Desktop.getDesktop();
+				desktop.browse(uri);
+			}
+			catch (IOException e)
+			{
+				status = new Status(IStatus.ERROR, context.getBundleContext().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+			} 
+			catch (URISyntaxException e) 
+			{
+				status = new Status(IStatus.ERROR, context.getBundleContext().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+			}
+		}
+		else
+		{
+			status = new Status(IStatus.ERROR, context.getBundleContext().getBundle().getSymbolicName(), "Das Resultat des Verbindungs");
+		}
+		return status;
+	}
+
+	@Override
+	public boolean isSalespointSpecificPossible() 
+	{
+		return true;
+	}
+
+	public enum VoucherSection implements Section
+	{
+		VOUCHER;
+		
+		public String title()
+		{
+			return "eGutschein";
+		}
+
+		@Override
+		public int columns() 
+		{
+			return 3;
+		}
+
+		@Override
+		public IProperty[] properties() 
+		{
+			return VoucherProperty.properties(this);
+		}
+	}
+
+	@Override
+	public Section[] getSections() 
+	{
+		return VoucherSection.values();
+	}
+
+	@Override
+	public int compareTo(ProviderUpdater other) 
+	{
+		return other.getRanking().compareTo(this.getRanking());
+	}
+
+	@Override
+	public Integer getRanking() 
+	{
+		return Integer.valueOf(1000);
+	}
+
+	@Override
+	public Collection<Position> getPositions(ConnectionService service,
+			int max, ConnectionType connectionType) 
+	{
+		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
+		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
+		if (salespoint == null)
+		{
+			return new ArrayList<Position>();
+		}
+		PositionQuery query = (PositionQuery) service.getQuery(Position.class);
+		return query.selectProviderUpdates(salespoint, this.getProviderId(), max, connectionType);
+	}
+
+	@Override
+	public IStatus updatePositions(ConnectionService connectionService,
+			Collection<Position> positions, IProgressMonitor monitor) 
+	{
+		IStatus status = Status.OK_STATUS;
+		for (Position position : positions)
+		{
+			if (monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			status = updateProvider(position);
+			if (status.getSeverity() == IStatus.CANCEL)
+			{
+				return status;
+			}
+			monitor.worked(1);
+		}
+		return status;
+	}
+
+	@Override
+	public Collection<Payment> getPayments(ConnectionService service, int max,
+			ConnectionType connectionType) 
+	{
+		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
+		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
+		if (salespoint == null)
+		{
+			return new ArrayList<Payment>();
+		}
+		PaymentQuery query = (PaymentQuery) service.getQuery(Payment.class);
+		return query.selectProviderUpdates(salespoint, getProviderId(), max, connectionType);
+	}
+
+	@Override
+	public IStatus updatePayments(ConnectionService connectionService,
+			Collection<Payment> payments, IProgressMonitor monitor) 
+	{
+		monitor.beginTask("Aktualisiere " + this.getName(), payments.size());
+		IStatus status = Status.OK_STATUS;
+		for (Payment payment : payments)
+		{
+			if (monitor.isCanceled())
+			{
+				return Status.CANCEL_STATUS;
+			}
+			status = updateProvider(payment);
+			if (status.getSeverity() == IStatus.CANCEL)
+			{
+				return status;
+			}
+			monitor.worked(1);
+		}
+		return status;
+	}
+
+	@Override
+	public boolean doUpdatePositions(ConnectionType connectionType) 
+	{
+		switch(connectionType)
+		{
+		case LOCAL:
+		{
+			return false;
+		}
+		case SERVER:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+		}
+	}
+
+	@Override
+	public boolean doUpdatePayments(ConnectionType connectionType) 
+	{
+		switch(connectionType)
+		{
+		case LOCAL:
+		{
+			return false;
+		}
+		case SERVER:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+		}
 	}
 	
 	public enum VoucherProperty implements IProperty
@@ -659,35 +873,35 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			{
 			case VERSION_WS:
 			{
-				return "Abfrage Version Webservice";
+				return "Colibri: Abfrage Version Webservice";
 			}
 			case VERSION_DB:
 			{
-				return "Abfrage Version Datenbank";
+				return "Colibri: Abfrage Version Datenbank";
 			}
 			case QUERY_BALANCE:
 			{
-				return "Abfrage Kontostand";
+				return "Colibri: Abfrage Kontostand";
 			}
 			case CHARGE_ACCOUNT:
 			{
-				return "Betrag belasten";
+				return "Colibri: Betrag belasten";
 			}
 			case CREDIT_ACCOUNT:
 			{
-				return "Betrag gutschreiben";
+				return "Colibri: Betrag gutschreiben";
 			}
 			case RESERVE_AMOUNT:
 			{
-				return "Betrag reservieren";
+				return "Colibri: Betrag reservieren";
 			}
 			case CANCEL_RESERVED_AMOUNT:
 			{
-				return "Reservierten Betrag freigeben";
+				return "Colibri: Reservierten Betrag freigeben";
 			}
 			case CONFIRM_RESERVED_AMOUNT:
 			{
-				return "Reservierten Betrag abbuchen";
+				return "Colibri: Reservierten Betrag abbuchen";
 			}
 			default:
 			{
@@ -695,75 +909,5 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			}
 			}
 		}
-	}
-
-	@Override
-	public boolean canCheckConnection() 
-	{
-		return true;
-	}
-
-	@Override
-	public IStatus checkConnection(Map<String, ProviderProperty> properties) 
-	{
-		IStatus status = new Status(IStatus.OK, context.getBundleContext().getBundle().getSymbolicName(), "Die Verbindung zu " + this.getName() + " wurde erfolgreich hergestellt.");
-		if (Desktop.isDesktopSupported())
-		{
-			ProviderProperty urlProperty = properties.get(VoucherProperty.URL.key());
-			String urlValue = urlProperty.getValue(VoucherProperty.URL.defaultValue());
-			try
-			{
-				URI uri = new URI(urlValue);
-				Desktop desktop = Desktop.getDesktop();
-				desktop.browse(uri);
-			}
-			catch (IOException e)
-			{
-				status = new Status(IStatus.ERROR, context.getBundleContext().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
-			} 
-			catch (URISyntaxException e) 
-			{
-				status = new Status(IStatus.ERROR, context.getBundleContext().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
-			}
-		}
-		else
-		{
-			status = new Status(IStatus.ERROR, context.getBundleContext().getBundle().getSymbolicName(), "Das Resultat des Verbindungs");
-		}
-		return status;
-	}
-
-	@Override
-	public boolean isSalespointSpecificPossible() 
-	{
-		return true;
-	}
-
-	public enum VoucherSection implements Section
-	{
-		VOUCHER;
-		
-		public String title()
-		{
-			return "eGutschein";
-		}
-
-		@Override
-		public int columns() 
-		{
-			return 3;
-		}
-
-		@Override
-		public IProperty[] properties() 
-		{
-			return VoucherProperty.properties(this);
-		}
-	}
-
-	@Override
-	public Section[] getSections() 
-	{
-		return VoucherSection.values();
 	}
 }

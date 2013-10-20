@@ -1144,6 +1144,7 @@ ch.eugster.colibri.persistence.connection/lib/migration/jakarta-regexp-1.3.jar -
 ch.eugster.colibri.persistence.connection/plugin.xml -text
 ch.eugster.colibri.persistence.connection/src/META-INF/persistence.xml -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/Activator.java -text
+ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/ServerExceptionHandler.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/AbstractConfigurator.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/AbstractInitializer.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/DatabaseConfigurator.java -text
@@ -1160,6 +1161,7 @@ ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/con
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/service/AbstractConnectionService.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/service/CacheServiceImpl.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/service/PersistenceServiceImpl.java -text
+ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/service/ServerExceptionHandler.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/service/ServerServiceImpl.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/ConnectionContentProvider.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/ConnectionLabelProvider.java -text
@@ -1285,11 +1287,9 @@ ch.eugster.colibri.persistence.transfer.impl/.project -text
 ch.eugster.colibri.persistence.transfer.impl/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.persistence.transfer.impl/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.transfer.impl/OSGI-INF/transfer-component.xml -text
-ch.eugster.colibri.persistence.transfer.impl/OSGI-INF/transfer-scheduler-component.xml -text
 ch.eugster.colibri.persistence.transfer.impl/build.properties -text
 ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/Activator.java -text
 ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/TransferAgentImpl.java -text
-ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/TransferSchedulerImpl.java -text
 ch.eugster.colibri.persistence.transfer/.classpath -text
 ch.eugster.colibri.persistence.transfer/.project -text
 ch.eugster.colibri.persistence.transfer/.settings/org.eclipse.pde.core.prefs -text
@@ -1297,7 +1297,6 @@ ch.eugster.colibri.persistence.transfer/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.transfer/build.properties -text
 ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/transfer/Activator.java -text
 ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/transfer/services/TransferAgent.java -text
-ch.eugster.colibri.persistence.transfer/src/ch/eugster/colibri/persistence/transfer/services/TransferScheduler.java -text
 ch.eugster.colibri.persistence/.classpath -text
 ch.eugster.colibri.persistence/.project -text
 ch.eugster.colibri.persistence/.settings/org.eclipse.jdt.core.prefs -text
@@ -1559,6 +1558,8 @@ ch.eugster.colibri.provider.galileo/OSGI-INF/configurator-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/id-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/interface-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/provider-property-selector-component.xml -text
+ch.eugster.colibri.provider.galileo/OSGI-INF/query-component.xml -text
+ch.eugster.colibri.provider.galileo/OSGI-INF/updater-component.xml -text
 ch.eugster.colibri.provider.galileo/build.properties -text
 ch.eugster.colibri.provider.galileo/com4j-x86.dll -text
 ch.eugster.colibri.provider.galileo/icons/galileo.png -text
@@ -1588,10 +1589,10 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kund
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/lagerinfo/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/lagerinfo/Ilainfo.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/lagerinfo/package.html -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/service/GalileoCacheProviderPropertySelector.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/service/GalileoConfiguratorComponent.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/service/GalileoIdService.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/service/GalileoInterfaceComponent.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/service/GalileoQueryComponent.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/service/GalileoUpdaterComponent.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/wgserve/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/wgserve/Iwgserve.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/wgserve/package.html -text
@@ -1646,11 +1647,11 @@ ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IDirty
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IProperty.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderConfiguration.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderTaxCode.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/AbstractProviderUpdater.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderConfigurator.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderFailoverService.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderIdService.java -text
-ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderInterface.java -text
-ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderPropertySelector.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderQuery.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderService.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderUpdater.java -text
 ch.eugster.colibri.report.commons/.classpath -text

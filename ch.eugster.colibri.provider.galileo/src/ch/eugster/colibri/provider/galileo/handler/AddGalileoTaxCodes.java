@@ -26,7 +26,7 @@ public class AddGalileoTaxCodes extends AbstractHandler implements IHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException 
 	{
-		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Platform.getBundle(Activator.PLUGIN_ID).getBundleContext(),
+		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Platform.getBundle(Activator.getDefault().getBundle().getSymbolicName()).getBundleContext(),
 				ProviderConfigurator.class, null);
 		try
 		{
@@ -111,18 +111,18 @@ public class AddGalileoTaxCodes extends AbstractHandler implements IHandler {
 	@Override
 	public void setEnabled(final Object evaluationContext)
 	{
-		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderConfigurator.class, null);
-		try
-		{
-			tracker.open();
-			final ProviderConfigurator configurator = (ProviderConfigurator) tracker.getService();
-			this.setBaseEnabled(configurator != null && configurator.isConnect());
-		}
-		finally
-		{
-			tracker.close();
-		}
+//		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Activator.getDefault().getBundle().getBundleContext(),
+//				ProviderConfigurator.class, null);
+//		try
+//		{
+//			tracker.open();
+//			final ProviderConfigurator configurator = (ProviderConfigurator) tracker.getService();
+//			this.setBaseEnabled(configurator != null && configurator.isConnect());
+//		}
+//		finally
+//		{
+//			tracker.close();
+//		}
 	}
 
 }

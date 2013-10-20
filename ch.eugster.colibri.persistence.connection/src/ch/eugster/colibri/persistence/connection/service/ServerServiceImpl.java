@@ -1,6 +1,8 @@
 package ch.eugster.colibri.persistence.connection.service;
 
+import java.text.SimpleDateFormat;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -32,9 +34,12 @@ import ch.eugster.colibri.persistence.service.ServerService;
 
 public class ServerServiceImpl extends AbstractConnectionService implements ServerService
 {
+	private LoginDialog loginDialog;
+	
 	public ServerServiceImpl(final PersistenceService persistenceService)
 	{
 		super(persistenceService);
+		ServerExceptionHandler.setServerService(this);
 	}
 
 	@Override
@@ -45,20 +50,27 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 
 	protected void login()
 	{
-		if (User.getLoginUser() == null)
+		if (User.getLoginUser() == null && loginDialog == null)
 		{
 			String application = System.getProperty("eclipse.application");
 			if (!application.contains("client"))
 			{
-				Display display = Display.getCurrent();
-				if (display == null)
+				try
 				{
-					display = new Display();
+					Display display = Display.getCurrent();
+					if (display == null)
+					{
+						display = new Display();
+					}
+					Shell shell = new Shell(display);
+					final UserQuery userQuery = (UserQuery) getQuery(User.class);
+					loginDialog = new LoginDialog(shell, userQuery);
+					loginDialog.open();
 				}
-				Shell shell = new Shell(display);
-				final UserQuery userQuery = (UserQuery) getQuery(User.class);
-				LoginDialog dialog = new LoginDialog(shell, userQuery);
-				dialog.open();
+				finally
+				{
+					loginDialog = null;
+				}
 			}
 		}
 	}
@@ -86,6 +98,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		final String url = connection.getAttributeValue(PersistenceUnitProperties.JDBC_URL);
 		final String username = connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER);
 		final String password = connection.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD);
+		final String target = connection.getAttributeValue(PersistenceUnitProperties.TARGET_DATABASE);
 
 		final Properties properties = new Properties();
 		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
@@ -98,8 +111,9 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 				embedded.booleanValue() ? "jdbc:derby:" + connection.getText() : url);
 		properties.setProperty(PersistenceUnitProperties.JDBC_USER, embedded.booleanValue() ? connection.getText() : username);
 		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, embedded.booleanValue() ? connection.getText() : password);
+		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, target);
+		properties.setProperty("eclipselink.jdbc.connection_pool.default.wait", "3000");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Activator.getDefault().getLogLevel());
-
 		return properties;
 	}
 	
@@ -125,8 +139,11 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 			map.put(key, value);
 		}
 
+		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, ServerExceptionHandler.class.getName());
 		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
 		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
+		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, "ch.eugster.colibri.persistence.connection.ServerExceptionHandler");
+
 		if (status.getSeverity() == IStatus.OK)
 		{
 			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.NONE);
@@ -160,8 +177,10 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		else
 		{
 			Map<String, Object> map = getEntityManagerProperties(status, properties);
+			System.out.println("Start creating EntityManagerFactory: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			factory = this.getPersistenceService().getPersistenceProvider()
 					.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_SERVER, map);
+			System.out.println("End creating EntityManagerFactory: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 		}
 		return factory;
 	}
@@ -169,13 +188,22 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	@Override
 	protected void updateReplicationValue(Entity entity) 
 	{
-		if (IReplicatable.class.isInstance(entity))
+		if (isConnected())
 		{
-			VersionQuery query = (VersionQuery) this.getQuery(Version.class);
-			Version version = query.findDefault();
-			version.setReplicationValue(version.getReplicationValue() + 1);
-			query.setDefault((Version)this.merge(version));
+			if (IReplicatable.class.isInstance(entity))
+			{
+				VersionQuery query = (VersionQuery) this.getQuery(Version.class);
+				Version version = query.findDefault();
+				version.setReplicationValue(version.getReplicationValue() + 1);
+				query.setDefault((Version)this.merge(version));
+			}
 		}
+	}
+
+	@Override
+	public ConnectionType getConnectionType() 
+	{
+		return ConnectionType.SERVER;
 	}
 
 }

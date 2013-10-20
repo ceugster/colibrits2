@@ -117,4 +117,6 @@ public interface VoucherService
 		}
 	}
 
+	IStatus checkConnection(Map<String, IProperty> properties);
+
 }

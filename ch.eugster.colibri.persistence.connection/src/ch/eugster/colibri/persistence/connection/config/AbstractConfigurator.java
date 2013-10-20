@@ -74,13 +74,12 @@ public abstract class AbstractConfigurator
 
 	protected void log(final IStatus status)
 	{
-		Activator.getDefault().log(status.getMessage());
-		Activator.getDefault().getLog().log(status);
+		Activator.getDefault().log(Activator.getDefault().getLogLevel(status.getSeverity()), status.getMessage());
 	}
 
-	protected void log(final String message)
+	protected void log(int level, final String message)
 	{
-		Activator.getDefault().log(message);
+		Activator.getDefault().log(level, message);
 	}
 
 	protected void releaseEntityManager(final EntityManager entityManager)
@@ -132,4 +131,5 @@ public abstract class AbstractConfigurator
 		final SequenceQuery sequenceQuery = new SequenceQuery(this.getEntityManager());
 		sequenceQuery.findAndUpdate(key, value);
 	}
+	
 }

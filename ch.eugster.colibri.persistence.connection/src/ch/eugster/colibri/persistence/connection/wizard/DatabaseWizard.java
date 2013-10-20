@@ -35,6 +35,18 @@ public class DatabaseWizard extends Wizard
 {
 	private Document document;
 
+	private Element selectedConnection;
+
+	public void setSelectedConnection(Element connection)
+	{
+		this.selectedConnection = connection;
+	}
+	
+	public Element getSelectedConnection()
+	{
+		return selectedConnection;
+	}
+	
 	public DatabaseWizard()
 	{
 		this.document = Activator.getDefault().getDocument();
@@ -47,11 +59,14 @@ public class DatabaseWizard extends Wizard
 	@Override
 	public void addPages()
 	{
+		WizardDialog dialog = (WizardDialog) this.getContainer();
 		if (Activator.getDefault().getFile().exists())
 		{
 			this.addPage(new DatabaseWizardSelectConnectionPage("select.connection.wizard.page"));
 		}
-		this.addPage(new DatabaseWizardConnectionPage("connection.wizard.page"));
+		DatabaseWizardConnectionPage connectionPage = new DatabaseWizardConnectionPage("connection.wizard.page");
+		dialog.addPageChangedListener(connectionPage);
+		this.addPage(connectionPage);
 		this.addPage(new DatabaseWizardMigrationPage("migration.wizard.page"));
 		this.addPage(new DatabaseWizardCurrencyPage("currency.wizard.page"));
 	}
@@ -170,51 +185,50 @@ public class DatabaseWizard extends Wizard
 					this.document.getRootElement().addContent(oldSelection);
 				}
 			}
-			Activator.getDefault().saveDocument(this.document);
+		}
+		Activator.getDefault().saveDocument(this.document);
 
-			final DatabaseWizardSelectConnectionPage selectPage = (DatabaseWizardSelectConnectionPage) this
-					.getPage("select.connection.wizard.page");
-			if ((selectPage == null) || selectPage.addNewConnection())
+		final DatabaseWizardSelectConnectionPage selectPage = (DatabaseWizardSelectConnectionPage) this
+				.getPage("select.connection.wizard.page");
+		if ((selectPage == null) || selectPage.addNewConnection())
+		{
+			User.setLoginUser(User.newInstance());
+			Activator.getDefault().startPersistenceService();
+			final DatabaseWizardConnectionPage connectionWizardPage = (DatabaseWizardConnectionPage) this
+					.getPage("connection.wizard.page");
+
+			
+			if (connectionWizardPage.migrate())
 			{
-				User.setLoginUser(User.newInstance());
-				Activator.getDefault().startPersistenceService();
-				final DatabaseWizardConnectionPage connectionWizardPage = (DatabaseWizardConnectionPage) this
-						.getPage("connection.wizard.page");
-
-				
-				if (connectionWizardPage.migrate())
+				final DatabaseWizardMigrationPage migrationWizardPage = (DatabaseWizardMigrationPage) this
+						.getPage("migration.wizard.page");
+				final Document oldDocument = migrationWizardPage.getDocument();
+				saveColibriXml(oldDocument);
+				final Salespoint[] salespoints = migrationWizardPage.getSalespoints();
+				this.startMigration(newSelection, oldDocument, salespoints);
+			}
+			else
+			{
+				final DatabaseWizardCurrencyPage currencyWizardPage = (DatabaseWizardCurrencyPage) this
+						.getPage("currency.wizard.page");
+				final Long currencyId = currencyWizardPage.getSelectedCurrency();
+				this.startConfiguration(newSelection, currencyId);
+			}
+			ServiceTracker<ReplicationService, ReplicationService> tracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle().getBundleContext(), ReplicationService.class, null);
+			tracker.open();
+			try
+			{
+				ReplicationService service = tracker.getService();
+				if (service != null)
 				{
-					final DatabaseWizardMigrationPage migrationWizardPage = (DatabaseWizardMigrationPage) this
-							.getPage("migration.wizard.page");
-					final Document oldDocument = migrationWizardPage.getDocument();
-					saveColibriXml(oldDocument);
-					final Salespoint[] salespoints = migrationWizardPage.getSalespoints();
-					this.startMigration(newSelection, oldDocument, salespoints);
-				}
-				else
-				{
-					final DatabaseWizardCurrencyPage currencyWizardPage = (DatabaseWizardCurrencyPage) this
-							.getPage("currency.wizard.page");
-					final Long currencyId = currencyWizardPage.getSelectedCurrency();
-					this.startConfiguration(newSelection, currencyId);
-				}
-				ServiceTracker<ReplicationService, ReplicationService> tracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle().getBundleContext(), ReplicationService.class, null);
-				tracker.open();
-				try
-				{
-					ReplicationService service = tracker.getService();
-					if (service != null)
-					{
-						service.replicate(this.getShell(), true);
-					}
-				}
-				finally
-				{
-					tracker.close();
+					service.replicate(this.getShell(), true);
 				}
 			}
+			finally
+			{
+				tracker.close();
+			}
 		}
-
 		return true;
 	}
 
@@ -246,18 +260,9 @@ public class DatabaseWizard extends Wizard
 
 	private Element getNewSelection()
 	{
-		final DatabaseWizardSelectConnectionPage selectConnectionWizardPage = (DatabaseWizardSelectConnectionPage) this
-				.getPage("select.connection.wizard.page");
-		if ((selectConnectionWizardPage == null) || selectConnectionWizardPage.addNewConnection())
-		{
-			final DatabaseWizardConnectionPage connectionWizardPage = (DatabaseWizardConnectionPage) this
-					.getPage("connection.wizard.page");
-			return connectionWizardPage.updateElement();
-		}
-		else
-		{
-			return selectConnectionWizardPage.getSelectedConnection();
-		}
+		final DatabaseWizardConnectionPage connectionWizardPage = (DatabaseWizardConnectionPage) this
+				.getPage("connection.wizard.page");
+		return connectionWizardPage.updateElement();
 	}
 
 	private String getLogLevel()

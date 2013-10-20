@@ -17,36 +17,29 @@ import ch.eugster.colibri.persistence.queries.VersionQuery;
 import ch.eugster.colibri.persistence.replication.impl.Activator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CommonSettingsPropertyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CommonSettingsReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.ConfigurableReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CurrencyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CurrentTaxCodeMappingReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CurrentTaxReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.CustomerDisplayReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.DisplayAreaReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.DisplayReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ExternalProductGroupReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.KeyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.MoneyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.PaymentTypeReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.PrintoutAreaReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.PrintoutReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ProductGroupMappingReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ProductGroupReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ProfileReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ProviderPropertyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.ReceiptPrinterReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.RolePropertyReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.RoleReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.SalespointCustomerDisplayReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.SalespointReceiptPrinterReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.SalespointReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.StockReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.TabReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.TaxCodeMappingReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.TaxRateReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.TaxReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.TaxTypeReplicator;
-import ch.eugster.colibri.persistence.replication.impl.replicators.UserReplicator;
 import ch.eugster.colibri.persistence.replication.impl.replicators.VersionReplicator;
 import ch.eugster.colibri.persistence.replication.service.ReplicationService;
 import ch.eugster.colibri.persistence.rules.LocalDatabaseRule;
@@ -215,6 +208,10 @@ public class ReplicationServiceImpl implements ReplicationService
 						status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Fehler beim replizieren der Daten.", e);
 					}
 				}
+			}
+			else
+			{
+				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Die Daten konnten nicht repliziert werden, weil keine Verbindung zur Serverdatenbank hergestellt werden kann.");
 			}
 		}
 		return status;

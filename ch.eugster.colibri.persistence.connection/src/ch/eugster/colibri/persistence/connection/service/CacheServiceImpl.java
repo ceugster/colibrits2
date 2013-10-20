@@ -169,4 +169,10 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		//Do nothing (only ServerService should update the replication value
 	}
 
+	@Override
+	public ConnectionType getConnectionType() 
+	{
+		return ConnectionType.LOCAL;
+	}
+
 }

@@ -7,7 +7,7 @@ Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/com4j.jar,
  .
-Service-Component: OSGI-INF/id-component.xml, OSGI-INF/provider-property-selector-component.xml, OSGI-INF/interface-component.xml, OSGI-INF/configurator-component.xml
+Service-Component: OSGI-INF/query-component.xml, OSGI-INF/updater-component.xml, OSGI-INF/configurator-component.xml
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: ch.eugster.colibri.provider.galileo.Activator
 Import-Package: ch.eugster.colibri.barcode.code,

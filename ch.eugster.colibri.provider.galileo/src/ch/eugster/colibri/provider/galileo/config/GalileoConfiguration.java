@@ -51,7 +51,7 @@ public class GalileoConfiguration implements ProviderConfiguration
 	@Override
 	public String getProviderId()
 	{
-		return Activator.PLUGIN_ID;
+		return Activator.getDefault().getBundle().getSymbolicName();
 	}
 
 	@Override

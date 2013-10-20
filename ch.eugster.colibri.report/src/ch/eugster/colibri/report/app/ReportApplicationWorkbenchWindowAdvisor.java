@@ -158,7 +158,6 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 		{
 			if (true)
 			{
-				System.out.println();
 			}
 			if (!node.getId().startsWith("org.eclipse.equinox.internal.p2.ui."))
 			{

@@ -72,6 +72,34 @@ public enum SupportedDriver
 			return false;
 		}
 	}
+	
+	public String getTargetDatabase()
+	{
+		if (this.equals(POSTGRESQL_8X))
+		{
+			return "PostgreSQL";
+		}
+		else if (this.equals(MSSQLSERVER_2008))
+		{
+			return "SQLServer";
+		}
+		else if (this.equals(MYSQL_51))
+		{
+			return "MySQL";
+		}
+		else if (this.equals(DERBY_CS))
+		{
+			return "Derby";
+		}
+		else if (this.equals(DERBY_EMBEDDED))
+		{
+			return "Derby";
+		}
+		else
+		{
+			throw new RuntimeException("Invalid driver");
+		}
+	}
 
 	public String getInstanceDelimiter()
 	{

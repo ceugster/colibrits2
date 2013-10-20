@@ -84,19 +84,19 @@ public class StartDatabaseConnectionService extends AbstractHandler implements I
 	public void setEnabled(Object evaluationContext)
 	{
 		boolean enabled = false;
-		for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles())
-		{
-			if (bundle.getSymbolicName().equals("org.eclipse.persistence.jpa"))
-			{
-				switch(bundle.getState())
-				{
-					case Bundle.RESOLVED:
-					{
-						enabled = true;
-					}
-				}
-			}
-		}
+//		for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles())
+//		{
+//			if (bundle.getSymbolicName().equals("org.eclipse.persistence.jpa"))
+//			{
+//				switch(bundle.getState())
+//				{
+//					case Bundle.RESOLVED:
+//					{
+//						enabled = true;
+//					}
+//				}
+//			}
+//		}
 		setBaseEnabled(enabled);
 	}
 	

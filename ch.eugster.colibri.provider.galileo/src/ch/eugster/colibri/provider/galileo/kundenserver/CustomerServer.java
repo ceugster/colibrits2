@@ -28,7 +28,7 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
-import ch.eugster.colibri.provider.service.ProviderInterface;
+import ch.eugster.colibri.provider.service.ProviderService;
 
 public class CustomerServer
 {
@@ -108,13 +108,13 @@ public class CustomerServer
 					position.setProductGroup(productGroup);
 					position.setOption(Option.PAYED_INVOICE);
 				}
-				CustomerServer.this.status = new Status(IStatus.OK, Activator.PLUGIN_ID,
-						ProviderInterface.Topic.CUSTOMER_UPDATE.topic());
+				CustomerServer.this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
+						ProviderService.Topic.CUSTOMER_UPDATE.topic());
 			}
 			else
 			{
-				CustomerServer.this.status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
-						ProviderInterface.Topic.CUSTOMER_UPDATE.topic());
+				CustomerServer.this.status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(),
+						ProviderService.Topic.CUSTOMER_UPDATE.topic());
 			}
 			position.getReceipt().setCustomer(customer);
 
@@ -125,7 +125,7 @@ public class CustomerServer
 		}
 		else
 		{
-			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderInterface.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Keine Verbindung"));
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Keine Verbindung"));
 		}
 		return this.status;
 	}

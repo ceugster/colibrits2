@@ -516,7 +516,7 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 			}
 			else
 			{
-				return section.replaceMarker(position.getProduct().getTitleAndAuthorShortForm(), marker, true);
+				return section.replaceMarker(position.getProduct().getTitleAndAuthorShortFormNoCode(), marker, true);
 			}
 		}
 		

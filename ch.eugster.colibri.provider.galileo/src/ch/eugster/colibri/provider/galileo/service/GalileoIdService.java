@@ -33,7 +33,7 @@ public class GalileoIdService implements ProviderIdService
 	@Override
 	public String getProviderId()
 	{
-		return Activator.PLUGIN_ID;
+		return Activator.getDefault().getBundle().getSymbolicName();
 	}
 
 	protected void activate(final ComponentContext componentContext)

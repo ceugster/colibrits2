@@ -166,15 +166,27 @@ public class ProviderProperty extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("salespoint", this.salespoint, this.salespoint = salespoint);
 	}
 
-	public void setValue(final String value, String defaultValue)
+	public void setValue(final String value)
 	{
 		if (this.parent == null)
 		{
-			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = value.equals(defaultValue) ? null : value);
+			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = value);
 		}
 		else
 		{
-			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = parent.getValue(defaultValue).equals(defaultValue) ? null : value);
+			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = parent.getValue());
+		}
+	}
+
+	public void setValue(final String value, final String defaultValue)
+	{
+		if (this.parent == null)
+		{
+			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = value == null ? defaultValue : value);
+		}
+		else
+		{
+			this.propertyChangeSupport.firePropertyChange("value", this.value, this.value = parent.getValue() == null ? defaultValue : parent.getValue());
 		}
 	}
 

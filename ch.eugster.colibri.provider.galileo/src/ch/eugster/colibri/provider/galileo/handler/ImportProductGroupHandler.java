@@ -27,7 +27,7 @@ public class ImportProductGroupHandler extends AbstractHandler implements IHandl
 	@Override
 	public Object execute(final ExecutionEvent event) throws ExecutionException
 	{
-		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Platform.getBundle(Activator.PLUGIN_ID).getBundleContext(),
+		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Platform.getBundle(Activator.getDefault().getBundle().getSymbolicName()).getBundleContext(),
 				ProviderConfigurator.class, null);
 		try
 		{
@@ -112,18 +112,18 @@ public class ImportProductGroupHandler extends AbstractHandler implements IHandl
 	@Override
 	public void setEnabled(final Object evaluationContext)
 	{
-		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Activator.getDefault().getBundle().getBundleContext(),
-				ProviderConfigurator.class, null);
-		try
-		{
-			tracker.open();
-			final ProviderConfigurator configurator = (ProviderConfigurator) tracker.getService();
-			this.setBaseEnabled(configurator != null && configurator.isConnect());
-		}
-		finally
-		{
-		tracker.close();
-		}
+//		final ServiceTracker<ProviderConfigurator, ProviderConfigurator> tracker = new ServiceTracker<ProviderConfigurator, ProviderConfigurator>(Activator.getDefault().getBundle().getBundleContext(),
+//				ProviderConfigurator.class, null);
+//		try
+//		{
+//			tracker.open();
+//			final ProviderConfigurator configurator = (ProviderConfigurator) tracker.getService();
+//			this.setBaseEnabled(configurator != null && configurator.isConnect());
+//		}
+//		finally
+//		{
+//		tracker.close();
+//		}
 	}
 
 }

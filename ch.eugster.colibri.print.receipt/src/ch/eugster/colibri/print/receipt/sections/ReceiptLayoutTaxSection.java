@@ -59,7 +59,7 @@ public class ReceiptLayoutTaxSection extends AbstractLayoutSection
 	protected String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("C SSSSSSSS PPPPP BBBBBBBB MMMMMMM NNNNNNNN\n");
+		builder = builder.append("SSSSSSSSSSSSS PPPPP von BBBBBBBB MMMMMMM C\n");
 		return builder.toString();
 	}
 
@@ -68,7 +68,7 @@ public class ReceiptLayoutTaxSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Total MWST       BBBBBBBB MMMMMMM NNNNNNNN");
+		builder = builder.append("Total MWST              BBBBBBBB MMMMMMM  ");
 		return builder.toString();
 	}
 

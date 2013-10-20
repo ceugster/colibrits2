@@ -12,10 +12,6 @@ import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
  */
 public class Activator extends AbstractUIPlugin
 {
-
-	// The plug-in ID
-	public static final String PLUGIN_ID = "ch.eugster.colibri.provider.galileo";
-
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
 	// The shared instance
@@ -50,7 +46,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService logService = (LogService) logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
+			logService.log(LogService.LOG_INFO, "Plugin " + context.getBundle().getSymbolicName() + " gestartet.");
 		}
 	}
 
@@ -67,7 +63,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService logService = (LogService) logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
+			logService.log(LogService.LOG_INFO, "Plugin " + context.getBundle().getSymbolicName() + " gestoppt.");
 		}
 
 		logServiceTracker.close();

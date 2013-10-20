@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.eugster.colibri.persistence.model.Payment;
-import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
@@ -213,7 +212,7 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 								.getCurrency().getCurrency().getDefaultFractionDigits());
 						ReceiptLayoutPaymentSection.amountFormatter.setMaximumFractionDigits(payment.getPaymentType()
 								.getCurrency().getCurrency().getDefaultFractionDigits());
-						final String formattedAmount = ReceiptLayoutPaymentSection.amountFormatter.format(amount);
+						final String formattedAmount = ReceiptLayoutPaymentSection.amountFormatter.format(Math.abs(amount));
 						return layoutSection.replaceMarker(formattedAmount, marker, false);
 					}
 					case F:
@@ -233,7 +232,11 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 					}
 					case K:
 					{
-						if (!payment.getPaymentType().getCurrency().getId()
+						if (payment.isBack())
+						{
+							return layoutSection.replaceMarker(payment.getPaymentType().getCurrency().getCode(), marker, false);
+						}
+						else if (!payment.getPaymentType().getCurrency().getId()
 								.equals(payment.getReceipt().getDefaultCurrency().getId()))
 						{
 							ReceiptLayoutPaymentSection.amountFormatter.setMinimumFractionDigits(0);

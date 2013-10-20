@@ -69,7 +69,7 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 						{
 							msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
 									+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
-							status = new Status(IStatus.CANCEL, Activator.PLUGIN_ID, msg);
+							status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
 							log(LogService.LOG_INFO, (msg));
 						}
 					}
@@ -121,19 +121,19 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 			if (galserve.do_NOpen(path))
 			{
 				galserve.do_NClose();
-				status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+				status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 						"Die Verbindung zur Warenbewirtschaftung Galileo konnte erfolgreich hergestellt werden.");
 			}
 			else
 			{
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 						"Das Herstellen der Verbindung zur Warenbewirtschaftung Galileo ist fehlgeschlagen.");
 			}
 			galserve.dispose();
 		}
 		else
 		{
-			status = new Status(IStatus.OK, Activator.PLUGIN_ID,
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 					"Die Verbindung zur Warenbewirtschaftung ist deaktiviert.");
 		}
 		return status;

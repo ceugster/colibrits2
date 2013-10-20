@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Text;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseMigrator;
@@ -305,7 +306,7 @@ public class DatabaseWizardMigrationPage extends WizardPage
 			{
 				try
 				{
-					Activator.getDefault().log(
+					Activator.getDefault().log(LogService.LOG_INFO, 
 							"Gewählte Datei mit Verbindungsdaten: " + colibriXML.getAbsolutePath() + ".");
 					monitor.beginTask("Die Verbindung wird geprüft...", 4);
 					if (DatabaseWizardMigrationPage.this.loadDocument(colibriXML))
@@ -313,17 +314,17 @@ public class DatabaseWizardMigrationPage extends WizardPage
 						monitor.worked(1);
 						if (DatabaseWizardMigrationPage.this.document != null)
 						{
-							Activator.getDefault().log("Verbindung mit der Datenbank herstellen.");
+							Activator.getDefault().log(LogService.LOG_INFO, "Verbindung mit der Datenbank herstellen.");
 							File ojbProperties = new File(colibriXML.getParent()+ File.separator + "ojb" + File.separator + "OJB.properties");
 							System.setProperty("OJB.properties", ojbProperties.getAbsolutePath());
 							final PersistenceBroker broker = DatabaseWizardMigrationPage.this.connect();
 							monitor.worked(1);
 							if ((broker != null) && !broker.isClosed())
 							{
-								Activator.getDefault().log("Verbindung hergestellt.");
+								Activator.getDefault().log(LogService.LOG_INFO, "Verbindung hergestellt.");
 								DatabaseWizardMigrationPage.this.version = DatabaseWizardMigrationPage.this.getOldVersion(broker);
 								monitor.worked(1);
-								Activator.getDefault().log("Kassenstationen einlesen.");
+								Activator.getDefault().log(LogService.LOG_INFO, "Kassenstationen einlesen.");
 								final Salespoint[] salespoints = DatabaseWizardMigrationPage.this.getOldSalespoints(broker);
 								final String id = DatabaseWizardMigrationPage.this.document.getRootElement()
 										.getChild("salespoint").getAttributeValue("id");
@@ -413,18 +414,18 @@ public class DatabaseWizardMigrationPage extends WizardPage
 		final SAXBuilder builder = new SAXBuilder();
 		try
 		{
-			Activator.getDefault().log("Datei einlesen.");
+			Activator.getDefault().log(LogService.LOG_INFO, "Datei einlesen.");
 			this.document = builder.build(DatabaseWizardMigrationPage.this.colibriPropertiesPath.getText());
-			Activator.getDefault().log("Datei gelesen.");
+			Activator.getDefault().log(LogService.LOG_INFO, "Datei gelesen.");
 			return true;
 		}
 		catch (final JDOMException e)
 		{
-			Activator.getDefault().log("Fehler beim Einlesen der Datei: " + e.getLocalizedMessage());
+			Activator.getDefault().log(LogService.LOG_INFO, "Fehler beim Einlesen der Datei: " + e.getLocalizedMessage());
 		}
 		catch (final IOException e)
 		{
-			Activator.getDefault().log("Fehler beim Einlesen der Datei: " + e.getLocalizedMessage());
+			Activator.getDefault().log(LogService.LOG_INFO, "Fehler beim Einlesen der Datei: " + e.getLocalizedMessage());
 		}
 		return false;
 	}

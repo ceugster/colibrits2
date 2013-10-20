@@ -27,7 +27,9 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.PageChangedEvent;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellEditor;
@@ -74,7 +76,8 @@ import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.service.ConnectionService;
 
-public class DatabaseWizardConnectionPage extends WizardPage
+
+public class DatabaseWizardConnectionPage extends WizardPage implements IPageChangedListener
 {
 	private Text connectionName;
 
@@ -120,11 +123,10 @@ public class DatabaseWizardConnectionPage extends WizardPage
 	
 	private IStatus status;
 
-	private Element newConnection;
-
 	public DatabaseWizardConnectionPage(final String name)
 	{
 		super(name);
+		this.status = Status.CANCEL_STATUS;
 	}
 
 	@Override
@@ -163,10 +165,14 @@ public class DatabaseWizardConnectionPage extends WizardPage
 						"select.connection.wizard.page");
 				if (selectWizardPage != null)
 				{
-					if (selectWizardPage.exists(DatabaseWizardConnectionPage.this.connectionName.getText()))
+					Element selectedConnection = ((DatabaseWizard) getWizard()).getSelectedConnection();
+					if (selectedConnection == null || !selectedConnection.getText().equals(connectionName.getText()))
 					{
-						DatabaseWizardConnectionPage.this.setMessage("Die Bezeichnung wird bereits verwendet.", IMessageProvider.WARNING);
-						DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(Status.CANCEL_STATUS));
+						if (selectWizardPage.exists(DatabaseWizardConnectionPage.this.connectionName.getText()))
+						{
+							DatabaseWizardConnectionPage.this.setMessage("Die Bezeichnung wird bereits verwendet.", IMessageProvider.WARNING);
+							DatabaseWizardConnectionPage.this.setPageComplete(DatabaseWizardConnectionPage.this.validatePage(Status.CANCEL_STATUS));
+						}
 					}
 				}
 				if (DatabaseWizardConnectionPage.this.embedded.getSelection())
@@ -176,6 +182,7 @@ public class DatabaseWizardConnectionPage extends WizardPage
 					final SupportedDriver driver = (SupportedDriver) ssel.getFirstElement();
 					final String url = driver.getBaseProtocol() + DatabaseWizardConnectionPage.this.connectionName.getText();
 					DatabaseWizardConnectionPage.this.url.setText(url);
+					DatabaseWizardConnectionPage.this.setMessage("Legen Sie die Angaben für die Datenbankverbindung fest.", IMessageProvider.INFORMATION);
 				}
 			}
 		});
@@ -614,6 +621,22 @@ public class DatabaseWizardConnectionPage extends WizardPage
 		
 		label = new Label(composite, SWT.NONE);
 		label.setLayoutData(new GridData());
+		label.setText("Beispiel-URL");
+		
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = cols -1;
+		
+		this.exampleUrl = new Label(composite, SWT.None);
+		this.exampleUrl.setLayoutData(gridData);
+
+		gridData = new GridData(GridData.FILL_BOTH);
+		gridData.horizontalSpan = cols;
+
+		this.helpLabel = new Label(composite, SWT.WRAP);
+		this.helpLabel.setLayoutData(gridData);
+
+		label = new Label(composite, SWT.NONE);
+		label.setLayoutData(new GridData());
 		label.setText("Benutzername");
 
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -695,30 +718,12 @@ public class DatabaseWizardConnectionPage extends WizardPage
 		this.logViewer.setLabelProvider(new LabelProvider());
 		this.logViewer.setInput(levels);
 
-		label = new Label(composite, SWT.NONE);
-		label.setLayoutData(new GridData());
-		label.setText("Beispiel-URL");
-		
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan = cols -1;
-		
-		this.exampleUrl = new Label(composite, SWT.None);
-		this.exampleUrl.setLayoutData(gridData);
-
-		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = cols;
-
-		this.helpLabel = new Label(composite, SWT.WRAP);
-		this.helpLabel.setLayoutData(gridData);
-
 		gridData = new GridData();
 		gridData.horizontalSpan = cols;
 
 		this.migrate = new Button(composite, SWT.CHECK);
 		this.migrate.setLayoutData(gridData);
 		this.migrate.setText("Daten aus Vorgängerversion migrieren");
-
-		this.loadValues();
 
 		this.setControl(composite);
 	}
@@ -749,10 +754,12 @@ public class DatabaseWizardConnectionPage extends WizardPage
 		final String text = this.connectionName.getText();
 		String driver = null;
 		String url = null;
+		String target = null;
 		if (embedded)
 		{
 			driver = EmbeddedDriver.class.getName();
 			url = "jdbc:derby:" + text;
+			target = "Derby";
 		}
 		else
 		{
@@ -760,21 +767,24 @@ public class DatabaseWizardConnectionPage extends WizardPage
 			final SupportedDriver selectedDriver = (SupportedDriver) ssel.getFirstElement();
 			driver = selectedDriver.getDriver();
 			url = this.url.getText();
+			target = selectedDriver.getTargetDatabase();
 		}
 		final String username = this.user.getText();
 		String password = this.password.getText();
 		password = password.isEmpty() ? "" : Activator.getDefault().encrypt(password);
 
-		this.newConnection = new Element("connection");
-		this.newConnection.setText(text);
-		this.newConnection.setAttribute(new Attribute(ConnectionService.KEY_USE_EMBEDDED_DATABASE, Boolean
+		DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardConnectionPage.this.getWizard();
+		Element connection = wizard.getSelectedConnection() == null ? new Element("connection") : wizard.getSelectedConnection();
+		connection.setText(text);
+		connection.setAttribute(new Attribute(ConnectionService.KEY_USE_EMBEDDED_DATABASE, Boolean
 				.toString(embedded)));
-		this.newConnection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_DRIVER, driver));
-		this.newConnection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_URL, url));
-		this.newConnection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_USER, username));
-		this.newConnection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_PASSWORD, password));
+		connection.setAttribute(new Attribute(PersistenceUnitProperties.TARGET_DATABASE, target));
+		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_DRIVER, driver));
+		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_URL, url));
+		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_USER, username));
+		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_PASSWORD, password));
 
-		return this.newConnection;
+		return connection;
 	}
 
 	public boolean useEmbeddedDatabase()
@@ -812,17 +822,17 @@ public class DatabaseWizardConnectionPage extends WizardPage
 		}
 		catch (final ClassNotFoundException e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Unerwarteter Fehler", e);
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Unerwarteter Fehler", e);
 		}
 		catch (final SQLException e)
 		{
-			status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Mit den eingegebenen Daten kann keine Datenbankverbindung hergestellt werden.", e);
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Mit den eingegebenen Daten kann keine Datenbankverbindung hergestellt werden.", e);
 		}
 		if (status.getSeverity() == IStatus.OK)
 		{
 			if (this.version != null && this.version.getStructure() > Version.STRUCTURE)
 			{
-				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Die Datenversion der gewählten Datenbank ist aktueller als die Programmversion. Bitte aktualisieren Sie das Programm auf die aktuelle Version " + Version.STRUCTURE);
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Die Datenversion der gewählten Datenbank ist aktueller als die Programmversion. Bitte aktualisieren Sie das Programm auf die aktuelle Version " + Version.STRUCTURE);
 			}
 		}
 		return status;
@@ -837,7 +847,8 @@ public class DatabaseWizardConnectionPage extends WizardPage
 
 	private Element createDefaultValues()
 	{
-		final boolean noSelectPage = this.getWizard().getPage("select.connection.wizard.page") == null;
+		DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardConnectionPage.this.getWizard();
+		final boolean noSelectPage = wizard.getPage("select.connection.wizard.page") == null;
 
 		final Element connection = new Element("connection");
 		connection.setText(noSelectPage ? "colibri" : "");
@@ -944,17 +955,21 @@ public class DatabaseWizardConnectionPage extends WizardPage
 			}
 			if (bs.length > 2)
 			{
-				if (bs[3].startsWith("//"))
+				if (bs[2].startsWith("//"))
 				{
-					String host = bs[3].substring(2);
-					if (host.indexOf("/", 3) == 0)
+					String host = bs[2].substring(2);
+					if (host.indexOf("/", 3) == -1)
 					{
-						this.host.setText(host);
+						String[] instance = host.split("\\\\");
+						this.host.setText(instance[0]);
+						this.instance.setText(instance.length == 2 ? instance[1] : "");
 					}
 					else
 					{
 						String[] database = host.split("[/]");
-						this.host.setText(database[0]);
+						String[] instance = database[0].split("\\\\");
+						this.host.setText(instance[0]);
+						this.instance.setText(instance.length == 2 ? instance[1] : "");
 						this.database.setText(database[1]);
 					}
 				}
@@ -988,8 +1003,13 @@ public class DatabaseWizardConnectionPage extends WizardPage
 
 	private void loadValues()
 	{
-		this.newConnection = this.createDefaultValues();
-		this.loadElement(this.newConnection);
+		DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardConnectionPage.this.getWizard();
+		Element connection = wizard.getSelectedConnection();
+		if (connection == null)
+		{
+			connection = this.createDefaultValues();
+		}
+		this.loadElement(connection);
 		this.setEnabled(!this.embedded.getSelection());
 		this.setPageComplete(this.embedded.getSelection());
 	}
@@ -1121,6 +1141,15 @@ public class DatabaseWizardConnectionPage extends WizardPage
 		{
 		}
 
+	}
+
+	@Override
+	public void pageChanged(PageChangedEvent event) 
+	{
+		if (event.getSelectedPage() == this)
+		{
+			this.loadValues();
+		}
 	}
 
 }

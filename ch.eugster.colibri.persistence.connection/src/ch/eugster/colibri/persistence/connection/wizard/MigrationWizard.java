@@ -198,8 +198,8 @@ public class MigrationWizard extends Wizard
 
 			try
 			{
-				Platform.getBundle(Activator.PLUGIN_ID).stop();
-				Platform.getBundle(Activator.PLUGIN_ID).start();
+				Platform.getBundle(Activator.getDefault().getBundle().getSymbolicName()).stop();
+				Platform.getBundle(Activator.getDefault().getBundle().getSymbolicName()).start();
 			}
 			catch (final BundleException e)
 			{

@@ -39,13 +39,12 @@ public abstract class AbstractInitializer
 
 	protected void log(final IStatus status)
 	{
-		this.log(status.getMessage());
+		this.log(Activator.getDefault().getLogLevel(status.getSeverity()), status.getMessage());
 	}
 
-	protected void log(final String message)
+	protected void log(int level, final String message)
 	{
-		System.out.println(message);
-		Activator.getDefault().log(message);
+		Activator.getDefault().log(level, message);
 	}
 
 	protected void releaseConnection(final Connection connection)

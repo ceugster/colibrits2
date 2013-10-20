@@ -83,7 +83,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	@Id
 	@Column(name = "re_id")
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "re_id")
-	@TableGenerator(allocationSize = 2, name = "re_id", table = "colibri_sequence", pkColumnName = "sq_key", valueColumnName = "sq_val")
+	@TableGenerator(allocationSize = 1, name = "re_id", table = "colibri_sequence", pkColumnName = "sq_key", valueColumnName = "sq_val")
 	protected Long id;
 
 	@ManyToOne(cascade = CascadeType.PERSIST, optional = false)
