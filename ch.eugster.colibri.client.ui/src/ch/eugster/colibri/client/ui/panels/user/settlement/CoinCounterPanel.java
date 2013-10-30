@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JLabel;
@@ -80,10 +81,10 @@ public class CoinCounterPanel extends ProfilePanel
 		this.init();
 	}
 
-	public Collection<SettlementDetail> getSettlementDetails(final Settlement settlement)
+	public List<SettlementDetail> getSettlementDetails(final Settlement settlement)
 	{
-		final Collection<SettlementDetail> details = new ArrayList<SettlementDetail>();
-		final Collection<Stock> stocks = this.userPanel.getSalespoint().getStocks();
+		final List<SettlementDetail> details = new ArrayList<SettlementDetail>();
+		final List<Stock> stocks = this.userPanel.getSalespoint().getStocks();
 		for (final Stock stock : stocks)
 		{
 			details.addAll(this.getSettlementDetails(stock, settlement));
@@ -91,10 +92,10 @@ public class CoinCounterPanel extends ProfilePanel
 		return details;
 	}
 
-	public Collection<SettlementMoney> getSettlementMoney(final Settlement settlement)
+	public List<SettlementMoney> getSettlementMoney(final Settlement settlement)
 	{
-		final Collection<SettlementMoney> moneys = new ArrayList<SettlementMoney>();
-		final Collection<Stock> stocks = this.userPanel.getSalespoint().getStocks();
+		final List<SettlementMoney> moneys = new ArrayList<SettlementMoney>();
+		final List<Stock> stocks = this.userPanel.getSalespoint().getStocks();
 		for (final Stock stock : stocks)
 		{
 			moneys.addAll(this.getSettlementMoney(stock, settlement));

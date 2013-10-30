@@ -7,8 +7,8 @@
 package ch.eugster.colibri.admin.user.editors;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -170,7 +170,7 @@ public class RoleEditor extends AbstractEntityEditor<Role>
 			prop = this.updateRoleProperty(prop, key, Boolean.toString(button.getSelection()));
 			props.put(prop.getKey(), prop);
 		}
-		final Collection<RoleProperty> rprops = new ArrayList<RoleProperty>();
+		final List<RoleProperty> rprops = new ArrayList<RoleProperty>();
 		for (final RoleProperty p : props.values())
 		{
 			rprops.add(p);

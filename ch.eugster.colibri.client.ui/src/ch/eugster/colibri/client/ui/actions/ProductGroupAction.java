@@ -7,20 +7,27 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
+import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
+import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.ProductGroupMapping;
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderIdService;
 
-public final class ProductGroupAction extends ConfigurableAction implements DisposeListener
+public final class ProductGroupAction extends ConfigurableAction implements DisposeListener, PropertyChangeListener
 {
 	public static final long serialVersionUID = 0l;
 
@@ -31,6 +38,9 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 	public ProductGroupAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
+
+		new PositionChangeMediator(userPanel, this, new String[] { "position" });
+
 		userPanel.addDisposeListener(this);
 
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
@@ -106,4 +116,27 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 		return true;
 	}
 
+	protected boolean getState(final StateChangeEvent event)
+	{
+		boolean state = super.getState(event);
+		if (state)
+		{
+			state = shouldEnable();
+		}
+		return state;
+	}
+
+	@Override
+	public void propertyChange(final PropertyChangeEvent event)
+	{
+		this.setEnabled(this.shouldEnable());
+	}
+
+	private boolean shouldEnable()
+	{
+		boolean isReceiptInternal = this.userPanel.getReceiptWrapper().getReceipt().isInternal(); 
+		boolean hasNoPositions = this.userPanel.getReceiptWrapper().getReceipt().getPositions().isEmpty();
+		boolean isThisInternal = this.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL);
+		return hasNoPositions ? true : (isReceiptInternal && isThisInternal || !isReceiptInternal && !isThisInternal);
+	}
 }

@@ -9,11 +9,16 @@ package ch.eugster.colibri.admin.profile.handlers;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.profile.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
+import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Tab;
 
 public class ClearPaymentDefaultTabHandler extends AbstractPersistenceClientHandler
@@ -35,7 +40,16 @@ public class ClearPaymentDefaultTabHandler extends AbstractPersistenceClientHand
 					tab.getConfigurable().setPaymentDefaultTab(null);
 					if (persistenceService != null)
 					{
-						persistenceService.getServerService().merge(tab.getConfigurable());
+						try
+						{
+							persistenceService.getServerService().merge(tab.getConfigurable());
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError((Shell) ctx.getVariable("activeShell"), "Fehler", "Der bestehende Default-Tab konnte nicht entfernt werden.", status);
+						}
 					}
 				}
 			}

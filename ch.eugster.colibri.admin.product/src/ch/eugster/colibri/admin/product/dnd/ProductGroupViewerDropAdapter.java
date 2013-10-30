@@ -2,6 +2,9 @@ package ch.eugster.colibri.admin.product.dnd;
 
 import java.util.Collection;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.dnd.TransferData;
@@ -127,7 +130,16 @@ public class ProductGroupViewerDropAdapter extends ViewerDropAdapter
 			if (service != null)
 			{
 				ServerService server = (ServerService) service.getServerService();
-				server.merge(productGroup);
+				try
+				{
+					productGroup = (ProductGroup) server.merge(productGroup);
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+					IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+					ErrorDialog.openError(this.getViewer().getControl().getShell(), "Fehler", productGroup.getName() + " konnte nicht verschoben werden.", status);
+				}
 			}
 		}
 		finally

@@ -6,6 +6,9 @@
  */
 package ch.eugster.colibri.admin.currency.wizards;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.currency.Activator;
@@ -70,7 +73,16 @@ public class ReferenceCurrencyWizard extends AbstractEntityWizard
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			persistenceService.getServerService().merge(this.settings);
+			try 
+			{
+				this.settings = (CommonSettings) persistenceService.getServerService().merge(this.settings);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+				IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+				ErrorDialog.openError(this.getShell(), "Fehler", this.settings.getReferenceCurrency().getName() + " konnte nicht als Referenzwährung gespeichert werden.", status);
+			}
 		}
 		return result;
 	}

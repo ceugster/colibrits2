@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -16,6 +18,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -35,6 +38,7 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.part.EditorPart;
 
+import ch.eugster.colibri.admin.provider.Activator;
 import ch.eugster.colibri.admin.ui.editors.Resetable;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -167,7 +171,16 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 					{
 						if (persistenceService != null)
 						{
-							persistenceService.getServerService().merge(property.getPersistedProperty());
+							try
+							{
+								persistenceService.getServerService().merge(property.getPersistedProperty());
+							} 
+							catch (Exception e) 
+							{
+								e.printStackTrace();
+								IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+								ErrorDialog.openError((Shell) this.getEditorSite().getShell(), "Fehler", "Die Eigenschaft " + property.toString() + " konnte nicht gespeichert werden.", status);
+							}
 						}
 					}
 				}

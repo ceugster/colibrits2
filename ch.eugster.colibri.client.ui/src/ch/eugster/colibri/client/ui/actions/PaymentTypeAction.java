@@ -103,7 +103,7 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		}
 		if (this.getPaymentType().getPaymentTypeGroup().isChargable())
 		{
-			if (!this.getPaymentType().getChargeType().equals(ChargeType.NONE))
+			if (this.getPaymentType().getChargeType() != null && !this.getPaymentType().getChargeType().equals(ChargeType.NONE))
 			{
 				if (this.getPaymentType().getProductGroup() != null)
 				{

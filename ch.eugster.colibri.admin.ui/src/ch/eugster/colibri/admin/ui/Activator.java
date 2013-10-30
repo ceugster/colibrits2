@@ -20,6 +20,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.events.EventTopic;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 /**
@@ -37,6 +38,8 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 
 	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
+	private UIJob job;
+	
 	// The shared instance
 	private static Activator plugin;
 
@@ -55,14 +58,14 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+		if (event.getTopic().equals(EventTopic.SERVER.topic()))
 		{
 			if (event.getProperty("status") instanceof IStatus)
 			{
 				final IStatus status = (IStatus) event.getProperty("status");
 				if (status.getSeverity() == IStatus.ERROR)
 				{
-					final UIJob job = new UIJob("database error")
+					job = new UIJob("database error")
 					{
 						@Override
 						public IStatus runInUIThread(final IProgressMonitor monitor)
@@ -123,7 +126,7 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = new String[] { "ch/eugster/colibri/persistence/server/database" };
+		final String[] topics = new String[] { EventTopic.SERVER.topic() };
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = context.registerService(EventHandler.class, eventHandler,
 				properties);
@@ -145,6 +148,10 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
+		if (this.job != null)
+		{
+			this.job.cancel();
+		}
 		this.eventHandlerServiceRegistration.unregister();
 
 		this.persistenceServiceTracker.close();

@@ -2,6 +2,9 @@ package ch.eugster.colibri.admin.ui.wizards;
 
 import java.util.Iterator;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -45,7 +48,16 @@ public class ListAndEditWizardDialog<T extends AbstractEntity> extends WizardDia
 						while (iterator.hasNext())
 						{
 							final T entity = iterator.next();
-							persistenceService.getServerService().delete(entity);
+							try
+							{
+								persistenceService.getServerService().delete(entity);
+							} 
+							catch (Exception e) 
+							{
+								e.printStackTrace();
+								IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+								ErrorDialog.openError(this.getShell(), "Fehler", "Die Änderungen konnten nicht gespeichert werden.", status);
+							}
 						}
 					}
 				}
@@ -177,7 +189,16 @@ public class ListAndEditWizardDialog<T extends AbstractEntity> extends WizardDia
 			final ItemsWizardPage<T> itemsPage = ((ListAndEditWizard) this.getWizard()).getItemsWizardPage();
 			final EditWizardPage<T> editPage = (EditWizardPage) this.getCurrentPage();
 			final T entity = editPage.getEntity();
-			persistenceService.getServerService().merge(entity);
+			try
+			{
+				persistenceService.getServerService().merge(entity);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+				IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+				ErrorDialog.openError(this.getShell(), "Fehler", "Die Änderungen konnten nicht gespeichert werden.", status);
+			}
 			this.showPage(itemsPage);
 			this.getButton(IDialogConstants.BACK_ID).setVisible(true);
 			this.getButton(IDialogConstants.NEXT_ID).setVisible(true);

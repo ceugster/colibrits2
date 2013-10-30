@@ -6,6 +6,10 @@
  */
 package ch.eugster.colibri.admin.salespoint.wizards;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.salespoint.Activator;
@@ -76,7 +80,16 @@ public class StockWizard extends AbstractEntityWizard
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			persistenceService.getServerService().merge(this.stock.getSalespoint());
+			try
+			{
+				persistenceService.getServerService().merge(this.stock.getSalespoint());
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+				IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+				ErrorDialog.openError(this.getShell(), "Fehler", "Die Änderung am Kassenstock " + stock.getPaymentType().getCurrency().getName() + " konnte nicht gespeichert werden.", status);
+			}
 		}
 		return result;
 	}

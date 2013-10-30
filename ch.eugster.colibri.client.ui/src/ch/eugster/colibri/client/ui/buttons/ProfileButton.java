@@ -6,8 +6,10 @@
  */
 package ch.eugster.colibri.client.ui.buttons;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
@@ -16,8 +18,10 @@ import org.osgi.service.event.EventHandler;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.persistence.events.EntityMediator;
+import ch.eugster.colibri.persistence.events.EventTopic;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.provider.service.ProviderService;
+import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 import ch.eugster.colibri.ui.buttons.AbstractProfileButton;
 
@@ -49,12 +53,12 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/provider/failover"))
+		if (event.getTopic().equals(ProviderService.Topic.PROVIDER_FAILOVER.topic()) || event.getTopic().equals(EventTopic.FAILOVER.topic()) || event.getTopic().equals(UpdateScheduler.SchedulerTopic.FAILOVER.topic()))
 		{
 			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
 		}
-		else
+		else if (event.getTopic().equals(UpdateScheduler.SchedulerTopic.OK.topic()))
 		{
 			this.update(false);
 		}
@@ -66,7 +70,17 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = ProviderService.Topic.topics();
+//		final String[] topics = ProviderService.Topic.topics();
+		List<String> topics = new ArrayList<String>();
+		for (ProviderService.Topic topic : ProviderService.Topic.values())
+		{
+			topics.add(topic.topic());
+		}
+		topics.add(EventTopic.FAILOVER.topic());
+		for(UpdateScheduler.SchedulerTopic topic : UpdateScheduler.SchedulerTopic.values())
+		{
+			topics.add(topic.topic());
+		}
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);

@@ -8,6 +8,9 @@ package ch.eugster.colibri.admin.user.handlers;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -69,7 +72,17 @@ public class DeleteUserHandler extends AbstractPersistenceClientHandler
 							{
 								if (element instanceof User)
 								{
-									persistenceService.getServerService().delete((User) element);
+									User user = (User) element;
+									try
+									{
+										persistenceService.getServerService().delete(user);
+									} 
+									catch (Exception e) 
+									{
+										e.printStackTrace();
+										IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+										ErrorDialog.openError(shell, "Fehler", "Der Benutzer " + user.getUsername() + " konnte nicht entfernt werden.", status);
+									}
 								}
 							}
 						}

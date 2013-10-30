@@ -13,6 +13,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.nebula.widgets.calendarcombo.CalendarCombo;
 import org.eclipse.nebula.widgets.calendarcombo.CalendarListenerAdapter;
@@ -324,7 +327,16 @@ public class NewCurrentTaxWizardPage extends AbstractEntityWizardPage
 				{
 					currentTax.getTax().setCurrentTax(currentTax);
 				}
-				currentTax.setTax((Tax) service.merge(currentTax.getTax()));
+				try
+				{
+					currentTax.setTax((Tax) service.merge(currentTax.getTax()));
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
+					IStatus status = new Status(IStatus.ERROR, TaxActivator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+					ErrorDialog.openError(NewCurrentTaxWizardPage.this.getShell(), "Fehler", "Der neue Mehrwertsteuersatz konnte nicht gespeichert werden.", status);
+				}
 			}
 		}
 

@@ -67,6 +67,7 @@ import ch.eugster.colibri.client.ui.events.ShutdownEvent;
 import ch.eugster.colibri.client.ui.events.ShutdownListener;
 import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.persistence.events.EntityMediator;
+import ch.eugster.colibri.persistence.events.EventTopic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.PaymentType;
@@ -358,11 +359,11 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					{
 						if (!persistenceService.getServerService().isLocal())
 						{
-							if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+							if (event.getTopic().equals(EventTopic.STORE_RECEIPT.topic()))
 							{
 								this.updateTransferMessage(event);
 							}
-							else if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+							else if (event.getTopic().equals(EventTopic.SERVER.topic()))
 							{
 								this.updateTransferMessage(event);
 							}
@@ -373,7 +374,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				{
 					if (this.providerQueryTracker.getService() != null)
 					{
-						if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+						if (event.getTopic().equals(EventTopic.STORE_RECEIPT.topic()))
 						{
 							this.updateProviderMessage(event);
 						}
@@ -404,8 +405,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		t.add(ProviderService.Topic.ARTICLE_UPDATE.topic());
 		t.add(ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic());
 		t.add(ProviderService.Topic.PROVIDER_FAILOVER.topic());
-		t.add("ch/eugster/colibri/client/store/receipt");
-		t.add("ch/eugster/colibri/persistence/server/database");
+		t.add(EventTopic.STORE_RECEIPT.topic());
+		t.add(EventTopic.SERVER.topic());
 		t.add("ch/eugster/colibri/print/error");
 		t.add("ch/eugster/colibri/display/error");
 		final String[] topics = t.toArray(new String[t.size()]);
@@ -856,7 +857,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					if ((status == null) || (status.getSeverity() == IStatus.OK))
 					{
 						status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING,
-								(String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME), "Zu übertragen: "
+								(String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME), "Transfer: "
 										+ count);
 					}
 					else

@@ -28,11 +28,13 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
 import ch.eugster.colibri.client.ui.Activator;
+import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeEvent;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.events.EventTopic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
@@ -195,7 +197,15 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			persistenceService.getCacheService().merge(this.receipt);
+			try
+			{
+				persistenceService.getCacheService().merge(this.receipt);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht geparkt werden.", MessageDialog.TYPE_ERROR);
+			}
 		}
 	}
 	
@@ -306,16 +316,24 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				if (persistenceService != null)
 				{
 ////					Long receiptId = ReceiptWrapper.this.receipt.getId();
-					ReceiptWrapper.this.receipt = (Receipt) persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
-					if (!ReceiptWrapper.this.receipt.isDeleted())
+					try
 					{
-						ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
+						ReceiptWrapper.this.receipt = (Receipt) persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
+						if (!ReceiptWrapper.this.receipt.isDeleted())
+						{
+							ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
+						}
+						ReceiptWrapper.this.prepareReceipt();
+						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
+						ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
+						ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
+								UserPanel.State.POSITION_INPUT));
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR);
 					}
-					ReceiptWrapper.this.prepareReceipt();
-					ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
-					ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
-					ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
-							UserPanel.State.POSITION_INPUT));
 				}
 				return Status.OK_STATUS;
 			}
@@ -366,7 +384,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		final EventAdmin eventAdmin = (EventAdmin) this.eventServiceTracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent("ch/eugster/colibri/client/store/receipt", receipt));
+			eventAdmin.sendEvent(this.getEvent(EventTopic.STORE_RECEIPT.topic(), receipt));
 		}
 	}
 

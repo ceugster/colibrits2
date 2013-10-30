@@ -17,6 +17,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -996,7 +997,16 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 //						periphery.setDelay(delay == null ? 0 : delay.intValue());
 						periphery.setConverter(getCustomerDisplayConverter(tracker, reference));
 						periphery.setPort((String) reference.getProperty("custom.port"));
-						periphery = (CustomerDisplaySettings) persistenceService.getServerService().merge(periphery);
+						try
+						{
+							periphery = (CustomerDisplaySettings) persistenceService.getServerService().merge(periphery);
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError((Shell) this.getEditorSite().getShell(), "Fehler", "Die Kundendisplay-Einstellungen konnten nicht gespeichert werden.", status);
+						}
 					}
 					peripheries.add(periphery);
 				}
@@ -1685,7 +1695,16 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 						periphery.setCols(cols == null ? 0 : cols.intValue());
 						periphery.setConverter((String) getConverter(reference.getProperty("custom.convert")));
 						periphery.setPort((String) reference.getProperty("custom.port"));
-						periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);
+						try
+						{
+							periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError((Shell) this.getEditorSite().getShell(), "Fehler", "Die Belegdrucker-Einstellungen konnten nicht gespeichert werden.", status);
+						}
 					}
 					peripheries.add(periphery);
 				}

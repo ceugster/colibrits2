@@ -909,7 +909,6 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settle
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settlement/MoneyRow.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settlement/VoucherRow.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/views/ClientView.java -text
-ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/views/TimeDisplayContribution.java -text
 ch.eugster.colibri.client/.classpath -text
 ch.eugster.colibri.client/.project -text
 ch.eugster.colibri.client/.settings/org.eclipse.pde.core.prefs -text

@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.SwingConstants;
@@ -480,7 +481,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 			}
 		}
 
-		final Collection<Position> positions = new Vector<Position>();
+		final List<Position> positions = new Vector<Position>();
 		for (final Position position : allPositions)
 		{
 			if (position != null)

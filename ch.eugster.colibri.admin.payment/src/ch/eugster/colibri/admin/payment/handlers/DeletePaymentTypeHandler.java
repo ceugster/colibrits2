@@ -6,9 +6,14 @@
  */
 package ch.eugster.colibri.admin.payment.handlers;
 
+import java.text.DecimalFormat;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -17,6 +22,7 @@ import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.payment.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
+import ch.eugster.colibri.persistence.model.Money;
 import ch.eugster.colibri.persistence.model.PaymentType;
 
 public class DeletePaymentTypeHandler extends AbstractPersistenceClientHandler
@@ -70,7 +76,17 @@ public class DeletePaymentTypeHandler extends AbstractPersistenceClientHandler
 							{
 								if (element instanceof PaymentType)
 								{
-									persistenceService.getServerService().delete((PaymentType) element);
+									PaymentType paymentType = (PaymentType) element;
+									try
+									{
+										persistenceService.getServerService().delete(paymentType);
+									} 
+									catch (Exception e) 
+									{
+										e.printStackTrace();
+										IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+										ErrorDialog.openError(shell, "Fehler", paymentType.getName() + " konnte nicht entfernt werden.", status);
+									}
 								}
 							}
 						}

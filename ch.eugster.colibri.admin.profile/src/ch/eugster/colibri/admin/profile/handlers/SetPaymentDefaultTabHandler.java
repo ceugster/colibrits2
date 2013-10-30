@@ -11,7 +11,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.profile.Activator;
@@ -80,7 +84,16 @@ public class SetPaymentDefaultTabHandler extends AbstractHandler implements IHan
 							.getService();
 					if (persistenceService != null)
 					{
-						persistenceService.getServerService().merge(tab.getConfigurable());
+						try
+						{
+							persistenceService.getServerService().merge(tab.getConfigurable());
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError((Shell) ctx.getVariable("activeShell"), "Fehler", "Der Tab " + tab.getName() + " konnte nicht als Default gesetzt werden.", status);
+						}
 					}
 				}
 			}

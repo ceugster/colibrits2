@@ -17,6 +17,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.actions.UserPanelProfileAction;
+import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Profile;
@@ -55,8 +56,16 @@ public class DeleteParkedReceiptAction extends UserPanelProfileAction implements
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			persistenceService.getCacheService().delete(this.selectionModel.getSelectedReceipt());
-			this.tableModel.update();
+			try
+			{
+				persistenceService.getCacheService().delete(this.selectionModel.getSelectedReceipt());
+				this.tableModel.update();
+			} 
+			catch (Exception ex) 
+			{
+				ex.printStackTrace();
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der parkierte Beleg konnte nicht gelöscht werden.", MessageDialog.TYPE_ERROR);
+			}
 		}
 	}
 

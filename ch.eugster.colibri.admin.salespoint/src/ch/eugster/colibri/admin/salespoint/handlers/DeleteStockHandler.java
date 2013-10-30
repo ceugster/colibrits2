@@ -3,6 +3,9 @@ package ch.eugster.colibri.admin.salespoint.handlers;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -78,7 +81,17 @@ public class DeleteStockHandler extends AbstractPersistenceClientHandler
 							{
 								if (element instanceof Stock)
 								{
-									persistenceService.getServerService().delete((Stock) element);
+									Stock stock = (Stock) element;
+									try
+									{
+										persistenceService.getServerService().delete(stock);
+									} 
+									catch (Exception e) 
+									{
+										e.printStackTrace();
+										IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+										ErrorDialog.openError((Shell) shell, "Fehler", "Der Kassenstock " + stock.getPaymentType().getCurrency().getName() + " konnte nicht entfernt werden.", status);
+									}
 								}
 							}
 						}

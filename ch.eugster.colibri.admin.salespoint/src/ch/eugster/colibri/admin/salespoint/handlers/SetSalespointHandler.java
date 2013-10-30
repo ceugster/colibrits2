@@ -3,7 +3,11 @@ package ch.eugster.colibri.admin.salespoint.handlers;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.salespoint.Activator;
@@ -51,7 +55,16 @@ public class SetSalespointHandler extends AbstractPersistenceClientHandler
 										Salespoint.class);
 								salespointQuery.clearSalespointHosts(host);
 								serverSalespoint.setHost(host);
-								persistenceService.getServerService().merge(serverSalespoint);
+								try
+								{
+									persistenceService.getServerService().merge(serverSalespoint);
+								} 
+								catch (Exception e) 
+								{
+									e.printStackTrace();
+									IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+									ErrorDialog.openError((Shell) ctx.getVariable("activeShell"), "Fehler", "Die Kasse " + serverSalespoint.getName() + " konnte nicht für diese Station gesetzt werden.", status);
+								}
 							}
 						}
 					}

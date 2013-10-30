@@ -11,7 +11,9 @@ import java.util.Iterator;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -20,9 +22,7 @@ import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.product.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
-import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ProductGroup;
-import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 
 public class DeleteProductGroupHandler extends AbstractPersistenceClientHandler
 {
@@ -80,7 +80,17 @@ public class DeleteProductGroupHandler extends AbstractPersistenceClientHandler
 							{
 								if (element instanceof ProductGroup)
 								{
-									persistenceService.getServerService().delete((ProductGroup) element);
+									ProductGroup pg = (ProductGroup) element;
+									try
+									{
+										pg = (ProductGroup) persistenceService.getServerService().delete(pg);
+									} 
+									catch (Exception e) 
+									{
+										e.printStackTrace();
+										IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+										ErrorDialog.openError(shell, "Fehler", pg.getName() + " konnte nicht entfernt werden.", status);
+									}
 								}
 							}
 						}

@@ -74,8 +74,16 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 					receipt.setState(Receipt.State.SAVED);
 				}
 				receipt.setTransferred(false);
-				this.tableModel.setReceipt((Receipt) persistenceService.getCacheService().merge(receipt, false),
-						this.selectionModel.getMinSelectionIndex());
+				try
+				{
+					this.tableModel.setReceipt((Receipt) persistenceService.getCacheService().merge(receipt, false),
+							this.selectionModel.getMinSelectionIndex());
+				} 
+				catch (Exception ex) 
+				{
+					ex.printStackTrace();
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Status des Belegs konnte nicht gändert werden.", MessageDialog.TYPE_ERROR);
+				}
 
 				if (this.printReceiptAction != null)
 				{

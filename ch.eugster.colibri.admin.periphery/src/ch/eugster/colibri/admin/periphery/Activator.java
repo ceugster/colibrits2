@@ -1,5 +1,8 @@
 package ch.eugster.colibri.admin.periphery;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.ui.PartInitException;
@@ -77,7 +80,16 @@ public class Activator extends AbstractUIPlugin
 						if (customerDisplayService != null)
 						{
 							periphery = customerDisplayService.createCustomerDisplaySettings();
-							periphery = (CustomerDisplaySettings) persistenceService.getServerService().merge(periphery);
+							try
+							{
+								periphery = (CustomerDisplaySettings) persistenceService.getServerService().merge(periphery);
+							} 
+							catch (Exception e) 
+							{
+								e.printStackTrace();
+								IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+								ErrorDialog.openError(this.getWorkbench().getActiveWorkbenchWindow().getShell(), "Fehler", periphery.getName() + " konnte nicht gespeichert werden.", status);
+							}
 						}
 					}
 				}
@@ -118,7 +130,16 @@ public class Activator extends AbstractUIPlugin
 					if (receiptPrinterService != null)
 					{
 						periphery = receiptPrinterService.createReceiptPrinterSettings();
-						periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);
+						try
+						{
+							periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError(this.getWorkbench().getActiveWorkbenchWindow().getShell(), "Fehler", periphery.getName() + " konnte nicht gespeichert werden.", status);
+						}
 					}
 				}
 				try

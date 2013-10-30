@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -116,17 +117,44 @@ public abstract class AbstractEntityEditor<T extends AbstractEntity> extends Edi
 					AbstractEntity parent = input.getParent();
 					if (parent != null)
 					{
-						input.setParent(persistenceService.getServerService().merge(parent));
+						try
+						{
+							input.setParent(persistenceService.getServerService().merge(parent));
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError(this.getEditorSite().getShell(), "Fehler", "Die Änderungen konnten nicht gespeichert werden.", status);
+						}
 					}
 					else
 					{
-						input.setEntity((T) persistenceService.getServerService().merge(input.getEntity()));
+						try
+						{
+							input.setEntity((T) persistenceService.getServerService().merge(input.getEntity()));
+						} 
+						catch (Exception e) 
+						{
+							e.printStackTrace();
+							IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+							ErrorDialog.openError(this.getEditorSite().getShell(), "Fehler", "Die Änderungen konnten nicht gespeichert werden.", status);
+						}
 					}
 				}
 				else
 				{
 					final T entity = input.getEntity();
-					input.setEntity((T) persistenceService.getServerService().merge(entity));
+					try
+					{
+						input.setEntity((T) persistenceService.getServerService().merge(entity));
+					} 
+					catch (Exception e) 
+					{
+						e.printStackTrace();
+						IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), e.getLocalizedMessage(), e);
+						ErrorDialog.openError(this.getEditorSite().getShell(), "Fehler", "Die Änderungen konnten nicht gespeichert werden.", status);
+					}
 				}
 				// if (input.hasParent())
 				// {

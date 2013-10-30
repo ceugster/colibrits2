@@ -12,11 +12,7 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.internal.resolver.UserState;
-import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
@@ -26,6 +22,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.events.EventTopic;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
@@ -49,8 +46,8 @@ public class ShowCoinCounterPanelAction extends ConfigurableAction implements Ev
 		persistenceServiceTracker.open();
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add("ch/eugster/colibri/client/store/receipt");
-		t.add("ch/eugster/colibri/persistence/server/database");
+		t.add(EventTopic.STORE_RECEIPT.topic());
+		t.add(EventTopic.SERVER.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
@@ -113,7 +110,7 @@ public class ShowCoinCounterPanelAction extends ConfigurableAction implements Ev
 	@Override
 	public void handleEvent(Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+		if (event.getTopic().equals(EventTopic.SERVER.topic()))
 		{
 			Object property = event.getProperty("status");
 			if (property instanceof IStatus)

@@ -64,12 +64,14 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 
 	private final ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
+	private UIJob job;
+	
 	public AdminApplicationActionBarAdvisor(final IActionBarConfigurer configurer)
 	{
 		super(configurer);
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add("ch/eugster/colibri/persistence/server/database");
+		t.add("ch/eugster/colibri/server/database");
 		final String[] topics = t.toArray(new String[t.size()]);
 
 		final EventHandler eventHandler = this;
@@ -83,6 +85,7 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 	public void dispose()
 	{
 		this.eventHandlerServiceRegistration.unregister();
+		this.job.cancel();
 		super.dispose();
 	}
 
@@ -91,14 +94,14 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 	{
 		if (this.connectionInformation != null)
 		{
-			if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+			if (event.getTopic().equals("ch/eugster/colibri/server/database"))
 			{
 				if (event.getProperty("status") instanceof IStatus)
 				{
 					final IStatus status = (IStatus) event.getProperty("status");
 					if (status.getSeverity() == IStatus.OK)
 					{
-						final UIJob uiJob = new UIJob("Verbindungsinformationen aktualisieren")
+						job = new UIJob("Verbindungsinformationen aktualisieren")
 						{
 							@Override
 							public IStatus runInUIThread(final IProgressMonitor monitor)
@@ -112,11 +115,11 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 								return Status.OK_STATUS;
 							}
 						};
-						uiJob.schedule();
+						job.schedule();
 					}
 					else if (status.getSeverity() == IStatus.CANCEL)
 					{
-						final UIJob uiJob = new UIJob("Verbindungsinformationen aktualisieren")
+						job = new UIJob("Verbindungsinformationen aktualisieren")
 						{
 							@Override
 							public IStatus runInUIThread(final IProgressMonitor monitor)
@@ -130,11 +133,11 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 								return Status.OK_STATUS;
 							}
 						};
-						uiJob.schedule();
+						job.schedule();
 					}
 					else if (status.getSeverity() == IStatus.ERROR)
 					{
-						final UIJob uiJob = new UIJob("Verbindungsinformationen aktualisieren")
+						job = new UIJob("Verbindungsinformationen aktualisieren")
 						{
 							@Override
 							public IStatus runInUIThread(final IProgressMonitor monitor)
@@ -148,7 +151,7 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 								return Status.OK_STATUS;
 							}
 						};
-						uiJob.schedule();
+						job.schedule();
 					}
 				}
 			}

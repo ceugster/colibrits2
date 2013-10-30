@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -29,6 +30,7 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.panels.user.settlement.CoinCounterPanel;
+import ch.eugster.colibri.persistence.events.EventTopic;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -67,7 +69,7 @@ public class SettleAction extends ProfileAction implements EventHandler
 		super(SettleAction.TEXT, SettleAction.ACTION_COMMAND, coinCounterPanel.getProfile());
 		this.coinCounterPanel = coinCounterPanel;
 		final Collection<String> t = new ArrayList<String>();
-		t.add("ch/eugster/colibri/persistence/server/database");
+		t.add(EventTopic.SERVER.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 		this.setEnabled(checkReceipts(null));
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -146,6 +148,7 @@ public class SettleAction extends ProfileAction implements EventHandler
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			MessageDialog.showInformation(Activator.getDefault().getFrame(), coinCounterPanel.getProfile(), "Fehler", "Beim Speichern des Tagesabschlusses ist ein Fehler aufgetreten.", MessageDialog.TYPE_ERROR);
 		}
 		finally
 		{
@@ -184,12 +187,12 @@ public class SettleAction extends ProfileAction implements EventHandler
 		return new Event(topics, properties);
 	}
 
-	private Collection<SettlementDetail> getSettlementDetails(final Settlement settlement)
+	private List<SettlementDetail> getSettlementDetails(final Settlement settlement)
 	{
 		return this.coinCounterPanel.getSettlementDetails(settlement);
 	}
 
-	private Collection<SettlementMoney> getSettlementMoney(final Settlement settlement)
+	private List<SettlementMoney> getSettlementMoney(final Settlement settlement)
 	{
 		return this.coinCounterPanel.getSettlementMoney(settlement);
 	}
@@ -197,7 +200,7 @@ public class SettleAction extends ProfileAction implements EventHandler
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+		if (event.getTopic().equals(EventTopic.SERVER.topic()))
 		{
 			final IStatus status = (IStatus) event.getProperty("status");
 			UIJob job = new UIJob("Aktualisieren")

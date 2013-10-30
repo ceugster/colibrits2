@@ -448,21 +448,28 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 					final Barcode barcode = this.verifyInput(input);
 					if (barcode instanceof Barcode)
 					{
-						log(LogService.LOG_INFO, "Barcode: " + barcode.getName());
-						if (barcode.getCode().startsWith(Barcode.PREFIX_CUSTOMER))
+						if (this.userPanel.getReceiptWrapper().getReceipt().isInternal())
 						{
-							log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
-							this.position.getReceipt().setCustomerCode(barcode.getCode());
-							this.findAndRead(barcode);
+							MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Geldeinlagen und -entnahmen dürfen keine anderen Positionen enthalten.", MessageDialog.TYPE_WARN);
 						}
-						else if (this.verifyOrderedNotYetScanned(barcode))
+						else
 						{
-							log(LogService.LOG_INFO, "Provider wird gesetzt.");
-							this.setProviderId(barcode);
-							log(LogService.LOG_INFO, "Default-WG setzen.");
-							this.setDefaultProductGroup();
-							log(LogService.LOG_INFO, "Start Titelsuche.");
-							this.findAndRead(barcode);
+							log(LogService.LOG_INFO, "Barcode: " + barcode.getName());
+							if (barcode.getCode().startsWith(Barcode.PREFIX_CUSTOMER))
+							{
+								log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
+								this.position.getReceipt().setCustomerCode(barcode.getCode());
+								this.findAndRead(barcode);
+							}
+							else if (this.verifyOrderedNotYetScanned(barcode))
+							{
+								log(LogService.LOG_INFO, "Provider wird gesetzt.");
+								this.setProviderId(barcode);
+								log(LogService.LOG_INFO, "Default-WG setzen.");
+								this.setDefaultProductGroup();
+								log(LogService.LOG_INFO, "Start Titelsuche.");
+								this.findAndRead(barcode);
+							}
 						}
 					}
 					else
