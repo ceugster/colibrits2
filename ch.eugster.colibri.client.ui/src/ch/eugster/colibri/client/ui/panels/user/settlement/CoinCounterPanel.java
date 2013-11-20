@@ -128,12 +128,12 @@ public class CoinCounterPanel extends ProfilePanel
 		panel.setLayout(new GridLayout(1, 4));
 
 		final SettleAction settleAction = new SettleAction(this);
-		final ProfileButton settleButton = new ProfileButton(settleAction, this.userPanel.getProfile());
+		final ProfileButton settleButton = new ProfileButton(settleAction, this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		settleButton.addActionListener(this.userPanel);
 		panel.add(settleButton);
 
 		final BackAction backAction = new BackAction(this.userPanel.getProfile());
-		final ProfileButton backButton = new ProfileButton(backAction, this.userPanel.getProfile());
+		final ProfileButton backButton = new ProfileButton(backAction, this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		backButton.addActionListener(this.userPanel);
 		panel.add(backButton);
 

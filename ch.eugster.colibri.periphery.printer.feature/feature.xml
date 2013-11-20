@@ -110,6 +110,13 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <update label="ColibriTS II Update Site" url="http://eugster-informatik.ch/colibrits/updates"/>
    </url>
 
+   <requires>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.osgi.services"/>
+   </requires>
+
    <plugin
          id="ch.eugster.colibri.periphery"
          download-size="0"

@@ -10,6 +10,7 @@ Export-Package: ch.eugster.colibri.display.area,
  ch.eugster.colibri.display.service
 Bundle-Activator: ch.eugster.colibri.display.Activator
 Import-Package: ch.eugster.colibri.periphery.display.service,
+ ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.model.print,
  ch.eugster.colibri.persistence.queries,

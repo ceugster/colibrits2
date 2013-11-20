@@ -34,7 +34,7 @@ import ch.eugster.colibri.client.ui.events.ReceiptChangeEvent;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
-import ch.eugster.colibri.persistence.events.EventTopic;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
@@ -252,6 +252,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		final Receipt newReceipt = Receipt.newInstance(this.userPanel.getSalespoint().getSettlement(),
 				this.userPanel.getUser());
 		newReceipt.addPropertyChangeListener("customer", this);
+		this.fireReceiptChangeEvent(new ReceiptChangeEvent(this.receipt, newReceipt));
 		this.receipt = newReceipt;
 		return this.receipt;
 	}
@@ -324,14 +325,16 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 							ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
 						}
 						ReceiptWrapper.this.prepareReceipt();
-						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
-						ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().getReceipt());
+//						ReceiptWrapper.this.receipt = ReceiptWrapper.this.prepareReceipt();
+						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
+						ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
 						ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
 								UserPanel.State.POSITION_INPUT));
 					} 
 					catch (Exception e) 
 					{
 						e.printStackTrace();
+						ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, e);
 						MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR);
 					}
 				}
@@ -352,7 +355,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		}
 	}
 
-	private Event getEvent(final String topics, final Receipt receipt)
+	private Event getEvent(final String topics, final Receipt receipt, Exception e)
 	{
 		boolean openCashdrawer = false;
 		for (Payment payment : receipt.getPayments())
@@ -372,8 +375,20 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		IStatus status = null;
+		if (e != null)
+		{
+			properties.put(EventConstants.EXCEPTION, e);
+			properties.put(EventConstants.EXCEPTION_CLASS, e.getClass());
+			properties.put(EventConstants.EXCEPTION, e.getMessage());
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.STORE_RECEIPT.topic(), e);
+		}
+		else
+		{
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.STORE_RECEIPT.topic());
+		}
 		properties.put(IPrintable.class.getName(), receipt);
-		properties.put("status", Status.OK_STATUS);
+		properties.put("status", status);
 		properties.put("open.drawer", Boolean.valueOf(openCashdrawer));
 		properties.put("copies", receipt.hasRestitution() ? Integer.valueOf(userPanel.getRestitutionPrintCount()) : Integer.valueOf(1));
 		return new Event(topics, properties);
@@ -381,10 +396,15 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	private void sendEvent(final Receipt receipt)
 	{
+		sendEvent(receipt, null);
+	}
+
+	private void sendEvent(final Receipt receipt, Exception e)
+	{
 		final EventAdmin eventAdmin = (EventAdmin) this.eventServiceTracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent(EventTopic.STORE_RECEIPT.topic(), receipt));
+			eventAdmin.sendEvent(this.getEvent(Topic.STORE_RECEIPT.topic(), receipt, e));
 		}
 	}
 

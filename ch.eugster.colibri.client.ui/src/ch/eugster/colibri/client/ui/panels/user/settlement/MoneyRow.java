@@ -118,7 +118,7 @@ public class MoneyRow
 	{
 		final CifferAction action = new CifferAction(this.integerFormatter.format(this.money.getCount()),
 				this.userPanel);
-		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile());
+		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		button.addActionListener(new ActionListener()
 		{
 			@Override
@@ -158,7 +158,7 @@ public class MoneyRow
 	private ProfileButton createValueButton()
 	{
 		final CifferAction action = new CifferAction(this.doubleFormatter.format(this.money.getValue()), this.userPanel);
-		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile());
+		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		button.addActionListener(new ActionListener()
 		{
 			@Override

@@ -40,6 +40,7 @@ import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.events.StateChangeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Payment;
@@ -237,10 +238,11 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 			buttonClass = ActionResolver.getButtonClass(key.getFunctionType());
 		}
 
-		final Constructor<?> constructor = buttonClass.getConstructor(ConfigurableAction.class, Key.class);
-		final Object[] parameters = new Object[2];
+		final Constructor<?> constructor = buttonClass.getConstructor(ConfigurableAction.class, Key.class, Boolean.TYPE);
+		final Object[] parameters = new Object[3];
 		parameters[0] = action;
 		parameters[1] = key;
+		parameters[2] = userPanel.getMainTabbedPane().isFailOver();
 
 		return (ConfigurableButton) constructor.newInstance(parameters);
 	}
@@ -399,7 +401,7 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 			final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
 			if (eventAdmin != null)
 			{
-				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), "ch/eugster/colibri/client/add/position", position));
+				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), Topic.POSITION_ADDED.topic(), position));
 			}
 		}
 		finally

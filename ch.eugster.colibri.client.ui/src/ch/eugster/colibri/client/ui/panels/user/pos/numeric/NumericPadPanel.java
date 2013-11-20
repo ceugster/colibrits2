@@ -138,7 +138,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 	private NumericPadButton createCifferButton(final String actionCommand, final Profile profile)
 	{
 		final CifferAction action = new CifferAction(actionCommand, this.userPanel);
-		final NumericPadButton button = new NumericPadButton(action, this.userPanel, profile);
+		final NumericPadButton button = new NumericPadButton(action, this.userPanel, profile, userPanel.getMainTabbedPane().isFailOver());
 		button.setPreferredSize(new Dimension(100, 80));
 		return button;
 	}
@@ -146,7 +146,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 	private NumericPadButton createEnterButton(final Profile profile)
 	{
 		final EnterAction action = new EnterAction(this.userPanel, profile);
-		final EnterButton button = new EnterButton(action, this.userPanel, profile);
+		final EnterButton button = new EnterButton(action, this.userPanel, profile, userPanel.getMainTabbedPane().isFailOver());
 		button.setPreferredSize(new Dimension(100, 160));
 		this.display.addPropertyChangeListener(NumericPadPanel.PROPERTY_VALUE_KEY, button);
 		action.addPropertyChangeListener(button);
@@ -193,7 +193,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 		topRightArea.add(this.createCifferButton(NumericPadPanel.TEXT_9, profile));
 
 		final NumericPadAction deleteAction = new DeleteAction(profile);
-		this.delete = new NumericPadButton(deleteAction, this.userPanel, profile);
+		this.delete = new NumericPadButton(deleteAction, this.userPanel, profile, userPanel.getMainTabbedPane().isFailOver());
 		this.delete.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(final ActionEvent event)
@@ -210,7 +210,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 		topRightArea.add(this.createCifferButton(NumericPadPanel.TEXT_6, profile));
 
 		final ClearAction clearAction = new ClearAction(profile);
-		this.clear = new NumericPadButton(clearAction, this.userPanel, profile);
+		this.clear = new NumericPadButton(clearAction, this.userPanel, profile, userPanel.getMainTabbedPane().isFailOver());
 		this.clear.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(final ActionEvent event)

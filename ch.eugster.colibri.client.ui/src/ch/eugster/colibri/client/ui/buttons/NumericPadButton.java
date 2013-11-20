@@ -24,9 +24,9 @@ public class NumericPadButton extends ProfileButton
 
 	protected UserPanel userPanel;
 
-	public NumericPadButton(final ProfileAction action, final UserPanel userPanel, final Profile profile)
+	public NumericPadButton(final ProfileAction action, final UserPanel userPanel, final Profile profile, boolean isFailOver)
 	{
-		super(action, profile);
+		super(action, profile, isFailOver);
 		this.userPanel = userPanel;
 
 		setMaximumSize(NumericPadButton.MAX_BUTTON_SIZE);

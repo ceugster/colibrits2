@@ -17,9 +17,9 @@ public class LockButton extends ConfigurableButton implements PropertyChangeList
 {
 	public static final long serialVersionUID = 0l;
 
-	public LockButton(final ConfigurableAction action, final Key key)
+	public LockButton(final ConfigurableAction action, final Key key, boolean isFailOver)
 	{
-		super(action, key);
+		super(action, key, isFailOver);
 	}
 
 	@Override

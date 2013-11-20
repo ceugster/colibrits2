@@ -11,7 +11,6 @@ import java.beans.PropertyChangeEvent;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
-import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Profile;
 

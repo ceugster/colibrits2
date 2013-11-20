@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
-import ch.eugster.colibri.persistence.model.Receipt;
 
 public class ReceiptParkingAction extends ConfigurableAction
 {

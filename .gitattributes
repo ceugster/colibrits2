@@ -836,6 +836,7 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/buttons/NumericPad
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/buttons/PositionButton.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/buttons/ProfileButton.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/buttons/ReceiptParkingButton.java -text
+ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/dialogs/CreditAccountDialog.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/dialogs/MessageDialog.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/events/DisposeEvent.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/events/DisposeListener.java -text

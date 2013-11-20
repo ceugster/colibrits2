@@ -19,6 +19,7 @@ import ch.eugster.colibri.display.area.ILayoutArea;
 import ch.eugster.colibri.display.area.ILayoutAreaType;
 import ch.eugster.colibri.display.area.ILayoutType;
 import ch.eugster.colibri.periphery.display.service.CustomerDisplayService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Display;
 import ch.eugster.colibri.persistence.model.DisplayArea;
 import ch.eugster.colibri.persistence.model.Payment;
@@ -114,23 +115,23 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 	{
 		if (isReady())
 		{
-			if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+			if (event.getTopic().equals(Topic.STORE_RECEIPT.topic()))
 			{
 				this.displayWelcomeMessage();
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/client/salespoint/closed"))
+			else if (event.getTopic().equals(Topic.SALESPOINT_CLOSED.topic()))
 			{
 				this.displaySalespointClosedMessage();
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/client/user/added"))
+			else if (event.getTopic().equals(Topic.USER_LOGGED_IN.topic()))
 			{
 				this.displayWelcomeMessage(0);
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/client/started"))
+			else if (event.getTopic().equals(Topic.CLIENT_STARTED.topic()))
 			{
 				this.displaySalespointClosedMessage();
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/client/add/position"))
+			else if (event.getTopic().equals(Topic.POSITION_ADDED.topic()))
 			{
 				if (event.getProperty(IPrintable.class.getName()) instanceof Position)
 				{
@@ -138,7 +139,7 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 					this.displayPositionAddedMessage(position);
 				}
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/client/add/payment"))
+			else if (event.getTopic().equals(Topic.PAYMENT_ADDED.topic()))
 			{
 				if (event.getProperty(IPrintable.class.getName()) instanceof Payment)
 				{
@@ -188,12 +189,12 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 		this.setReady(this.setDisplayContext());
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add("ch/eugster/colibri/client/store/receipt");
-		t.add("ch/eugster/colibri/client/salespoint/closed");
-		t.add("ch/eugster/colibri/client/user/added");
-		t.add("ch/eugster/colibri/client/started");
-		t.add("ch/eugster/colibri/client/add/position");
-		t.add("ch/eugster/colibri/client/add/payment");
+		t.add(Topic.STORE_RECEIPT.topic());
+		t.add(Topic.SALESPOINT_CLOSED.topic());
+		t.add(Topic.USER_LOGGED_IN.topic());
+		t.add(Topic.CLIENT_STARTED.topic());
+		t.add(Topic.POSITION_ADDED.topic());
+		t.add(Topic.PAYMENT_ADDED.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -343,11 +344,11 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 		this.salespoint = this.getSalespoint(this.persistenceService.getCacheService());
 		this.display = this.getDisplay(this.persistenceService.getCacheService());
 
-		if (this.salespoint == null)
-		{
-			this.salespoint = this.getSalespoint(this.persistenceService.getServerService());
-			this.display = this.getDisplay(this.persistenceService.getServerService());
-		}
+//		if (this.salespoint == null)
+//		{
+//			this.salespoint = this.getSalespoint(this.persistenceService.getServerService());
+//			this.display = this.getDisplay(this.persistenceService.getServerService());
+//		}
 		if ((this.salespoint == null) || (this.display == null))
 		{
 			return false;

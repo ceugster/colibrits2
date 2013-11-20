@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.eclipse.core.runtime.Status;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -22,12 +21,8 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
-import ch.eugster.colibri.persistence.events.EntityMediator;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Key;
-import ch.eugster.colibri.persistence.model.Receipt;
-import ch.eugster.colibri.persistence.model.key.FunctionType;
-import ch.eugster.colibri.persistence.model.key.KeyType;
-import ch.eugster.colibri.persistence.model.print.IPrintable;
 
 public class LockAction extends ConfigurableAction implements DisposeListener
 {
@@ -55,7 +50,7 @@ public class LockAction extends ConfigurableAction implements DisposeListener
 				EventAdmin eventAdmin = eventServiceTracker.getService();
 				if (eventAdmin != null)
 				{
-					eventAdmin.sendEvent(getEvent("ch/eugster/colibri/client/user/added"));
+					eventAdmin.sendEvent(getEvent(Topic.USER_LOGGED_IN.topic()));
 				}
 			}
 			else
@@ -72,7 +67,7 @@ public class LockAction extends ConfigurableAction implements DisposeListener
 			EventAdmin eventAdmin = eventServiceTracker.getService();
 			if (eventAdmin != null)
 			{
-				eventAdmin.sendEvent(getEvent("ch/eugster/colibri/client/salespoint/closed"));
+				eventAdmin.sendEvent(getEvent(Topic.SALESPOINT_CLOSED.topic()));
 			}
 		}
 	}

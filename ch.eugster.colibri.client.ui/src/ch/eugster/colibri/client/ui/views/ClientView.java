@@ -67,29 +67,32 @@ import ch.eugster.colibri.client.ui.events.ShutdownEvent;
 import ch.eugster.colibri.client.ui.events.ShutdownListener;
 import ch.eugster.colibri.client.ui.panels.MainTabbedPane;
 import ch.eugster.colibri.persistence.events.EntityMediator;
-import ch.eugster.colibri.persistence.events.EventTopic;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
+import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
+import ch.eugster.colibri.persistence.queries.PaymentQuery;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
+import ch.eugster.colibri.persistence.queries.SettlementQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.service.ProviderIdService;
 import ch.eugster.colibri.provider.service.ProviderQuery;
-import ch.eugster.colibri.provider.service.ProviderService;
 import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class ClientView extends ViewPart implements IWorkbenchListener, PropertyChangeListener, ChangeListener,
@@ -149,7 +152,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	{
 		StringBuilder errors = new StringBuilder();
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
-		String msg = "Die Verbindung zur lokalen Datenbank konnte nicht hergestellt werden.";
+		String msg = "Die Verbindung zur lokalen Datenbank kann nicht hergestellt werden.";
 		errors = errors.append(persistenceService == null ? msg : "");
 		if (persistenceService != null)
 		{
@@ -296,44 +299,43 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals(ProviderService.Topic.PROVIDER_FAILOVER.topic()))
+		Object ex = event.getProperty(EventConstants.EXCEPTION);
+		if (ex instanceof Exception)
 		{
-			if (frequency == null)
+			if (event.getTopic().equals(Topic.SCHEDULED.topic()) || 
+					event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+					event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()) ||
+					event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
 			{
-				try
+				if (frequency == null)
 				{
-					frequency = Long.valueOf(getMessageFrequency()).longValue() * 60000;
+					try
+					{
+						frequency = Long.valueOf(getMessageFrequency()).longValue() * 60000;
+					}
+					catch(NumberFormatException e)
+					{
+						frequency = 3600000L;
+					}
 				}
-				catch(NumberFormatException e)
+//				Boolean force = (Boolean) event.getProperty("force");
+				long now = GregorianCalendar.getInstance().getTimeInMillis();
+				long diff = now - this.lastFailoverMessage;
+				if (diff > frequency)
 				{
-					frequency = 3600000L;
+					lastFailoverMessage = now;
+					final String message = "Die Verbindung zum Server kann zur Zeit nicht hergestellt werden."
+							+ "\nTiteleingaben müssen manuell vorgenommen werden." 
+							+ "\nAktualisierungen können nicht durchgeführt werden."
+							+ "\n\nFalls der Ausfall länger dauert, benachrichtigen Sie bitte den Lieferanten.";
+					if (message != null)
+					{
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+										.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
+					}
 				}
 			}
-//			Boolean force = (Boolean) event.getProperty("force");
-			long now = GregorianCalendar.getInstance().getTimeInMillis();
-			long diff = now - this.lastFailoverMessage;
-			if (diff > frequency)
-			{
-				lastFailoverMessage = now;
-				final String message = (String) event.getProperty("message");
-				if (message != null)
-				{
-					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-									.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
-//						MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-//								.getProfile(), "Verbindungsproblem", new int[] { 0 }, 0);
-//						dialog.setMessage(message);
-//						dialog.pack();
-//						dialog.setLocationRelativeTo(Activator.getDefault().getFrame());
-//						dialog.setVisible(true);
-//					}
-				}
-			}
-			this.updateProviderMessage(event);
-		}
-		else
-		{
-			if (event.getTopic().equals("ch/eugster/colibri/print/error"))
+			else if (event.getTopic().equals(Topic.PRINT_SETTLEMENT.topic()) || event.getTopic().equals(Topic.PRINT_RECEIPT.topic()) || event.getTopic().equals(Topic.PRINT_VOUCHER.topic()))
 			{
 				final IStatus status = (IStatus) event.getProperty("status");
 				final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
@@ -341,55 +343,9 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
 						.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/display/error"))
-			{
-				final IStatus status = (IStatus) event.getProperty("status");
-				final String message = status.getMessage() == null ? "Das Kundendisplay kann nicht angesprochen werden"
-						: status.getMessage();
-				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
-						.getProfile(), "Problem mit Kundendisplay", message, MessageDialog.TYPE_ERROR);
-			}
-			else
-			{
-				if (this.transferInformation != null)
-				{
-					final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-							.getService();
-					if (persistenceService != null)
-					{
-						if (!persistenceService.getServerService().isLocal())
-						{
-							if (event.getTopic().equals(EventTopic.STORE_RECEIPT.topic()))
-							{
-								this.updateTransferMessage(event);
-							}
-							else if (event.getTopic().equals(EventTopic.SERVER.topic()))
-							{
-								this.updateTransferMessage(event);
-							}
-						}
-					}
-				}
-				if (this.providerInformation != null)
-				{
-					if (this.providerQueryTracker.getService() != null)
-					{
-						if (event.getTopic().equals(EventTopic.STORE_RECEIPT.topic()))
-						{
-							this.updateProviderMessage(event);
-						}
-						else if (event.getTopic().equals(ProviderService.Topic.ARTICLE_UPDATE.topic()))
-						{
-							this.updateProviderMessage(event);
-						}
-						else if (event.getTopic().equals(ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic()))
-						{
-							this.updateProviderMessage(event);
-						}
-					}
-				}
-			}
 		}
+		this.updateTransferMessage(event);
+		this.updateProviderMessage(event);
 	}
 
 	@Override
@@ -402,13 +358,15 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		ClientView.instance = this;
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add(ProviderService.Topic.ARTICLE_UPDATE.topic());
-		t.add(ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic());
-		t.add(ProviderService.Topic.PROVIDER_FAILOVER.topic());
-		t.add(EventTopic.STORE_RECEIPT.topic());
-		t.add(EventTopic.SERVER.topic());
-		t.add("ch/eugster/colibri/print/error");
-		t.add("ch/eugster/colibri/display/error");
+		t.add(Topic.SCHEDULED.topic());
+		t.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		t.add(Topic.SCHEDULED_TRANSFER.topic());
+		t.add(Topic.STORE_RECEIPT.topic());
+		t.add(Topic.PRINT_RECEIPT.topic());
+		t.add(Topic.PRINT_SETTLEMENT.topic());
+		t.add(Topic.PRINT_VOUCHER.topic());
+		t.add(Topic.SETTLE_PERFORMED.topic());
+		t.add(Topic.PROVIDER_QUERY.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 
 		final EventHandler eventHandler = this;
@@ -494,71 +452,63 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	public void updateProviderMessage(final Event event)
 	{
-		final ProviderQuery provider = providerQueryTracker.getService();
-		if (provider == null || !provider.isConnect())
+		if (this.providerInformation != null)
 		{
-			return;
-		}
-
-		final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
-		{
-			@Override
-			public IStatus runInUIThread(final IProgressMonitor monitor)
+			if (event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+					event.getTopic().equals(Topic.STORE_RECEIPT.topic()) ||
+					event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
 			{
-				ProviderService.Topic topic = (ProviderService.Topic) event.getProperty("topic");
-				IStatus status = (IStatus) event.getProperty("status");
-				final ImageRegistry registry = Activator.getDefault().getImageRegistry();
-				if (status.getSeverity() == IStatus.ERROR)
+				final ProviderQuery provider = providerQueryTracker.getService();
+				if (provider == null || !provider.isConnect())
 				{
-					ClientView.this.providerInformation.setImage(null);
-					ClientView.this.providerInformation.setText(null);
-					ClientView.this.providerInformation.setErrorText(topic.message());
-					ClientView.this.providerInformation.setErrorImage(registry.get("error"));
+					return;
 				}
-				else
+	
+				final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
 				{
-					IStatus transferStatus = (IStatus) event.getProperty("transferStatus");
-					long count = countProviderUpdates(salespoint, provider.getProviderId(), transferStatus);
-					if (topic == null || topic.equals(ProviderService.Topic.ARTICLE_UPDATE))
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
 					{
-						if ((status == null) || (status.getSeverity() == IStatus.OK))
+						IStatus status = (IStatus) event.getProperty("status");
+						final ImageRegistry registry = Activator.getDefault().getImageRegistry();
+						if (status.getSeverity() == IStatus.ERROR)
 						{
-							status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
-									"Zu verbuchen: " + count);
+							status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+									"Keine Verbindung!");
+							ClientView.this.providerInformation.setImage(null);
+							ClientView.this.providerInformation.setText(null);
+							ClientView.this.providerInformation.setErrorText(status.getMessage());
+							ClientView.this.providerInformation.setErrorImage(registry.get("error"));
+						}
+						else if (status.getSeverity() == IStatus.OK)
+						{
+							long count = countProviderUpdates(salespoint, provider.getProviderId());
+							status = new Status(count == 0D ? IStatus.OK : IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
+									"Verbuchen: " + count);
 							ClientView.this.providerInformation.setErrorImage(null);
 							ClientView.this.providerInformation.setErrorText(null);
 							ClientView.this.providerInformation.setText(status.getMessage());
-							ClientView.this.providerInformation.setImage(registry.get(status.getSeverity() == IStatus.OK ? "ok" : "exclamation"));
+							ClientView.this.providerInformation.setImage(registry.get(Topic.SCHEDULED_PROVIDER_UPDATE.icon(status)));
 						}
+						return Status.OK_STATUS;
 					}
-					else
-					{
-						ClientView.this.providerInformation.setImage(null);
-						ClientView.this.providerInformation.setText(null);
-						ClientView.this.providerInformation.setErrorText(status.getMessage());
-						ClientView.this.providerInformation.setErrorImage(registry.get("error"));
-					}
-				}
-				return Status.OK_STATUS;
+				};
+				uiJob.setPriority(Job.DECORATE);
+				uiJob.schedule();
 			}
-		};
-		uiJob.setPriority(Job.DECORATE);
-		uiJob.schedule();
+		}
 	}
 
-	private long countProviderUpdates(Salespoint salespoint, String providerId, IStatus transferStatus)
+	private long countProviderUpdates(Salespoint salespoint, String providerId)
 	{
 		long count = 0L;
 		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			PositionQuery query = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
-			count = query.countProviderUpdates(salespoint, providerId, persistenceService.getCacheService().getConnectionType());
-			if (count == 0L && persistenceService.getServerService().isConnected())
-			{
-				query = (PositionQuery) persistenceService.getServerService().getQuery(Position.class);
-				count = query.countProviderUpdates(salespoint, providerId, persistenceService.getServerService().getConnectionType());
-			}
+			PositionQuery positionQuery = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
+			count = positionQuery.countProviderUpdates(salespoint, providerId);
+			PaymentQuery paymentQuery = (PaymentQuery) persistenceService.getCacheService().getQuery(Payment.class);
+			count += paymentQuery.countProviderUpdates(salespoint, providerId);
 		}
 		return count;
 	}
@@ -627,8 +577,10 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		{
 			if (!persistenceService.getServerService().isLocal())
 			{
-				final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
-				final long counted = query.countRemainingToTransfer();
+				ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+				long counted = receiptQuery.countRemainingToTransfer();
+				final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
+				counted += settlementQuery.countTransferables();
 				count = Long.valueOf(counted).toString();
 				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
 				this.transferInformation.setText("Zu übertragen: " + count);
@@ -653,7 +605,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			}
 			else
 			{
-				final long counted = countProviderUpdates(salespoint, provider.getProviderId(), null);
+				final long counted = countProviderUpdates(salespoint, provider.getProviderId());
 				count = Long.valueOf(counted).toString();
 				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
 				this.providerInformation.setText(provider.getName() + ": " + count);
@@ -672,7 +624,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		this.timeInformation.setText("");
 		this.getViewSite().getActionBars().getStatusLineManager().prependToGroup(StatusLineManager.BEGIN_GROUP, this.timeInformation);
 
-		this.sendEvent("ch/eugster/colibri/client/started");
+		this.sendEvent(Topic.CLIENT_STARTED.topic());
 		
 		startTimer();
 	}
@@ -783,114 +735,129 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private void updateCustomerLabel(final Object object)
 	{
-//		if (this.customerInformation != null)
-//		{
-			final UIJob uiJob = new UIJob("set provider message")
-			{
-				@Override
-				public IStatus runInUIThread(final IProgressMonitor monitor)
-				{
-					StringBuilder builder = new StringBuilder("Kunde: ");
-					Customer customer = null;
-					if (object instanceof Receipt)
-					{
-						customer = ((Receipt) object).getCustomer();
-					}
-					else if (object instanceof Customer)
-					{
-						customer = (Customer) object;
-					}
-					else if (object instanceof String)
-					{
-						builder = builder.append((String) object);
-					}
-					if (customer != null)
-					{
-						builder = builder.append(customer.getId().toString());
-						builder = builder.append(" ");
-						if (!customer.getFullname().isEmpty())
-						{
-							builder = builder.append(customer.getFullname());
-						}
-						else
-						{
-							builder = builder.append("?");
-						}
-						if (customer.getDiscount() != 0D)
-						{
-							builder = builder.append(" (Rabatt "
-									+ NumberFormat.getPercentInstance().format(customer.getDiscount()) + ")");
-						}
-						builder = builder.append(", Kontostand: ");
-						final NumberFormat formatter = NumberFormat.getNumberInstance();
-						formatter.setMaximumFractionDigits(2);
-						formatter.setMinimumFractionDigits(2);
-						final String amount = formatter.format(customer.getAccount());
-						builder = builder.append(amount);
-						builder = builder.append(customer.getHasAccount() ? " (Kundenkarte: " + customer.getId().toString() + ")" : " (OHNE KUNDENKARTE)");
-					}
-					String text = builder.toString();
-//					ClientView.this.customerInformation.setText(text);
-					ClientView.this.getSite().getShell().setText(ClientView.this.mainTabbedPane.prepareTitle() + " :: " + text);
-					return Status.OK_STATUS;
-				}
-			};
-			uiJob.schedule();
-//		}
-	}
-
-	private void updateTransferMessage(final Event event)
-	{
-		final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
+		final UIJob uiJob = new UIJob("set provider message")
 		{
 			@Override
 			public IStatus runInUIThread(final IProgressMonitor monitor)
 			{
-				final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-						.getService();
-				if (persistenceService != null)
+				StringBuilder builder = new StringBuilder("Kunde: ");
+				Customer customer = null;
+				if (object instanceof Receipt)
 				{
-					final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(
-							Receipt.class);
-					final long count = query.countRemainingToTransfer();
-					IStatus status = (IStatus) event.getProperty("status");
-					if ((status == null) || (status.getSeverity() == IStatus.OK))
+					customer = ((Receipt) object).getCustomer();
+				}
+				else if (object instanceof Customer)
+				{
+					customer = (Customer) object;
+				}
+				else if (object instanceof String)
+				{
+					builder = builder.append((String) object);
+				}
+				if (customer != null)
+				{
+					builder = builder.append(customer.getId().toString());
+					builder = builder.append(" ");
+					if (!customer.getFullname().isEmpty())
 					{
-						status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING,
-								(String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME), "Transfer: "
-										+ count);
+						builder = builder.append(customer.getFullname());
 					}
 					else
 					{
-						status = new Status(IStatus.ERROR, status.getPlugin(), "Keine Verbindung");
+						builder = builder.append("?");
 					}
-					final ImageRegistry registry = Activator.getDefault().getImageRegistry();
-					if (status.getSeverity() == IStatus.OK)
+					if (customer.getDiscount() != 0D)
 					{
-						ClientView.this.transferInformation.setErrorImage(null);
-						ClientView.this.transferInformation.setErrorText(null);
-						ClientView.this.transferInformation.setText(status.getMessage());
-						ClientView.this.transferInformation.setImage(registry.get("ok"));
+						builder = builder.append(" (Rabatt "
+								+ NumberFormat.getPercentInstance().format(customer.getDiscount()) + ")");
 					}
-					else if (status.getSeverity() == IStatus.WARNING)
-					{
-						ClientView.this.transferInformation.setErrorImage(null);
-						ClientView.this.transferInformation.setErrorText(null);
-						ClientView.this.transferInformation.setText(status.getMessage());
-						ClientView.this.transferInformation.setImage(registry.get("exclamation"));
-					}
-					else if (status.getSeverity() == IStatus.ERROR)
-					{
-						ClientView.this.transferInformation.setImage(null);
-						ClientView.this.transferInformation.setText(null);
-						ClientView.this.transferInformation.setErrorText(status.getMessage());
-						ClientView.this.transferInformation.setErrorImage(registry.get("error"));
-					}
+					builder = builder.append(", Kontostand: ");
+					final NumberFormat formatter = NumberFormat.getNumberInstance();
+					formatter.setMaximumFractionDigits(2);
+					formatter.setMinimumFractionDigits(2);
+					final String amount = formatter.format(customer.getAccount());
+					builder = builder.append(amount);
+					builder = builder.append(customer.getHasAccount() ? " (Kundenkarte: " + customer.getId().toString() + ")" : " (OHNE KUNDENKARTE)");
 				}
+				String text = builder.toString();
+//					ClientView.this.customerInformation.setText(text);
+				ClientView.this.getSite().getShell().setText(ClientView.this.mainTabbedPane.prepareTitle() + " :: " + text);
 				return Status.OK_STATUS;
 			}
 		};
 		uiJob.schedule();
+	}
+
+	private void updateTransferMessage(final Event event)
+	{
+		if (this.transferInformation != null)
+		{
+			if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()) ||
+					event.getTopic().equals(Topic.STORE_RECEIPT.topic()) ||
+							event.getTopic().equals(Topic.SETTLE_PERFORMED.topic()))
+			{
+				final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
+				{
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						final ImageRegistry registry = Activator.getDefault().getImageRegistry();
+						IStatus status = (IStatus) event.getProperty("status");
+						if (status.getSeverity() == IStatus.OK)
+						{
+							final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
+									.getService();
+							if (persistenceService != null)
+							{
+								final ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(
+										Receipt.class);
+								long count = receiptQuery.countRemainingToTransfer();
+								final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(
+										Settlement.class);
+								count += settlementQuery.countTransferables();
+								if ((status == null) || (status.getSeverity() == IStatus.OK))
+								{
+									status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING,
+											(String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME), "Transfer: "
+													+ count);
+								}
+								else
+								{
+									status = new Status(IStatus.ERROR, status.getPlugin(), "Keine Verbindung");
+								}
+								if (status.getSeverity() == IStatus.OK)
+								{
+									ClientView.this.transferInformation.setErrorImage(null);
+									ClientView.this.transferInformation.setErrorText(null);
+									ClientView.this.transferInformation.setText(status.getMessage());
+									ClientView.this.transferInformation.setImage(registry.get("ok"));
+								}
+								else if (status.getSeverity() == IStatus.WARNING)
+								{
+									ClientView.this.transferInformation.setErrorImage(null);
+									ClientView.this.transferInformation.setErrorText(null);
+									ClientView.this.transferInformation.setText(status.getMessage());
+									ClientView.this.transferInformation.setImage(registry.get("exclamation"));
+								}
+								else if (status.getSeverity() == IStatus.ERROR)
+								{
+								}
+							}
+						}
+						else
+						{
+							status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Keine Verbindung!");
+							ClientView.this.transferInformation.setImage(null);
+							ClientView.this.transferInformation.setText(null);
+							ClientView.this.transferInformation.setErrorText(status.getMessage());
+							ClientView.this.transferInformation.setErrorImage(registry.get(Topic.SCHEDULED_TRANSFER.icon(status)));
+						}
+						return Status.OK_STATUS;
+					}
+				};
+				uiJob.schedule();
+			}
+		}
 	}
 
 	public static ClientView getClientView()

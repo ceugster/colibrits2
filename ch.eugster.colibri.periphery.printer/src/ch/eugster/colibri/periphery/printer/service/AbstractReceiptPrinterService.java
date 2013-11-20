@@ -79,13 +79,13 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 	public void setReceiptPrinterSettings()
 	{
 		this.receiptPrinterSettings = this.getReceiptPrinterSettings(this.persistenceService.getCacheService());
-		if (this.receiptPrinterSettings == null)
-		{
-			if (this.persistenceService.getServerService().isConnected())
-			{
-				this.receiptPrinterSettings = this.getReceiptPrinterSettings(this.persistenceService.getServerService());
-			}
-		}
+//		if (this.receiptPrinterSettings == null)
+//		{
+//			if (this.persistenceService.getServerService().isConnected())
+//			{
+//				this.receiptPrinterSettings = this.getReceiptPrinterSettings(this.persistenceService.getServerService());
+//			}
+//		}
 		if (this.receiptPrinterSettings == null)
 		{
 			this.receiptPrinterSettings = this.createReceiptPrinterSettings();

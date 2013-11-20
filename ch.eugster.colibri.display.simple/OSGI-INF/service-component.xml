@@ -9,8 +9,8 @@
       <provide interface="org.osgi.service.event.EventHandler"/>
    </service>
    <property name="custom.label" type="String" value="Layout Kundendisplay"/>
-   <property name="event.topics" type="String">ch/eugster/colibri/client/add/position
-ch/eugster/colibri/client/add/payment
-ch/eugster/colibri/client/store/receipt
+   <property name="event.topics" type="String">ch/eugster/colibri/add/position
+ch/eugster/colibri/add/payment
+ch/eugster/colibri/store/receipt
    </property>
 </scr:component>

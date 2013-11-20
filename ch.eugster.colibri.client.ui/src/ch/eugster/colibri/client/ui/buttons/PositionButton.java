@@ -24,9 +24,9 @@ public class PositionButton extends ProfileButton
 
 	private final UserPanel userPanel;
 
-	public PositionButton(final UserPanelProfileAction action, final UserPanel userPanel, final Profile profile)
+	public PositionButton(final UserPanelProfileAction action, final UserPanel userPanel, final Profile profile, boolean isFailOver)
 	{
-		super(action, profile);
+		super(action, profile, isFailOver);
 		this.userPanel = userPanel;
 		this.userPanel.getValueDisplay().addPropertyChangeListener("value", action);
 

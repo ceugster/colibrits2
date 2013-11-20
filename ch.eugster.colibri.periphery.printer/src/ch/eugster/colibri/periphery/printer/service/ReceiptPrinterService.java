@@ -1,12 +1,13 @@
 package ch.eugster.colibri.periphery.printer.service;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Salespoint;
 
 public interface ReceiptPrinterService
 {
-	public static final String EVENT_ADMIN_TOPIC_ERROR = "ch/eugster/colibri/periphery/printer/error";
+	public static final String EVENT_ADMIN_TOPIC_ERROR = Topic.PRINT_ERROR.topic();
 
 	void cutPaper();
 

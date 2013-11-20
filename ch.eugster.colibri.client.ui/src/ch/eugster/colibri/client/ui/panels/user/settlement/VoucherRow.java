@@ -129,7 +129,7 @@ public class VoucherRow
 	private ProfileButton createCountButton()
 	{
 		final CifferAction action = new CifferAction(this.integerFormatter.format(this.getCount()), this.userPanel);
-		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile());
+		final ProfileButton button = new ProfileButton(action, this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		button.addActionListener(new ActionListener()
 		{
 			@Override
@@ -191,7 +191,7 @@ public class VoucherRow
 		
 		public VoucherButton(ProfileAction action, final Profile profile, Key key)
 		{
-			super(action, profile);
+			super(action, profile, userPanel.getMainTabbedPane().isFailOver());
 			this.key = key;
 		}
 		

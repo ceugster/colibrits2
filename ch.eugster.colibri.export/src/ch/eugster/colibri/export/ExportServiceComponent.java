@@ -34,6 +34,7 @@ import org.osgi.service.log.LogService;
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
 import ch.eugster.colibri.export.service.ExportService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
@@ -136,7 +137,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 		}
 		if (doExport.booleanValue())
 		{
-			if (event.getTopic().equals("ch/eugster/colibri/client/store/receipt"))
+			if (event.getTopic().equals(Topic.STORE_RECEIPT.topic()))
 			{
 				IPrintable printable = (IPrintable) event.getProperty("ch.eugster.colibri.persistence.model.print.IPrintable");
 				if (printable instanceof Receipt)
@@ -146,7 +147,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 					log(LogService.LOG_INFO, "Beleg " + receipt.getNumber() + " exportiert.");
 				}
 			}
-			else if (event.getTopic().equals("ch/eugster/colibri/client/print/settlement"))
+			else if (event.getTopic().equals(Topic.PRINT_SETTLEMENT.topic()))
 			{
 				IPrintable printable = (IPrintable) event.getProperty(IPrintable.class.getName());
 				if (printable instanceof Settlement)

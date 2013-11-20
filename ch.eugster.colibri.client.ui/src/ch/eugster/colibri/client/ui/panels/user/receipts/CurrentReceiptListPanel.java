@@ -183,14 +183,15 @@ public class CurrentReceiptListPanel extends ProfilePanel implements TableModelL
 		/*
 		 * Buttons
 		 */
+		boolean failOver = userPanel.getMainTabbedPane().isFailOver();
 		final UpAction upAction = new UpAction(userPanel, profile, table.getModel(), table.getSelectionModel());
-		upButton = new ProfileButton(upAction, profile);
+		upButton = new ProfileButton(upAction, profile, failOver);
 		upButton.addActionListener(this);
 		table.getSelectionModel().addListSelectionListener(upAction);
 		table.getModel().addTableModelListener(upAction);
 
 		final DownAction downAction = new DownAction(userPanel, profile, table.getModel(), table.getSelectionModel());
-		downButton = new ProfileButton(downAction, profile);
+		downButton = new ProfileButton(downAction, profile, failOver);
 		downButton.addActionListener(this);
 		table.getModel().addTableModelListener(downAction);
 		table.getSelectionModel().addListSelectionListener(downAction);
@@ -198,7 +199,7 @@ public class CurrentReceiptListPanel extends ProfilePanel implements TableModelL
 		final PrintReceiptAction printAction = new PrintReceiptAction(userPanel, profile,
 				(CurrentReceiptListModel) table.getModel(),
 				(CurrentReceiptListSelectionModel) table.getSelectionModel());
-		printButton = new ProfileButton(printAction, profile);
+		printButton = new ProfileButton(printAction, profile, failOver);
 		table.getModel().addTableModelListener(printAction);
 		table.getSelectionModel().addListSelectionListener(printAction);
 
@@ -206,7 +207,7 @@ public class CurrentReceiptListPanel extends ProfilePanel implements TableModelL
 				(CurrentReceiptListModel) table.getModel(),
 				(CurrentReceiptListSelectionModel) table.getSelectionModel());
 		reverseAction.addPrintReceiptAction(printAction);
-		reverseButton = new ProfileButton(reverseAction, profile);
+		reverseButton = new ProfileButton(reverseAction, profile, failOver);
 		table.getSelectionModel().addListSelectionListener(reverseAction);
 		table.getModel().addTableModelListener(reverseAction);
 
@@ -217,7 +218,7 @@ public class CurrentReceiptListPanel extends ProfilePanel implements TableModelL
 		// table.getModel().addTableModelListener(loadAction);
 
 		final BackAction backAction = new BackAction(profile);
-		backButton = new ProfileButton(backAction, profile);
+		backButton = new ProfileButton(backAction, profile, failOver);
 		backButton.addActionListener(userPanel);
 
 		final JPanel buttonPanel = new JPanel(new GridLayout(1, 5));

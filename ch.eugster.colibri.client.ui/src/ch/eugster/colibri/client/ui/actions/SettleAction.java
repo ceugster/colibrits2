@@ -7,22 +7,15 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.progress.UIJob;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -30,30 +23,17 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.panels.user.settlement.CoinCounterPanel;
-import ch.eugster.colibri.persistence.events.EventTopic;
-import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementDetail;
 import ch.eugster.colibri.persistence.model.SettlementMoney;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
-import ch.eugster.colibri.persistence.queries.ReceiptQuery;
-import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.service.SettlementService;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 
-public class SettleAction extends ProfileAction implements EventHandler
+public class SettleAction extends ProfileAction
 {
-	@Override
-	protected void finalize() throws Throwable 
-	{
-		if (this.eventHandlerServiceRegistration != null)
-		{
-			this.eventHandlerServiceRegistration.unregister();
-		}
-		super.finalize();
-	}
-
 	private static final long serialVersionUID = 0l;
 
 	public static final String TEXT = "Abschluss";
@@ -62,20 +42,10 @@ public class SettleAction extends ProfileAction implements EventHandler
 
 	private final CoinCounterPanel coinCounterPanel;
 
-	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
-	
 	public SettleAction(final CoinCounterPanel coinCounterPanel)
 	{
 		super(SettleAction.TEXT, SettleAction.ACTION_COMMAND, coinCounterPanel.getProfile());
 		this.coinCounterPanel = coinCounterPanel;
-		final Collection<String> t = new ArrayList<String>();
-		t.add(EventTopic.SERVER.topic());
-		final String[] topics = t.toArray(new String[t.size()]);
-		this.setEnabled(checkReceipts(null));
-		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.EVENT_TOPIC, topics);
-		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
-				.registerService(EventHandler.class, this, properties);
 	}
 
 	@Override
@@ -167,7 +137,7 @@ public class SettleAction extends ProfileAction implements EventHandler
 		final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent(tracker, "ch/eugster/colibri/client/print/settlement", settlement));
+			eventAdmin.sendEvent(this.getEvent(tracker, Topic.PRINT_SETTLEMENT.topic(), settlement));
 		}
 		tracker.close();
 	}
@@ -197,51 +167,4 @@ public class SettleAction extends ProfileAction implements EventHandler
 		return this.coinCounterPanel.getSettlementMoney(settlement);
 	}
 
-	@Override
-	public void handleEvent(final Event event)
-	{
-		if (event.getTopic().equals(EventTopic.SERVER.topic()))
-		{
-			final IStatus status = (IStatus) event.getProperty("status");
-			UIJob job = new UIJob("Aktualisieren")
-			{
-				@Override
-				public IStatus runInUIThread(IProgressMonitor monitor) 
-				{
-					setEnabled(checkReceipts(status));
-					return Status.OK_STATUS;
-				}
-			};
-			job.schedule();
-		}
-	}
-
-	private boolean checkReceipts(IStatus status)
-	{
-		boolean result = false;
-		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
-		tracker.open();
-		try
-		{
-			PersistenceService service = tracker.getService();
-			if (service != null)
-			{
-				if (service.getServerService().isLocal())
-				{
-					result = true;
-				}
-				final ReceiptQuery query = (ReceiptQuery) service.getCacheService().getQuery(Receipt.class);
-				final long count = query.countRemainingToTransfer();
-				if ((status == null) || (status.getSeverity() == IStatus.OK))
-				{
-					result = count == 0;
-				}
-			}
-		}
-		finally
-		{
-			tracker.close();
-		}
-		return result;
-	}
 }

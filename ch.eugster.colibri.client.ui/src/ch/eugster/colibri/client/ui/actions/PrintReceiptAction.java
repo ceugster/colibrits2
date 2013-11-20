@@ -25,6 +25,7 @@ import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListModel;
 import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListSelectionModel;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
@@ -94,7 +95,7 @@ public class PrintReceiptAction extends UserPanelProfileAction implements ListSe
 		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		eventProps.put(IPrintable.class.getName(), receipt);
 		eventProps.put("force", true);
-		return new Event("ch/eugster/colibri/print/receipt", eventProps);
+		return new Event(Topic.PRINT_RECEIPT.topic(), eventProps);
 	}
 
 	private boolean shouldEnable()

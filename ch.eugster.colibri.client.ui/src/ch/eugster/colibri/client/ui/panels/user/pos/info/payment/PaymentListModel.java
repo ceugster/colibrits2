@@ -27,6 +27,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
@@ -210,7 +211,7 @@ public class PaymentListModel extends AbstractTableModel implements ActionListen
 			final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
 			if (eventAdmin != null)
 			{
-				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), "ch/eugster/colibri/client/add/payment", payment));
+				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), Topic.PAYMENT_ADDED.topic(), payment));
 			}
 		}
 		finally

@@ -24,7 +24,7 @@ import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
-import ch.eugster.colibri.persistence.events.EventTopic;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
@@ -45,7 +45,7 @@ public class UserSalesAction extends ConfigurableAction
 	private void registerHandler()
 	{
 		final Collection<String> t = new ArrayList<String>();
-		t.add(EventTopic.SERVER.topic());
+		t.add(Topic.SCHEDULED_TRANSFER.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 
 		final EventHandler eventHandler = this;
@@ -120,7 +120,7 @@ public class UserSalesAction extends ConfigurableAction
 	@Override
 	public void handleEvent(Event event) 
 	{
-		if (event.getTopic().equals(EventTopic.SERVER.topic()))
+		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 		{
 			Object property = event.getProperty("status");
 			if (property instanceof IStatus)

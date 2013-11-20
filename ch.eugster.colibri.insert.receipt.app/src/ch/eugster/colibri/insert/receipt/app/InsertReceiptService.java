@@ -57,17 +57,24 @@ public class InsertReceiptService
 		}
 		prepare();
 
-		Settlement settlement = settlementService
-				.settle(salespoint.getSettlement(), SettlementService.State.DEFINITIVE);
-
-		PrintService service = printServices.get("ch.eugster.colibri.print.settlement");
-		if (service != null)
+		try
 		{
-			service.printDocument(settlement);
+			Settlement settlement = settlementService
+					.settle(salespoint.getSettlement(), SettlementService.State.DEFINITIVE);
+			PrintService service = printServices.get("ch.eugster.colibri.print.settlement");
+			if (service != null)
+			{
+				service.printDocument(settlement);
+			}
+
+			settlement.getSalespoint().setSettlement(settlement);
+			salespoint = settlementService.updateSettlement(salespoint);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
 		}
 
-		settlement.getSalespoint().setSettlement(settlement);
-		salespoint = settlementService.updateSettlement(salespoint);
 	}
 
 	private void prepare()
@@ -179,7 +186,14 @@ public class InsertReceiptService
 				receipt.addPayment(payment);
 			}
 
-			receipt = (Receipt) persistenceService.getCacheService().merge(receipt);
+			try
+			{
+				receipt = (Receipt) persistenceService.getCacheService().merge(receipt);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
 
 			PrintService service = printServices.get("ch.eugster.colibri.print.receipt");
 			if (service != null)

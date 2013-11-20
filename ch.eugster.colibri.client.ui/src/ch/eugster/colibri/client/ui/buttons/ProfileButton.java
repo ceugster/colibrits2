@@ -18,10 +18,8 @@ import org.osgi.service.event.EventHandler;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.persistence.events.EntityMediator;
-import ch.eugster.colibri.persistence.events.EventTopic;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Profile;
-import ch.eugster.colibri.provider.service.ProviderService;
-import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 import ch.eugster.colibri.ui.buttons.AbstractProfileButton;
 
@@ -37,11 +35,11 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 		this.init();
 	}
 
-	public ProfileButton(final ProfileAction action, final Profile profile)
+	public ProfileButton(final ProfileAction action, final Profile profile, boolean isFailOver)
 	{
-		super(action, profile);
+		super(action, profile, isFailOver);
 		this.init();
-		this.update(false);
+		this.update(isFailOver);
 	}
 
 	@Override
@@ -53,34 +51,33 @@ public class ProfileButton extends AbstractProfileButton implements EventHandler
 
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals(ProviderService.Topic.PROVIDER_FAILOVER.topic()) || event.getTopic().equals(EventTopic.FAILOVER.topic()) || event.getTopic().equals(UpdateScheduler.SchedulerTopic.FAILOVER.topic()))
+		this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
+		if (this.failOver)
 		{
-			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
 		}
-		else if (event.getTopic().equals(UpdateScheduler.SchedulerTopic.OK.topic()))
+		else
 		{
-			this.update(false);
+			if (event.getTopic().equals(Topic.SCHEDULED.topic()) ||
+					event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+					event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+			{
+				this.update(this.failOver);
+			}
+			
 		}
 	}
 
 	private void init()
 	{
 		EntityMediator.addListener(Profile.class, this);
-
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-//		final String[] topics = ProviderService.Topic.topics();
 		List<String> topics = new ArrayList<String>();
-		for (ProviderService.Topic topic : ProviderService.Topic.values())
-		{
-			topics.add(topic.topic());
-		}
-		topics.add(EventTopic.FAILOVER.topic());
-		for(UpdateScheduler.SchedulerTopic topic : UpdateScheduler.SchedulerTopic.values())
-		{
-			topics.add(topic.topic());
-		}
+		topics.add(Topic.SCHEDULED.topic());
+		topics.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		topics.add(Topic.SCHEDULED_TRANSFER.topic());
+		topics.add(Topic.PROVIDER_QUERY.topic());
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);

@@ -42,13 +42,11 @@ import ch.eugster.colibri.client.ui.actions.TotalSalesAction;
 import ch.eugster.colibri.client.ui.actions.UserSalesAction;
 import ch.eugster.colibri.persistence.events.EntityListener;
 import ch.eugster.colibri.persistence.events.EntityMediator;
-import ch.eugster.colibri.persistence.events.EventTopic;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.model.key.KeyType;
-import ch.eugster.colibri.provider.service.ProviderService;
-import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 import ch.eugster.colibri.ui.buttons.HTMLButton;
 
 public class ConfigurableButton extends HTMLButton implements EntityListener, EventHandler
@@ -61,9 +59,9 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
-	public ConfigurableButton(final ConfigurableAction action, final Key key)
+	public ConfigurableButton(final ConfigurableAction action, final Key key, boolean isFailOver)
 	{
-		super(action, key.getNormalFg(), key.getFailOverFg());
+		super(action, key.getNormalFg(), key.getFailOverFg(), isFailOver);
 		this.key = key;
 		this.setFocusable(false);
 
@@ -71,22 +69,16 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-//		final String[] topics = ProviderService.Topic.topics();
 		List<String> topics = new ArrayList<String>();
-		for (ProviderService.Topic topic : ProviderService.Topic.values())
-		{
-			topics.add(topic.topic());
-		}
-		topics.add(EventTopic.FAILOVER.topic());
-		for(UpdateScheduler.SchedulerTopic topic : UpdateScheduler.SchedulerTopic.values())
-		{
-			topics.add(topic.topic());
-		}
+		topics.add(Topic.SCHEDULED.topic());
+		topics.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		topics.add(Topic.SCHEDULED_TRANSFER.topic());
+		topics.add(Topic.PROVIDER_QUERY.topic());
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);
 
-		this.silentUpdate(false);
+		this.silentUpdate(isFailOver);
 	}
 
 	@Override
@@ -115,14 +107,20 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals(ProviderService.Topic.PROVIDER_FAILOVER.topic()) || event.getTopic().equals(EventTopic.FAILOVER.topic()) || event.getTopic().equals(UpdateScheduler.SchedulerTopic.FAILOVER.topic()))
+		this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
+		if (this.failOver)
 		{
-			this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
 			this.update(this.failOver);
 		}
-		else if (event.getTopic().equals(UpdateScheduler.SchedulerTopic.OK.topic()))
+		else
 		{
-			this.update(false);
+			if (event.getTopic().equals(Topic.SCHEDULED.topic()) ||
+					event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+					event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+			{
+				this.update(this.failOver);
+			}
+			
 		}
 	}
 

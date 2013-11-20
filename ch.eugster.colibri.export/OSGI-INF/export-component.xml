@@ -8,6 +8,6 @@
    <reference bind="addBarcodeVerifier" cardinality="0..n" interface="ch.eugster.colibri.barcode.service.BarcodeVerifier" name="BarcodeVerifier" policy="static" unbind="removeBarcodeVerifier"/>
    <reference bind="setLogService" cardinality="0..1" interface="org.osgi.service.log.LogService" name="LogService" policy="static" unbind="unsetLogService"/>
    <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="PersistenceService" policy="static" unbind="unsetPersistenceService"/>
-   <property name="event.topics" type="String">ch/eugster/colibri/client/store/receipt
-ch/eugster/colibri/client/print/settlement</property>
+   <property name="event.topics" type="String">ch/eugster/colibri/store/receipt
+ch/eugster/colibri/print/settlement</property>
 </scr:component>

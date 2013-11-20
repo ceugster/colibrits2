@@ -157,17 +157,18 @@ public class ParkedReceiptListPanel extends ProfilePanel implements TableModelLi
 		 */
 		final JPanel buttonPanel = new JPanel(new GridLayout(1, 5));
 
+		boolean failOver = userPanel.getMainTabbedPane().isFailOver();
 		final UpAction upAction = new UpAction(userPanel, profile, parkedReceiptListModel, selectionListModel);
 		table.getSelectionModel().addListSelectionListener(upAction);
 		table.getModel().addTableModelListener(upAction);
-		ProfileButton button = new ProfileButton(upAction, profile);
+		ProfileButton button = new ProfileButton(upAction, profile, failOver);
 		button.addActionListener(this);
 		buttonPanel.add(button);
 
 		final DownAction downAction = new DownAction(userPanel, profile, parkedReceiptListModel, selectionListModel);
 		table.getModel().addTableModelListener(downAction);
 		table.getSelectionModel().addListSelectionListener(downAction);
-		button = new ProfileButton(downAction, profile);
+		button = new ProfileButton(downAction, profile, failOver);
 		button.addActionListener(this);
 		buttonPanel.add(button);
 
@@ -175,18 +176,18 @@ public class ParkedReceiptListPanel extends ProfilePanel implements TableModelLi
 				selectionListModel);
 		table.getModel().addTableModelListener(deleteParkedReceiptAction);
 		table.getSelectionModel().addListSelectionListener(deleteParkedReceiptAction);
-		button = new ProfileButton(deleteParkedReceiptAction, profile);
+		button = new ProfileButton(deleteParkedReceiptAction, profile, failOver);
 		buttonPanel.add(button);
 
 		final LoadParkedReceiptAction loadParkedReceiptAction = new LoadParkedReceiptAction(userPanel, profile, parkedReceiptListModel,
 				selectionListModel);
 		table.getModel().addTableModelListener(loadParkedReceiptAction);
 		table.getSelectionModel().addListSelectionListener(loadParkedReceiptAction);
-		button = new ProfileButton(loadParkedReceiptAction, profile);
+		button = new ProfileButton(loadParkedReceiptAction, profile, failOver);
 		buttonPanel.add(button);
 
 		final BackAction backAction = new BackAction(profile);
-		button = new ProfileButton(backAction, profile);
+		button = new ProfileButton(backAction, profile, failOver);
 		button.addActionListener(userPanel);
 		buttonPanel.add(button);
 

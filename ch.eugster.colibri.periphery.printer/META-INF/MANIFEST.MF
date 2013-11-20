@@ -9,6 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: ch.eugster.colibri.periphery.printer.service
 Import-Package: ch.eugster.colibri.periphery.converters,
+ ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.queries,
  ch.eugster.colibri.persistence.service,

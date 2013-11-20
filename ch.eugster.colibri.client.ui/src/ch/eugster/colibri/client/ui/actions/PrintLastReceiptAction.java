@@ -24,6 +24,7 @@ import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.events.EntityAdapter;
 import ch.eugster.colibri.persistence.events.EntityListener;
 import ch.eugster.colibri.persistence.events.EntityMediator;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -92,7 +93,7 @@ public class PrintLastReceiptAction extends ConfigurableAction implements Dispos
 		final EventAdmin eventAdmin = (EventAdmin) this.eventServiceTracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent("ch/eugster/colibri/print/receipt", this.lastReceipt));
+			eventAdmin.sendEvent(this.getEvent(Topic.PRINT_RECEIPT.topic(), this.lastReceipt));
 		}
 	}
 

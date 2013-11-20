@@ -40,9 +40,9 @@ public class ReceiptParkingButton extends ConfigurableButton implements Property
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	public ReceiptParkingButton(final ConfigurableAction action, final Key key)
+	public ReceiptParkingButton(final ConfigurableAction action, final Key key, boolean isFailOver)
 	{
-		super(action, key);
+		super(action, key, isFailOver);
 		this.userPanel = action.getUserPanel();
 		new ReceiptChangeMediator(this.userPanel, this, this.receiptProperties);
 		new PositionChangeMediator(this.userPanel, this, this.positionProperties);

@@ -25,9 +25,9 @@ public class EnterButton extends NumericPadButton implements PropertyChangeListe
 			PositionWrapper.KEY_PROPERTY_RECEIPT, PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP, PositionWrapper.KEY_PROPERTY_CURRENT_TAX,
 			PositionWrapper.KEY_PROPERTY_CURRENCY, PositionWrapper.KEY_PROPERTY_SEARCH_VALUE, PositionWrapper.KEY_PROPERTY_PRODUCT };
 
-	public EnterButton(final EnterAction action, final UserPanel userPanel, final Profile profile)
+	public EnterButton(final EnterAction action, final UserPanel userPanel, final Profile profile, boolean isFailOver)
 	{
-		super(action, userPanel, profile);
+		super(action, userPanel, profile, isFailOver);
 		addActionListener(this.userPanel.getValueDisplay());
 		new PositionChangeMediator(this.userPanel, this, positionProperties);
 		userPanel.getPositionWrapper().addPropertyChangeListener(this);

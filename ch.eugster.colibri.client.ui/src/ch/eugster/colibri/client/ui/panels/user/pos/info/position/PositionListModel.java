@@ -40,6 +40,7 @@ import ch.eugster.colibri.client.ui.buttons.ConfigurableButton;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
 import ch.eugster.colibri.client.ui.panels.user.ReceiptWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -378,7 +379,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 			final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
 			if (eventAdmin != null)
 			{
-				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), "ch/eugster/colibri/client/add/position", position));
+				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), Topic.POSITION_ADDED.topic(), position));
 			}
 		}
 		finally

@@ -17,6 +17,16 @@
       [Enter License Description here.]
    </license>
 
+   <requires>
+      <import plugin="ch.eugster.colibri.barcode"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui.workbench"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.services"/>
+   </requires>
+
    <plugin
          id="ch.eugster.colibri.export"
          download-size="0"

@@ -382,10 +382,11 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 		JPanel childPanel = new JPanel();
 		childPanel.setLayout(new BorderLayout());
 
+		boolean failOver = userPanel.getMainTabbedPane().isFailOver();
 		UserPanelProfileAction action = new QuantityAction(this.userPanel, profile);
 		this.userPanel.addStateChangeListener(action);
 		this.userPanel.getValueDisplay().addPropertyChangeListener("value", action);
-		this.quantityButton = new PositionButton(action, this.userPanel, profile);
+		this.quantityButton = new PositionButton(action, this.userPanel, profile, failOver);
 		childPanel.add(this.quantityButton, BorderLayout.CENTER);
 
 		this.quantityValueLabel = this.createValueLabel(profile, SwingConstants.RIGHT);
@@ -398,7 +399,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 		action = new PriceAction(this.userPanel, profile);
 		this.userPanel.addStateChangeListener(action);
 		this.userPanel.getValueDisplay().addPropertyChangeListener("value", action);
-		this.priceButton = new PositionButton(action, this.userPanel, profile);
+		this.priceButton = new PositionButton(action, this.userPanel, profile, failOver);
 		childPanel.add(this.priceButton, BorderLayout.CENTER);
 
 		this.priceValueLabel = this.createValueLabel(profile, SwingConstants.RIGHT);
@@ -411,7 +412,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 		action = new DiscountAction(this.userPanel, profile);
 		this.userPanel.addStateChangeListener(action);
 		this.userPanel.getValueDisplay().addPropertyChangeListener("value", action);
-		this.discountButton = new PositionButton(action, this.userPanel, profile);
+		this.discountButton = new PositionButton(action, this.userPanel, profile, failOver);
 		this.discountButton.addActionListener(this.userPanel);
 		childPanel.add(this.discountButton, BorderLayout.CENTER);
 
@@ -426,7 +427,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 				.getPositionListPanel().getModel().getSelectionListModel());
 		this.userPanel.addStateChangeListener(upAction);
 		this.userPanel.getValueDisplay().addPropertyChangeListener("value", upAction);
-		this.up = new PositionButton(upAction, this.userPanel, profile);
+		this.up = new PositionButton(upAction, this.userPanel, profile, failOver);
 		this.up.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(final ActionEvent event)
@@ -449,7 +450,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 				.getPositionListPanel().getModel().getSelectionListModel());
 		this.userPanel.addStateChangeListener(downAction);
 		this.userPanel.getValueDisplay().addPropertyChangeListener("value", downAction);
-		this.down = new PositionButton(downAction, this.userPanel, profile);
+		this.down = new PositionButton(downAction, this.userPanel, profile, failOver);
 		this.down.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(final ActionEvent event)
