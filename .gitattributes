@@ -1117,7 +1117,6 @@ ch.eugster.colibri.persistence.connection/META-INF/database.dtd -text
 ch.eugster.colibri.persistence.connection/META-INF/p2.inf -text
 ch.eugster.colibri.persistence.connection/META-INF/repository.dtd -text
 ch.eugster.colibri.persistence.connection/META-INF/repository.xml -text
-ch.eugster.colibri.persistence.connection/OSGI-INF/service-component.xml -text
 ch.eugster.colibri.persistence.connection/build.properties -text
 ch.eugster.colibri.persistence.connection/icons/Database.png -text
 ch.eugster.colibri.persistence.connection/icons/Database_edit.png -text
