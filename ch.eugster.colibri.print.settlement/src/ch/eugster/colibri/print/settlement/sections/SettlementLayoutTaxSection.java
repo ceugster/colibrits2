@@ -229,7 +229,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 								.getDefaultFractionDigits());
 						SettlementLayoutTaxSection.amountFormatter.setMaximumFractionDigits(currency
 								.getDefaultFractionDigits());
-						final String amount = SettlementLayoutTaxSection.amountFormatter.format(tax.getTaxAmount());
+						final String amount = SettlementLayoutTaxSection.amountFormatter.format(-tax.getTaxAmount());
 						return layoutArea.replaceMarker(amount, marker, false);
 					}
 					default:
@@ -311,7 +311,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 								.getDefaultFractionDigits());
 						SettlementLayoutTaxSection.amountFormatter.setMaximumFractionDigits(currency
 								.getDefaultFractionDigits());
-						final String amount = SettlementLayoutTaxSection.amountFormatter.format(tax.getTaxAmount());
+						final String amount = SettlementLayoutTaxSection.amountFormatter.format(-tax.getTaxAmount());
 						return layoutArea.replaceMarker(amount, marker, false);
 					}
 					default:

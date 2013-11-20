@@ -10,6 +10,7 @@ Export-Package: ch.eugster.colibri.provider.configuration,
 Bundle-Activator: ch.eugster.colibri.provider.Activator
 Bundle-ActivationPolicy: lazy
 Import-Package: ch.eugster.colibri.barcode.code,
+ ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.model.product,
  ch.eugster.colibri.persistence.queries,

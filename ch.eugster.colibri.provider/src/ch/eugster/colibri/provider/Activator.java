@@ -11,13 +11,21 @@ public class Activator implements BundleActivator
 
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
+	private BundleContext bundleContext;
+	
 	private static Activator plugin;
 
+	public BundleContext getBundleContext()
+	{
+		return this.bundleContext;
+	}
+	
 	@Override
 	public void start(final BundleContext context) throws Exception
 	{
 		Activator.plugin = this;
-
+		this.bundleContext = context;
+		
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		this.logServiceTracker.open();
 
@@ -39,6 +47,7 @@ public class Activator implements BundleActivator
 
 		this.logServiceTracker.close();
 
+		this.bundleContext = null;
 		Activator.plugin = null;
 	}
 

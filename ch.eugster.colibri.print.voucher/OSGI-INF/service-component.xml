@@ -10,7 +10,7 @@
    <reference bind="addReceiptPrinterService" cardinality="1..n" interface="ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService" name="receiptPrinterService" policy="static" unbind="removeReceiptPrinterService"/>
    <property name="custom.label" type="String" value="Layout Gutschein"/>
    <property name="event.topics" type="String">ch/eugster/colibri/print/receipt
-ch/eugster/colibri/client/store/receipt
+ch/eugster/colibri/store/receipt
    </property>
    <reference bind="setEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
 </scr:component>

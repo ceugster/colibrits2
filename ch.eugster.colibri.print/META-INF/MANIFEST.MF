@@ -10,6 +10,7 @@ Export-Package: ch.eugster.colibri.print.section,
  ch.eugster.colibri.print.service
 Bundle-Activator: ch.eugster.colibri.print.Activator
 Import-Package: ch.eugster.colibri.periphery.printer.service,
+ ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.model.print,
  ch.eugster.colibri.persistence.queries,

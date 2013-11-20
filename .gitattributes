@@ -1290,6 +1290,9 @@ ch.eugster.colibri.persistence.transfer.impl/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.persistence.transfer.impl/OSGI-INF/transfer-component.xml -text
 ch.eugster.colibri.persistence.transfer.impl/build.properties -text
 ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/Activator.java -text
+ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/AbstractTransfer.java -text
+ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/ReceiptTransfer.java -text
+ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/SettlementTransfer.java -text
 ch.eugster.colibri.persistence.transfer.impl/src/ch/eugster/colibri/persistence/transfer/impl/services/TransferAgentImpl.java -text
 ch.eugster.colibri.persistence.transfer/.classpath -text
 ch.eugster.colibri.persistence.transfer/.project -text
@@ -1521,9 +1524,6 @@ ch.eugster.colibri.product/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.product/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.product/build.properties -text
 ch.eugster.colibri.product/colibri.full.product -text
-ch.eugster.colibri.product/colibri.product -text
-ch.eugster.colibri.product/colibri.report.product -text
-ch.eugster.colibri.product/colibri.wo.export.product -text
 ch.eugster.colibri.product/icons/kasse_128x128.bmp -text
 ch.eugster.colibri.product/icons/kasse_128x128.png -text
 ch.eugster.colibri.product/icons/kasse_128x128_32.bmp -text

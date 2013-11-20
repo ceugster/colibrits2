@@ -31,6 +31,8 @@ public interface ProviderQuery extends ProviderService
 	boolean isConnect();
 	
 	String getName();
-
+	
+	void setStatus(IStatus status);
+	
 	IStatus checkTaxCodes(PersistenceService service);
 }

@@ -17,6 +17,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
@@ -314,7 +315,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 		eventProps.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
 		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		eventProps.put("status", status);
-		return new Event("ch/eugster/colibri/print/error", eventProps);
+		return new Event(Topic.PRINT_ERROR.topic(), eventProps);
 	}
 
 	protected EventAdmin getEventAdmin()
@@ -463,14 +464,14 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 		this.salespoint = this.getSalespoint(this.persistenceService.getCacheService());
 		this.printout = this.getPrintout(this.persistenceService.getCacheService());
 
-		if (this.salespoint == null)
-		{
-			this.salespoint = this.getSalespoint(this.persistenceService.getServerService());
-		}
-		if (this.printout == null)
-		{
-			this.printout = this.getPrintout(this.persistenceService.getServerService());
-		}
+//		if (this.salespoint == null)
+//		{
+//			this.salespoint = this.getSalespoint(this.persistenceService.getServerService());
+//		}
+//		if (this.printout == null)
+//		{
+//			this.printout = this.getPrintout(this.persistenceService.getServerService());
+//		}
 		if ((this.salespoint == null) || (this.printout == null))
 		{
 			return false;

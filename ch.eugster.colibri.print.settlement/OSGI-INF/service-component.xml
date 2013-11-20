@@ -9,6 +9,6 @@
    </service>
    <property name="custom.label" type="String" value="Layout Tagesabschluss"/>
    <reference bind="addReceiptPrinterService" cardinality="1..n" interface="ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService" name="receiptPrinterService" policy="static" unbind="removeReceiptPrinterService"/>
-   <property name="event.topics" type="String" value="ch/eugster/colibri/client/print/settlement"></property>
+   <property name="event.topics" type="String" value="ch/eugster/colibri/print/settlement"></property>
    <reference bind="setEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
 </scr:component>
