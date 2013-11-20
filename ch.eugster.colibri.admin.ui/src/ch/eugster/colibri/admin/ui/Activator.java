@@ -20,7 +20,7 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import ch.eugster.colibri.persistence.events.EventTopic;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 /**
@@ -58,7 +58,7 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals(EventTopic.SERVER.topic()))
+		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 		{
 			if (event.getProperty("status") instanceof IStatus)
 			{
@@ -126,7 +126,7 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		final String[] topics = new String[] { EventTopic.SERVER.topic() };
+		final String[] topics = new String[] { Topic.SCHEDULED_TRANSFER.topic() };
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = context.registerService(EventHandler.class, eventHandler,
 				properties);

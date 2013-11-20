@@ -11,6 +11,7 @@ Export-Package: ch.eugster.colibri.admin.layout.printer.editors
 Import-Package: ch.eugster.colibri.admin.ui.editors,
  ch.eugster.colibri.admin.ui.menus,
  ch.eugster.colibri.periphery.printer.service,
+ ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.queries,
  ch.eugster.colibri.persistence.service,

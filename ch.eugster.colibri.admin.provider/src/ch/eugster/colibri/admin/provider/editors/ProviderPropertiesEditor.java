@@ -331,15 +331,16 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 					IStatus status = input.checkConnection(testProperties);
 					if (status.getSeverity() == IStatus.OK)
 					{
+						String message = "Die Verbindung konnte erfolgreich hergestellt werden.";
 						MessageDialog
 						.openInformation(getSite().getShell(), "Verbindungstest",
-								status.getMessage());
+								message);
 					}
 					else
 					{
 						MessageDialog
-						.openWarning(getSite().getShell(), "Verbindungstest",
-								status.getMessage());
+						.openError(getSite().getShell(), "Verbindungstest",
+								status.getException().getMessage());
 					}
 					for (String key : keys)
 					{

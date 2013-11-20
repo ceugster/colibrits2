@@ -47,6 +47,7 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,6 +55,7 @@ import ch.eugster.colibri.admin.periphery.Activator;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditor;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditorInput;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Printout;
 import ch.eugster.colibri.persistence.model.PrintoutArea;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
@@ -97,17 +99,20 @@ public class PrintoutEditor extends AbstractEntityEditor<Printout> implements Ev
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/periphery/printer/error"))
+		if (event.getTopic().equals(Topic.PRINT_ERROR.topic()))
 		{
-			StringBuilder message = new StringBuilder("Der Belegdrucker kann nicht angesprochen werden. ");
-			message = message.append("Bitte vergewissern Sie sich, dass er:\n");
-			message = message.append("- eingeschaltet ist");
-			message = message.append("- am Computer angeschlossen ist");
-			message = message.append("- vom Computer erkannt worden ist");
-			final Shell shell = this.getSite().getShell();
-			final ErrorDialog dialog = new ErrorDialog(shell, "Belegdrucker", message.toString(),
-					(IStatus) event.getProperty("status"), 0);
-			dialog.open();
+			if (event.getProperty(EventConstants.EXCEPTION) != null)
+			{
+				StringBuilder message = new StringBuilder("Der Belegdrucker kann nicht angesprochen werden. ");
+				message = message.append("Bitte vergewissern Sie sich, dass er:\n");
+				message = message.append("- eingeschaltet ist");
+				message = message.append("- am Computer angeschlossen ist");
+				message = message.append("- vom Computer erkannt worden ist");
+				final Shell shell = this.getSite().getShell();
+				final ErrorDialog dialog = new ErrorDialog(shell, "Belegdrucker", message.toString(),
+						(IStatus) event.getProperty("status"), 0);
+				dialog.open();
+			}
 		}
 	}
 

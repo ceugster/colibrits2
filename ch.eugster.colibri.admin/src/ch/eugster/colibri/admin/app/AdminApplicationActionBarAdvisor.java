@@ -71,7 +71,7 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 		super(configurer);
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add("ch/eugster/colibri/server/database");
+		t.add("ch/eugster/colibri/transfer");
 		final String[] topics = t.toArray(new String[t.size()]);
 
 		final EventHandler eventHandler = this;
@@ -84,8 +84,14 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 	@Override
 	public void dispose()
 	{
-		this.eventHandlerServiceRegistration.unregister();
-		this.job.cancel();
+		if (this.eventHandlerServiceRegistration != null)
+		{
+			this.eventHandlerServiceRegistration.unregister();
+		}
+		if (this.job != null)
+		{
+			this.job.cancel();
+		}
 		super.dispose();
 	}
 
@@ -94,7 +100,7 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 	{
 		if (this.connectionInformation != null)
 		{
-			if (event.getTopic().equals("ch/eugster/colibri/server/database"))
+			if (event.getTopic().equals("ch/eugster/colibri/transfer"))
 			{
 				if (event.getProperty("status") instanceof IStatus)
 				{

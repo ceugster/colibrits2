@@ -55,6 +55,7 @@ import ch.eugster.colibri.admin.layout.printer.Activator;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditor;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditorInput;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Printout;
 import ch.eugster.colibri.persistence.model.PrintoutArea;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
@@ -100,7 +101,7 @@ public class PrintoutEditor extends AbstractEntityEditor<Printout> implements Ev
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/periphery/printer/error"))
+		if (event.getTopic().equals(Topic.PRINT_ERROR.topic()))
 		{
 			StringBuilder message = new StringBuilder("Der Belegdrucker kann nicht angesprochen werden. ");
 			message = message.append("Bitte vergewissern Sie sich, dass er:\n");

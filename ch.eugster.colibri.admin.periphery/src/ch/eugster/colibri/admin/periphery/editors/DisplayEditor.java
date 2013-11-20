@@ -48,6 +48,7 @@ import ch.eugster.colibri.display.area.ILayoutAreaType;
 import ch.eugster.colibri.display.area.ILayoutType;
 import ch.eugster.colibri.display.service.DisplayService;
 import ch.eugster.colibri.periphery.display.service.CustomerDisplayService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Display;
 import ch.eugster.colibri.persistence.model.DisplayArea;
 
@@ -75,7 +76,7 @@ public class DisplayEditor extends AbstractEntityEditor<Display> implements Even
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/periphery/display/error"))
+		if (event.getTopic().equals(Topic.DISPLAY_ERROR.topic()))
 		{
 			StringBuilder message = new StringBuilder("Das Kundendisplay kann nicht angesprochen werden. ");
 			message = message.append("Bitte vergewissern Sie sich, dass es:\n");
