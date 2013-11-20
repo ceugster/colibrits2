@@ -4,7 +4,7 @@ import static javax.persistence.FetchType.EAGER;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -21,11 +21,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
+import org.eclipse.persistence.annotations.Index;
 
 import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Position.Option;
@@ -107,6 +109,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	private Long number;
 
 	@Basic
+	@Index
 	@Column(name = "re_other_id")
 	private Long otherId;
 
@@ -119,6 +122,11 @@ public class Receipt extends AbstractEntity implements IPrintable
 	@Convert("booleanConverter")
 	@Column(name = "re_provider_updated")
 	private boolean providerUpdated;
+
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "re_internal")
+	private boolean internal;
 
 	@Basic
 	@Column(name = "re_transaction")
@@ -157,6 +165,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	private long bookkeepingTransaction;
 
 	@Basic
+	@Index
 	@Column(name = "re_state")
 	@Enumerated
 	private State state;
@@ -173,10 +182,10 @@ public class Receipt extends AbstractEntity implements IPrintable
 	private User user;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "receipt")
-	private Collection<Position> positions = new Vector<Position>();
+	private List<Position> positions = new Vector<Position>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "receipt")
-	private Collection<Payment> payments = new Vector<Payment>();
+	private List<Payment> payments = new Vector<Payment>();
 
 	private Receipt()
 	{
@@ -211,7 +220,26 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		this.propertyChangeSupport.firePropertyChange("positions", this.positions, this.positions.add(position));
 	}
+	
+	private boolean hasInternals()
+	{
+		List<Position> positions = this.getPositions();
+		for (Position position : positions)
+		{
+			if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
+	@PrePersist
+	public void prePersist()
+	{
+		this.internal = hasInternals();
+	}
+	
 	public void clearPayments()
 	{
 		final Payment[] payments = this.payments.toArray(new Payment[0]);
@@ -221,19 +249,19 @@ public class Receipt extends AbstractEntity implements IPrintable
 		}
 	}
 
-	public Collection<Payment> getAllPayments()
+	public List<Payment> getAllPayments()
 	{
 		return this.payments;
 	}
 
-	public Collection<Position> getAllPositions()
+	public List<Position> getAllPositions()
 	{
 		return this.positions;
 	}
 
-	public Collection<Position> getRestituted()
+	public List<Position> getRestituted()
 	{
-		Collection<Position> restituted = new ArrayList<Position>();
+		List<Position> restituted = new ArrayList<Position>();
 		for (Position position : this.getPositions())
 		{
 			if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.SALES) && position.getQuantity() < 0)
@@ -284,9 +312,9 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return this.defaultCurrencyRoundFactor;
 	}
 
-	public Collection<Payment> getDeletedPayments()
+	public List<Payment> getDeletedPayments()
 	{
-		final Collection<Payment> payments = new Vector<Payment>();
+		final List<Payment> payments = new Vector<Payment>();
 		for (final Payment payment : this.payments)
 		{
 			if (payment.isDeleted())
@@ -335,12 +363,12 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return this.id;
 	}
 
-	public Collection<Payment> getPayments()
+	public List<Payment> getPayments()
 	{
 		return this.payments;
 	}
 
-	public Collection<Position> getPositions()
+	public List<Position> getPositions()
 	{
 		return positions;
 	}
@@ -352,7 +380,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 
 	public Position[] getPayedInvoices()
 	{
-		final Collection<Position> payedInvoices = new ArrayList<Position>();
+		final List<Position> payedInvoices = new ArrayList<Position>();
 		final Position[] positions = this.getPositions().toArray(new Position[0]);
 		for (final Position position : positions)
 		{
@@ -367,7 +395,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public double getPaymentAmount(final Receipt.QuotationType quotationType)
 	{
 		double amount = 0d;
-		final Collection<Payment> payments = this.getPayments();
+		final List<Payment> payments = this.getPayments();
 		for (final Payment payment : payments)
 		{
 			if (!payment.isDeleted())
@@ -381,7 +409,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public double getPaymentBackAmount(final Receipt.QuotationType quotationType)
 	{
 		double amount = 0d;
-		final Collection<Payment> payments = this.getPayments();
+		final List<Payment> payments = this.getPayments();
 		for (final Payment payment : payments)
 		{
 			if (!payment.isDeleted() && payment.isBack())
@@ -425,7 +453,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public double getPositionAmount(final Receipt.QuotationType quotationType, final AmountType amountType)
 	{
 		double amount = 0d;
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (!position.isDeleted())
@@ -440,7 +468,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 			final Option[] options)
 	{
 		double amount = 0d;
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			for (final Option option : options)
@@ -467,7 +495,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public int getPositionDiscountQuantity()
 	{
 		int quantity = 0;
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (!position.isDeleted() && (position.getDiscount() != 0d))
@@ -481,7 +509,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public int getPositionQuantity(final Option[] options)
 	{
 		int quantity = 0;
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			for (final Option option : options)
@@ -500,10 +528,10 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return this.getPositionAmount(Receipt.QuotationType.REFERENCE_CURRENCY, amountType);
 	}
 
-	public Collection<Position> getPositions(final CurrentTax currentTax)
+	public List<Position> getPositions(final CurrentTax currentTax)
 	{
-		final Collection<Position> selected = new ArrayList<Position>();
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> selected = new ArrayList<Position>();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (position.getCurrentTax().getId().equals(currentTax.getId()))
@@ -518,7 +546,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		double brutAmount = 0D;
 
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (position.getCurrentTax().getId().equals(currentTax.getId()))
@@ -532,7 +560,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public double getPositionsTaxAmount()
 	{
 		double taxAmount = 0D;
-		final Collection<CurrentTax> taxes = this.getTaxes();
+		final List<CurrentTax> taxes = this.getTaxes();
 		for (final CurrentTax tax : taxes)
 		{
 			taxAmount += this.getPositionsTaxAmount(tax);
@@ -544,7 +572,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		double taxAmount = 0D;
 
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (position.getCurrentTax().getId().equals(currentTax.getId()))
@@ -558,7 +586,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public int getPositionTotalQuantity()
 	{
 		int quantity = 0;
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			quantity += position.getQuantity();
@@ -569,7 +597,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public int getPositionWithDiscountQuantity()
 	{
 		int quantity = 0;
-		final Collection<Position> positions = this.getPositions();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (position.getDiscount() != 0D)
@@ -600,9 +628,9 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return this.referenceCurrencyRoundFactor;
 	}
 	
-	public Collection<Payment> getBackPayments()
+	public List<Payment> getBackPayments()
 	{
-		Collection<Payment> payments = new ArrayList<Payment>();
+		List<Payment> payments = new ArrayList<Payment>();
 		for (Payment payment : this.getPayments())
 		{
 			if (payment.isBack())
@@ -613,9 +641,9 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return payments;
 	}
 
-	public Collection<Payment> getBackVouchers()
+	public List<Payment> getBackVouchers()
 	{
-		Collection<Payment> payments = new ArrayList<Payment>();
+		List<Payment> payments = new ArrayList<Payment>();
 		for (Payment payment : this.getPayments())
 		{
 			if (payment.isBack() && payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
@@ -636,10 +664,10 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return this.state;
 	}
 
-	public Collection<CurrentTax> getTaxes()
+	public List<CurrentTax> getTaxes()
 	{
-		final Collection<CurrentTax> taxes = new ArrayList<CurrentTax>();
-		final Collection<Position> positions = this.getPositions();
+		final List<CurrentTax> taxes = new ArrayList<CurrentTax>();
+		final List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
 			if (!taxes.contains(position.getCurrentTax()))
@@ -835,12 +863,12 @@ public class Receipt extends AbstractEntity implements IPrintable
 		this.propertyChangeSupport.firePropertyChange("number", this.number, this.number = number);
 	}
 
-	public void setPayments(final Collection<Payment> payments)
+	public void setPayments(final List<Payment> payments)
 	{
 		this.propertyChangeSupport.firePropertyChange("payments", this.payments, this.payments = payments);
 	}
 
-	public void setPositions(final Collection<Position> positions)
+	public void setPositions(final List<Position> positions)
 	{
 		this.propertyChangeSupport.firePropertyChange("positions", this.positions, this.positions = positions);
 	}
@@ -916,6 +944,26 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public void setHour(int hour) 
 	{
 		this.propertyChangeSupport.firePropertyChange("hour", this.hour, this.hour = hour);
+	}
+
+	public boolean isInternal() 
+	{
+		if (this.getId() == null)
+		{
+			List<Position> positions = this.getPositions();
+			for (Position position : positions)
+			{
+				if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		else
+		{
+			return internal;
+		}
 	}
 
 	public static Receipt newInstance(final Settlement settlement, final User user)

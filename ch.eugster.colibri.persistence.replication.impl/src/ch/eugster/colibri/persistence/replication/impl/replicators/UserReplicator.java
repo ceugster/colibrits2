@@ -52,7 +52,7 @@ public class UserReplicator extends AbstractEntityReplicator<User>
 					{
 						target = this.replicate(source, target);
 					}
-					target = (User) this.persistenceService.getCacheService().merge(target);
+					target = (User) merge(target);
 					target.getRole().addUser(target);
 				}
 				if (monitor != null)

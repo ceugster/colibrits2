@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Query;
@@ -34,7 +35,6 @@ import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
-import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
 
 public class PositionQuery extends AbstractQuery<Position>
 {
@@ -54,21 +54,18 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.select(deleted.and(parked.and(value)));
 	}
 
-	public long countProviderUpdates(Salespoint salespoint, String providerId, ConnectionType connectionType)
+	public long countProviderUpdates(Salespoint salespoint, String providerId)
 	{
 		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-		if (connectionType.equals(ConnectionType.LOCAL))
-		{
-			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
-		}
-		
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
+
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
-		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
-		provider = provider.and(update);
-
+		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
+		
 		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
 		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
 
@@ -80,21 +77,21 @@ public class PositionQuery extends AbstractQuery<Position>
 		return value;
 	}
 
-	public Collection<SettlementPosition> selectPositions(final Salespoint[] salespoints, Calendar[] dateRange)
+	public List<SettlementPosition> selectPositions(final Salespoint[] salespoints, Calendar[] dateRange)
 	{
-		Collection<ReportQueryResult> results = this.selectPositionsBySalespointsAndDateRange(salespoints, dateRange);
-		Collection<SettlementPosition> positions = this.getPositionsDetails(results, null);
+		List<ReportQueryResult> results = this.selectPositionsBySalespointsAndDateRange(salespoints, dateRange);
+		List<SettlementPosition> positions = this.getPositionsDetails(results, null);
 		return positions;
 	}
 
-	public Collection<SettlementPosition> selectPositions(final Settlement settlement)
+	public List<SettlementPosition> selectPositions(final Settlement settlement)
 	{
-		Collection<ReportQueryResult> results = this.selectPositionsBySettlement(settlement);
-		Collection<SettlementPosition> positions = this.getPositionsDetails(results, settlement);
+		List<ReportQueryResult> results = this.selectPositionsBySettlement(settlement);
+		List<SettlementPosition> positions = this.getPositionsDetails(results, settlement);
 		return positions;
 	}
 
-	public Collection<SettlementPayedInvoice> selectPayedInvoices(final Settlement settlement)
+	public List<SettlementPayedInvoice> selectPayedInvoices(final Settlement settlement)
 	{
 		return this.getPayedInvoicesDetails(this.selectPayedInvoicesBySettlement(settlement), settlement);
 	}
@@ -105,7 +102,7 @@ public class PositionQuery extends AbstractQuery<Position>
 				null);
 	}
 
-	public Collection<SettlementRestitutedPosition> selectRestitutedPositions(final Settlement settlement)
+	public List<SettlementRestitutedPosition> selectRestitutedPositions(final Settlement settlement)
 	{
 		return this.getRestitutedPositionDetails(this.selectRestitutedPositionsBySettlement(settlement), settlement);
 	}
@@ -117,31 +114,28 @@ public class PositionQuery extends AbstractQuery<Position>
 				this.selectRestitutedPositionsBySalespointsAndDateRange(salespoints, dateRange), null);
 	}
 
-	public Collection<SettlementInternal> selectInternals(final Settlement settlement)
+	public List<SettlementInternal> selectInternals(final Settlement settlement)
 	{
 		return this.getInternalDetails(this.selectInternalsBySettlement(settlement), settlement);
 	}
 
-	public Collection<SettlementInternal> selectInternals(final Salespoint[] salespoints, Calendar[] dateRange)
+	public List<SettlementInternal> selectInternals(final Salespoint[] salespoints, Calendar[] dateRange)
 	{
 		return this.getInternalDetails(this.selectInternalsBySalespointsAndDateRange(salespoints, dateRange), null);
 	}
 
-	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows, ConnectionType connectionType)
+	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows)
 	{
 		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-		if (connectionType.equals(ConnectionType.LOCAL))
-		{
-			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
-		}
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
-		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
-		provider = provider.and(update);
-
+		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
+		
 		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
 		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
 
@@ -153,7 +147,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		return positions;
 	}
 
-	public Collection<SettlementTax> selectTaxes(final Settlement settlement)
+	public List<SettlementTax> selectTaxes(final Settlement settlement)
 	{
 		return this.getTaxDetails(this.selectTaxesBySettlement(settlement), settlement);
 	}
@@ -296,14 +290,15 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.settings;
 	}
 
-	private Collection<SettlementPosition> getPositionsDetails(final Collection<ReportQueryResult> results,
+	private List<SettlementPosition> getPositionsDetails(final Collection<ReportQueryResult> results,
 			final Settlement settlement)
 	{
-		final Collection<SettlementPosition> details = new ArrayList<SettlementPosition>();
+		final List<SettlementPosition> details = new ArrayList<SettlementPosition>();
 		for (final ReportQueryResult result : results)
 		{
 			Long id = (Long) result.get("productGroup");
 			final ProductGroup productGroup = (ProductGroup) this.getConnectionService().find(ProductGroup.class, id);
+
 			Currency defaultCurrency = null;
 			if (settlement == null)
 			{
@@ -334,10 +329,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		return details;
 	}
 
-	private Collection<SettlementPayedInvoice> getPayedInvoicesDetails(final Collection<Position> positions,
+	private List<SettlementPayedInvoice> getPayedInvoicesDetails(final Collection<Position> positions,
 			final Settlement settlement)
 	{
-		final Collection<SettlementPayedInvoice> payedInvoices = new ArrayList<SettlementPayedInvoice>();
+		final List<SettlementPayedInvoice> payedInvoices = new ArrayList<SettlementPayedInvoice>();
 		for (final Position position : positions)
 		{
 			final SettlementPayedInvoice payedInvoice = SettlementPayedInvoice.newInstance(settlement, position);
@@ -346,10 +341,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		return payedInvoices;
 	}
 
-	private Collection<SettlementRestitutedPosition> getRestitutedPositionDetails(final Collection<Position> positions,
+	private List<SettlementRestitutedPosition> getRestitutedPositionDetails(final Collection<Position> positions,
 			final Settlement settlement)
 	{
-		final Collection<SettlementRestitutedPosition> details = new ArrayList<SettlementRestitutedPosition>();
+		final List<SettlementRestitutedPosition> details = new ArrayList<SettlementRestitutedPosition>();
 		for (final Position position : positions)
 		{
 			final SettlementRestitutedPosition detail = SettlementRestitutedPosition.newInstance(settlement, position);
@@ -358,10 +353,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		return details;
 	}
 
-	private Collection<SettlementInternal> getInternalDetails(final Collection<Position> positions,
+	private List<SettlementInternal> getInternalDetails(final List<Position> positions,
 			final Settlement settlement)
 	{
-		final Collection<SettlementInternal> details = new ArrayList<SettlementInternal>();
+		final List<SettlementInternal> details = new ArrayList<SettlementInternal>();
 		for (final Position position : positions)
 		{
 			final SettlementInternal detail = SettlementInternal.newInstance(settlement, position);
@@ -402,10 +397,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		return result;
 	}
 
-	private Collection<SettlementTax> getTaxDetails(final Collection<ReportQueryResult> results,
+	private List<SettlementTax> getTaxDetails(final Collection<ReportQueryResult> results,
 			final Settlement settlement)
 	{
-		final Collection<SettlementTax> details = new ArrayList<SettlementTax>();
+		final List<SettlementTax> details = new ArrayList<SettlementTax>();
 		for (final ReportQueryResult result : results)
 		{
 			final Long id = (Long) result.get("currentTax");
@@ -522,7 +517,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		}
 	}
 
-	private Collection<ReportQueryResult> selectPositionsBySalespointsAndDateRange(Salespoint[] salespoints,
+	private List<ReportQueryResult> selectPositionsBySalespointsAndDateRange(Salespoint[] salespoints,
 			Calendar[] dateRange)
 	{
 		if (salespoints == null || salespoints.length == 0)
@@ -535,6 +530,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+//		expression = expression.and(new ExpressionBuilder().get("productGroup").get("productGroupType").get("productGroupGroup").notEqual(ProductGroupGroup.INTERNAL));
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -634,7 +630,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		return positions;
 	}
 
-	private Collection<ReportQueryResult> selectPositionsBySettlement(final Settlement settlement)
+	private List<ReportQueryResult> selectPositionsBySettlement(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
@@ -657,7 +653,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		reportQuery.addGrouping(new ExpressionBuilder().get("productGroup").get("productGroupType"));
 		reportQuery.addGrouping(new ExpressionBuilder().get("productGroup").get("id"));
 
-		Collection<ReportQueryResult> result = super.selectReportQueryResults(reportQuery);
+		List<ReportQueryResult> result = super.selectReportQueryResults(reportQuery);
 		return result;
 	}
 
@@ -680,7 +676,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.select(expression);
 	}
 
-	private Collection<Position> selectInternalsBySettlement(final Settlement settlement)
+	private List<Position> selectInternalsBySettlement(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
@@ -693,11 +689,11 @@ public class PositionQuery extends AbstractQuery<Position>
 				.equal(ProductGroupType.WITHDRAWAL);
 
 		expression = expression.and(alloc.or(withd));
-		Collection<Position> internals = this.select(expression);
+		List<Position> internals = this.select(expression);
 		return internals;
 	}
 
-	private Collection<Position> selectInternalsBySalespointsAndDateRange(final Salespoint[] salespoints,
+	private List<Position> selectInternalsBySalespointsAndDateRange(final Salespoint[] salespoints,
 			Calendar[] dateRange)
 	{
 		if (salespoints == null || salespoints.length == 0)
@@ -722,11 +718,11 @@ public class PositionQuery extends AbstractQuery<Position>
 				.equal(ProductGroupType.WITHDRAWAL);
 
 		expression = expression.and(alloc.or(withd));
-		Collection<Position> internals = this.select(expression);
+		List<Position> internals = this.select(expression);
 		return internals;
 	}
 
-	private Collection<Position> selectRestitutedPositionsBySettlement(final Settlement settlement)
+	private List<Position> selectRestitutedPositionsBySettlement(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("settlement").equal(settlement);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
@@ -786,7 +782,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		return super.select(expression);
 	}
 
-	private Collection<ReportQueryResult> selectTaxesBySettlement(final Settlement settlement)
+	private List<ReportQueryResult> selectTaxesBySettlement(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.get("receipt").get("settlement").equal(settlement);
@@ -815,6 +811,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("internal").equal(false));
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)

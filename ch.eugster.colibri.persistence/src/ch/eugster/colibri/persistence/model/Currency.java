@@ -8,7 +8,7 @@ package ch.eugster.colibri.persistence.model;
 
 import static javax.persistence.FetchType.EAGER;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -38,7 +38,7 @@ public class Currency extends AbstractEntity implements IReplicatable
 	protected Long id;
 
 	@OneToMany(fetch = EAGER, mappedBy = "currency")
-	private Collection<PaymentType> paymentTypes = new Vector<PaymentType>();
+	private List<PaymentType> paymentTypes = new Vector<PaymentType>();
 
 	@Basic
 	@Column(name = "cu_code")
@@ -106,7 +106,7 @@ public class Currency extends AbstractEntity implements IReplicatable
 		return this.valueOf(this.name);
 	}
 
-	public Collection<PaymentType> getPaymentTypes()
+	public List<PaymentType> getPaymentTypes()
 	{
 		return this.paymentTypes;
 	}
@@ -174,7 +174,7 @@ public class Currency extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("name", this.name, this.name = name);
 	}
 
-	public void setPaymentTypes(final Collection<PaymentType> paymentTypes)
+	public void setPaymentTypes(final List<PaymentType> paymentTypes)
 	{
 		this.paymentTypes = paymentTypes;
 	}

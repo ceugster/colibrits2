@@ -17,7 +17,6 @@ import ch.eugster.colibri.scheduler.Activator;
 
 public interface UpdateScheduler
 {
-	public static final String SCHEDULE_TOPIC = "ch/eugster/colibri/scheduler/updated";
 	String getName();
 
 	Section[] getSections();

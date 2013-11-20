@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.Product;
@@ -28,7 +29,6 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
-import ch.eugster.colibri.provider.service.ProviderService;
 
 public class CustomerServer
 {
@@ -56,8 +56,6 @@ public class CustomerServer
 
 	public IStatus selectCustomer(final Position position, final ProductGroup productGroup)
 	{
-		this.status = Status.OK_STATUS;
-
 		if (kserver == null)
 		{
 			kserver = ClassFactory.createkundenserver();
@@ -109,12 +107,12 @@ public class CustomerServer
 					position.setOption(Option.PAYED_INVOICE);
 				}
 				CustomerServer.this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
-						ProviderService.Topic.CUSTOMER_UPDATE.topic());
+						Topic.CUSTOMER_UPDATE.topic());
 			}
 			else
 			{
 				CustomerServer.this.status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(),
-						ProviderService.Topic.CUSTOMER_UPDATE.topic());
+						Topic.CUSTOMER_UPDATE.topic());
 			}
 			position.getReceipt().setCustomer(customer);
 
@@ -125,7 +123,7 @@ public class CustomerServer
 		}
 		else
 		{
-			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Keine Verbindung"));
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic(), new Exception("Keine Verbindung"));
 		}
 		return this.status;
 	}

@@ -62,7 +62,7 @@ public class TaxReplicator extends AbstractEntityReplicator<Tax>
 						}
 						target = this.replicate(source, target);
 					}
-					target = (Tax) this.persistenceService.getCacheService().merge(target);
+					target = (Tax) merge(target);
 					target.getTaxRate().addTax(target);
 					target.getTaxType().addTax(target);
 				}
@@ -101,7 +101,7 @@ public class TaxReplicator extends AbstractEntityReplicator<Tax>
 				if (target.getCurrentTax() == null)
 				{
 					target.setCurrentTax((CurrentTax) this.persistenceService.getCacheService().find(CurrentTax.class, source.getCurrentTax().getId()));
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

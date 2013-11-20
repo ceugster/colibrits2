@@ -12,6 +12,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: ch.eugster.colibri.provider.galileo.Activator
 Import-Package: ch.eugster.colibri.barcode.code,
  ch.eugster.colibri.barcode.service,
+ ch.eugster.colibri.persistence.events,
  ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.model.product,
  ch.eugster.colibri.persistence.queries,

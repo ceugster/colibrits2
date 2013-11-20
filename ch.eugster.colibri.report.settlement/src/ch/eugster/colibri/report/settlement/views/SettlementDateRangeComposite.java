@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 
@@ -26,10 +27,8 @@ import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRParameter;
 import net.sf.jasperreports.engine.data.JRMapArrayDataSource;
 
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -64,8 +63,6 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 {
 	private static final String reportName = "SettlementStatistics";
 
-	private final ListenerList listeners = new ListenerList();
-
 	private Button printReversedReceipts;
 
 	private Button printInternals;
@@ -80,13 +77,13 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	 * @param parent
 	 * @param style
 	 */
-	public SettlementDateRangeComposite(Composite parent, int style)
+	public SettlementDateRangeComposite(Composite parent, SettlementView parentView, int style)
 	{
-		super(parent, style);
+		super(parent, parentView, style);
 	}
 
 	@Override
-	protected void setInput()
+	public void setInput()
 	{
 		// do nothing
 	}
@@ -244,54 +241,55 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	protected Map<Long, SettlementEntry> createPositionSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementPosition> positions = query.selectPositions(this.selectedSalespoints,
-				this.selectedDateRange);
-		return createPositionSection(new HashMap<Long, SettlementEntry>(), positions);
+		List<SettlementPosition> positions = query.selectPositions(this.getSelectedSalespoints(),
+				this.getSelectedDateRange());
+		Map<Long, SettlementEntry> section = createPositionSection(new HashMap<Long, SettlementEntry>(), positions);
+		return section;
 	}
 
 	protected Map<Long, SettlementEntry> createPaymentSection(ServerService service)
 	{
 		final PaymentQuery query = (PaymentQuery) service.getQuery(Payment.class);
-		Collection<SettlementPayment> payments = query.selectPayments(this.selectedSalespoints, this.selectedDateRange);
-		return createPaymentSection(new HashMap<Long, SettlementEntry>(), payments, this.selectedSalespoints[0]
+		Collection<SettlementPayment> payments = query.selectPayments(this.getSelectedSalespoints(), this.getSelectedDateRange());
+		return createPaymentSection(new HashMap<Long, SettlementEntry>(), payments, this.getSelectedSalespoints()[0]
 				.getCommonSettings().getReferenceCurrency());
 	}
 
 	protected Map<Long, SettlementEntry> createTaxSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementTax> taxes = query.selectTaxes(this.selectedSalespoints, this.selectedDateRange);
+		Collection<SettlementTax> taxes = query.selectTaxes(this.getSelectedSalespoints(), this.getSelectedDateRange());
 		return createTaxSection(new HashMap<Long, SettlementEntry>(), taxes);
 	}
 
 	protected Map<Long, SettlementEntry> createInternalSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementInternal> internals = query.selectInternals(this.selectedSalespoints,
-				this.selectedDateRange);
+		Collection<SettlementInternal> internals = query.selectInternals(this.getSelectedSalespoints(),
+				this.getSelectedDateRange());
 		return createInternalSection(new HashMap<Long, SettlementEntry>(), internals);
 	}
 
 	protected Map<Long, SettlementEntry> createRestitutedPositionSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementRestitutedPosition> internals = query.selectRestitutedPositions(this.selectedSalespoints,
-				this.selectedDateRange);
+		Collection<SettlementRestitutedPosition> internals = query.selectRestitutedPositions(this.getSelectedSalespoints(),
+				this.getSelectedDateRange());
 		return createRestitutedPositionSection(new HashMap<Long, SettlementEntry>(), internals);
 	}
 
 	protected Map<Long, SettlementEntry> createPayedInvoiceSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementPayedInvoice> payedInvoices = query.selectPayedInvoices(this.selectedSalespoints,
-				this.selectedDateRange);
+		Collection<SettlementPayedInvoice> payedInvoices = query.selectPayedInvoices(this.getSelectedSalespoints(),
+				this.getSelectedDateRange());
 		return createPayedInvoiceSection(new HashMap<Long, SettlementEntry>(), payedInvoices);
 	}
 
 	protected Map<Long, SettlementEntry> createReversedReceiptsSection(ServerService service)
 	{
 		final ReceiptQuery query = (ReceiptQuery) service.getQuery(Receipt.class);
-		Collection<SettlementReceipt> receipts = query.selectReversed(this.selectedSalespoints, this.selectedDateRange);
+		Collection<SettlementReceipt> receipts = query.selectReversed(this.getSelectedSalespoints(), this.getSelectedDateRange());
 		return createReceiptSection(new HashMap<Long, SettlementEntry>(), receipts);
 	}
 
@@ -316,71 +314,10 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	}
 
 	@Override
-	public void addSelectionChangedListener(ISelectionChangedListener listener)
-	{
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public ISelection getSelection()
-	{
-		if (selectedSalespoints == null)
-		{
-			if (selectedDateRange == null || selectedDateRange.length != 2)
-			{
-				return new StructuredSelection();
-			}
-			return new StructuredSelection(selectedDateRange);
-		}
-
-		Object[] objects = new Object[selectedSalespoints.length + selectedDateRange.length];
-		for (int i = 0; i > selectedSalespoints.length; i++)
-		{
-			objects[i] = selectedSalespoints[i];
-		}
-		for (int i = 0; i < selectedDateRange.length; i++)
-		{
-			objects[selectedSalespoints.length + i] = selectedDateRange[i];
-		}
-		return new StructuredSelection(objects);
-	}
-
-	@Override
-	public void removeSelectionChangedListener(ISelectionChangedListener listener)
-	{
-		this.listeners.remove(listener);
-	}
-
-	@Override
-	public void setSelection(ISelection selection)
-	{
-		if (selection instanceof StructuredSelection)
-		{
-			Collection<Salespoint> salespoints = new ArrayList<Salespoint>();
-			Collection<Calendar> dates = new ArrayList<Calendar>();
-			StructuredSelection ssel = (StructuredSelection) selection;
-			Object[] objects = ssel.toArray();
-			for (Object object : objects)
-			{
-				if (object instanceof Salespoint)
-				{
-					salespoints.add((Salespoint) object);
-				}
-				else if (object instanceof Calendar)
-				{
-					dates.add((Calendar) object);
-				}
-			}
-			selectedSalespoints = salespoints.toArray(new Salespoint[0]);
-			selectedDateRange = dates.size() == 2 ? dates.toArray(new Calendar[0]) : null;
-		}
-	}
-
-	@Override
 	public boolean validateSelection()
 	{
-		return selectedSalespoints != null && selectedSalespoints.length > 0 && selectedDateRange != null
-				&& selectedDateRange.length == 2;
+		return (getSelectedSalespoints() != null && getSelectedSalespoints().length > 0) && getSelectedDateRange() != null
+				&& getSelectedDateRange().length == 2;
 	}
 
 	@Override
@@ -406,7 +343,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 		if (service != null)
 		{
 			ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
-			count = query.countBySalespointsAndDateRange(this.selectedSalespoints, this.selectedDateRange);
+			count = query.countBySalespointsAndDateRange(this.getSelectedSalespoints(), this.getSelectedDateRange());
 		}
 		tracker.close();
 		return count;
@@ -424,7 +361,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 		parameters.put("salespoints", getSalespointList());
 		parameters.put("dateRange", getDateRangeList());
 		parameters.put("receiptCount", nf.format(countReceipts()));
-		parameters.put("taxInclusive", this.selectedSalespoints[0].getCommonSettings().isTaxInclusive() ? "inkl. MwSt."
+		parameters.put("taxInclusive", this.getSelectedSalespoints()[0].getCommonSettings().isTaxInclusive() ? "inkl. MwSt."
 				: "exkl. Mwst.");
 		URL entry = Activator.getDefault().getBundle().getEntry("/reports/" + getReportName() + ".properties");
 		try
@@ -441,9 +378,9 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	private String getSalespointList()
 	{
 		StringBuilder salespoints = new StringBuilder();
-		if (selectedSalespoints != null && selectedSalespoints.length > 0)
+		if (getSelectedSalespoints() != null && getSelectedSalespoints().length > 0)
 		{
-			for (Salespoint selectedSalespoint : selectedSalespoints)
+			for (Salespoint selectedSalespoint : getSelectedSalespoints())
 			{
 				if (salespoints.length() > 0)
 				{
@@ -457,26 +394,36 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 
 	private String getDateRangeList()
 	{
-		if (selectedDateRange != null && selectedDateRange.length == 2)
+		if (getSelectedDateRange() != null && getSelectedDateRange().length == 2)
 		{
-			if (selectedDateRange[0].get(Calendar.YEAR) == selectedDateRange[1].get(Calendar.YEAR))
+			if (getSelectedDateRange()[0].get(Calendar.YEAR) == getSelectedDateRange()[1].get(Calendar.YEAR))
 			{
-				if (selectedDateRange[0].get(Calendar.MONTH) == selectedDateRange[1].get(Calendar.MONTH))
+				if (getSelectedDateRange()[0].get(Calendar.MONTH) == getSelectedDateRange()[1].get(Calendar.MONTH))
 				{
-					if (selectedDateRange[0].get(Calendar.DATE) == selectedDateRange[1].get(Calendar.DATE))
+					if (getSelectedDateRange()[0].get(Calendar.DATE) == getSelectedDateRange()[1].get(Calendar.DATE))
 					{
-						return SimpleDateFormat.getDateInstance().format(selectedDateRange[0].getTime());
+						return SimpleDateFormat.getDateInstance().format(getSelectedDateRange()[0].getTime());
 					}
 				}
 			}
 
 			StringBuilder builder = new StringBuilder();
-			builder = builder.append(SimpleDateFormat.getDateInstance().format(selectedDateRange[0].getTime()));
+			builder = builder.append(SimpleDateFormat.getDateInstance().format(getSelectedDateRange()[0].getTime()));
 			builder = builder.append(" bis ");
-			builder = builder.append(SimpleDateFormat.getDateInstance().format(selectedDateRange[1].getTime()));
+			builder = builder.append(SimpleDateFormat.getDateInstance().format(getSelectedDateRange()[1].getTime()));
 			return builder.toString();
 		}
 		return "";
 	}
 
+	@Override
+	public ISelection getSelection() 
+	{
+		return new StructuredSelection();
+	}
+
+	@Override
+	public void setSelection(ISelection selection) 
+	{
+	}
 }

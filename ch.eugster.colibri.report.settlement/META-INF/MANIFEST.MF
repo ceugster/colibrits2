@@ -6,7 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: ch.eugster.colibri.report.settlement.Activator
 Bundle-Vendor: Christian Eugster
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: ch.eugster.colibri.persistence.model,
+Import-Package: ch.eugster.colibri.persistence.events,
+ ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.model.key,
  ch.eugster.colibri.persistence.model.payment,
  ch.eugster.colibri.persistence.model.print,

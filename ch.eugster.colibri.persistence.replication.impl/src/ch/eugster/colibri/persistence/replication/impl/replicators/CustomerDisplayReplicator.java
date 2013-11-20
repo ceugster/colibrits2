@@ -50,7 +50,7 @@ public class CustomerDisplayReplicator extends AbstractEntityReplicator<Customer
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

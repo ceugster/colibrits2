@@ -1,7 +1,10 @@
 package ch.eugster.colibri.persistence.queries;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -211,7 +214,7 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		return sps;
 	}
 
-	protected Collection<T> select(final Expression expression)
+	protected List<T> select(final Expression expression)
 	{
 		return this.select(expression, 0);
 	}
@@ -235,15 +238,15 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		return query;
 	}
 
-	protected Collection<T> select(final Expression expression, final int maxResults)
+	protected List<T> select(final Expression expression, final int maxResults)
 	{
 		return select(expression, null, maxResults);
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Collection<T> select(final Expression expression, final List<Expression> order, final int maxResults)
+	protected List<T> select(final Expression expression, final List<Expression> order, final int maxResults)
 	{
-		Collection<T> result = new ArrayList<T>();
+		List<T> result = new ArrayList<T>();
 		EntityManager entityManager = null;
 		try
 		{
@@ -256,7 +259,10 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 					readAllQuery.setOrderByExpressions(order);
 				}
 				final Query query = createQuery(entityManager, readAllQuery, maxResults);
+				Calendar calendar = GregorianCalendar.getInstance();
+				String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
 				result = query.getResultList();
+				System.out.println(time + " " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			}
 		}
 		catch (Exception e)
@@ -268,9 +274,9 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected Collection<ReportQueryResult> selectReportQueryResults(ReportQuery reportQuery)
+	protected List<ReportQueryResult> selectReportQueryResults(ReportQuery reportQuery)
 	{
-		Collection<ReportQueryResult> results = new ArrayList<ReportQueryResult>();
+		List<ReportQueryResult> results = new ArrayList<ReportQueryResult>();
 		EntityManager entityManager = null;
 		try
 		{

@@ -5,7 +5,6 @@
    <service>
       <provide interface="ch.eugster.colibri.provider.service.ProviderUpdater"/>
    </service>
-   <reference bind="setEventAdmin" cardinality="1..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
    <reference bind="setProviderQuery" cardinality="1..1" interface="ch.eugster.colibri.provider.service.ProviderQuery" name="ProviderQuery" policy="static" unbind="unsetProviderQuery"/>
    <property name="service.ranking" type="Integer" value="10000"/>
 </scr:component>

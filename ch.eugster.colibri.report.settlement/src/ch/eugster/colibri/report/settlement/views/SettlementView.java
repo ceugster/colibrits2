@@ -3,6 +3,7 @@ package ch.eugster.colibri.report.settlement.views;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Calendar;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.report.daterange.views.DateView;
 import ch.eugster.colibri.report.destination.views.DestinationView;
 import ch.eugster.colibri.report.engine.ReportService;
@@ -52,7 +54,11 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 
 	private TabFolder tabFolder;
 
-	private ReportService.Destination selectedDestination;
+	protected Salespoint[] selectedSalespoints;
+
+	protected Calendar[] selectedDateRange;
+	
+	protected ReportService.Destination selectedDestination;
 
 	private ReportService.Format selectedFormat;
 
@@ -78,7 +84,6 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		{
 			settings.put("selected.tab", 0);
 		}
-		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DestinationView.ID, this);
 	}
 
 	@Override
@@ -91,12 +96,12 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 
 		TabItem item = new TabItem(tabFolder, SWT.NONE);
 		item.setText("Nach Datumsbereich");
-		SettlementDateRangeComposite dateRangeComposite = new SettlementDateRangeComposite(tabFolder, SWT.NONE);
+		SettlementDateRangeComposite dateRangeComposite = new SettlementDateRangeComposite(tabFolder, this, SWT.NONE);
 		item.setControl(dateRangeComposite);
 
 		item = new TabItem(tabFolder, SWT.NONE);
 		item.setText("Einzelner Abschluss");
-		SettlementNumberComposite numberComposite = new SettlementNumberComposite(tabFolder, SWT.NONE);
+		SettlementNumberComposite numberComposite = new SettlementNumberComposite(tabFolder, this, SWT.NONE);
 		numberComposite.addSelectionChangedListener(this);
 		item.setControl(numberComposite);
 
@@ -145,18 +150,6 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 			}
 		});
 
-		ISelectionService service = this.getSite().getWorkbenchWindow().getSelectionService();
-		Control[] controls = tabFolder.getTabList();
-		for (Control control : controls)
-		{
-			if (control instanceof ISettlementCompositeChild)
-			{
-				ISettlementCompositeChild child = (ISettlementCompositeChild) control;
-				service.addPostSelectionListener(DateView.ID, child);
-				service.addPostSelectionListener(SalespointView.ID, child);
-			}
-		}
-
 		if (tabFolder.getItemCount() > settings.getInt("selected.tab"))
 		{
 			item = tabFolder.getItem(settings.getInt("selected.tab"));
@@ -192,7 +185,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 						final JRDataSource dataSource = selectedChild.createDataSource();
 						if (dataSource == null)
 						{
-							MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden.");
+							MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden (aus der Vorgängerversion übernommene Daten sind für diese Auswertung nicht abrufbar).");
 							return;
 						}
 						final Hashtable<String, Object> parameters = selectedChild.getParameters();
@@ -211,30 +204,37 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 				}
 			}
 		});
+		
+		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(SalespointView.ID, this);
+		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DateView.ID, this);
+		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DestinationView.ID, this);
+
+		updateStartButton();
 	}
 
 	@Override
 	public void dispose()
 	{
 		ISelectionService service = getSite().getWorkbenchWindow().getSelectionService();
-
+		service.removePostSelectionListener(SalespointView.ID, this);
+		service.removePostSelectionListener(DateView.ID, this);
 		service.removePostSelectionListener(DestinationView.ID, this);
-
-		if (!tabFolder.isDisposed())
-		{
-			Control[] controls = tabFolder.getTabList();
-			for (Control control : controls)
-			{
-				if (control instanceof ISettlementCompositeChild)
-				{
-					ISettlementCompositeChild child = (ISettlementCompositeChild) control;
-					service.removePostSelectionListener(DateView.ID, child);
-					service.removePostSelectionListener(SalespointView.ID, child);
-					child.removeSelectionChangedListener(this);
-				}
-			}
-		}
 		super.dispose();
+	}
+	
+	public Salespoint[] getSelectedSalespoints()
+	{
+		return this.selectedSalespoints;
+	}
+	
+	public Calendar[] getSelectedDateRange()
+	{
+		return this.selectedDateRange;
+	}
+	
+	public ReportService.Destination getSelectedDestination()
+	{
+		return this.selectedDestination;
 	}
 
 	@Override
@@ -246,7 +246,17 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection)
 	{
-		if (part instanceof DestinationView)
+		if (part instanceof SalespointView)
+		{
+			SalespointView view = (SalespointView) part;
+			selectedSalespoints = view.getSelectedSalespoints();
+		}
+		else if (part instanceof DateView)
+		{
+			DateView view = (DateView) part;
+			selectedDateRange = view.getDates();
+		}
+		else if (part instanceof DestinationView)
 		{
 			DestinationView view = (DestinationView) part;
 			selectedDestination = view.getSelectedDestination();
@@ -255,7 +265,21 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 				selectedFormat = view.getSelectedFormat();
 			}
 		}
+		updateChildren();
 		updateStartButton();
+	}
+	
+	private void updateChildren()
+	{
+		Control[] controls = tabFolder.getChildren();
+		for (Control control : controls)
+		{
+			if (control instanceof ISettlementCompositeChild)
+			{
+				ISettlementCompositeChild child = (ISettlementCompositeChild) control;
+				child.setInput();
+			}
+		}
 	}
 
 	public boolean validateSelection()
@@ -290,7 +314,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 	@Override
 	public void selectionChanged(SelectionChangedEvent event)
 	{
-		start.setEnabled(!event.getSelection().isEmpty());
+		this.updateStartButton();
 	}
 
 	protected IStatus printReport(final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)

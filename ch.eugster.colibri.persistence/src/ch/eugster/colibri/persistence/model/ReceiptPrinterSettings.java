@@ -1,8 +1,7 @@
 package ch.eugster.colibri.persistence.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -64,7 +63,7 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 	private Map<String, Printout> printouts = new HashMap<String, Printout>();
 
 	@OneToMany(mappedBy = "receiptPrinterSettings")
-	private Collection<SalespointReceiptPrinterSettings> salespointReceiptPrinters = new Vector<SalespointReceiptPrinterSettings>();
+	private List<SalespointReceiptPrinterSettings> salespointReceiptPrinters = new Vector<SalespointReceiptPrinterSettings>();
 
 	protected ReceiptPrinterSettings()
 	{
@@ -128,7 +127,7 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 		return null;
 	}
 
-	public Collection<SalespointReceiptPrinterSettings> getSalespointReceiptPrinters()
+	public List<SalespointReceiptPrinterSettings> getSalespointReceiptPrinters()
 	{
 		return this.salespointReceiptPrinters;
 	}

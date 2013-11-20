@@ -9,6 +9,7 @@ package ch.eugster.colibri.persistence.replication.impl.replicators;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.AbstractEntity;
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractEntityReplicator<T extends AbstractEntity> implements EntityReplicator<T>
@@ -33,4 +34,16 @@ public abstract class AbstractEntityReplicator<T extends AbstractEntity> impleme
 		return target;
 	}
 	
+	protected AbstractEntity merge(AbstractEntity entity)
+	{
+		try
+		{
+			return this.persistenceService.getCacheService().merge(entity);
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		return entity;
+	}
 }

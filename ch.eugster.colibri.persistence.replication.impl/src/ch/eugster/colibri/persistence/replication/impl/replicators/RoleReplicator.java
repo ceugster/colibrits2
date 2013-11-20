@@ -52,7 +52,7 @@ public class RoleReplicator extends AbstractEntityReplicator<Role>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

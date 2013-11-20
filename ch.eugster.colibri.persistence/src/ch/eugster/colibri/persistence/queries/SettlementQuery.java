@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
@@ -21,7 +22,14 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		Settlement settlement = this.find(salespointCriteria.and(settledCriteria));
 		if (settlement == null)
 		{
-			settlement = (Settlement) this.getConnectionService().merge(Settlement.newInstance(salespoint));
+			try
+			{
+				settlement = (Settlement) this.getConnectionService().merge(Settlement.newInstance(salespoint));
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
 		}
 		return settlement;
 	}
@@ -40,6 +48,15 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		final Expression settledCriteria = new ExpressionBuilder().get("settled").between(dateRange[0], dateRange[1]);
 		Collection<Settlement> settlements = this.select(salespointCriteria.and(settledCriteria));
 		return settlements;
+	}
+
+	public long countTransferables()
+	{
+		Expression expression = new ExpressionBuilder(Settlement.class).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settled").notNull());
+		expression = expression.and(new ExpressionBuilder().get("otherId").isNull());
+		long count = this.count(expression);
+		return count;
 	}
 
 	public Collection<Settlement> selectBySalespointsAndSettled(final Salespoint[] salespoints, final Long settledFrom,
@@ -95,5 +112,14 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 	protected Class<Settlement> getEntityClass()
 	{
 		return Settlement.class;
+	}
+
+	public List<Settlement> selectTransferables()
+	{
+		Expression expression = new ExpressionBuilder(Settlement.class).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settled").notNull());
+		expression = expression.and(new ExpressionBuilder().get("otherId").isNull());
+		List<Settlement> settlements = this.select(expression, 0);
+		return settlements;
 	}
 }

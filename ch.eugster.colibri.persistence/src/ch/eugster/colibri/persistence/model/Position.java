@@ -58,6 +58,7 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
 import org.eclipse.persistence.annotations.Convert;
+import org.eclipse.persistence.annotations.Index;
 
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
@@ -160,6 +161,7 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	private boolean fromStock;
 
 	@Basic
+	@Index
 	@Column(name = "po_provider")
 	private String provider;
 
@@ -169,11 +171,13 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	private ProviderState providerState;
 
 	@Basic
+	@Index
 	@Column(name = "po_book_provider")
 	@Convert("booleanConverter")
 	private boolean bookProvider;
 
 	@Basic
+	@Index
 	@Column(name = "po_provider_booked")
 	@Convert("booleanConverter")
 	private boolean providerBooked;
@@ -186,6 +190,11 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Basic
 	@Column(name = "po_other_id")
 	private Long otherId;
+
+	@Basic
+	@Column(name = "po_server_updated", columnDefinition="SMALLINT")
+	@Convert("booleanConverter")
+	private boolean serverUpdated;
 
 	protected Position()
 	{
@@ -730,6 +739,14 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	// {
 	// return foreignCurrencyAmount;
 	// }
+
+	public boolean isServerUpdated() {
+		return serverUpdated;
+	}
+
+	public void setServerUpdated(boolean serverUpdated) {
+		this.serverUpdated = serverUpdated;
+	}
 
 	public enum AmountType
 	{

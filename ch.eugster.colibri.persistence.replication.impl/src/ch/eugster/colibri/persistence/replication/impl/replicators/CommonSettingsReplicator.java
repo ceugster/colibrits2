@@ -54,7 +54,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{
@@ -98,7 +98,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 							|| (target.getDefaultProductGroup().getId() != productGroup.getId()))
 					{
 						target.setDefaultProductGroup(productGroup);
-						this.persistenceService.getCacheService().merge(target);
+						merge(target);
 					}
 				}
 				if (monitor != null)
@@ -115,7 +115,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 							|| (target.getPayedInvoice().getId() != productGroup.getId()))
 					{
 						target.setPayedInvoice(productGroup);
-						this.persistenceService.getCacheService().merge(target);
+						merge(target);
 					}
 				}
 				if (monitor != null)

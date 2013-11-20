@@ -62,7 +62,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{
@@ -171,7 +171,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 
 				if (update)
 				{
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{
@@ -233,7 +233,7 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 				}
 				salespoint.setReceiptPrinterSettings(receiptPrinterSettings);
 
-				this.persistenceService.getCacheService().merge(salespoint);
+				merge(salespoint);
 
 				if (monitor != null)
 				{

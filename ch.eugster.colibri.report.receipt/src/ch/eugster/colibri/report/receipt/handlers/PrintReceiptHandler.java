@@ -17,6 +17,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.report.receipt.Activator;
@@ -87,7 +88,7 @@ public class PrintReceiptHandler extends AbstractHandler implements IHandler
 		final EventAdmin eventAdmin = (EventAdmin) this.eventServiceTracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent("ch/eugster/colibri/print/receipt", receipt));
+			eventAdmin.sendEvent(this.getEvent(Topic.PRINT_RECEIPT.topic(), receipt));
 		}
 	}
 

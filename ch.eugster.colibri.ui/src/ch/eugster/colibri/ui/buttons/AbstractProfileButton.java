@@ -27,7 +27,12 @@ public abstract class AbstractProfileButton extends HTMLButton implements Entity
 
 	public AbstractProfileButton(final ProfileAction action, final Profile profile)
 	{
-		super(action, profile.getButtonNormalFg(), profile.getButtonFailOverFg());
+		this(action, profile, false);
+	}
+
+	public AbstractProfileButton(final ProfileAction action, final Profile profile, boolean isFailOver)
+	{
+		super(action, profile.getButtonNormalFg(), profile.getButtonFailOverFg(), isFailOver);
 		this.init(profile);
 	}
 

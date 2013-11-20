@@ -601,7 +601,7 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 
 	public ProductGroup getDefaultVoucherProductGroup() 
 	{
-		return defaultVoucherProductGroup;
+		return this.defaultVoucherProductGroup;
 	}
 
 	public void setDefaultVoucherProductGroup(ProductGroup defaultVoucherProductGroup) 

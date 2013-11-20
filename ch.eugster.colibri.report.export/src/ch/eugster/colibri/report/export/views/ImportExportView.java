@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -75,6 +76,7 @@ import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -371,6 +373,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 				if (path != null)
 				{
 					File saveDirectory= new File(path);
+					if (!saveDirectory.exists())
+					{
+						saveDirectory.mkdirs();
+					}
 					if (saveDirectory.isDirectory())
 					{
 						savePath.setText(saveDirectory.getAbsolutePath());
@@ -426,6 +432,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 				if (path != null)
 				{
 					File logDirectory= new File(path);
+					if (!logDirectory.exists())
+					{
+						logDirectory.mkdirs();
+					}
 					if (logDirectory.isDirectory())
 					{
 						logPath.setText(logDirectory.getAbsolutePath());
@@ -480,7 +490,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		{
 			SalespointQuery query = (SalespointQuery) service.getServerService().getQuery(Salespoint.class);
 			Salespoint current = query.getCurrentSalespoint();
-			path = current.getExportPath();
+			if (current != null)
+			{
+				path = current.getExportPath();
+			}
 		}
 		if (path == null || path.isEmpty())
 		{
@@ -652,6 +665,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 
 		if (files.length > 0)
 		{
+			final Result result = new Result();
 			monitor.beginTask("Belege werden importiert...", files.length);
 			try
 			{
@@ -660,7 +674,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 					Document document = load(file);
 					if (document != null)
 					{
-						if (!doImport(new SubProgressMonitor(monitor, 1), document, file))
+						if (!doImport(new SubProgressMonitor(monitor, 1), document, file, result))
 						{
 							monitor.setCanceled(true);
 						}
@@ -685,7 +699,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 						}
 						else
 						{
-							MessageDialog.openInformation(ImportExportView.this.getSite().getShell(), "Import abgeschlossen", "Der Import von " + DecimalFormat.getIntegerInstance().format(files.length) + " Dateien ist abgeschlossen. Allfällige Fehler sind in Dateien mit gleichem Namen und der Endung \".log\" protokolliert.");
+							MessageDialog.openInformation(ImportExportView.this.getSite().getShell(), "Import abgeschlossen", "Der Import von " + DecimalFormat.getIntegerInstance().format(files.length) + " Dateien ist abgeschlossen.\n\nZusammenfassung:\n" + DecimalFormat.getInstance().format(result.read) + " Belege wurden gelesen,\n" + DecimalFormat.getInstance().format(result.write) + " Belege wurden geschrieben,\n" + DecimalFormat.getInstance().format(result.error) + " Fehler wurden festgestellt und\n" + DecimalFormat.getInstance().format(result.exist) + " Belege waren bereits vorhanden.\n\nAllfällige Fehler sind in Dateien mit gleichem Namen und der Endung \".log\" protokolliert.");
 						}
 					}
 				});
@@ -706,6 +720,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 
 	private PrintWriter createLog(File file)
 	{
+		if (!logDirectory.exists())
+		{
+			logDirectory.mkdirs();
+		}
 		String path = logDirectory.getAbsolutePath();
 		if (!path.endsWith(File.separator))
 		{
@@ -741,18 +759,16 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			printer.close();
 		}
 	}
-	private boolean doImport(SubProgressMonitor monitor, Document document, File file)
+	private boolean doImport(SubProgressMonitor monitor, Document document, File file, Result result)
 	{
+		if (!saveDirectory.exists())
+		{
+			saveDirectory.mkdirs();
+		}
+
 		PrintWriter printer = createLog(file);
 		try
 		{
-			int read = 0;
-			int write = 0;
-			int exist = 0;
-			int error = 0;
-
-			long date = Long.valueOf(document.getRootElement().getAttributeValue("date")).longValue();
-			String mapping = document.getRootElement().getAttributeValue("salespoint");
 			int count = Integer.valueOf(document.getRootElement().getAttributeValue("count")).intValue();
 			log(printer, "Import: " + file.getName()+ " (" + count + " Belege.");
 
@@ -760,66 +776,81 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			if (service != null)
 			{
 				SalespointQuery salespointQuery = (SalespointQuery) service.getServerService().getQuery(Salespoint.class);
-				Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mapping);
-				if (salespoints.size() == 1)
+				monitor.beginTask("Importiere " + file.getName(), count);
+				try
 				{
-					monitor.beginTask("Importiere " + file.getName(), count);
-					try
+					@SuppressWarnings("unchecked")
+					List<Element> receiptElements = document.getRootElement().getChildren("receipt");
+					for (Element receiptElement : receiptElements)
 					{
-						Salespoint salespoint = salespoints.iterator().next();
-						Settlement settlement = getSettlement(service, salespoint, date);
-						@SuppressWarnings("unchecked")
-						List<Element> receiptElements = document.getRootElement().getChildren("receipt");
-						for (Element receiptElement : receiptElements)
+						if (monitor.isCanceled())
 						{
-							if (monitor.isCanceled())
-							{
-								return false;
-							}
-							read++;
-							try
-							{
-								Receipt receipt = this.convertToReceipt(receiptElement, settlement);
-								if (!receiptExists(service, receipt.getNumber(), settlement.getId()))
-								{
-									service.getServerService().getQuery(Receipt.class);
-									service.getServerService().persist(receipt, false);
-									write++;
-								}
-								else
-								{
-									exist++;
-									if (printer != null)
-									{
-										String id = receiptElement.getAttributeValue("id");
-										log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
-									}
-									Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + receiptElement.getAttributeValue("id") + ": Beleg existiert bereits.");
-								}
-							}
-							catch (Exception e)
-							{
-								Activator.getDefault().log(LogService.LOG_ERROR, "Fehler beim verarbeiten von Beleg mit der Id " + receiptElement.getAttributeValue("id") + ": " + e.getMessage());
-								error++;
-								String id = receiptElement.getAttributeValue("id");
-								log(printer, "Fehler in Beleg " + id + ": " + e.getLocalizedMessage());
-							}
-							monitor.worked(1);
+							return false;
 						}
+						result.read++;
+						try
+						{
+							String mappingId = receiptElement.getAttributeValue("salespoint-id");
+							Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
+							if (salespoints.isEmpty())
+							{
+								
+							}
+							Salespoint salespoint = salespoints.iterator().next();
+							Settlement settlement = null;
+							Long settled = getSettlementTimeInMillis(receiptElement.getAttributeValue("settlement"));
+							Calendar calendar = GregorianCalendar.getInstance();
+							calendar.setTimeInMillis(settled.longValue());
+							System.out.println(salespoint.getMapping() + " " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
+							if (settled != null)
+							{
+								settlement = getSettlement(service, salespoint, settled.longValue());
+							}
+							System.out.println(receiptElement.getAttributeValue("number"));
+							if (receiptElement.getAttributeValue("number").equals("1000010000249246"))
+							{
+								System.out.println(receiptElement.getAttributeValue("number"));
+							}
+							Receipt receipt = this.convertToReceipt(receiptElement, settlement);
+							if (!receiptExists(service, receipt.getOtherId()))
+							{
+//								service.getServerService().getQuery(Receipt.class);
+								service.getServerService().persist(receipt, false);
+								result.write++;
+							}
+							else
+							{
+								result.exist++;
+								if (printer != null)
+								{
+									String id = receiptElement.getAttributeValue("id");
+									log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
+								}
+								Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + receiptElement.getAttributeValue("id") + ": Beleg existiert bereits.");
+							}
+						}
+						catch (Exception e)
+						{
+							Activator.getDefault().log(LogService.LOG_ERROR, "Fehler beim verarbeiten von Beleg mit der Id " + receiptElement.getAttributeValue("id") + ": " + e.getMessage());
+							result.error++;
+							String id = receiptElement.getAttributeValue("id");
+							log(printer, "Fehler in Beleg " + id + ": " + e.getLocalizedMessage());
+						}
+						monitor.worked(1);
 					}
-					finally
-					{
-						monitor.done();
-					}
+				}
+				finally
+				{
+					monitor.done();
 				}
 			}
 			if (printer != null)
 			{
 				log(printer, "");
-				log(printer, "Gelesen: " + DecimalFormat.getIntegerInstance().format(read));
-				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(write));
-				log(printer, "Vorhanden: " + DecimalFormat.getIntegerInstance().format(exist));
-				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(error));
+				log(printer, "Gelesen: " + DecimalFormat.getIntegerInstance().format(result.read));
+				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(result.write));
+				log(printer, "Vorhanden: " + DecimalFormat.getIntegerInstance().format(result.exist));
+				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(result.error));
 			}
 			if (deleteFile)
 			{
@@ -873,6 +904,20 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			closeLog(printer);
 		}
 		return true;
+	}
+	
+	private Long getSettlementTimeInMillis(String settlement)
+	{
+		Long value = null;
+		try
+		{
+			value = Long.valueOf(settlement);
+		}
+		catch(NumberFormatException e)
+		{
+			
+		}
+		return value;
 	}
 	
 	private void doExport(final IProgressMonitor monitor)
@@ -946,7 +991,14 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			settlement = Settlement.newInstance(salespoint);
 			settlement.setSettled(calendar);
 			settlement.setDeleted(false);
-			service.getServerService().persist(settlement);
+			try
+			{
+				service.getServerService().persist(settlement);
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		else
 		{
@@ -955,18 +1007,11 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		return settlement;
 	}
 	
-	private boolean receiptExists(PersistenceService service, Long number, Long settlementId)
+	private boolean receiptExists(PersistenceService service, Long id)
 	{
 		ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
-		Collection<Receipt> receipts = query.selectByNumber(number);
-		for (Receipt receipt : receipts)
-		{
-			if (receipt.getSettlement().getId().equals(settlementId))
-			{
-				return true;
-			}
-		}
-		return false;
+		Receipt receipt = query.findWithOtherId(id);
+		return receipt != null;
 	}
 	
 	@Override
@@ -1360,29 +1405,19 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	private Receipt convertToReceipt(Element element, Settlement settlement) throws IllegalArgumentException
 	{
 		Receipt receipt = Receipt.newInstance(settlement, getUser(element.getAttributeValue("user-id")));
+		receipt.setState(getState(element.getAttributeValue("status")));
 		receipt.setBookkeepingTransaction(Long.valueOf(element.getAttributeValue("booking-id")).longValue());
 		receipt.setCustomer(getCustomer(element.getAttributeValue("customer-id")));
 		receipt.setDefaultCurrency(settlement.getSalespoint().getPaymentType().getCurrency());
 		receipt.setDeleted(false);
 		receipt.setForeignCurrency(settlement.getSalespoint().getPaymentType().getCurrency());
-		receipt.setState(getState(element.getAttributeValue("status")));
-		Long number = null;
-		if (receipt.getState().equals(Receipt.State.REVERSED))
-		{
-			number = Long.valueOf(element.getAttributeValue("number").substring(1));
-		}
-		else
-		{
-			number = Long.valueOf(element.getAttributeValue("number"));
-		}
-		receipt.setNumber(number);
-		receipt.setOtherId(null);
+		receipt.setTimestamp(getTimestamp(element));
+		receipt.setHour(getHour(receipt.getTimestamp()));
+		receipt.setNumber(getNumber(receipt, element));
+		receipt.setOtherId(getOtherId(element));
+		receipt.setProviderUpdated(true);
 		receipt.setReferenceCurrency(settlement.getSalespoint().getCommonSettings().getReferenceCurrency());
 		receipt.setSettlement(settlement);
-		receipt.setState(getState(element.getAttributeValue("status")));
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setTimeInMillis(Long.valueOf(element.getAttributeValue("timestamp")).longValue());
-		receipt.setTimestamp(calendar);
 		receipt.setTransaction(Long.valueOf(element.getAttributeValue("transaction-id")));
 		receipt.setTransferred(Boolean.valueOf(element.getAttributeValue("transferred")));
 		receipt.setUser(getUser(element.getAttributeValue("user-id")));
@@ -1390,6 +1425,43 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		updatePositions(element, receipt);
 		updatePayments(element, receipt);
 		return receipt;
+	}
+	
+	private Long getOtherId(Element element) throws IllegalArgumentException
+	{
+		String id = element.getAttributeValue("id");
+		try
+		{
+			return Long.valueOf(id);
+		}
+		catch (Exception e)
+		{
+			throw new IllegalArgumentException("Die Id " + id + " ist nicht numerisch.");
+		}
+	}
+	
+	private Calendar getTimestamp(Element element)
+	{
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.setTimeInMillis(Long.valueOf(element.getAttributeValue("timestamp")).longValue());
+		return calendar;
+	}
+
+	private Long getNumber(Receipt receipt, Element element)
+	{
+		if (receipt.getState().equals(Receipt.State.REVERSED))
+		{
+			return Long.valueOf(element.getAttributeValue("number").substring(1));
+		}
+		else
+		{
+			return Long.valueOf(element.getAttributeValue("number"));
+		}
+	}
+	
+	private int getHour(Calendar timestamp)
+	{
+		return timestamp.get(Calendar.HOUR_OF_DAY);
 	}
 
 	private void updatePositions(Element receiptElement, Receipt receipt)
@@ -1470,6 +1542,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		position.setProductGroup(getProductGroup(element.getAttributeValue("product-group-id")));
 		position.setProvider("ch.eugster.colibri.provider.galileo");
 		position.setProviderBooked(Boolean.valueOf(element.getAttributeValue("galileo-booked")));
+		position.setProviderState(position.isProviderBooked() ? ProviderState.BOOKED : ProviderState.OPEN);
 		position.setQuantity(Integer.valueOf(element.getAttributeValue("quantity")).intValue());
 		position.setSearchValue(element.getAttributeValue("product-number"));
 		String code = element.getAttributeValue("tax-id");
@@ -1499,6 +1572,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		payment.setForeignCurrencyQuotation(Double.valueOf(element.getAttributeValue("quotation")));
 		payment.setForeignCurrencyRoundFactor(Double.valueOf(element.getAttributeValue("round-factor-fc")));
 		payment.setTimestamp(receipt.getTimestamp());
+		payment.setBookProvider(false);
+		payment.setCode(null);
+		payment.setProviderBooked(false);
+		payment.setProviderState(ProviderState.BOOKED);
 		return payment;
 	}
 	
@@ -1753,5 +1830,13 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			}
 			}
 		}
+	}
+	
+	private class Result
+	{
+		public int read = 0;
+		public int write = 0;
+		public int exist = 0;
+		public int error = 0;
 	}
 }

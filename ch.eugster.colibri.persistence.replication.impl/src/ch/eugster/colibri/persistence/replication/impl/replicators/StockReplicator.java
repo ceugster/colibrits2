@@ -57,7 +57,7 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 						}
 						target = this.replicate(source, target);
 					}
-					target = (Stock) this.persistenceService.getCacheService().merge(target);
+					target = (Stock) merge(target);
 					target.getSalespoint().addStock(target);
 					target.getPaymentType().addStock(target);
 				}

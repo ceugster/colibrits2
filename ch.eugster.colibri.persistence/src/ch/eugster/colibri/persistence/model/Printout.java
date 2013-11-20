@@ -1,7 +1,7 @@
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -66,7 +66,7 @@ public class Printout extends AbstractEntity implements IReplicatable
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "printout")
 	@MapKey(name = "printout")
-	private Collection<Printout> printouts = new Vector<Printout>();
+	private List<Printout> printouts = new Vector<Printout>();
 
 	@Basic
 	@Column(name = "pn_printout_type")
@@ -125,7 +125,7 @@ public class Printout extends AbstractEntity implements IReplicatable
 				this.printoutAreas.put(Integer.valueOf(printoutArea.getPrintAreaType()), pa));
 	}
 
-	public Collection<Printout> getChildren()
+	public List<Printout> getChildren()
 	{
 		return this.printouts;
 	}
@@ -247,7 +247,7 @@ public class Printout extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("printoutAreas", printoutAreas, this.printoutAreas = printoutAreas);
 	}
 
-	public void setPrintouts(final Collection<Printout> printouts)
+	public void setPrintouts(final List<Printout> printouts)
 	{
 		this.propertyChangeSupport.firePropertyChange("printouts", printouts, this.printouts = printouts);
 	}

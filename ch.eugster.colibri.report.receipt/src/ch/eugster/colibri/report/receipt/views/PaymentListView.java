@@ -17,8 +17,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
@@ -49,7 +49,6 @@ public class PaymentListView extends ViewPart implements ISelectionListener
 	public void init(IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		site.getWorkbenchWindow().getSelectionService().addPostSelectionListener(this);
 	}
 
 	@Override
@@ -135,11 +134,39 @@ public class PaymentListView extends ViewPart implements ISelectionListener
 			}
 		});
 
+		this.getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(this);
+
+		IViewPart view = this.getSite().getWorkbenchWindow().getActivePage().findView("ch.eugster.colibri.report.receipt.receiptview");
+		if (view instanceof ReceiptListView)
+		{
+			ReceiptListView receiptView = (ReceiptListView) view;
+			ISelection selection = receiptView.getSelection();
+			if (selection instanceof IStructuredSelection)
+			{
+				IStructuredSelection ssel = (IStructuredSelection) selection;
+				if (ssel.isEmpty())
+				{
+					this.viewer.setInput(null);
+				}
+				else if (ssel.getFirstElement() instanceof Receipt)
+				{
+					Receipt receipt = (Receipt) ssel.getFirstElement();
+					this.viewer.setInput(receipt);
+					final TableColumn[] columns = this.viewer.getTable().getColumns();
+					for (final TableColumn column : columns)
+					{
+						column.pack();
+					}
+				}
+			}
+		}
+
 		final TableColumn[] columns = this.viewer.getTable().getColumns();
 		for (final TableColumn column : columns)
 		{
 			column.pack();
 		}
+
 	}
 
 	@Override

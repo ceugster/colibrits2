@@ -8,7 +8,7 @@ package ch.eugster.colibri.persistence.model;
 
 import static javax.persistence.FetchType.EAGER;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -39,7 +39,7 @@ public class TaxType extends AbstractEntity implements IReplicatable
 	protected Long id;
 
 	@OneToMany(cascade=CascadeType.ALL, fetch = EAGER, mappedBy = "taxType")
-	private Collection<Tax> taxes = new Vector<Tax>();
+	private List<Tax> taxes = new Vector<Tax>();
 
 	@Basic
 	@Column(name = "tt_code")
@@ -85,7 +85,7 @@ public class TaxType extends AbstractEntity implements IReplicatable
 		return this.valueOf(this.name);
 	}
 
-	public Collection<Tax> getTaxes()
+	public List<Tax> getTaxes()
 	{
 		return this.taxes;
 	}
@@ -123,7 +123,7 @@ public class TaxType extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("name", this.name, this.name = name);
 	}
 
-	public void setTaxes(final Collection<Tax> taxes)
+	public void setTaxes(final List<Tax> taxes)
 	{
 		this.propertyChangeSupport.firePropertyChange("taxes", this.taxes, this.taxes = taxes);
 	}

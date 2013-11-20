@@ -19,6 +19,7 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.Position;
@@ -45,7 +46,6 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
-import ch.eugster.colibri.provider.service.ProviderService;
 
 import com4j.ComException;
 
@@ -438,7 +438,7 @@ public abstract class AbstractServer implements IServer
 		else
 		{
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-					ProviderService.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Die Verbindung konnte nicht hergestellt werden."));
+					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
 		}
 		galserve.dispose();
 		return status;
@@ -486,7 +486,7 @@ public abstract class AbstractServer implements IServer
 					this.open = this.getGalserve().do_NOpen(this.database);
 					if (!this.open)
 					{
-						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_FAILOVER.topic(), new RuntimeException("Verbindung zur Warenbewirtschaftung konnte nicht hergestellt werden."));
+						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
 					}
 				}
 				catch (Exception e)
@@ -503,7 +503,7 @@ public abstract class AbstractServer implements IServer
 	{
 		this.status = Status.OK_STATUS;
 
-		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
+		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
 				LogService.class, null);

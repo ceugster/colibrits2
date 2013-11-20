@@ -22,7 +22,14 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 		for (final Salespoint salespoint : salespoints)
 		{
 			salespoint.setHost(null);
-			this.getConnectionService().merge(salespoint, true);
+			try
+			{
+				this.getConnectionService().merge(salespoint, true);
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -66,7 +73,14 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 							{
 								this.thisSalespoint.setSettlement(settlements.iterator().next());
 							}
-							this.thisSalespoint = (Salespoint) this.getConnectionService().merge(this.thisSalespoint);
+							try
+							{
+								this.thisSalespoint = (Salespoint) this.getConnectionService().merge(this.thisSalespoint);
+							} 
+							catch (Exception e) 
+							{
+								e.printStackTrace();
+							}
 						}
 					}
 				}

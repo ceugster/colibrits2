@@ -13,6 +13,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -52,7 +53,7 @@ public class CurrentTax extends AbstractEntity implements IReplicatable
 	private Tax tax;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "currentTax")
-	private Collection<CurrentTaxCodeMapping> currentTaxCodeMappings = new ArrayList<CurrentTaxCodeMapping>();;
+	private List<CurrentTaxCodeMapping> currentTaxCodeMappings = new ArrayList<CurrentTaxCodeMapping>();;
 
 	@Basic
 	@Column(name = "ct_percentage", columnDefinition = "DECIMAL(18, 6)")
@@ -101,7 +102,7 @@ public class CurrentTax extends AbstractEntity implements IReplicatable
 		return null;
 	}
 
-	public Collection<CurrentTaxCodeMapping> getCurrentTaxCodeMappings()
+	public List<CurrentTaxCodeMapping> getCurrentTaxCodeMappings()
 	{
 		return this.currentTaxCodeMappings;
 	}
@@ -146,7 +147,7 @@ public class CurrentTax extends AbstractEntity implements IReplicatable
 				this.currentTaxCodeMappings.remove(currentTaxCodeMapping));
 	}
 
-	public void setCurrentTaxCodeMappings(final Collection<CurrentTaxCodeMapping> currentTaxCodeMappings)
+	public void setCurrentTaxCodeMappings(final List<CurrentTaxCodeMapping> currentTaxCodeMappings)
 	{
 		this.propertyChangeSupport.firePropertyChange("currentTaxCodeMappings", this.currentTaxCodeMappings,
 				this.currentTaxCodeMappings = currentTaxCodeMappings);

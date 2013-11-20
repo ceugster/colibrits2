@@ -6,7 +6,7 @@
  */
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -58,10 +58,10 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 	private ProductGroup productGroup;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "paymentType")
-	private Collection<Money> moneys = new Vector<Money>();
+	private List<Money> moneys = new Vector<Money>();
 
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "paymentType")
-	private Collection<Stock> stocks = new Vector<Stock>();
+	private List<Stock> stocks = new Vector<Stock>();
 
 	@Basic
 	@Column(name = "pt_code")
@@ -192,12 +192,12 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 		return this.valueOf(this.mappingId);
 	}
 
-	public Collection<Money> getMoneys()
+	public List<Money> getMoneys()
 	{
 		return getMoneys(false);
 	}
 
-	public Collection<Money> getMoneys(boolean deletedToo)
+	public List<Money> getMoneys(boolean deletedToo)
 	{
 		if (deletedToo)
 		{
@@ -205,7 +205,7 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 		}
 		else
 		{
-			Collection<Money> moneys = new Vector<Money>();
+			List<Money> moneys = new Vector<Money>();
 			for (Money money : this.moneys)
 			{
 				if (!money.isDeleted())
@@ -237,7 +237,7 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 		return this.paymentTypeGroup;
 	}
 
-	public Collection<Stock> getStocks()
+	public List<Stock> getStocks()
 	{
 		return this.stocks;
 	}
@@ -365,7 +365,7 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("mappingId", this.mappingId, this.mappingId = mappingId);
 	}
 
-	public void setMoneys(final Collection<Money> moneys)
+	public void setMoneys(final List<Money> moneys)
 	{
 		this.propertyChangeSupport.firePropertyChange("moneys", this.moneys, this.moneys = moneys);
 	}
@@ -406,7 +406,7 @@ public class PaymentType extends AbstractEntity implements IReplicatable
 				this.paymentTypeGroup = paymentTypeGroup);
 	}
 
-	public void setStocks(final Collection<Stock> stocks)
+	public void setStocks(final List<Stock> stocks)
 	{
 		this.propertyChangeSupport.firePropertyChange("stocks", this.stocks, this.stocks = stocks);
 	}

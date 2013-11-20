@@ -7,9 +7,8 @@ import java.util.Hashtable;
 import net.sf.jasperreports.engine.JRDataSource;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.ui.ISelectionListener;
 
-public interface ISettlementCompositeChild extends ISelectionListener, ISelectionProvider
+public interface ISettlementCompositeChild extends ISelectionProvider
 {
 	/**
 	 * 
@@ -24,4 +23,6 @@ public interface ISettlementCompositeChild extends ISelectionListener, ISelectio
 	InputStream getReport() throws IOException;
 
 	String getReportName();
+	
+	public void setInput();
 }

@@ -55,7 +55,7 @@ public class CurrentTaxCodeMappingReplicator extends AbstractEntityReplicator<Cu
 						}
 						target = this.replicate(source, target);
 					}
-					target = (CurrentTaxCodeMapping) this.persistenceService.getCacheService().merge(target);
+					target = (CurrentTaxCodeMapping) merge(target);
 					target.getCurrentTax().addCurrentTaxCodeMapping(target);
 				}
 				if (monitor != null)

@@ -12,11 +12,12 @@ import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.provider.galileo.Activator;
-import ch.eugster.colibri.provider.service.ProviderService;
 
 public class UpdateProviderServerCom4j extends AbstractServer implements IUpdateProviderServer
 {
@@ -45,13 +46,16 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 	@Override
 	public IStatus updateProvider(final Position position)
 	{
-		this.status = Status.OK_STATUS;
+		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		if (isConnect())
 		{
 			if (position.isBookProvider())
 			{
 				if (this.open())
 				{
+					/*
+					 * Zuerst Receipt und Position aktualisieren, falls sie im Failovermodus erfasst worden ist.
+					 */
 					if (position.getReceipt().getCustomer() == null && position.getReceipt().getCustomerCode() != null && position.getReceipt().getCustomerCode().length() > 0)
 					{
 						final Barcode barcode = this.createCustomerBarcode(position.getReceipt().getCustomerCode());
@@ -155,6 +159,10 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 								}
 								else
 								{
+									if (position.getProduct() != null && position.getProduct().getInvoiceNumber() != null)
+									{
+										position.setOption(Option.PAYED_INVOICE);
+									}
 									switch (position.getOption())
 									{
 										case ARTICLE:
@@ -189,6 +197,10 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 						this.close();
 					}
 				}
+				else
+				{
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.getConfiguration().getName() + " kann nicht hergestellt werden."));
+				}
 			}
 		}
 		return status;
@@ -210,14 +222,14 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		}
 		catch (final NumberFormatException e)
 		{
-			log(LogService.LOG_INFO, "Code: " + code + ". konnte nicht konvertiert werden (ungültiger Datentyp).");
+			log(LogService.LOG_ERROR, "Code: " + code + " konnte nicht konvertiert werden (ungültiger Datentyp).");
 		}
 		return id;
 	}
 
 	private IStatus galileoTransactionWritten()
 	{
-		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		final String msg = "Galileo: Transaktion geschrieben.";
 
 		final Boolean result = (Boolean)this.getGalserve().vtranswrite();
@@ -228,7 +240,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		else
 		{
 			status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
-			log(LogService.LOG_INFO, msg + " FEHLER!");
+			log(LogService.LOG_ERROR, msg + " FEHLER!");
 		}
 
 		return status;
@@ -236,6 +248,10 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 
 	private IStatus payInvoice(final Position position) throws Exception
 	{
+		if (position.getProduct().getInvoiceNumber() != null)
+		{
+			position.setOption(Option.PAYED_INVOICE);
+		}
 		IStatus status = this.setProviderValues(position);
 		if (status.getSeverity() == IStatus.OK)
 		{
@@ -339,13 +355,13 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				if (this.getGalserve().do_wgstorno())
 				{
 					position.setProviderBooked(false);
-						log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
+					log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
 								+ " aufgerufen... Ok!");
 				}
 				else
 				{
 					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
-						log(LogService.LOG_INFO, status.getMessage());
+					log(LogService.LOG_INFO, status.getMessage());
 				}
 			}
 			status = this.galileoTransactionWritten();
@@ -466,7 +482,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 
 	private IStatus setProviderValues(final Position position)
 	{
-		IStatus status = Status.OK_STATUS;
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		try
 		{
 			this.getGalserve().vbestellt(position.isOrdered());
@@ -507,14 +523,14 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 					}
 					catch (NullPointerException e)
 					{
-						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic(), e);
+						String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler Mwst-Mapping ungültig).";
 					}
 				}
 			}
 		}
 		catch(Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.PROVIDER_TAX_NOT_SPECIFIED.topic(), e);
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.getConfiguration().getName() + " kann nicht hergestellt werden."));
 		}
 		return status;
 	}
@@ -530,7 +546,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			else
 			{
 				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen).";
-				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(msg));
 				log(LogService.LOG_INFO, msg);
 			}
 		}
@@ -552,7 +568,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			{
 				String error = (String) this.getGalserve().crgerror();
 				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + error + ").";
-				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(msg));
 				log(LogService.LOG_INFO, msg);
 			}
 		}

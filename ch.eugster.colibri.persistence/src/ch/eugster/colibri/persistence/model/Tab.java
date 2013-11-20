@@ -9,7 +9,7 @@ package ch.eugster.colibri.persistence.model;
 import static javax.persistence.FetchType.EAGER;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -45,7 +45,7 @@ public class Tab extends AbstractEntity implements Comparable<Tab>, IReplicatabl
 	private Configurable configurable;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "tab")
-	private Collection<Key> keys = new ArrayList<Key>();
+	private List<Key> keys = new ArrayList<Key>();
 
 	@Basic
 	@Column(name = "tab_name")
@@ -106,7 +106,7 @@ public class Tab extends AbstractEntity implements Comparable<Tab>, IReplicatabl
 		return id;
 	}
 
-	public Collection<Key> getKeys()
+	public List<Key> getKeys()
 	{
 		return keys;
 	}
@@ -153,7 +153,7 @@ public class Tab extends AbstractEntity implements Comparable<Tab>, IReplicatabl
 		propertyChangeSupport.firePropertyChange("id", this.id, this.id = id);
 	}
 
-	public void setKeys(final Collection<Key> keys)
+	public void setKeys(final List<Key> keys)
 	{
 		propertyChangeSupport.firePropertyChange("keys", this.keys, this.keys = keys);
 	}

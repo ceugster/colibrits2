@@ -54,7 +54,7 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{
@@ -76,7 +76,7 @@ public class PrintoutReplicator extends AbstractEntityReplicator<Printout>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

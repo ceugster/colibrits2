@@ -1,25 +1,20 @@
 package ch.eugster.colibri.provider.galileo.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.IProperty.Section;
 import ch.eugster.colibri.provider.galileo.Activator;
@@ -29,32 +24,19 @@ import ch.eugster.colibri.provider.galileo.galserve.IUpdateProviderServer;
 import ch.eugster.colibri.provider.galileo.galserve.UpdateProviderServerCom4j;
 import ch.eugster.colibri.provider.service.AbstractProviderUpdater;
 import ch.eugster.colibri.provider.service.ProviderQuery;
-import ch.eugster.colibri.provider.service.ProviderService;
 
 public class GalileoUpdaterComponent extends AbstractProviderUpdater
 {
 	private LogService logService;
 
-	private EventAdmin eventAdmin;
-
 	private ProviderQuery providerQuery;
 
 	private IUpdateProviderServer updateProviderServer;
 
-	private boolean showFailoverMessage = true;
-	
 	private final Collection<BarcodeVerifier> barcodeVerifiers = new ArrayList<BarcodeVerifier>();
 
 	public GalileoUpdaterComponent()
 	{
-	}
-
-	private void sendEvent(Event event)
-	{
-		if (this.eventAdmin != null)
-		{
-			this.eventAdmin.sendEvent(event);
-		}
 	}
 
 	@Override
@@ -74,11 +56,29 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	{
 		return Activator.getDefault().getConfiguration().getProviderId();
 	}
-
+	
+	@Override
+	public IStatus updatePositions(PersistenceService persistenceService,
+			Collection<Position> positions)
+	{
+		IStatus status = super.updatePositions(persistenceService, positions);
+		this.providerQuery.setStatus(status);
+		return status;
+	}
+	
+	@Override
+	public IStatus updatePayments(PersistenceService persistenceService,
+			Collection<Payment> payments)
+	{
+		IStatus status = super.updatePayments(persistenceService, payments);
+		this.providerQuery.setStatus(status);
+		return status;
+	}
+	
 	@Override
 	public IStatus updateProvider(final Position position)
 	{
-		IStatus status = Status.OK_STATUS;
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		if (getUpdateProviderServer().isConnect())
 		{
 			log(LogService.LOG_INFO, "Aktualisiere Warenbewirtschaftung...");
@@ -92,10 +92,6 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 				status = this.getUpdateProviderServer().updateProvider(position);
 			}
 			log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
-			if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
-			{
-				this.sendEvent(this.getEvent(status, false));
-			}
 		}
 		return status;
 	}
@@ -149,11 +145,6 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 		this.barcodeVerifiers.add(barcodeVerifier);
 	}
 
-	protected void setEventAdmin(final EventAdmin eventAdmin)
-	{
-		this.eventAdmin = eventAdmin;
-	}
-
 	protected void setLogService(final LogService logService)
 	{
 		this.logService = logService;
@@ -174,11 +165,6 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 		this.providerQuery = null;
 	}
 	
-	protected void unsetEventAdmin(final EventAdmin eventAdmin)
-	{
-		this.eventAdmin = null;
-	}
-
 	protected void unsetLogService(final LogService logService)
 	{
 		this.logService = null;
@@ -191,7 +177,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 		 * Product vorhanden sein. Falls das nicht ist, muss es nachträglich
 		 * erstellt werden.
 		 */
-		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), ProviderService.Topic.ARTICLE_UPDATE.topic());
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		if (position.getProduct() == null)
 		{
 			final BarcodeVerifier[] verifiers = this.barcodeVerifiers.toArray(new BarcodeVerifier[0]);
@@ -220,50 +206,6 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	{
 		this.startUpdateProviderServer();
 		return this.updateProviderServer;
-	}
-
-	private Event getEvent(final IStatus status, boolean force)
-	{
-		final String topic = status.getMessage();
-		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-
-		if (status.getException() != null)
-		{
-			if (this.showFailoverMessage)
-			{
-				properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
-				this.showFailoverMessage = false;
-			}
-		}
-		else
-		{
-			if (!this.showFailoverMessage)
-			{
-				this.showFailoverMessage = true;
-			}
-		}
-
-		properties.put(EventConstants.EVENT_TOPIC, topic);
-		properties.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
-		if (status.getException() != null)
-		{
-			properties.put(EventConstants.EXCEPTION, status.getException());
-			properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage() == null ? "" : status.getException().getMessage());
-		}
-		properties.put("message", "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
-		properties.put("status", status);
-		properties.put("force", Boolean.valueOf(force));
-		for (ProviderService.Topic t : ProviderService.Topic.values())
-		{
-			if (t.topic().equals(status.getMessage()))
-			{
-				properties.put("topic", t);
-				break;
-			}
-		}
-		final Event event = new Event(topic, properties);
-		return event;
 	}
 
 	private void startUpdateProviderServer()
@@ -327,43 +269,15 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	}
 
 	@Override
-	public boolean doUpdatePositions(ConnectionType connectionType) 
+	public boolean doUpdatePositions() 
 	{
-		switch(connectionType)
-		{
-		case LOCAL:
-		{
-			return true;
-		}
-		case SERVER:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-		}
+		return true;
 	}
 
 	@Override
-	public boolean doUpdatePayments(ConnectionType connectionType) 
+	public boolean doUpdatePayments() 
 	{
-		switch(connectionType)
-		{
-		case LOCAL:
-		{
-			return true;
-		}
-		case SERVER:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-		}
+		return false;
 	}
 	
 }

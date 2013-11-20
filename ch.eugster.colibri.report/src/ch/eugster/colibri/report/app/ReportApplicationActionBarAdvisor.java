@@ -67,7 +67,7 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 		super(configurer);
 
 		final String[] topics = new String[1];
-		topics[0] = "ch/eugster/colibri/persistence/server/database";
+		topics[0] = "ch/eugster/colibri/transfer";
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -89,7 +89,7 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 	{
 		if (this.connectionInformation != null)
 		{
-			if (event.getTopic().equals("ch/eugster/colibri/persistence/server/database"))
+			if (event.getTopic().equals("ch/eugster/colibri/transfer"))
 			{
 				if (event.getProperty("status") instanceof Integer)
 				{

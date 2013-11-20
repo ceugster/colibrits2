@@ -29,7 +29,7 @@ public interface ConnectionService
 	
 	public static final String OJB_MIGRATION_DIR = "Migration";
 	
-	AbstractEntity delete(AbstractEntity entity);
+	AbstractEntity delete(AbstractEntity entity) throws Exception;
 
 	AbstractEntity find(Class<? extends AbstractEntity> clazz, Long id);
 
@@ -39,17 +39,17 @@ public interface ConnectionService
 	
 	AbstractQuery<? extends AbstractEntity> getQuery(final Class<? extends AbstractEntity> adaptable);
 
-	AbstractEntity merge(AbstractEntity entity);
+	AbstractEntity merge(AbstractEntity entity) throws Exception;
 
-	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp);
+	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp) throws Exception;
 
-	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp, boolean updateReplicatable);
+	AbstractEntity merge(AbstractEntity entity, boolean updateTimestamp, boolean updateReplicatable) throws Exception;
 
-	void remove(AbstractEntity entity);
+	void remove(AbstractEntity entity) throws Exception;
 	
-	void persist(AbstractEntity entity);
+	void persist(AbstractEntity entity) throws Exception;
 
-	void persist(AbstractEntity entity, boolean updateTimestamp);
+	void persist(AbstractEntity entity, boolean updateTimestamp) throws Exception;
 
 	AbstractQuery<? extends AbstractEntity> getQuery(ConnectionService connectionService,
 			Class<? extends AbstractEntity> clazz);
@@ -62,7 +62,7 @@ public interface ConnectionService
 	
 	void stop();
 	
-	void resetEntityManager(Throwable throwable);
+	void resetEntityManager(Exception exception);
 
 	boolean connect();
 	

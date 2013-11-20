@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.barcode.code.Barcode;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.provider.galileo.Activator;
 
@@ -19,7 +20,7 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
-		status = Status.OK_STATUS;
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
 		String msg = null;
 
 		log(LogService.LOG_INFO, "Verbindung checken in Server.");
@@ -84,6 +85,7 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 					log(LogService.LOG_INFO, "Suchwert auf null setzen.");
 					position.setSearchValue(null);
 				}
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic(), new Exception("Die Verbindung zu " + this.getConfiguration().getName() + " kann nicht hergestellt werden."));
 			}
 		}
 		return status;
@@ -127,7 +129,7 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 			else
 			{
 				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-						"Das Herstellen der Verbindung zur Warenbewirtschaftung Galileo ist fehlgeschlagen.");
+						Topic.PROVIDER_QUERY.topic(), new Exception("Die Verbindung zu " + this.getConfiguration().getName() + " kann nicht hergestellt werden."));
 			}
 			galserve.dispose();
 		}

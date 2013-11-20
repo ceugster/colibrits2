@@ -57,7 +57,7 @@ public class MoneyReplicator extends AbstractEntityReplicator<Money>
 						}
 						target = this.replicate(source, target);
 					}
-					target = (Money) this.persistenceService.getCacheService().merge(target);
+					target = (Money) merge(target);
 					target.getPaymentType().addMoney(target);
 				}
 				if (monitor != null)

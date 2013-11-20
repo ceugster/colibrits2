@@ -55,7 +55,7 @@ public class CurrentTaxReplicator extends AbstractEntityReplicator<CurrentTax>
 						}
 						target = this.replicate(source, target);
 					}
-					target = (CurrentTax) this.persistenceService.getCacheService().merge(target);
+					target = (CurrentTax) merge(target);
 					target.getTax().addCurrentTax(target);
 				}
 				if (monitor != null)

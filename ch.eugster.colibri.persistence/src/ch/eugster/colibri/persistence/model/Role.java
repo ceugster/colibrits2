@@ -1,7 +1,7 @@
 package ch.eugster.colibri.persistence.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -33,10 +33,10 @@ public class Role extends AbstractEntity implements IReplicatable
 	protected Long id;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "role")
-	private Collection<RoleProperty> roleProperties = new Vector<RoleProperty>();
+	private List<RoleProperty> roleProperties = new Vector<RoleProperty>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "role")
-	private Collection<User> users = new ArrayList<User>();
+	private List<User> users = new ArrayList<User>();
 
 	@Basic
 	@Column(name = "ro_name")
@@ -70,7 +70,7 @@ public class Role extends AbstractEntity implements IReplicatable
 			return true;
 		}
 
-		final Collection<RoleProperty> properties = this.getRoleProperties();
+		final List<RoleProperty> properties = this.getRoleProperties();
 		for (final RoleProperty property : properties)
 		{
 			if (!property.isDeleted() && property.getKey().equals(key))
@@ -81,7 +81,7 @@ public class Role extends AbstractEntity implements IReplicatable
 		return false;
 	}
 
-	public Collection<RoleProperty> getRoleProperties()
+	public List<RoleProperty> getRoleProperties()
 	{
 		return this.roleProperties;
 	}
@@ -110,7 +110,7 @@ public class Role extends AbstractEntity implements IReplicatable
 		return null;
 	}
 
-	public Collection<User> getUsers()
+	public List<User> getUsers()
 	{
 		return this.users;
 	}
@@ -136,12 +136,12 @@ public class Role extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("name", this.name, this.name = name);
 	}
 
-	public void setRoleProperties(final Collection<RoleProperty> roleProperties)
+	public void setRoleProperties(final List<RoleProperty> roleProperties)
 	{
 		this.propertyChangeSupport.firePropertyChange("roleProperties", this.roleProperties, this.roleProperties = roleProperties);
 	}
 
-	public void setUsers(final Collection<User> users)
+	public void setUsers(final List<User> users)
 	{
 		this.propertyChangeSupport.firePropertyChange("users", this.users, this.users = users);
 	}

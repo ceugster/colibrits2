@@ -1315,6 +1315,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/Activator.java
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/events/EntityAdapter.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/events/EntityListener.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/events/EntityMediator.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/events/Topic.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/AbstractEntity.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ChargeType.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CommonSettings.java -text
@@ -1778,6 +1779,7 @@ ch.eugster.colibri.report.settlement/plugin.xml -text
 ch.eugster.colibri.report.settlement/reports/SettlementDiffs.jrxml -text
 ch.eugster.colibri.report.settlement/reports/SettlementDiscounts.jrxml -text
 ch.eugster.colibri.report.settlement/reports/SettlementStatistics.jrxml -text
+ch.eugster.colibri.report.settlement/reports/SettlementStatistics_old.jrxml -text
 ch.eugster.colibri.report.settlement/reports/SingleSettlementReport.jrxml -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/Activator.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/ReportSettlementPerspective.java -text

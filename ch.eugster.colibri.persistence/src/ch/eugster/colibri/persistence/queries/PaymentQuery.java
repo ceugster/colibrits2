@@ -1,8 +1,10 @@
 package ch.eugster.colibri.persistence.queries;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Query;
@@ -18,14 +20,12 @@ import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
-import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementPayment;
 import ch.eugster.colibri.persistence.model.Stock;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
-import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
 
 public class PaymentQuery extends AbstractQuery<Payment>
 {
@@ -49,7 +49,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		return payments;
 	}
 
-	private Collection<ReportQueryResult> selectPaymentsBySettlement(final Settlement settlement)
+	private List<ReportQueryResult> selectPaymentsBySettlement(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.get("receipt").get("settlement").equal(settlement);
@@ -80,13 +80,14 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		return super.selectReportQueryResults(reportQuery);
 	}
 
-	public Collection<ReportQueryResult> selectPaymentsBySalespointsAndDateRange(final Salespoint[] salespoints,
+	public List<ReportQueryResult> selectPaymentsBySalespointsAndDateRange(final Salespoint[] salespoints,
 			Calendar[] dateRange)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
-
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("internal").equal(false));
+		
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -135,15 +136,15 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		return super.selectReportQueryResults(reportQuery);
 	}
 
-	public Collection<SettlementPayment> selectPayments(final Settlement settlement)
+	public List<SettlementPayment> selectPayments(final Settlement settlement)
 	{
 		return this.getPaymentDetails(this.selectPaymentsBySettlement(settlement), settlement);
 	}
 
-	public Collection<SettlementPayment> selectPayments(Salespoint[] salespoints, Calendar[] dateRange)
+	public List<SettlementPayment> selectPayments(Salespoint[] salespoints, Calendar[] dateRange)
 	{
-		Collection<ReportQueryResult> results = this.selectPaymentsBySalespointsAndDateRange(salespoints, dateRange);
-		Collection<SettlementPayment> payments = this.getPaymentDetails(results, null);
+		List<ReportQueryResult> results = this.selectPaymentsBySalespointsAndDateRange(salespoints, dateRange);
+		List<SettlementPayment> payments = this.getPaymentDetails(results, null);
 		return payments;
 	}
 
@@ -288,7 +289,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		}
 	}
 
-	private Collection<SettlementPayment> getPaymentDetails(final Collection<ReportQueryResult> results,
+	private List<SettlementPayment> getPaymentDetails(final List<ReportQueryResult> results,
 			final Settlement settlement)
 	{
 		final Map<Long, SettlementPayment> details = new HashMap<Long, SettlementPayment>();
@@ -311,23 +312,24 @@ public class PaymentQuery extends AbstractQuery<Payment>
 			amount = (Double) result.get("foreignCurrencyAmount");
 			detail.setForeignCurrencyAmount(detail.getForeignCurrencyAmount() + (amount == null ? 0d : amount));
 		}
-		return details.values();
+		List<SettlementPayment> payments = new ArrayList<SettlementPayment>();
+		for (SettlementPayment detail : details.values())
+		{
+			payments.add(detail);
+		}
+		return payments;
 	}
 
-	public long countProviderUpdates(Salespoint salespoint, String providerId, ConnectionType connectionType)
+	public long countProviderUpdates(Salespoint salespoint, String providerId)
 	{
-		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-		if (connectionType.equals(ConnectionType.LOCAL))
-		{
-			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
-		}
-		
+		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
-		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
 		Expression provider = new ExpressionBuilder().get("providerId").equal(providerId);
-		provider = provider.and(update);
+		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
 
 		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
 		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
@@ -340,20 +342,16 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		return value;
 	}
 
-	public Collection<Payment> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows, ConnectionType connectionType)
+	public Collection<Payment> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows)
 	{
 		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-		if (connectionType.equals(ConnectionType.LOCAL))
-		{
-			expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
-		}
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
-		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
 		Expression provider = new ExpressionBuilder().get("providerId").equal(providerId);
-		provider = provider.and(update);
+		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
+		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
 
 		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
 		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));

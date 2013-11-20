@@ -217,6 +217,7 @@ litigation.
    </url>
 
    <requires>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="ch.eugster.colibri.persistence"/>
       <import plugin="ch.eugster.colibri.report.daterange"/>
       <import plugin="ch.eugster.colibri.report.destination"/>
@@ -229,9 +230,11 @@ litigation.
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.osgi.services"/>
-      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.app"/>
       <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="ch.eugster.colibri.report.pdf"/>
+      <import plugin="ch.eugster.colibri.report.commons"/>
+      <import plugin="org.apache.commons.logging"/>
    </requires>
 
    <plugin

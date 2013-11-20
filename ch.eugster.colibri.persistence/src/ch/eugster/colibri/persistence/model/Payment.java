@@ -87,6 +87,15 @@ public class Payment extends AbstractEntity implements IPrintable
 	@Enumerated
 	private ProviderState providerState;
 
+	@Basic
+	@Column(name = "pa_other_id", columnDefinition="BIGINT")
+	private Long otherId;
+
+	@Basic
+	@Column(name = "pa_server_updated", columnDefinition="SMALLINT")
+	@Convert("booleanConverter")
+	private boolean serverUpdated;
+
 	private Payment()
 	{
 		super();
@@ -325,6 +334,22 @@ public class Payment extends AbstractEntity implements IPrintable
 			}
 		}
 		return roundedAmount;
+	}
+
+	public Long getOtherId() {
+		return otherId;
+	}
+
+	public void setOtherId(Long otherId) {
+		this.otherId = otherId;
+	}
+
+	public boolean isServerUpdated() {
+		return serverUpdated;
+	}
+
+	public void setServerUpdated(boolean serverUpdated) {
+		this.serverUpdated = serverUpdated;
 	}
 
 	public static Payment newInstance(final Receipt receipt)

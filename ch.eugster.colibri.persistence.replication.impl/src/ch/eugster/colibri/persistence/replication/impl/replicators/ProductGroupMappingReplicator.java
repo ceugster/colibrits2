@@ -69,7 +69,7 @@ public class ProductGroupMappingReplicator extends AbstractEntityReplicator<Prod
 					}
 					if (target != null)
 					{
-						target = (ProductGroupMapping) this.persistenceService.getCacheService().merge(target);
+						target = (ProductGroupMapping) merge(target);
 						target.getExternalProductGroup().setProductGroupMapping(target);
 						target.getProductGroup().addProductGroupMapping(target);
 					}

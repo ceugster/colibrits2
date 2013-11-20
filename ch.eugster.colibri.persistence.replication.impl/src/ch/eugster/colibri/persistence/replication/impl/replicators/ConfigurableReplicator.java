@@ -56,7 +56,7 @@ public class ConfigurableReplicator extends AbstractEntityReplicator<Configurabl
 						}
 						target = this.replicate(source, target);
 					}
-					target = (Configurable) this.persistenceService.getCacheService().merge(target);
+					target = (Configurable) merge(target);
 					if (!target.getProfile().getConfigurables().contains(target))
 					{
 						target.getProfile().addConfigurable(target);
@@ -145,7 +145,7 @@ public class ConfigurableReplicator extends AbstractEntityReplicator<Configurabl
 
 				if (changed)
 				{
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

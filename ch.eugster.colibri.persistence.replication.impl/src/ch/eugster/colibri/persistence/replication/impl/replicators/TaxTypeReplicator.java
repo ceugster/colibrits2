@@ -50,7 +50,7 @@ public class TaxTypeReplicator extends AbstractEntityReplicator<TaxType>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

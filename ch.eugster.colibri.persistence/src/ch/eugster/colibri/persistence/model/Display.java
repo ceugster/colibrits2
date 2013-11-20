@@ -1,7 +1,7 @@
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -59,7 +59,7 @@ public class Display extends AbstractEntity implements IReplicatable
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "display")
 	@MapKey(name = "display")
-	private Collection<Display> displays = new Vector<Display>();
+	private List<Display> displays = new Vector<Display>();
 
 	protected Display()
 	{
@@ -116,7 +116,7 @@ public class Display extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("displays", this.displays, this.displays.add(display));
 	}
 
-	public Collection<Display> getChildren()
+	public List<Display> getChildren()
 	{
 		return this.displays;
 	}
@@ -234,7 +234,7 @@ public class Display extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("displayAreas", displayAreas, this.displayAreas = displayAreas);
 	}
 
-	public void setDisplays(final Collection<Display> displays)
+	public void setDisplays(final List<Display> displays)
 	{
 		this.propertyChangeSupport.firePropertyChange("displays", displays, this.displays = displays);
 	}

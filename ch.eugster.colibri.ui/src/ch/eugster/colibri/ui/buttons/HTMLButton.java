@@ -67,9 +67,20 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		return this.failOver;
 	}
 
-	public HTMLButton(final BasicAction action, final int fgNormal, final int fgFailOver)
+	public HTMLButton(final BasicAction action, final int fgNormal, boolean isFailOver)
 	{
 		super(action);
+		this.failOver = isFailOver;
+		setActionCommand(action.getActionCommand());
+		this.init(fgNormal, fgFailOver);
+		setFocusable(false);
+		action.addPropertyChangeListener(this);
+	}
+
+	public HTMLButton(final BasicAction action, final int fgNormal, final int fgFailOver, boolean isFailOver)
+	{
+		super(action);
+		this.failOver = isFailOver;
 		setActionCommand(action.getActionCommand());
 		this.init(fgNormal, fgFailOver);
 		setFocusable(false);
@@ -294,8 +305,14 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 
 	private void init(final int fgNormal, final int fgFailOver)
 	{
+		this.init(fgNormal, fgFailOver, failOver);
+	}
+
+	private void init(final int fgNormal, final int fgFailOver, boolean failOver)
+	{
 //		this.fgNormal = fgNormal;
 		this.fgFailOver = fgFailOver;
+		this.failOver = failOver;
 
 		setFocusable(true);
 

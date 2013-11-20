@@ -6,12 +6,14 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Position;
@@ -26,57 +28,77 @@ import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.SettlementReceipt;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
-import ch.eugster.colibri.report.daterange.views.DateView;
-import ch.eugster.colibri.report.salespoint.views.SalespointView;
+import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
+import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.settlement.model.Section;
 import ch.eugster.colibri.report.settlement.model.SettlementEntry;
 
-public abstract class AbstractSettlementCompositeChild extends Composite implements ISettlementCompositeChild,
-		ISelectionListener
+public abstract class AbstractSettlementCompositeChild extends Composite implements ISettlementCompositeChild
 {
-	protected Salespoint[] selectedSalespoints;
+	protected SettlementView parentView;
 
-	protected Calendar[] selectedDateRange;
+	private final ListenerList listeners = new ListenerList();
 
 	/**
 	 * @param parent
 	 * @param style
 	 */
-	public AbstractSettlementCompositeChild(Composite parent, int style)
+	public AbstractSettlementCompositeChild(Composite parent, SettlementView parentView, int style)
 	{
 		super(parent, style);
+		this.parentView = parentView;
 		this.init();
 	}
-
-	protected abstract void init();
-
+	
 	@Override
-	public void selectionChanged(IWorkbenchPart part, ISelection selection)
+	public void addSelectionChangedListener(ISelectionChangedListener listener)
 	{
-		if (part instanceof SalespointView)
-		{
-			SalespointView view = (SalespointView) part;
-			selectedSalespoints = view.getSelectedSalespoints();
-		}
-		else if (part instanceof DateView)
-		{
-			DateView view = (DateView) part;
-			selectedDateRange = view.getDates();
-		}
-		setInput();
+		this.listeners.add(listener);
 	}
 
-	protected abstract void setInput();
+	@Override
+	public void removeSelectionChangedListener(ISelectionChangedListener listener)
+	{
+		this.listeners.remove(listener);
+	}
+
+	protected Salespoint[] getSelectedSalespoints()
+	{
+		return this.parentView.getSelectedSalespoints();
+	}
+	
+	protected Calendar[] getSelectedDateRange()
+	{
+		return this.parentView.getSelectedDateRange();
+	}
+	
+	protected ReportService.Destination getSelectedDestination()
+	{
+		return this.parentView.getSelectedDestination();
+	}
+	
+	protected abstract void init();
 
 	protected Map<Long, SettlementEntry> createPositionSection(Map<Long, SettlementEntry> section,
-			Collection<SettlementPosition> positions)
+			List<SettlementPosition> positions)
 	{
+		Collections.sort(positions, new Comparator<SettlementPosition>() 
+		{
+			@Override
+			public int compare(SettlementPosition pos1, SettlementPosition pos2) 
+			{
+				String name1 = pos1.getName();
+				String name2 = pos2.getName();
+				return name1.compareTo(name2);
+			}
+		});
 		for (SettlementPosition position : positions)
 		{
 			SettlementEntry entry = section.get(position.getProductGroup().getId());
 			if (entry == null)
 			{
-				entry = new SettlementEntry(Section.POSITION);
+				Section sectionType = position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL) ? Section.INTERNAL : Section.POSITION;
+				entry = new SettlementEntry(sectionType);
 				entry.setGroup(position.getProductGroup().getProductGroupType().ordinal());
 				entry.setCode(position.getProductGroup().getCode());
 				entry.setText(position.getProductGroup().getName());
@@ -87,11 +109,13 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 
 			double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
 			amount += position.getDefaultCurrencyAmount();
-			entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
+//			entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
+			entry.setAmount1(Double.valueOf(amount));
 
 			amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
 			amount -= position.getTaxAmount();
-			entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+//			entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+			entry.setAmount2(Double.valueOf(amount));
 		}
 		return section;
 	}
@@ -101,14 +125,15 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 	{
 		for (SettlementPayment payment : payments)
 		{
-			SettlementEntry entry = section.get(payment.getPaymentType().getId());
+			long id = payment.getDefaultCurrencyAmount() < 0D ? -payment.getPaymentType().getId().longValue() : payment.getPaymentType().getId().longValue();
+			SettlementEntry entry = section.get(Long.valueOf(id));
 			if (entry == null)
 			{
 				entry = new SettlementEntry(Section.PAYMENT);
 				section.put(payment.getPaymentType().getId(), entry);
 				entry.setGroup(payment.getPaymentType().getCurrency().getId().equals(referenceCurrency.getId()) ? 0 : 1);
 				entry.setCode(payment.getPaymentType().getCode());
-				entry.setText(payment.getPaymentType().getName());
+				entry.setText((id < 0D ? "Rückgeld " : "") + payment.getPaymentType().getName());
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + payment.getQuantity();
 			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
@@ -245,28 +270,27 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 	{
 		for (SettlementTax tax : taxes)
 		{
-			if (tax.getCurrentTax().getPercentage() != 0D)
+			SettlementEntry entry = section.get(tax.getCurrentTax().getId());
+			if (entry == null)
 			{
-				SettlementEntry entry = section.get(tax.getCurrentTax().getId());
-				if (entry == null)
-				{
-					entry = new SettlementEntry(Section.TAX);
-					section.put(tax.getCurrentTax().getId(), entry);
-					entry.setGroup(tax.getCurrentTax().getTax().getTaxType().getId().intValue());
-					entry.setCode(tax.getCurrentTax().getTax().format());
-					entry.setText(tax.getCurrentTax().getTax().format());
-				}
-				int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + tax.getQuantity();
-				entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
-
-				double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
-				amount += tax.getBaseAmount();
-				entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
-
-				amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
-				amount += -tax.getTaxAmount();
-				entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+				entry = new SettlementEntry(Section.TAX);
+				section.put(tax.getCurrentTax().getId(), entry);
+				entry.setGroup(0);
+				entry.setCode(tax.getCurrentTax().getTax().format());
+				entry.setText(tax.getCurrentTax().getTax().format());
 			}
+			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + tax.getQuantity();
+			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
+
+			double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
+			amount += tax.getBaseAmount();
+//			entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
+			entry.setAmount1(Double.valueOf(amount));
+
+			amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
+			amount += -tax.getTaxAmount();
+//			entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+			entry.setAmount2(Double.valueOf(amount));
 		}
 		return section;
 	}
@@ -277,13 +301,13 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 		DateFormat df = SimpleDateFormat.getInstance();
 		for (SettlementReceipt receipt : receipts)
 		{
-			SettlementEntry entry = section.get(receipt.getId());
+			SettlementEntry entry = section.get(receipt.getReceipt().getId());
 			if (entry == null)
 			{
 				NumberFormat nf = new DecimalFormat(receipt.getSettlement().getSalespoint().getCommonSettings()
 						.getReceiptNumberFormat());
 				entry = new SettlementEntry(Section.REVERSED_RECEIPT);
-				section.put(receipt.getId(), entry);
+				section.put(receipt.getReceipt().getId(), entry);
 				entry.setGroup(0);
 				entry.setCode(nf.format(receipt.getNumber()));
 				entry.setText(nf.format(receipt.getNumber()) + " " + df.format(receipt.getTime().getTime()));
@@ -354,5 +378,4 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 		}
 		return section;
 	}
-
 }

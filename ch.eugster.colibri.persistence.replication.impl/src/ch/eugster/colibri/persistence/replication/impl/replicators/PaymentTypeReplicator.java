@@ -52,7 +52,7 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 					{
 						target = this.replicate(source, target);
 					}
-					target = (PaymentType) this.persistenceService.getCacheService().merge(target);
+					target = (PaymentType) merge(target);
 					target.getCurrency().addPaymentType(target);
 				}
 				if (monitor != null)
@@ -64,7 +64,6 @@ public class PaymentTypeReplicator extends AbstractEntityReplicator<PaymentType>
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
 			e.printStackTrace();
 		}
 		finally

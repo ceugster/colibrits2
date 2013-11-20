@@ -9,7 +9,7 @@ package ch.eugster.colibri.persistence.model;
 import static javax.persistence.FetchType.EAGER;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -56,7 +56,7 @@ public class Configurable extends AbstractEntity implements IReplicatable
 	private Tab paymentDefaultTab;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "configurable")
-	private Collection<Tab> tabs = new Vector<Tab>();
+	private List<Tab> tabs = new Vector<Tab>();
 
 	@Basic
 	@Column(name = "cfg_font_size", nullable = true)
@@ -154,14 +154,14 @@ public class Configurable extends AbstractEntity implements IReplicatable
 		return this.profile;
 	}
 
-	public Collection<Tab> getTabs()
+	public List<Tab> getTabs()
 	{
 		return this.tabs;
 	}
 
-	public Collection<Tab> getActiveTabs()
+	public List<Tab> getActiveTabs()
 	{
-		Collection<Tab> activeTabs = new ArrayList<Tab>();
+		List<Tab> activeTabs = new ArrayList<Tab>();
 		for (Tab tab : this.tabs)
 		{
 			if (!tab.isDeleted())
@@ -265,7 +265,7 @@ public class Configurable extends AbstractEntity implements IReplicatable
 		super.setDeleted(deleted);
 	}
 
-	public void setTabs(final Collection<Tab> tabs)
+	public void setTabs(final List<Tab> tabs)
 	{
 		this.propertyChangeSupport.firePropertyChange("tabs", this.tabs, this.tabs = tabs);
 	}

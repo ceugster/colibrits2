@@ -3,6 +3,7 @@ package ch.eugster.colibri.persistence.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -144,7 +145,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 	private Settlement settlement;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "salespoint")
-	private Collection<Stock> stocks = new Vector<Stock>();
+	private List<Stock> stocks = new Vector<Stock>();
 
 	@JoinColumn(name = "sp_scd_id", referencedColumnName = "scd_id")
 	@OneToOne(cascade = CascadeType.ALL, optional = true)
@@ -155,7 +156,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 	private SalespointReceiptPrinterSettings receiptPrinterSettings;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "salespoint")
-	private Collection<ProviderProperty> providerProperties = new Vector<ProviderProperty>();
+	private List<ProviderProperty> providerProperties = new Vector<ProviderProperty>();
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "salespoint")
 	@MapKey(name = "printoutType")
@@ -299,7 +300,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 		return this.proposalTax;
 	}
 
-	public Collection<ProviderProperty> getProviderProperties()
+	public List<ProviderProperty> getProviderProperties()
 	{
 		return this.providerProperties;
 	}
@@ -314,9 +315,9 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 		return this.settlement;
 	}
 
-	public Collection<Stock> getStocks()
+	public List<Stock> getStocks()
 	{
-		Collection<Stock> stocks = new ArrayList<Stock>();
+		List<Stock> stocks = new ArrayList<Stock>();
 		for (Stock stock : this.stocks)
 		{
 			if (!stock.isDeleted())
@@ -478,7 +479,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 		this.propertyChangeSupport.firePropertyChange("settlement", this.settlement, this.settlement = settlement);
 	}
 
-	public void setStocks(final Collection<Stock> stocks)
+	public void setStocks(final List<Stock> stocks)
 	{
 		this.propertyChangeSupport.firePropertyChange("stocks", this.stocks, this.stocks = stocks);
 	}

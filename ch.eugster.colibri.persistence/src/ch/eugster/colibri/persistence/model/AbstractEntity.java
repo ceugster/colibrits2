@@ -14,6 +14,7 @@ import javax.persistence.Version;
 
 import org.eclipse.persistence.annotations.ConversionValue;
 import org.eclipse.persistence.annotations.Convert;
+import org.eclipse.persistence.annotations.Index;
 import org.eclipse.persistence.annotations.ObjectTypeConverter;
 
 import ch.eugster.colibri.persistence.events.EntityMediator;
@@ -40,6 +41,7 @@ public abstract class AbstractEntity implements Entity
 	private int version;
 
 	@Basic
+	@Index
 	@Convert("booleanConverter")
 	private boolean deleted;
 

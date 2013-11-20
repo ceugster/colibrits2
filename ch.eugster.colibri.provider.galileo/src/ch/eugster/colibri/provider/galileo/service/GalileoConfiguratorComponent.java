@@ -13,6 +13,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
@@ -237,7 +238,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		catch (final Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-					" Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " konnte nicht hergestellt werden.", e);
+					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(" Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
 			e.printStackTrace();
 		}
 		return status;
@@ -452,29 +453,35 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 						if (this.persistenceService != null)
 						{
-							externalProductGroup = (ExternalProductGroup) GalileoConfiguratorComponent.this.persistenceService.getServerService().merge(
-									externalProductGroup);
-
-							if (GalileoConfiguratorComponent.this.inserted)
+							try
 							{
-								GalileoConfiguratorComponent.this.countInserted++;
+								externalProductGroup = (ExternalProductGroup) GalileoConfiguratorComponent.this.persistenceService.getServerService().merge(
+										externalProductGroup);
+								if (GalileoConfiguratorComponent.this.inserted)
+								{
+									GalileoConfiguratorComponent.this.countInserted++;
+								}
+								if (GalileoConfiguratorComponent.this.updated)
+								{
+									GalileoConfiguratorComponent.this.countUpdated++;
+								}
+								if (GalileoConfiguratorComponent.this.notMapped)
+								{
+									GalileoConfiguratorComponent.this.countNotMapped++;
+								}
+								if (GalileoConfiguratorComponent.this.inserted || GalileoConfiguratorComponent.this.updated  || GalileoConfiguratorComponent.this.notMapped)
+								{
+									GalileoConfiguratorComponent.this.confirmChanges(code);
+									GalileoConfiguratorComponent.this.inserted = false;
+									GalileoConfiguratorComponent.this.updated= false;
+									GalileoConfiguratorComponent.this.notMapped = false;
+								}
+								else
+								{
+									GalileoConfiguratorComponent.this.codesWithError.add(code);
+								}
 							}
-							if (GalileoConfiguratorComponent.this.updated)
-							{
-								GalileoConfiguratorComponent.this.countUpdated++;
-							}
-							if (GalileoConfiguratorComponent.this.notMapped)
-							{
-								GalileoConfiguratorComponent.this.countNotMapped++;
-							}
-							if (GalileoConfiguratorComponent.this.inserted || GalileoConfiguratorComponent.this.updated  || GalileoConfiguratorComponent.this.notMapped)
-							{
-								GalileoConfiguratorComponent.this.confirmChanges(code);
-								GalileoConfiguratorComponent.this.inserted = false;
-								GalileoConfiguratorComponent.this.updated= false;
-								GalileoConfiguratorComponent.this.notMapped = false;
-							}
-							else
+							catch (Exception e)
 							{
 								GalileoConfiguratorComponent.this.codesWithError.add(code);
 							}
@@ -742,8 +749,15 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 					mapping.setProvider(this.getProviderId());
 					mapping.setTax(tax);
 					tax.addTaxCodeMapping(mapping);
-					persistenceService.getServerService().merge(mapping.getTax());
-					newCodes++;
+					try
+					{
+						persistenceService.getServerService().merge(mapping.getTax());
+						newCodes++;
+					}
+					catch (Exception e)
+					{
+						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Einige Zuordnungen konnten nicht durchgeführt werden, versuchen Sie es nach einem Neustart des Programms noch einmal.");
+					}
 				}
 				count++;
 			}

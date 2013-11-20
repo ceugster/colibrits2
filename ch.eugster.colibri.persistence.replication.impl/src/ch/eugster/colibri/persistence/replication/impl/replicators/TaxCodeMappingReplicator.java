@@ -56,7 +56,7 @@ public class TaxCodeMappingReplicator extends AbstractEntityReplicator<TaxCodeMa
 						}
 						target = this.replicate(source, target);
 					}
-					target = (TaxCodeMapping) this.persistenceService.getCacheService().merge(target);
+					target = (TaxCodeMapping) merge(target);
 					target.getTax().addTaxCodeMapping(target);
 				}
 				if (monitor != null)

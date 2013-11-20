@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.datacontract.schemas._2004._07.GCDService.CFaultEx;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.widgets.Composite;
@@ -23,6 +22,7 @@ import org.osgi.service.log.LogService;
 import org.tempuri.IService;
 import org.tempuri.IServiceProxy;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
@@ -38,7 +38,6 @@ import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.ConnectionService;
-import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
@@ -322,7 +321,14 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		}
 		if (result.isOK())
 		{
-			position = (Position) persistenceService.getServerService().merge(position);
+			try
+			{
+				position = (Position) persistenceService.getServerService().merge(position);
+			}
+			catch (Exception e)
+			{
+				return new Status(IStatus.ERROR, Activator.getDefault().getContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+			}
 		}
 		return result.getStatus();
 	}
@@ -367,7 +373,14 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			{
 				payment.setProviderBooked(false);
 				payment.setProviderState(ProviderState.OPEN);
-				payment = (Payment) persistenceService.getServerService().merge(payment);
+				try
+				{
+					payment = (Payment) persistenceService.getServerService().merge(payment);
+				}
+				catch (Exception e)
+				{
+					return new Status(IStatus.ERROR, Activator.getDefault().getContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+				}
 			}
 		}
 		return result.getStatus();
@@ -475,7 +488,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 
 	@Override
 	public Collection<Position> getPositions(ConnectionService service,
-			int max, ConnectionType connectionType) 
+			int max)
 	{
 		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
@@ -484,33 +497,27 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			return new ArrayList<Position>();
 		}
 		PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		return query.selectProviderUpdates(salespoint, this.getProviderId(), max, connectionType);
+		return query.selectProviderUpdates(salespoint, this.getProviderId(), max);
 	}
 
 	@Override
-	public IStatus updatePositions(ConnectionService connectionService,
-			Collection<Position> positions, IProgressMonitor monitor) 
+	public IStatus updatePositions(PersistenceService persistenceService,
+			Collection<Position> positions) 
 	{
 		IStatus status = Status.OK_STATUS;
 		for (Position position : positions)
 		{
-			if (monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
 			status = updateProvider(position);
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return status;
 			}
-			monitor.worked(1);
 		}
 		return status;
 	}
 
 	@Override
-	public Collection<Payment> getPayments(ConnectionService service, int max,
-			ConnectionType connectionType) 
+	public Collection<Payment> getPayments(ConnectionService service, int max) 
 	{
 		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
@@ -519,69 +526,35 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			return new ArrayList<Payment>();
 		}
 		PaymentQuery query = (PaymentQuery) service.getQuery(Payment.class);
-		return query.selectProviderUpdates(salespoint, getProviderId(), max, connectionType);
+		return query.selectProviderUpdates(salespoint, getProviderId(), max);
 	}
 
 	@Override
-	public IStatus updatePayments(ConnectionService connectionService,
-			Collection<Payment> payments, IProgressMonitor monitor) 
+	public IStatus updatePayments(PersistenceService persistenceService,
+			Collection<Payment> payments) 
 	{
-		monitor.beginTask("Aktualisiere " + this.getName(), payments.size());
 		IStatus status = Status.OK_STATUS;
 		for (Payment payment : payments)
 		{
-			if (monitor.isCanceled())
-			{
-				return Status.CANCEL_STATUS;
-			}
 			status = updateProvider(payment);
 			if (status.getSeverity() == IStatus.CANCEL)
 			{
 				return status;
 			}
-			monitor.worked(1);
 		}
 		return status;
 	}
 
 	@Override
-	public boolean doUpdatePositions(ConnectionType connectionType) 
+	public boolean doUpdatePositions() 
 	{
-		switch(connectionType)
-		{
-		case LOCAL:
-		{
-			return false;
-		}
-		case SERVER:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-		}
+		return true;
 	}
 
 	@Override
-	public boolean doUpdatePayments(ConnectionType connectionType) 
+	public boolean doUpdatePayments() 
 	{
-		switch(connectionType)
-		{
-		case LOCAL:
-		{
-			return false;
-		}
-		case SERVER:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-		}
+		return true;
 	}
 	
 	public enum VoucherProperty implements IProperty

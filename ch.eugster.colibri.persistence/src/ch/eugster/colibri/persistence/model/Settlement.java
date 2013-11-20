@@ -10,7 +10,7 @@ import static javax.persistence.FetchType.EAGER;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -63,32 +63,36 @@ public class Settlement extends AbstractEntity implements IPrintable
 	@Column(name = "se_settled")
 	private Calendar settled;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementPosition> positions = new ArrayList<SettlementPosition>();
+	@Basic
+	@Column(name = "se_other_id")
+	private Long otherId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementInternal> internals = new ArrayList<SettlementInternal>();
+	private List<SettlementPosition> positions = new ArrayList<SettlementPosition>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementPayment> payments = new ArrayList<SettlementPayment>();
+	private List<SettlementInternal> internals = new ArrayList<SettlementInternal>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementTax> taxes = new ArrayList<SettlementTax>();;
+	private List<SettlementPayment> payments = new ArrayList<SettlementPayment>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementPayedInvoice> invoices = new ArrayList<SettlementPayedInvoice>();
+	private List<SettlementTax> taxes = new ArrayList<SettlementTax>();;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementRestitutedPosition> restituted = new ArrayList<SettlementRestitutedPosition>();
+	private List<SettlementPayedInvoice> invoices = new ArrayList<SettlementPayedInvoice>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementReceipt> receipts = new ArrayList<SettlementReceipt>();
+	private List<SettlementRestitutedPosition> restituted = new ArrayList<SettlementRestitutedPosition>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementDetail> details = new ArrayList<SettlementDetail>();
+	private List<SettlementReceipt> receipts = new ArrayList<SettlementReceipt>();
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
-	private Collection<SettlementMoney> moneys = new ArrayList<SettlementMoney>();
+	private List<SettlementDetail> details = new ArrayList<SettlementDetail>();
+
+	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
+	private List<SettlementMoney> moneys = new ArrayList<SettlementMoney>();
 
 	protected Settlement()
 	{
@@ -116,7 +120,7 @@ public class Settlement extends AbstractEntity implements IPrintable
 //		return this.otherId;
 //	}
 	
-	public Collection<SettlementDetail> getDetails()
+	public List<SettlementDetail> getDetails()
 	{
 		return this.details;
 	}
@@ -134,7 +138,7 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return count;
 	}
 
-	public Collection<SettlementMoney> getMoneys()
+	public List<SettlementMoney> getMoneys()
 	{
 		return this.moneys;
 	}
@@ -145,17 +149,17 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return this.id;
 	}
 
-	public Collection<SettlementPayment> getPayments()
+	public List<SettlementPayment> getPayments()
 	{
 		return this.payments;
 	}
 
-	public Collection<SettlementPosition> getPositions()
+	public List<SettlementPosition> getPositions()
 	{
 		return this.positions;
 	}
 
-	public Collection<SettlementPayedInvoice> getPayedInvoices()
+	public List<SettlementPayedInvoice> getPayedInvoices()
 	{
 		return this.invoices;
 	}
@@ -165,7 +169,7 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return this.salespoint.getReceiptPrinterSettings();
 	}
 
-	public Collection<SettlementReceipt> getReversedReceipts()
+	public List<SettlementReceipt> getReversedReceipts()
 	{
 		return this.receipts;
 	}
@@ -180,7 +184,7 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return this.settled;
 	}
 
-	public Collection<SettlementTax> getTaxes()
+	public List<SettlementTax> getTaxes()
 	{
 		return this.taxes;
 	}
@@ -190,7 +194,7 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return this.user;
 	}
 
-	public void setDetails(final Collection<SettlementDetail> details)
+	public void setDetails(final List<SettlementDetail> details)
 	{
 		this.details = details;
 	}
@@ -201,22 +205,22 @@ public class Settlement extends AbstractEntity implements IPrintable
 		this.propertyChangeSupport.firePropertyChange("id", this.id, this.id = id);
 	}
 
-	public void setPayments(final Collection<SettlementPayment> payments)
+	public void setPayments(final List<SettlementPayment> payments)
 	{
 		this.propertyChangeSupport.firePropertyChange("payments", this.payments, this.payments = payments);
 	}
 
-	public void setPositions(final Collection<SettlementPosition> positions)
+	public void setPositions(final List<SettlementPosition> positions)
 	{
 		this.propertyChangeSupport.firePropertyChange("positions", this.positions, this.positions = positions);
 	}
 
-	public void setMoneys(final Collection<SettlementMoney> moneys)
+	public void setMoneys(final List<SettlementMoney> moneys)
 	{
 		this.propertyChangeSupport.firePropertyChange("moneys", this.moneys, this.moneys = moneys);
 	}
 
-	public void setReversedReceipts(final Collection<SettlementReceipt> receipts)
+	public void setReversedReceipts(final List<SettlementReceipt> receipts)
 	{
 		this.propertyChangeSupport.firePropertyChange("receipts", this.receipts, this.receipts = receipts);
 	}
@@ -231,12 +235,12 @@ public class Settlement extends AbstractEntity implements IPrintable
 		this.propertyChangeSupport.firePropertyChange("settled", this.settled, this.settled = settled);
 	}
 
-	public void setTaxes(final Collection<SettlementTax> taxes)
+	public void setTaxes(final List<SettlementTax> taxes)
 	{
 		this.propertyChangeSupport.firePropertyChange("taxes", this.taxes, this.taxes = taxes);
 	}
 
-	public void setPayedInvoices(final Collection<SettlementPayedInvoice> invoices)
+	public void setPayedInvoices(final List<SettlementPayedInvoice> invoices)
 	{
 		this.propertyChangeSupport.firePropertyChange("invoices", this.invoices, this.invoices = invoices);
 	}
@@ -262,24 +266,31 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return receiptCount;
 	}
 
-	public void setRestitutedPositions(Collection<SettlementRestitutedPosition> restituted)
+	public void setRestitutedPositions(List<SettlementRestitutedPosition> restituted)
 	{
 		this.propertyChangeSupport.firePropertyChange("restituted", this.restituted, this.restituted = restituted);
 	}
 
-	public Collection<SettlementRestitutedPosition> getRestitutedPositions()
+	public List<SettlementRestitutedPosition> getRestitutedPositions()
 	{
 		return restituted;
 	}
 
-	public void setInternals(Collection<SettlementInternal> internals)
+	public void setInternals(List<SettlementInternal> internals)
 	{
 		this.propertyChangeSupport.firePropertyChange("internals", this.internals, this.internals = internals);
 	}
 
-	public Collection<SettlementInternal> getInternals()
+	public List<SettlementInternal> getInternals()
 	{
 		return internals;
 	}
 
+	public Long getOtherId() {
+		return otherId;
+	}
+
+	public void setOtherId(Long otherId) {
+		this.propertyChangeSupport.firePropertyChange("otherId", this.otherId, this.otherId = otherId);
+	}
 }

@@ -61,7 +61,7 @@ public class TabReplicator extends AbstractEntityReplicator<Tab>
 						}
 						target = this.replicate(source, target);
 					}
-					target = (Tab) this.persistenceService.getCacheService().merge(target);
+					target = (Tab) merge(target);
 					if (add)
 					{
 						target.getConfigurable().addTab(target);

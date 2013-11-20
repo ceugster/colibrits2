@@ -9,6 +9,7 @@ import java.util.Currency;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -22,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
@@ -53,7 +55,6 @@ public class PositionListView extends ViewPart implements ISelectionListener, IS
 	public void init(IViewSite site) throws PartInitException
 	{
 		super.init(site);
-		site.getWorkbenchWindow().getSelectionService().addSelectionListener(this);
 	}
 
 	@Override
@@ -301,11 +302,39 @@ public class PositionListView extends ViewPart implements ISelectionListener, IS
 			}
 		});
 
+		this.getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(this);
+
+		IViewPart view = this.getSite().getWorkbenchWindow().getActivePage().findView("ch.eugster.colibri.report.receipt.receiptview");
+		if (view instanceof ReceiptListView)
+		{
+			ReceiptListView receiptView = (ReceiptListView) view;
+			ISelection selection = receiptView.getSelection();
+			if (selection instanceof IStructuredSelection)
+			{
+				IStructuredSelection ssel = (IStructuredSelection) selection;
+				if (ssel.isEmpty())
+				{
+					this.viewer.setInput(null);
+				}
+				else if (ssel.getFirstElement() instanceof Receipt)
+				{
+					Receipt receipt = (Receipt) ssel.getFirstElement();
+					this.viewer.setInput(receipt);
+					final TableColumn[] columns = this.viewer.getTable().getColumns();
+					for (final TableColumn column : columns)
+					{
+						column.pack();
+					}
+				}
+			}
+		}
+
 		final TableColumn[] columns = this.viewer.getTable().getColumns();
 		for (final TableColumn column : columns)
 		{
 			column.pack();
 		}
+
 	}
 
 	@Override

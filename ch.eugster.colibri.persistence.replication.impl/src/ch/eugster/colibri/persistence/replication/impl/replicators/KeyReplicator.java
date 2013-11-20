@@ -56,7 +56,7 @@ public class KeyReplicator extends AbstractEntityReplicator<Key>
 						}
 						target = this.replicate(source, target);
 					}
-					target = (Key) this.persistenceService.getCacheService().merge(target);
+					target = (Key) merge(target);
 					target.getTab().addKey(target);
 				}
 				if (monitor != null)

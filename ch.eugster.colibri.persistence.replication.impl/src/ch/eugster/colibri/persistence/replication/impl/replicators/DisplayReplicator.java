@@ -55,7 +55,7 @@ public class DisplayReplicator extends AbstractEntityReplicator<Display>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{
@@ -77,7 +77,7 @@ public class DisplayReplicator extends AbstractEntityReplicator<Display>
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

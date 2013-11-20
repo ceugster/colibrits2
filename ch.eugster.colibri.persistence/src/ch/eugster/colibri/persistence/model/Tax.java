@@ -11,7 +11,7 @@ import static javax.persistence.FetchType.EAGER;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -60,10 +60,10 @@ public class Tax extends AbstractEntity implements IReplicatable
 	private CurrentTax currentTax;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "tax")
-	private Collection<CurrentTax> currentTaxes = new ArrayList<CurrentTax>();;
+	private List<CurrentTax> currentTaxes = new ArrayList<CurrentTax>();;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "tax")
-	private Collection<TaxCodeMapping> taxCodeMappings = new ArrayList<TaxCodeMapping>();;
+	private List<TaxCodeMapping> taxCodeMappings = new ArrayList<TaxCodeMapping>();;
 
 	@Basic
 	@Column(name = "tx_text")
@@ -137,7 +137,7 @@ public class Tax extends AbstractEntity implements IReplicatable
 		return this.currentTax;
 	}
 
-	public Collection<CurrentTax> getCurrentTaxes()
+	public List<CurrentTax> getCurrentTaxes()
 	{
 		return this.currentTaxes;
 	}
@@ -164,7 +164,7 @@ public class Tax extends AbstractEntity implements IReplicatable
 		return null;
 	}
 
-	public Collection<TaxCodeMapping> getTaxCodeMappings()
+	public List<TaxCodeMapping> getTaxCodeMappings()
 	{
 		return this.taxCodeMappings;
 	}
@@ -217,7 +217,7 @@ public class Tax extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("currentTax", this.currentTax, this.currentTax = currentTax);
 	}
 
-	public void setCurrentTaxes(final Collection<CurrentTax> currentTaxes)
+	public void setCurrentTaxes(final List<CurrentTax> currentTaxes)
 	{
 		this.propertyChangeSupport.firePropertyChange("currentTaxes", this.currentTaxes,
 				this.currentTaxes = currentTaxes);
@@ -229,7 +229,7 @@ public class Tax extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("id", this.id, this.id = id);
 	}
 
-	public void setTaxCodeMappings(final Collection<TaxCodeMapping> taxMappings)
+	public void setTaxCodeMappings(final List<TaxCodeMapping> taxMappings)
 	{
 		this.propertyChangeSupport.firePropertyChange("taxCodeMappings", this.taxCodeMappings,
 				this.taxCodeMappings = taxMappings);

@@ -52,7 +52,7 @@ public class ExternalProductGroupReplicator extends AbstractEntityReplicator<Ext
 					{
 						target = this.replicate(source, target);
 					}
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{
@@ -92,7 +92,7 @@ public class ExternalProductGroupReplicator extends AbstractEntityReplicator<Ext
 					final Long id = source.getProductGroupMapping().getId();
 					final ProductGroupMapping mapping = (ProductGroupMapping) this.persistenceService.getCacheService().find(ProductGroupMapping.class, id);
 					target.setProductGroupMapping(mapping);
-					this.persistenceService.getCacheService().merge(target);
+					merge(target);
 				}
 				if (monitor != null)
 				{

@@ -7,7 +7,7 @@
 package ch.eugster.colibri.persistence.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -102,7 +102,7 @@ public class ProductGroup extends AbstractEntity implements IReplicatable
 	private ProductGroupType productGroupType;
 
 	@OneToMany(mappedBy = "productGroup", cascade = CascadeType.ALL)
-	private Collection<ProductGroupMapping> productGroupMappings = new Vector<ProductGroupMapping>();
+	private List<ProductGroupMapping> productGroupMappings = new Vector<ProductGroupMapping>();
 
 	protected ProductGroup()
 	{
@@ -187,9 +187,9 @@ public class ProductGroup extends AbstractEntity implements IReplicatable
 		return this.priceProposal;
 	}
 
-	public Collection<ProductGroupMapping> getProductGroupMappings(final String provider)
+	public List<ProductGroupMapping> getProductGroupMappings(final String provider)
 	{
-		Collection<ProductGroupMapping> mappings = new ArrayList<ProductGroupMapping>();
+		List<ProductGroupMapping> mappings = new ArrayList<ProductGroupMapping>();
 		for (ProductGroupMapping productGroupMapping : productGroupMappings)
 		{
 			if (productGroupMapping.getProvider().equals(provider))
@@ -200,7 +200,7 @@ public class ProductGroup extends AbstractEntity implements IReplicatable
 		return mappings;
 	}
 
-	public Collection<ProductGroupMapping> getProductGroupMappings()
+	public List<ProductGroupMapping> getProductGroupMappings()
 	{
 		return this.productGroupMappings;
 	}

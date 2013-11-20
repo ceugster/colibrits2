@@ -403,4 +403,8 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 		}
 	}
 
+	public ISelection getSelection()
+	{
+		return this.viewer.getSelection();
+	}
 }

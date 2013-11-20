@@ -5,7 +5,7 @@ import static javax.persistence.FetchType.EAGER;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.Vector;
 
 import javax.persistence.AttributeOverride;
@@ -230,10 +230,10 @@ public class Profile extends AbstractEntity implements IReplicatable
 	private int listBg;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "profile")
-	private Collection<Configurable> configurables = new ArrayList<Configurable>();
+	private List<Configurable> configurables = new ArrayList<Configurable>();
 
 	@OneToMany(fetch = EAGER, mappedBy = "profile")
-	private Collection<Salespoint> salespoints = new ArrayList<Salespoint>();
+	private List<Salespoint> salespoints = new ArrayList<Salespoint>();
 
 	private Profile()
 	{
@@ -347,14 +347,14 @@ public class Profile extends AbstractEntity implements IReplicatable
 	 * 
 	 * @see IProfile#getConfigurables()
 	 */
-	public Collection<Configurable> getConfigurables()
+	public List<Configurable> getConfigurables()
 	{
 		return this.configurables;
 	}
 
-	public Collection<Configurable> getActiveConfigurables()
+	public List<Configurable> getActiveConfigurables()
 	{
-		Collection<Configurable> activeConfigurables = new ArrayList<Configurable>();
+		List<Configurable> activeConfigurables = new ArrayList<Configurable>();
 		for (Configurable configurable : this.configurables)
 		{
 			if (!configurable.isDeleted())
@@ -466,7 +466,7 @@ public class Profile extends AbstractEntity implements IReplicatable
 	 * 
 	 * @see IProfile#getSalespoints()
 	 */
-	public Collection<Salespoint> getSalespoints()
+	public List<Salespoint> getSalespoints()
 	{
 		return this.salespoints;
 	}
@@ -533,6 +533,12 @@ public class Profile extends AbstractEntity implements IReplicatable
 
 	public void initialize()
 	{
+		setDefaultValues();
+		addConfigurables();
+	}
+
+	public void setDefaultValues()
+	{
 		this.setTopLeft(PanelType.DISPLAY);
 		this.setBottomLeft(PanelType.NUMERIC);
 		this.setTopRight(PanelType.SELECTION);
@@ -594,14 +600,17 @@ public class Profile extends AbstractEntity implements IReplicatable
 		this.setListFg(Color.BLACK.getRGB());
 		this.setListFontSize(12f);
 		this.setListFontStyle(Font.BOLD);
-
+	}
+	
+	public void addConfigurables()
+	{
 		this.configurables = new Vector<Configurable>();
 		for (final Configurable.ConfigurableType configurableType : Configurable.ConfigurableType.values())
 		{
 			this.configurables.add(Configurable.newInstance(this, configurableType));
 		}
 	}
-
+	
 	public boolean isDisplayShowReceivedRemainderAlways()
 	{
 		return this.displayShowReceivedRemainderAlways;
@@ -722,7 +731,7 @@ public class Profile extends AbstractEntity implements IReplicatable
 	 * 
 	 * @see IProfile#setConfigurables (java.util.Collection)
 	 */
-	public void setConfigurables(final Collection<Configurable> configurables)
+	public void setConfigurables(final List<Configurable> configurables)
 	{
 		this.propertyChangeSupport.firePropertyChange("configurables", this.configurables, this.configurables = configurables);
 	}
@@ -833,7 +842,7 @@ public class Profile extends AbstractEntity implements IReplicatable
 	 * 
 	 * @see IProfile#setSalespoints(java .util.Collection)
 	 */
-	public void setSalespoints(final Collection<Salespoint> salespoints)
+	public void setSalespoints(final List<Salespoint> salespoints)
 	{
 		this.propertyChangeSupport.firePropertyChange("salespoints", this.salespoints, this.salespoints = salespoints);
 	}

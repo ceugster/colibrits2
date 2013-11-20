@@ -50,12 +50,14 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.queries.SettlementQuery;
@@ -75,9 +77,9 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 	 * @param parent
 	 * @param style
 	 */
-	public SettlementNumberComposite(Composite parent, int style)
+	public SettlementNumberComposite(Composite parent, SettlementView parentView, int style)
 	{
-		super(parent, style);
+		super(parent, parentView, style);
 	}
 
 	@Override
@@ -162,7 +164,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 									if (eventAdmin != null)
 									{
 										eventAdmin.sendEvent(getEvent(tracker,
-												"ch/eugster/colibri/client/print/settlement", settlement));
+												Topic.PRINT_SETTLEMENT.topic(), settlement));
 									}
 								}
 								finally
@@ -193,7 +195,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 		});
 
 		Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put("event.topics", "ch/eugster/colibri/print/error");
+		properties.put("event.topics", Topic.PRINT_ERROR.topic());
 		Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class.getName(), this, properties);
 	}
@@ -274,17 +276,17 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 	}
 
 	@Override
-	protected void setInput()
+	public void setInput()
 	{
 		if (settlementViewer.getContentProvider() != null)
 		{
-			if (selectedSalespoints == null || selectedSalespoints.length == 0)
+			if (getSelectedSalespoints() == null || getSelectedSalespoints().length == 0)
 			{
 				settlementViewer.setInput(new Object[0]);
 				settlementViewer.setSelection(new StructuredSelection());
 				return;
 			}
-			if (selectedDateRange == null || selectedDateRange.length != 2)
+			if (getSelectedDateRange() == null || getSelectedDateRange().length != 2)
 			{
 				settlementViewer.setInput(new Object[0]);
 				settlementViewer.setSelection(new StructuredSelection());
@@ -302,8 +304,8 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 			else
 			{
 				SettlementQuery query = (SettlementQuery) service.getServerService().getQuery(Settlement.class);
-				Collection<Settlement> s = query.selectBySalespointsAndSettled(selectedSalespoints,
-						selectedDateRange[0].getTimeInMillis(), selectedDateRange[1].getTimeInMillis());
+				Collection<Settlement> s = query.selectBySalespointsAndSettled(getSelectedSalespoints(),
+						getSelectedDateRange()[0].getTimeInMillis(), getSelectedDateRange()[1].getTimeInMillis());
 				Settlement[] settlements = s.toArray(new Settlement[0]);
 				settlementViewer.setInput(settlements);
 				if (settlements.length > 0)
@@ -326,21 +328,9 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 	}
 
 	@Override
-	public ISelection getSelection()
-	{
-		return this.settlementViewer.getSelection();
-	}
-
-	@Override
 	public void removeSelectionChangedListener(ISelectionChangedListener listener)
 	{
 		this.settlementViewer.removeSelectionChangedListener(listener);
-	}
-
-	@Override
-	public void setSelection(ISelection selection)
-	{
-		this.settlementViewer.setSelection(selection);
 	}
 
 	@Override
@@ -401,14 +391,35 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (event.getTopic().equals("ch/eugster/colibri/print/error"))
+		if (event.getTopic().equals(Topic.PRINT_ERROR.topic()))
 		{
-			IStatus status = (IStatus) event.getProperty("status");
-			Toolkit.getDefaultToolkit().beep();
-			MessageDialog dialog = new MessageDialog(getShell(), "Belegdrucker", null, status.getMessage(),
-					MessageDialog.WARNING, new String[] { "OK" }, 0);
-			dialog.setBlockOnOpen(true);
-			dialog.open();
+			UIJob job = new UIJob("Message")
+			{
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) 
+				{
+					IStatus status = (IStatus) event.getProperty("status");
+					Toolkit.getDefaultToolkit().beep();
+					MessageDialog dialog = new MessageDialog(getShell(), "Belegdrucker", null, status.getMessage(),
+							MessageDialog.WARNING, new String[] { "OK" }, 0);
+//					dialog.setBlockOnOpen(true);
+					dialog.open();
+					return status;
+				}
+			};
+			job.schedule();
 		}
+	}
+
+	@Override
+	public ISelection getSelection() 
+	{
+		return this.settlementViewer.getSelection();
+	}
+
+	@Override
+	public void setSelection(ISelection selection) 
+	{
+		this.settlementViewer.setSelection(selection);
 	}
 }

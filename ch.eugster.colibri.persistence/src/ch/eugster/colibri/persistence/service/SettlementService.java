@@ -1,6 +1,6 @@
 package ch.eugster.colibri.persistence.service;
 
-import java.util.Collection;
+import java.util.List;
 
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -10,9 +10,9 @@ public interface SettlementService
 {
 	long countReceipts(Settlement settlement);
 	
-	Collection<SettlementReceipt> getReversedReceipts(Settlement settlement);
+	List<SettlementReceipt> getReversedReceipts(Settlement settlement);
 
-	Settlement settle(Settlement settlement, State state);
+	Settlement settle(Settlement settlement, State state) throws Exception;
 
 	Salespoint updateSettlement(Salespoint salespoint);
 

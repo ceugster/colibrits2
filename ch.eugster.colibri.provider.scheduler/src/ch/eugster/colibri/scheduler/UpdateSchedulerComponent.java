@@ -1,6 +1,5 @@
 package ch.eugster.colibri.scheduler;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -23,19 +22,16 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.log.LogService;
 
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
-import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.rules.ServerDatabaseRule;
-import ch.eugster.colibri.persistence.service.ConnectionService;
-import ch.eugster.colibri.persistence.service.ConnectionService.ConnectionType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.IProperty.Section;
-import ch.eugster.colibri.provider.service.ProviderService;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
 import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
@@ -161,6 +157,8 @@ public class UpdateSchedulerComponent implements UpdateScheduler
 
 	private class UpdateSchedulerJob extends Job
 	{
+		private boolean showFailoverMessage = true;
+		
 		UpdateSchedulerJob(String name)
 		{
 			super(name);
@@ -168,110 +166,39 @@ public class UpdateSchedulerComponent implements UpdateScheduler
 
 		protected IStatus run(final IProgressMonitor monitor)
 		{
-			IStatus status = Status.OK_STATUS;
-			if (monitor.isCanceled())
+			IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_TRANSFER.topic());
+			try
 			{
-				return Status.CANCEL_STATUS;
-			}
-//			try
-//			{
-				List<ConnectionService> services = new ArrayList<ConnectionService>();
-				if (persistenceService.getServerService() != null && persistenceService.getServerService().isConnected())
-				{
-					services.add(persistenceService.getServerService());
-				}
-				if (persistenceService.getCacheService() != null && persistenceService.getCacheService().isConnected())
-				{
-					services.add(persistenceService.getCacheService());
-				}
+				monitor.beginTask("Aktualisiere...", 2);
 				ProviderUpdater[] providerUpdaters = UpdateSchedulerComponent.this.providerUpdaters.toArray(new ProviderUpdater[0]);
 				Arrays.sort(providerUpdaters);
-	
-				monitor.beginTask("Aktualisiere...", providerUpdaters.length * services.size() + (transferAgent == null ? 0 : 1));
-				try
+				if (persistenceService.getCacheService() != null)
 				{
-					if (transferAgent != null)
+					IStatus providerStatus = update(new SubProgressMonitor(monitor, providerUpdaters.length), providerUpdaters, persistenceService);
+					sendUpdateEvent(Topic.SCHEDULED_PROVIDER_UPDATE, providerStatus);
+					monitor.worked(1);
+					IStatus transferStatus = transfer(new SubProgressMonitor(monitor, getSchedulerCount()));
+					sendUpdateEvent(Topic.SCHEDULED_TRANSFER, transferStatus);
+					monitor.worked(1);
+					if (transferStatus.getSeverity() == IStatus.ERROR)
 					{
-						status = transferAgent.transfer(new SubProgressMonitor(monitor, getSchedulerCount()), getSchedulerCount());
-						sendReceiptTransferEvent(status);
-						if (status.getSeverity() == IStatus.CANCEL)
-						{
-							monitor.done();
-							return status;
-						}
-						monitor.worked(1);
+						status = transferStatus;
 					}
-	
-					IStatus transferStatus = status;
-					IStatus providerUpdateStatus = Status.OK_STATUS;
-					for (ProviderUpdater providerUpdater : providerUpdaters)
+					if (providerStatus.getSeverity() == IStatus.ERROR)
 					{
-						boolean checked = false;
-						for (ConnectionService service : services)
-						{
-							if (providerUpdater.doUpdatePositions(service.getConnectionType()))
-							{
-								Collection<Position> positions = providerUpdater.getPositions(service, getSchedulerCount(), service.getConnectionType());
-								if (positions.size() > 0)
-								{
-									checked = true;
-									IStatus providerStatus = providerUpdater.updatePositions(service, positions, new SubProgressMonitor(monitor, positions.size()));
-									if (providerStatus.getSeverity() == IStatus.ERROR)
-									{
-										providerUpdateStatus = providerStatus;
-									}
-									if (providerStatus.getSeverity() == IStatus.CANCEL)
-									{
-										return status;
-									}
-								}
-							}
-							if (providerUpdater.doUpdatePayments(service.getConnectionType()))
-							{
-								Collection<Payment> payments = providerUpdater.getPayments(service, getSchedulerCount(), service.getConnectionType());
-								if (payments.size() > 0)
-								{
-									checked = true;
-									IStatus providerStatus = providerUpdater.updatePayments(service, payments, new SubProgressMonitor(monitor, payments.size()));
-									if (providerStatus.getSeverity() == IStatus.ERROR)
-									{
-										providerUpdateStatus = providerStatus;
-									}
-									if (providerStatus.getSeverity() == IStatus.CANCEL)
-									{
-										return status;
-									}
-								}
-							}
-							if (!checked)
-							{
-								if (providerUpdater.doCheckFailover())
-								{
-									IStatus providerStatus = providerUpdater.checkConnection();
-									if (providerStatus.getSeverity() == IStatus.ERROR)
-									{
-										providerUpdateStatus = providerStatus;
-									}
-								}
-							}
-							this.sendProviderUpdateEvent(providerUpdateStatus, transferStatus, providerUpdater);
-							monitor.worked(1);
-						}
+						status = providerStatus;
 					}
 				}
-				finally
-				{
-					monitor.done();
-				}
-//			}
-//			finally
-//			{
-//				UpdateSchedulerComponent.this.updateScheduler.schedule(getRepeatDelay());
-//			}
-			return Status.OK_STATUS;
+			}
+			finally
+			{
+				sendUpdateEvent(Topic.SCHEDULED, status);
+				monitor.done();
+			}
+			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED.topic());
 		}
 		
-		private void sendProviderUpdateEvent(IStatus status, IStatus transferStatus, ProviderUpdater providerUpdater)
+		private void sendUpdateEvent(Topic topic, IStatus status)
 		{
 			if (UpdateSchedulerComponent.this.eventAdmin != null)
 			{
@@ -289,56 +216,105 @@ public class UpdateSchedulerComponent implements UpdateScheduler
 						.getProperties().get("component.name"));
 				properties
 						.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
-				properties.put("transferStatus", transferStatus);
-				properties.put("providerId", providerUpdater.getProviderId());
-				properties.put("message", "Die Verbindung zu " + providerUpdater.getName() + " konnte nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
 				if (status.getException() != null)
 				{
 					properties.put(EventConstants.EXCEPTION, status.getException());
 					String msg = status.getException().getMessage();
 					properties.put(EventConstants.EXCEPTION_MESSAGE, msg == null ? "" : msg);
-				}
-				properties.put("status", status);
-				ProviderService.Topic topic = null;
-				for (ProviderService.Topic t : ProviderService.Topic.values())
-				{
-					if (status.getMessage().equals(t.topic()))
+
+					if (this.showFailoverMessage)
 					{
-						topic = t;
-						break;
+						properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
+						this.showFailoverMessage = false;
 					}
 				}
-				if (topic == null)
+				else
 				{
-					topic = ProviderService.Topic.ARTICLE_UPDATE;
+					if (!this.showFailoverMessage)
+					{
+						this.showFailoverMessage = true;
+					}
 				}
 				properties.put("topic", topic);
+				properties.put("status", status);
 				final Event event = new Event(topic.topic(), properties);
 				UpdateSchedulerComponent.this.eventAdmin.sendEvent(event);
 			}
 		}
 		
-		private void sendReceiptTransferEvent(IStatus status)
+		private IStatus transfer(IProgressMonitor monitor)
 		{
-			if (eventAdmin != null)
+			monitor.beginTask("Transferiere...", 1);
+			IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_TRANSFER.topic());
+			if (transferAgent != null)
 			{
-				final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-				properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundleContext()
-						.getBundle());
-				properties.put(
-						EventConstants.BUNDLE_ID,
-						Long.valueOf(Activator.getDefault().getBundleContext().getBundle()
-								.getBundleId()));
-				properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundleContext().getBundle().getSymbolicName());
-				properties.put(EventConstants.SERVICE, context.getServiceReference());
-				properties.put(EventConstants.SERVICE_ID, context.getProperties().get("component.id"));
-				properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-				properties.put(EventConstants.SERVICE_PID, context.getProperties().get("component.name"));
-				properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
-				properties.put("status", status); final Event event = new Event("ch/eugster/colibri/persistence/server/database",
-						properties);
-				eventAdmin.sendEvent(event);
+				try
+				{
+					status = transferAgent.transfer(getSchedulerCount());
+					monitor.worked(1);
+				}
+				finally
+				{
+					monitor.done();
+				}
 			}
+			return status;
+		}
+
+		private IStatus update(IProgressMonitor monitor, ProviderUpdater[] providerUpdaters, PersistenceService persistenceService)
+		{
+			try
+			{
+				monitor.beginTask("Update Positions...", providerUpdaters.length * 2);
+				for (ProviderUpdater providerUpdater : providerUpdaters)
+				{
+					if (providerUpdater.doUpdatePositions())
+					{
+						IStatus status = updatePositions(providerUpdater, persistenceService);
+						if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+						{
+							return status;
+						}
+					}
+					monitor.worked(1);
+
+					if (providerUpdater.doUpdatePayments())
+					{
+						IStatus status = updatePayments(providerUpdater, persistenceService);
+						monitor.worked(1);
+						if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+						{
+							return status;
+						}
+					}
+					monitor.worked(1);
+				}
+			}
+			finally
+			{
+				monitor.done();
+			}
+			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		}
+		
+		private IStatus updatePositions(ProviderUpdater providerUpdater, PersistenceService persistenceService)
+		{
+			if (providerUpdater.doUpdatePositions())
+			{
+				Collection<Position> positions = providerUpdater.getPositions(persistenceService.getCacheService(), getSchedulerCount());
+				return providerUpdater.updatePositions(persistenceService, positions);
+			}
+			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		}
+		
+		private IStatus updatePayments(ProviderUpdater providerUpdater, PersistenceService persistenceService)
+		{
+			if (providerUpdater.doUpdatePayments())
+			{
+				Collection<Payment> payments = providerUpdater.getPayments(persistenceService.getCacheService(), getSchedulerCount());
+				return providerUpdater.updatePayments(persistenceService, payments);
+			}
+			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		}
 	}
 	
@@ -376,5 +352,4 @@ public class UpdateSchedulerComponent implements UpdateScheduler
 	{
 		return Activator.getDefault().getBundleContext().getBundle().getSymbolicName();
 	}
-	
 }
