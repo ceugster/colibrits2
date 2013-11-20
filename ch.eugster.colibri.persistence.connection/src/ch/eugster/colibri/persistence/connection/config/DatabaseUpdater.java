@@ -7,8 +7,6 @@ import java.sql.Statement;
 import java.util.Calendar;
 import java.util.Properties;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Table;
 
 import org.apache.derby.jdbc.ClientDriver;
@@ -766,6 +764,84 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								if (status.getSeverity() == IStatus.CANCEL)
 								{
 									sql = getAddColumnStatement(tableName, columnName, "INTEGER", "0", false);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 19)
+							{
+								this.log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_receipt";
+								String columnName = "re_internal";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 20)
+							{
+								this.log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_settlement";
+								String columnName = "se_transferred";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 21)
+							{
+								this.log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_payment";
+								String columnName = "pa_other_id";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "BIGINT", null , true);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 22)
+							{
+								this.log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_payment";
+								String columnName = "pa_server_updated";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "BIGINT", null , true);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								tableName = "colibri_position";
+								columnName = "po_server_updated";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "BIGINT", null , true);
 									this.log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");

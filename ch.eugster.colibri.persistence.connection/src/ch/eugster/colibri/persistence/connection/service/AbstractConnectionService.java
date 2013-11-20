@@ -13,12 +13,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
+import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.persistence.exceptions.DatabaseException;
+import org.eclipse.ui.PlatformUI;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.log.LogService;
@@ -357,36 +361,6 @@ public abstract class AbstractConnectionService implements ConnectionService
 
 	protected abstract EntityManagerFactory createEntityManagerFactory(IStatus status, Properties properties);
 
-	protected Event getEvent(final IStatus status)
-	{
-		final Dictionary<String, Object> eventProps = new Hashtable<String, Object>();
-		eventProps.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
-		eventProps.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
-		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
-//		if (this.getPersistenceService().getComponentContext() != null)
-//		{
-//			if (this.getPersistenceService().getComponentContext().getServiceReference() != null)
-//			{
-//				eventProps.put(EventConstants.SERVICE, this.getPersistenceService().getComponentContext()
-//						.getServiceReference());
-//			}
-//			if (this.getPersistenceService().getComponentContext().getProperties().get("component.id") != null)
-//			{
-//				eventProps.put(EventConstants.SERVICE_ID, this.getPersistenceService().getComponentContext()
-//						.getProperties().get("component.id"));
-//			}
-//			if (this.getPersistenceService().getComponentContext().getProperties().get("component.name") != null)
-//			{
-//				eventProps.put(EventConstants.SERVICE_PID, this.getPersistenceService().getComponentContext()
-//						.getProperties().get("component.name"));
-//			}
-//		}
-		eventProps.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
-		eventProps.put("status", status);
-		return new Event(getTopic(), eventProps);
-	}
-
 	protected abstract String getTopic();
 
 	public EntityManager createEntityManager()
@@ -405,7 +379,6 @@ public abstract class AbstractConnectionService implements ConnectionService
 	{
 		try
 		{
-			
 			Activator.getDefault().log(LogService.LOG_INFO, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
 			System.out.println("Start creating entityManager: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			this.entityManager = getEntityManagerFactory().createEntityManager(getEntityManagerFactory().getProperties());
@@ -419,35 +392,105 @@ public abstract class AbstractConnectionService implements ConnectionService
 		{
 			System.out.println("Creating entityManager failed: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			Activator.getDefault().log(LogService.LOG_INFO, "EntityManager konnte nicht kreiert werden.");
-			resetEntityManager(e);
+//			IProduct product = Platform.getProduct();
+			String[] args = Platform.getCommandLineArgs();
+			String app = "ch.eugster.colibri.admin.application";
+			for (int i = 0; i < args.length; i++)
+			{
+				if (args[i].equals("-application"))
+				{
+					app = args[i + 1];
+					break;
+				}
+			}
+			if (app.equals("ch.eugster.colibri.client.application"))
+			{
+				resetEntityManager(e);
+			}
+			else
+			{
+				MessageDialog.openError(null, "Keine Datenbankverbindung", "Es kann keine Datenbankverbindung hergestellt werden. Das Programm wird beendet.");
+					PlatformUI.getWorkbench().close();
+			}
 		}
 		return this.entityManager != null;
 	}
 	
+	protected Event getEvent(final IStatus status)
+	{
+		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
+		properties.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
+		properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put("status", status);
+		properties.put("show.failover.message", Boolean.valueOf(true));
+		properties.put(EventConstants.EVENT_TOPIC, status.getMessage());
+		properties.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		if (status.getException() != null)
+		{
+			properties.put(EventConstants.EXCEPTION, status.getException());
+			properties.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage() == null ? "" : status.getException().getMessage());
+		}
+		String message = "Die Verbindung zum Datenbankserver kann nicht hergestellt werden.";
+		properties.put("message", message);
+		properties.put("force", Boolean.valueOf(false));
+		final Event event = new Event(status.getMessage(), properties);
+		return event;
+	}
+
+//	private Event getEvent(Exception e)
+//	{
+//		final String topic = this.getTopic(e);
+//		IStatus status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), message);
+//		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+//		properties.put("show.failover.message", Boolean.valueOf(true));
+//		properties.put(EventConstants.EVENT_TOPIC, topic);
+//		properties.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
+//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+//		if (e != null)
+//		{
+//			properties.put(EventConstants.EXCEPTION, e);
+//			properties.put(EventConstants.EXCEPTION_MESSAGE, e.getMessage() == null ? "" : e.getMessage());
+//		}
+//		properties.put("message", message);
+//		properties.put("status", status);
+//		properties.put("force", Boolean.valueOf(false));
+//		final Event event = new Event(topic, properties);
+//		return event;
+//	}
+
 	public AbstractConnectionService(final PersistenceService persistenceService)
 	{
 		this.persistenceService = persistenceService;
 	}
 
 	@Override
-	public AbstractEntity delete(final AbstractEntity entity)
+	public AbstractEntity delete(final AbstractEntity entity) throws Exception
 	{
 		entity.setDeleted(true);
 		return this.merge(entity);
 	}
 
-	public void resetEntityManager(Throwable throwable)
+	public void resetEntityManager(Exception exception)
 	{
 		if (entityManager != null)
 		{
-			if (throwable instanceof DatabaseException)
+			if (exception instanceof DatabaseException || exception instanceof PersistenceException)
 			{
 				entityManager.clear();
 				entityManager.close();
 				entityManager = null;
 			}
 		}
-		this.getPersistenceService().sendEvent(this.getEvent(new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Keine Verbindung", throwable)));
+		this.getPersistenceService().sendEvent(this.getEvent(getStatus(exception)));
+	}
+
+	private IStatus getStatus(Exception exception)
+	{
+		return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), getTopic(), exception);
 	}
 	
 	@Override
@@ -465,7 +508,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		}
 		catch (Exception e)
 		{
-			this.resetEntityManager(e.getCause());
+			this.resetEntityManager(e);
 		}
 		finally
 		{
@@ -483,21 +526,21 @@ public abstract class AbstractConnectionService implements ConnectionService
 	}
 
 	@Override
-	public AbstractEntity merge(final AbstractEntity entity)
+	public AbstractEntity merge(final AbstractEntity entity) throws Exception
 	{
 		return this.merge(entity, true);
 	}
 
 	@Override
-	public AbstractEntity merge(final AbstractEntity entity, boolean updateTimestamp)
+	public AbstractEntity merge(final AbstractEntity entity, boolean updateTimestamp) throws Exception
 	{
 		return this.merge(entity, updateTimestamp, true);
 	}
 
-	protected abstract void updateReplicationValue(Entity entity);
+	protected abstract void updateReplicationValue(Entity entity) throws Exception;
 
 	@Override
-	public synchronized AbstractEntity merge(AbstractEntity entity, final boolean updateTimestamp, boolean updateReplicatable)
+	public synchronized AbstractEntity merge(AbstractEntity entity, final boolean updateTimestamp, boolean updateReplicatable) throws Exception
 	{
 		EntityManager entityManager = this.getEntityManager();
 		if (entityManager != null)
@@ -532,12 +575,12 @@ public abstract class AbstractConnectionService implements ConnectionService
 							DatabaseException de = (DatabaseException) re.getCause();
 							if (de.getErrorCode() == 4002)
 							{
-								this.resetEntityManager(e.getCause());
+								this.resetEntityManager(e);
 								return entity;
 							}
 						}
 					}
-//					throw new RuntimeException(e);
+					throw new Exception(e);
 				}
 				finally
 				{
@@ -565,12 +608,12 @@ public abstract class AbstractConnectionService implements ConnectionService
 	}
 
 	@Override
-	public void persist(final AbstractEntity entity)
+	public void persist(final AbstractEntity entity) throws Exception
 	{
 		this.persist(entity, true);
 	}
 
-	public synchronized void persist(final AbstractEntity entity, final boolean updateTimestamp)
+	public synchronized void persist(final AbstractEntity entity, final boolean updateTimestamp) throws Exception
 	{
 		EntityManager entityManager = this.getEntityManager();
 		if (entityManager != null)
@@ -612,7 +655,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		}
 	}
 
-	public synchronized void remove(final AbstractEntity entity)
+	public synchronized void remove(final AbstractEntity entity) throws Exception
 	{
 		EntityManager entityManager = this.getEntityManager();
 		if (entityManager != null)

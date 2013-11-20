@@ -49,13 +49,13 @@ public class Activator extends AbstractUIPlugin
 {
 	private static Activator plugin;
 
-	private ServiceTracker<LogService, LogService> logServiceTracker;
-
 	private ServiceTracker<EncryptionService, EncryptionService> encryptionServiceTracker;
 
-//	private ServiceTracker<PersistenceProvider, PersistenceProvider> persistenceProviderTracker;
+	private ServiceTracker<LogService, LogService> logServiceTracker;
 
 	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;
+
+	private LogService logService;
 
 	private PersistenceProvider persistenceProvider;
 	
@@ -64,8 +64,6 @@ public class Activator extends AbstractUIPlugin
 	private Document document;
 
 	private Document oldDocument;
-	
-	private LogService logService;
 	
 	/**
 	 * The constructor
@@ -376,8 +374,7 @@ public class Activator extends AbstractUIPlugin
 
 	public LogService getLogService()
 	{
-		LogService service = this.logServiceTracker.getService();
-		return service;
+		return logService;
 	}
 
 	private void initializeConfiguration(final File file)

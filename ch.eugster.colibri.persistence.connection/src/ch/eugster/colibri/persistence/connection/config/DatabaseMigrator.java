@@ -6,8 +6,6 @@
  */
 package ch.eugster.colibri.persistence.connection.config;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,7 +24,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.Metamodel;
-import javax.swing.SwingConstants;
 
 import org.apache.ojb.broker.PBKey;
 import org.apache.ojb.broker.PersistenceBroker;
@@ -61,7 +58,6 @@ import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.Profile;
-import ch.eugster.colibri.persistence.model.Profile.PanelType;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Role;
 import ch.eugster.colibri.persistence.model.RoleProperty;
@@ -469,18 +465,9 @@ public class DatabaseMigrator extends AbstractConfigurator
 			{
 				final long id = 1L;
 				profile = Profile.newInstance();
+				profile.setDefaultValues();
 				profile.setName("Profile 1");
 				profile.setId(Long.valueOf(id));
-
-				profile.setTopLeft(PanelType.DISPLAY);
-				profile.setTopRight(PanelType.SELECTION);
-				profile.setBottomLeft(PanelType.NUMERIC);
-				profile.setBottomRight(PanelType.FUNCTION);
-
-				profile.setDisplayFontSize(20f);
-				profile.setDisplayFontStyle(java.awt.Font.BOLD);
-				profile.setDisplayFg(java.awt.Color.GREEN.getRGB());
-				profile.setDisplayBg(java.awt.Color.BLACK.getRGB());
 
 				query = new QueryByCriteria(ch.eugster.pos.db.Block.class);
 				final Collection<ch.eugster.pos.db.Block> blocks = broker.getCollectionByQuery(query);
@@ -497,44 +484,6 @@ public class DatabaseMigrator extends AbstractConfigurator
 						}
 					}
 				}
-				profile.setTabbedPaneFontSize(18f);
-				profile.setTabbedPaneFontStyle(java.awt.Font.PLAIN);
-				profile.setTabbedPaneFgSelected(java.awt.Color.RED.getRGB());
-				profile.setTabbedPaneFg(java.awt.Color.GREEN.getRGB());
-				profile.setTabbedPaneBg(java.awt.Color.WHITE.getRGB());
-
-				profile.setButtonNormalFontSize(12f);
-				profile.setButtonNormalFontStyle(java.awt.Font.BOLD);
-				profile.setButtonNormalHorizontalAlign(SwingConstants.CENTER);
-				profile.setButtonNormalVerticalAlign(SwingConstants.CENTER);
-				profile.setButtonNormalFg(java.awt.Color.BLACK.getRGB());
-				profile.setButtonNormalBg(java.awt.Color.GREEN.getRGB());
-
-				profile.setButtonFailOverFontSize(12f);
-				profile.setButtonFailOverFontStyle(java.awt.Font.BOLD);
-				profile.setButtonFailOverHorizontalAlign(SwingConstants.CENTER);
-				profile.setButtonFailOverVerticalAlign(SwingConstants.CENTER);
-				profile.setButtonFailOverFg(java.awt.Color.BLACK.getRGB());
-				profile.setButtonFailOverBg(java.awt.Color.ORANGE.getRGB());
-				/*
-				 * Labels
-				 */
-				profile.setNameLabelFontSize(12f);
-				profile.setNameLabelFontStyle(0);
-				profile.setNameLabelFg(Color.BLACK.getRGB());
-				profile.setNameLabelBg(Color.WHITE.getRGB());
-				profile.setValueLabelFontSize(12f);
-				profile.setValueLabelFontStyle(0);
-				profile.setValueLabelFg(Color.BLACK.getRGB());
-				profile.setValueLabelBg(Color.WHITE.getRGB());
-				profile.setValueLabelBgSelected(Color.WHITE.getRGB());
-				/*
-				 * List
-				 */
-				profile.setListBg(Color.WHITE.getRGB());
-				profile.setListFg(Color.BLACK.getRGB());
-				profile.setListFontSize(12f);
-				profile.setListFontStyle(Font.PLAIN);
 
 				this.getEntityManager().getTransaction().begin();
 				profile = this.getEntityManager().merge(profile);
@@ -637,12 +586,12 @@ public class DatabaseMigrator extends AbstractConfigurator
 		try
 		{
 			numberlength = Integer.valueOf(
-					this.oldDocument.getRootElement().getChild("receipt").getAttributeValue("number-length"))
+					this.oldDocument.getRootElement().getChild("receipt").getChild("header").getAttributeValue("number-length"))
 					.intValue();
 		}
 		catch (final NumberFormatException e)
 		{
-
+			numberlength = 6;
 		}
 		String numberFormat = null;
 		if (numberlength > 0)
@@ -1084,7 +1033,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 					target.setMappingId(source.exportId);
 					target.setName(source.name);
 					target.setPriceProposal(source.priceProposal);
-					target.setQuantityProposal(source.quantityProposal);
+					target.setQuantityProposal(Math.abs(source.quantityProposal));
 					if ((source.galileoId != null) && (source.galileoId.length() > 0))
 					{
 						final ExternalProductGroup epg = ExternalProductGroup
@@ -1199,6 +1148,16 @@ public class DatabaseMigrator extends AbstractConfigurator
 				if (target == null)
 				{
 					target = Salespoint.newInstance(settings);
+					boolean allowTestSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("settlement").getAttributeValue("admit-test-settlement"));
+					target.setAllowTestSettlement(allowTestSettlement);
+					boolean forceSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-settlement"));
+					target.setForceSettlement(forceSettlement);
+					boolean export = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("export"));
+					target.setExport(export);
+					String path = this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("path");
+					target.setExportPath(path);
+					boolean forceCashCheck = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-stock-count"));
+					target.setForceCashCheck(forceCashCheck);
 					target.setMapping(source.exportId);
 					target.setSettlement(null);
 					target.setId(source.getId());

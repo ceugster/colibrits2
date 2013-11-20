@@ -17,6 +17,7 @@ import org.jdom.Element;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Entity;
 import ch.eugster.colibri.persistence.queries.AbstractQuery;
@@ -151,7 +152,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	@Override
 	protected String getTopic()
 	{
-		return CacheService.EVENT_TOPIC;
+		return Topic.LOCAL_DATABASE.topic();
 	}
 
 	@Override

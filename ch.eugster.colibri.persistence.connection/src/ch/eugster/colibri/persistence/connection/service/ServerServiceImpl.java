@@ -20,6 +20,7 @@ import org.jdom.Element;
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
 import ch.eugster.colibri.persistence.connection.dialog.LoginDialog;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Entity;
 import ch.eugster.colibri.persistence.model.IReplicatable;
@@ -112,7 +113,8 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		properties.setProperty(PersistenceUnitProperties.JDBC_USER, embedded.booleanValue() ? connection.getText() : username);
 		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, embedded.booleanValue() ? connection.getText() : password);
 		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, target);
-		properties.setProperty("eclipselink.jdbc.connection_pool.default.wait", "3000");
+		properties.setProperty(PersistenceUnitProperties.CONNECTION_POOL_WAIT, "3000");
+		properties.setProperty(PersistenceUnitProperties.QUERY_TIMEOUT, "0");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Activator.getDefault().getLogLevel());
 		return properties;
 	}
@@ -139,7 +141,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 			map.put(key, value);
 		}
 
-		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, ServerExceptionHandler.class.getName());
+//		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, ServerExceptionHandler.class.getName());
 		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
 		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
 		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, "ch.eugster.colibri.persistence.connection.ServerExceptionHandler");
@@ -162,7 +164,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	@Override
 	protected String getTopic()
 	{
-		return "ch/eugster/colibri/persistence/server/database";
+		return Topic.SCHEDULED_TRANSFER.topic();
 	}
 
 	@Override
@@ -186,7 +188,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	}
 
 	@Override
-	protected void updateReplicationValue(Entity entity) 
+	protected void updateReplicationValue(Entity entity) throws Exception 
 	{
 		if (isConnected())
 		{

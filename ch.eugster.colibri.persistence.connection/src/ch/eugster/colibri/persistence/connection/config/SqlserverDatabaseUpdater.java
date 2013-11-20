@@ -2,8 +2,6 @@ package ch.eugster.colibri.persistence.connection.config;
 
 import java.util.Properties;
 
-import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater.DatePart;
-
 public class SqlserverDatabaseUpdater extends DatabaseUpdater
 {
 	public SqlserverDatabaseUpdater(Properties properties)

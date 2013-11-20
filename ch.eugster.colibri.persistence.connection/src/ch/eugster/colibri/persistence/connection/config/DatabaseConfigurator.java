@@ -652,7 +652,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				key = Key.newInstance(tab);
 				key.setKeyType(KeyType.FUNCTION);
 				key.setFunctionType(FunctionType.FUNCTION_PRINT_LAST_RECEIPT);
-				key.setLabel("Letzen<br>Beleg");
+				key.setLabel("<html>Letzen<br>Beleg");
 				key.setTabCol(1);
 				key.setTabRow(2);
 				tab.addKey(key);
@@ -1270,8 +1270,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			if (version == null)
 			{
 				version = Version.newInstance();
-				version.setData(0);
-				version.setStructure(0);
+				version.setData(Version.DATA);
+				version.setStructure(Version.STRUCTURE);
 				version.setReplicationValue(version.getReplicationValue() + 1);
 
 				this.getEntityManager().getTransaction().begin();

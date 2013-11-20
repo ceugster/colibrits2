@@ -75,7 +75,7 @@ public class PersistenceServiceImpl implements PersistenceService
 	@Override
 	public void postEvent(final Event event)
 	{
-		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
+		EventAdmin eventAdmin = getEventAdmin();
 		if (eventAdmin != null)
 		{
 			eventAdmin.postEvent(event);
@@ -85,7 +85,7 @@ public class PersistenceServiceImpl implements PersistenceService
 	@Override
 	public void sendEvent(final Event event)
 	{
-		EventAdmin eventAdmin = Activator.getDefault().getEventAdmin();
+		EventAdmin eventAdmin = getEventAdmin();
 		if (eventAdmin != null)
 		{
 			eventAdmin.sendEvent(event);
@@ -140,34 +140,5 @@ public class PersistenceServiceImpl implements PersistenceService
 	{
 		return Activator.getDefault().getPersistenceProvider();
 	}
-//
-//	public void setEventAdmin(final EventAdmin eventAdmin)
-//	{
-//		this.eventAdmin = eventAdmin;
-//	}
-//
-//	public void unsetEventAdmin(final EventAdmin eventAdmin)
-//	{
-//		this.eventAdmin = null;
-//	}
-//
-//	public void setPersistenceProvider(final PersistenceProvider persistenceProvider)
-//	{
-//		this.persistenceProvider = persistenceProvider;
-//	}
-//
-//	public void unsetPersistenceProvider(final PersistenceProvider persistenceProvider)
-//	{
-//		this.persistenceProvider = null;
-//	}
-//
-//	public void setLogService(final LogService logService)
-//	{
-//		this.logService = logService;
-//	}
-//
-//	public void unsetLogService(final LogService logService)
-//	{
-//		this.logService = null;
-//	}
+
 }
