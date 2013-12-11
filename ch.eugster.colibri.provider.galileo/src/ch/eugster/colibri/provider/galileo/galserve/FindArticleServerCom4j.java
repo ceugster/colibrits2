@@ -34,15 +34,22 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 					log(LogService.LOG_INFO, "Kundennummer setzen.");
 					final int customerId = this.getCustomerId(barcode);
 					log(LogService.LOG_INFO, "Kunden suchen.");
-					if (this.getGalserve().do_getkunde(customerId))
+					try
 					{
-						log(LogService.LOG_INFO, "Kunden gefunden; aktualisieren.");
-						this.updatePosition(barcode, position);
+						if (this.getGalserve().do_getkunde(customerId))
+						{
+							log(LogService.LOG_INFO, "Kunden gefunden; aktualisieren.");
+							this.updatePosition(barcode, position);
+						}
+						else
+						{
+							msg = "Kundennummer \"" + customerId + "\" nicht vorhanden.";
+							log(LogService.LOG_INFO, msg);
+						}
 					}
-					else
+					catch(Exception e)
 					{
-						msg = "Kundennummer \"" + customerId + "\" nicht vorhanden.";
-						log(LogService.LOG_INFO, msg);
+						log(LogService.LOG_ERROR, e.getLocalizedMessage());
 					}
 					position.setSearchValue(null);
 				}
@@ -58,20 +65,30 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 					else
 					{
 						log(LogService.LOG_INFO, "Artikel suchen.");
-						this.getGalserve().do_NSearch(barcode.getProductCode());
-						if (((Boolean) this.getGalserve().gefunden()).booleanValue())
+						try
 						{
-							log(LogService.LOG_INFO, "Artikel gefunden; Position aktualisieren.");
-							this.updatePosition(barcode, position);
-							log(LogService.LOG_INFO, "Defaultwerte des Barcodes übernehmen, falls notwendig.");
-							barcode.updatePosition(position);
+							this.getGalserve().do_NSearch(barcode.getProductCode());
+							if (((Boolean) this.getGalserve().gefunden()).booleanValue())
+							{
+								log(LogService.LOG_INFO, "Artikel gefunden; Position aktualisieren.");
+								this.updatePosition(barcode, position);
+								log(LogService.LOG_INFO, "Defaultwerte des Barcodes übernehmen, falls notwendig.");
+								barcode.updatePosition(position);
+							}
+							else
+							{
+								msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
+										+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
+								status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+								log(LogService.LOG_INFO, (msg));
+							}
 						}
-						else
+						catch(Exception e)
 						{
 							msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
-									+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
-							status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
-							log(LogService.LOG_INFO, (msg));
+									+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell. " + e.getLocalizedMessage();
+							status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg);
+							log(LogService.LOG_ERROR, (msg));
 						}
 					}
 				}
@@ -113,31 +130,31 @@ public class FindArticleServerCom4j extends AbstractServer implements IFindArtic
 //		return customer;
 //	}
 
-	@Override
-	public IStatus checkConnection(String path)
-	{
-		IStatus status = null;
-		if (isConnect())
-		{
-			Igdserve galserve = ClassFactory.creategdserve();
-			if (galserve.do_NOpen(path))
-			{
-				galserve.do_NClose();
-				status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
-						"Die Verbindung zur Warenbewirtschaftung Galileo konnte erfolgreich hergestellt werden.");
-			}
-			else
-			{
-				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-						Topic.PROVIDER_QUERY.topic(), new Exception("Die Verbindung zu " + this.getConfiguration().getName() + " kann nicht hergestellt werden."));
-			}
-			galserve.dispose();
-		}
-		else
-		{
-			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
-					"Die Verbindung zur Warenbewirtschaftung ist deaktiviert.");
-		}
-		return status;
-	}
+//	@Override
+//	public IStatus checkConnection(String path)
+//	{
+//		IStatus status = null;
+//		if (isConnect())
+//		{
+//			Igdserve galserve = ClassFactory.creategdserve();
+//			if (galserve.do_NOpen(path))
+//			{
+//				galserve.do_NClose();
+//				status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
+//						"Die Verbindung zur Warenbewirtschaftung Galileo konnte erfolgreich hergestellt werden.");
+//			}
+//			else
+//			{
+//				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+//						Topic.PROVIDER_QUERY.topic(), new Exception("Die Verbindung zu " + this.getConfiguration().getName() + " kann nicht hergestellt werden."));
+//			}
+//			galserve.dispose();
+//		}
+//		else
+//		{
+//			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
+//					"Die Verbindung zur Warenbewirtschaftung ist deaktiviert.");
+//		}
+//		return status;
+//	}
 }

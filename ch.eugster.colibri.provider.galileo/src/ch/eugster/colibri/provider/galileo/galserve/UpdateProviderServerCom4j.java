@@ -64,14 +64,22 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 							int customerId = this.getCustomerId(barcode);
 							if (customerId > 0)
 							{
-								if (this.getGalserve().do_getkunde(customerId))
+								try
 								{
-									this.updatePosition(barcode, position);
+									if (this.getGalserve().do_getkunde(customerId))
+									{
+										this.updatePosition(barcode, position);
+									}
+									else
+									{
+										String msg = "Kundennummer \"" + customerId + "\" nicht vorhanden.";
+										log(LogService.LOG_INFO, msg);
+									}
 								}
-								else
+								catch(Exception e)
 								{
-									String msg = "Kundennummer \"" + customerId + "\" nicht vorhanden.";
-									log(LogService.LOG_INFO, msg);
+									String msg = "Fehler beim Aufruf von do_getkunde: " + e.getLocalizedMessage();
+									log(LogService.LOG_ERROR, msg);
 								}
 							}
 						}
@@ -97,18 +105,27 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 							}
 							else
 							{
-								this.getGalserve().do_NSearch(barcode.getProductCode());
-								if (((Boolean) this.getGalserve().gefunden()).booleanValue())
+								try
 								{
-									this.updatePosition(barcode, position);
-									barcode.updatePosition(position);
+									this.getGalserve().do_NSearch(barcode.getProductCode());
+									if (((Boolean) this.getGalserve().gefunden()).booleanValue())
+									{
+										this.updatePosition(barcode, position);
+										barcode.updatePosition(position);
+									}
+									else
+									{
+										String msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
+												+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
+										status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+										log(LogService.LOG_INFO, (msg));
+									}
 								}
-								else
+								catch(Exception e)
 								{
-									String msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
-											+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
-									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
-									log(LogService.LOG_INFO, (msg));
+									String msg = "Fehler beim Aufruf von do_NSearch: " + e.getLocalizedMessage();
+									status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
+									log(LogService.LOG_ERROR, (msg));
 								}
 							}
 						}
@@ -232,15 +249,23 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		final String msg = "Galileo: Transaktion geschrieben.";
 
-		final Boolean result = (Boolean)this.getGalserve().vtranswrite();
-		if (result.booleanValue())
+		try
 		{
-			log(LogService.LOG_INFO, msg);
+			final Boolean result = (Boolean)this.getGalserve().vtranswrite();
+			if (result.booleanValue())
+			{
+				log(LogService.LOG_INFO, msg);
+			}
+			else
+			{
+				status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+				log(LogService.LOG_ERROR, msg + " FEHLER!");
+			}
 		}
-		else
+		catch(Exception e)
 		{
-			status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
-			log(LogService.LOG_ERROR, msg + " FEHLER!");
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
+			log(LogService.LOG_ERROR, msg + " FEHLER: " + e.getLocalizedMessage());
 		}
 
 		return status;
@@ -258,17 +283,26 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			final Integer invoiceNumber = this.convert(position.getProduct().getInvoiceNumber());
 			if (invoiceNumber != null)
 			{
-				if (this.getGalserve().do_BucheRechnung(invoiceNumber))
+				try
 				{
-					position.setProviderBooked(true);
-					this.updateCustomerAccount(position);
-					log(LogService.LOG_INFO, "Galileo: Rechnung " + position.getProduct().getInvoiceNumber()
-								+ " verbuchen... Ok.");
+					if (this.getGalserve().do_BucheRechnung(invoiceNumber))
+					{
+						position.setProviderBooked(true);
+						this.updateCustomerAccount(position);
+						log(LogService.LOG_INFO, "Galileo: Rechnung " + position.getProduct().getInvoiceNumber()
+									+ " verbuchen... Ok.");
+					}
+					else
+					{
+						final String msg = this.getGalserve().crgerror().toString();
+						log(LogService.LOG_ERROR, "Galileo: Rechnung " + position.getProduct().getInvoiceNumber()
+									+ " verbuchen... Fehler: " + msg);
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					final String msg = this.getGalserve().crgerror().toString();
-					log(LogService.LOG_INFO, "Galileo: Rechnung " + position.getProduct().getInvoiceNumber()
+					final String msg = "Fehler beim Aufruf von do_BucheRechnung: " + e.getLocalizedMessage();
+					log(LogService.LOG_ERROR, "Galileo: Rechnung " + position.getProduct().getInvoiceNumber()
 								+ " verbuchen... Fehler: " + msg);
 				}
 			}
@@ -293,32 +327,48 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				 * Eine negative Menge bedeuted die Rücknahme eines Artikels, dieser
 				 * muss beim Stornieren einer Rechnung wieder 'verkauft' werden.
 				 */
-				if (this.getGalserve().do_verkauf(position.getCode()))
+				try
 				{
-					position.setProviderBooked(false);
-					this.updateCustomerAccount(position);
-					log(LogService.LOG_INFO, "Galileo: do_verkauf() für " + position.getSearchValue()
-								+ " aufgerufen... Ok!");
+					if (this.getGalserve().do_verkauf(position.getCode()))
+					{
+						position.setProviderBooked(false);
+						this.updateCustomerAccount(position);
+						log(LogService.LOG_INFO, "Galileo: do_verkauf() für " + position.getSearchValue()
+									+ " aufgerufen... Ok!");
+					}
+					else
+					{
+						log(LogService.LOG_ERROR, "Galileo: do_verkauf() für " + position.getSearchValue()
+									+ " aufgerufen... Fehler!");
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					log(LogService.LOG_INFO, "Galileo: do_verkauf() für " + position.getSearchValue()
-								+ " aufgerufen... Fehler!");
+					log(LogService.LOG_ERROR, "Galileo: do_verkauf() für " + position.getSearchValue()
+							+ " aufgerufen... Fehler: " + e.getLocalizedMessage());
 				}
 			}
 			else
 			{
-				if (this.getGalserve().do_storno(position.getCode()))
+				try
 				{
-					position.setProviderBooked(false);
-					this.updateCustomerAccount(position);
-					log(LogService.LOG_INFO, "Galileo: do_storno() für " + position.getSearchValue()
-								+ " aufgerufen... Ok!");
+					if (this.getGalserve().do_storno(position.getCode()))
+					{
+						position.setProviderBooked(false);
+						this.updateCustomerAccount(position);
+						log(LogService.LOG_INFO, "Galileo: do_storno() für " + position.getSearchValue()
+									+ " aufgerufen... Ok!");
+					}
+					else
+					{
+						log(LogService.LOG_ERROR, "Galileo: do_storno() für " + position.getSearchValue()
+									+ " aufgerufen... Fehler!");
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					log(LogService.LOG_INFO, "Galileo: do_storno() für " + position.getSearchValue()
-								+ " aufgerufen... Fehler!");
+					log(LogService.LOG_ERROR, "Galileo: do_storno() für " + position.getSearchValue()
+							+ " aufgerufen... Fehler: " + e.getLocalizedMessage());
 				}
 			}
 
@@ -338,30 +388,46 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				 * Bei negativer Menge (Ursprünglich eine Rückbuchung eines
 				 * Artikels, muss dieser nun wieder 'verkauft' werden
 				 */
-				if (this.getGalserve().do_wgverkauf())
+				try
 				{
-					position.setProviderBooked(false);
-					log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
-								+ " aufgerufen... Ok!");
+					if (this.getGalserve().do_wgverkauf())
+					{
+						position.setProviderBooked(false);
+						log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
+									+ " aufgerufen... Ok!");
+					}
+					else
+					{
+						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
+						log(LogService.LOG_ERROR, status.getMessage());
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
-					log(LogService.LOG_INFO, status.getMessage());
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()", e);
+					log(LogService.LOG_ERROR, status.getMessage() + e.getLocalizedMessage());
 				}
 			}
 			else
 			{
-				if (this.getGalserve().do_wgstorno())
+				try
 				{
-					position.setProviderBooked(false);
-					log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
-								+ " aufgerufen... Ok!");
+					if (this.getGalserve().do_wgstorno())
+					{
+						position.setProviderBooked(false);
+						log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
+									+ " aufgerufen... Ok!");
+					}
+					else
+					{
+						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
+						log(LogService.LOG_ERROR, status.getMessage());
+					}
 				}
-				else
+				catch(Exception e)
 				{
-					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()");
-					log(LogService.LOG_INFO, status.getMessage());
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Beim Versuch, die Daten an die Warenbewirtschaftung zu übermitteln, ist ein Fehler aufgetreten (Galileo: do_wgverkauf()", e);
+					log(LogService.LOG_ERROR, status.getMessage() + e.getLocalizedMessage());
 				}
 			}
 			status = this.galileoTransactionWritten();
@@ -380,17 +446,25 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				 * Eine negative Menge bedeutet die Rücknahme eines Artikels, damit
 				 * muss dieser storniert werden.
 				 */
-				if (this.getGalserve().do_storno(position.getCode()))
+				try
 				{
-					position.setProviderBooked(true);
-					this.updateCustomerAccount(position);
-						log(LogService.LOG_INFO, "Galileo: do_storno() für " + position.getSearchValue()
-								+ " aufgerufen... Ok!");
+					if (this.getGalserve().do_storno(position.getCode()))
+					{
+						position.setProviderBooked(true);
+						this.updateCustomerAccount(position);
+							log(LogService.LOG_INFO, "Galileo: do_storno() für " + position.getSearchValue()
+									+ " aufgerufen... Ok!");
+					}
+					else
+					{
+							log(LogService.LOG_ERROR, "Galileo: do_storno() für " + position.getSearchValue()
+									+ " aufgerufen... Fehler!");
+					}
 				}
-				else
+				catch(Exception e)
 				{
-						log(LogService.LOG_INFO, "Galileo: do_storno() für " + position.getSearchValue()
-								+ " aufgerufen... Fehler!");
+					log(LogService.LOG_ERROR, "Galileo: do_storno() für " + position.getSearchValue()
+							+ " aufgerufen... Fehler. " + e.getLocalizedMessage());
 				}
 			}
 			else
@@ -398,16 +472,24 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 				/*
 				 * Eine positive Menge bedeutet den Verkauf eines Artikels.
 				 */
-				if (this.getGalserve().do_verkauf(position.getCode()))
+				try
 				{
-					position.setProviderBooked(true);
-					this.updateCustomerAccount(position);
-						log(LogService.LOG_INFO, "Galileo: do_verkauf() für " + position.getSearchValue() + " aufgerufen... Ok!");
+					if (this.getGalserve().do_verkauf(position.getCode()))
+					{
+						position.setProviderBooked(true);
+						this.updateCustomerAccount(position);
+							log(LogService.LOG_INFO, "Galileo: do_verkauf() für " + position.getSearchValue() + " aufgerufen... Ok!");
+					}
+					else
+					{
+							log(LogService.LOG_ERROR, "Galileo: do_verkauf() für " +
+									position.getSearchValue() + " aufgerufen... FEHLER!");
+					}
 				}
-				else
+				catch(Exception e)
 				{
-						log(LogService.LOG_INFO, "Galileo: do_verkauf() für " +
-								position.getSearchValue() + " aufgerufen... FEHLER!");
+					log(LogService.LOG_ERROR, "Galileo: do_verkauf() für " +
+							position.getSearchValue() + " aufgerufen... FEHLER: " + e.getLocalizedMessage());
 				}
 			}
 			return this.galileoTransactionWritten();
@@ -425,33 +507,49 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 			 * Eine negative Menge bedeutet die Rückbuchung eines Artikels,
 			 * dieser muss somit storniert werden
 			 */
-			if (this.getGalserve().do_wgstorno())
+			try
 			{
-				position.setProviderBooked(true);
-				this.updateCustomerAccount(position);
-				log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
-							+ " aufgerufen... Ok!");
+				if (this.getGalserve().do_wgstorno())
+				{
+					position.setProviderBooked(true);
+					this.updateCustomerAccount(position);
+					log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
+								+ " aufgerufen... Ok!");
+				}
+				else
+				{
+					log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
+								+ " aufgerufen... FEHLER!");
+				}
 			}
-			else
+			catch(Exception e)
 			{
 				log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
-							+ " aufgerufen... FEHLER!");
+						+ " aufgerufen... FEHLER: " + e.getLocalizedMessage());
 			}
 		}
 		else
 		{
-			boolean sold = this.getGalserve().do_wgverkauf();
-			if (sold)
+			try
 			{
-				position.setProviderBooked(true);
-				this.updateCustomerAccount(position);
-				log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
-							+ " aufgerufen... Ok!");
+				boolean sold = this.getGalserve().do_wgverkauf();
+				if (sold)
+				{
+					position.setProviderBooked(true);
+					this.updateCustomerAccount(position);
+					log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
+								+ " aufgerufen... Ok!");
+				}
+				else
+				{
+					log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
+								+ " aufgerufen... Fehler!");
+				}
 			}
-			else
+			catch(Exception e)
 			{
 				log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
-							+ " aufgerufen... Fehler!");
+						+ " aufgerufen... Fehler: " + e.getLocalizedMessage());
 			}
 		}
 
@@ -475,7 +573,7 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 		}
 		else
 		{
-			value = this.convert(receipt.getCustomer().getCode());
+			value = this.convert(receipt.getCustomerCode());
 		}
 		return value == null ? Integer.valueOf(0) : value;
 	}
@@ -539,15 +637,24 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 	{
 		if (status.getSeverity() == IStatus.OK)
 		{
-			if (this.getGalserve().do_verkauf(position.getCode()))
+			try
 			{
-				log(LogService.LOG_INFO, "Galileo: do_verkauf() aufgerufen... Ok!");
+				if (this.getGalserve().do_verkauf(position.getCode()))
+				{
+					log(LogService.LOG_INFO, "Galileo: do_verkauf() aufgerufen... Ok!");
+				}
+				else
+				{
+					String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen).";
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(msg));
+					log(LogService.LOG_INFO, msg);
+				}
 			}
-			else
+			catch(Exception e)
 			{
-				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen).";
+				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_verkauf() fehlgeschlagen). ";
 				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(msg));
-				log(LogService.LOG_INFO, msg);
+				log(LogService.LOG_INFO, msg + e.getLocalizedMessage());
 			}
 		}
 		return status;
@@ -557,17 +664,26 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 	{
 		if (status.getSeverity() == IStatus.OK)
 		{
-			if (this.getGalserve().do_delabholfach(position.getSearchValue(), Math.abs(position.getQuantity())))
+			try
 			{
-				position.setProviderBooked(true);
-				this.updateCustomerAccount(position);
-				log(LogService.LOG_INFO, "Galileo: do_delabholfach() aufgerufen... Ok!");
-				status = this.galileoTransactionWritten();
+				if (this.getGalserve().do_delabholfach(position.getSearchValue(), Math.abs(position.getQuantity())))
+				{
+					position.setProviderBooked(true);
+					this.updateCustomerAccount(position);
+					log(LogService.LOG_INFO, "Galileo: do_delabholfach() aufgerufen... Ok!");
+					status = this.galileoTransactionWritten();
+				}
+				else
+				{
+					String error = (String) this.getGalserve().crgerror();
+					String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + error + ").";
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(msg));
+					log(LogService.LOG_INFO, msg);
+				}
 			}
-			else
+			catch(Exception e)
 			{
-				String error = (String) this.getGalserve().crgerror();
-				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + error + ").";
+				String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler aus Galileo: do_delabholfach() fehlgeschlagen:\n" + e.getLocalizedMessage()+ ").";
 				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(msg));
 				log(LogService.LOG_INFO, msg);
 			}
@@ -589,11 +705,14 @@ public class UpdateProviderServerCom4j extends AbstractServer implements IUpdate
 
 	private void updateCustomerAccount(final Position position) throws Exception
 	{
-		if (position.getReceipt().getCustomer() != null)
+		if (position.getReceipt().getCustomer() != null && position.getReceipt().getCustomer().getHasAccount())
 		{
-			if (position.getReceipt().getCustomer().getHasAccount())
+			try
 			{
-				position.getReceipt().getCustomer().setAccount(((Integer)this.getGalserve().nkundkonto()).intValue());
+				position.getReceipt().getCustomer().setAccount(((Double)this.getGalserve().nkundkonto()).doubleValue());
+			}
+			catch(Exception e)
+			{
 			}
 		}
 	}

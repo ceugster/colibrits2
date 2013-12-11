@@ -125,16 +125,13 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	protected void activate(final ComponentContext componentContext)
 	{
 		this.context = componentContext;
+		this.startUpdateProviderServer();
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
 	{
-//		this.stopArticleServer();
-//		this.stopFindArticleServer();
 		this.stopUpdateProviderServer();
-//		this.stopCustomerServer();
-
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
 					+ " deaktiviert.");
 		this.context = null;
@@ -204,7 +201,6 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 
 	private IUpdateProviderServer getUpdateProviderServer()
 	{
-		this.startUpdateProviderServer();
 		return this.updateProviderServer;
 	}
 

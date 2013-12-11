@@ -137,6 +137,12 @@ public class GalileoQueryComponent implements ProviderQuery
 			{
 				status = this.getCustomerServer().selectCustomer(position, productGroup);
 			}
+			catch (Exception e)
+			{
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Fehler bei Aufruf von Kundensuche. " + e.getLocalizedMessage(),e);
+				log(LogService.LOG_ERROR, status.getMessage());
+//				this.sendEvent(this.getEvent(status, true));
+			}
 			finally
 			{
 				log(LogService.LOG_INFO, position.getReceipt().getCustomer() == null ? "Kundensuche abgebrochen." : "Kunden ausgewählt: " + position.getReceipt().getCustomerCode() + " - " + position.getReceipt().getCustomer().getFullname() + ".");

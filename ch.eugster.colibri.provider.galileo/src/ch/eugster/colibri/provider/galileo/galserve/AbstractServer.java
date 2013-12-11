@@ -61,7 +61,7 @@ public abstract class AbstractServer implements IServer
 
 	private boolean connect;
 	
-	private boolean open;
+	private boolean open = false;
 
 	private boolean wasOpen;
 	
@@ -427,20 +427,32 @@ public abstract class AbstractServer implements IServer
 	@Override
 	public IStatus checkConnection(String path)
 	{
-		IStatus status = null;
-		Igdserve galserve = ClassFactory.creategdserve();
-		if (galserve.do_NOpen(path))
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
+				"Die Verbindung zur Warenbewirtschaftung Galileo wurde erfolgreich hergestellt.");
+		if (galserve == null || this.status.getSeverity() != IStatus.OK)
 		{
-			galserve.do_NClose();
-			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
-					"Die Verbindung zur Warenbewirtschaftung Galileo wurde erfolgreich hergestellt.");
+			try
+			{
+				galserve = ClassFactory.creategdserve();
+				boolean result = galserve.do_NOpen(path);
+				if (result)
+				{
+					galserve.do_NClose();
+				}
+				else
+				{
+					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+							Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
+				}
+				galserve.dispose();
+				galserve = null;
+			}
+			catch (Exception e)
+			{
+				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+						Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+			}
 		}
-		else
-		{
-			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
-		}
-		galserve.dispose();
 		return status;
 	}
 
@@ -472,10 +484,7 @@ public abstract class AbstractServer implements IServer
 	protected boolean open()
 	{
 		this.wasOpen = this.open;
-		if ((this.getGalserve() == null) || (this.status.getSeverity() == IStatus.ERROR))
-		{
-			this.status = this.start();
-		}
+		this.status = this.start();
 
 		if (this.status.getSeverity() != IStatus.ERROR)
 		{
@@ -492,6 +501,7 @@ public abstract class AbstractServer implements IServer
 				catch (Exception e)
 				{
 					e.printStackTrace();
+					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
 				}
 			}
 		}
@@ -501,32 +511,28 @@ public abstract class AbstractServer implements IServer
 
 	public IStatus start()
 	{
-		this.status = Status.OK_STATUS;
-
 		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
-
-		this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
-				LogService.class, null);
-		this.logServiceTracker.open();
-
-		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-				PersistenceService.class, null);
-		this.persistenceServiceTracker.open();
-
-		this.barcodeVerifierTracker = new ServiceTracker<BarcodeVerifier, BarcodeVerifier>(Activator.getDefault().getBundle().getBundleContext(), BarcodeVerifier.class, null);
-		this.barcodeVerifierTracker.open();
-
-		updateProperties();
-		try
+		if ((this.getGalserve() == null) || (this.status.getSeverity() == IStatus.ERROR))
 		{
-			this.galserve = ClassFactory.creategdserve();
+			this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
+					LogService.class, null);
+			this.logServiceTracker.open();
+			this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+					PersistenceService.class, null);
+			this.persistenceServiceTracker.open();
+			this.barcodeVerifierTracker = new ServiceTracker<BarcodeVerifier, BarcodeVerifier>(Activator.getDefault().getBundle().getBundleContext(), BarcodeVerifier.class, null);
+			this.barcodeVerifierTracker.open();
+			updateProperties();
+			try
+			{
+				this.galserve = ClassFactory.creategdserve();
+			}
+			catch (ComException e)
+			{
+				this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+						"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
+			}
 		}
-		catch (ComException e)
-		{
-			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-					"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
-		}
-
 		return this.status;
 	}
 
