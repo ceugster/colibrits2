@@ -304,7 +304,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 				detail = SettlementPayment.newInstance(settlement, paymentType);
 				details.put(id, detail);
 			}
-			final Integer quantity = (Integer) result.get("COUNT");
+			final Long quantity = (Long) result.get("id");
 			detail.setQuantity(detail.getQuantity() + (quantity == null ? 0 : quantity.intValue()));
 
 			Double amount = (Double) result.get("defaultCurrencyAmount");

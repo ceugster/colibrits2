@@ -9,6 +9,8 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 
+import org.osgi.service.log.LogService;
+
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
@@ -36,6 +38,7 @@ public final class PriceAction extends UserPanelProfileAction
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter PriceAction.actionPerformed()");
 		final double price = userPanel.getValueDisplay().testAmount();
 
 		int result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES;
@@ -52,6 +55,7 @@ public final class PriceAction extends UserPanelProfileAction
 			userPanel.getPositionWrapper().getPosition().setPrice(userPanel.getValueDisplay().getAmount());
 		}
 		userPanel.getPositionListPanel().getModel().actionPerformed(event);
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit PriceAction.actionPerformed()");
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import ch.eugster.colibri.persistence.Activator;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.ProductGroup;
@@ -289,28 +290,35 @@ public enum ProductGroupType implements IProductGroupType
 	@Override
 	public double computePrice(double price)
 	{
+		Activator.getDefault().log("Enter ProductGroupType.computePrice()");
 		if (this.equals(SALES_RELATED))
 		{
+			Activator.getDefault().log("Exit ProductGroupType.computePrice()");
 			return Math.abs(price);
 		}
 		else if (this.equals(NON_SALES_RELATED))
 		{
+			Activator.getDefault().log("Exit ProductGroupType.computePrice()");
 			return Math.abs(price);
 		}
 		else if (this.equals(EXPENSES_MATERIAL))
 		{
+			Activator.getDefault().log("Exit ProductGroupType.computePrice()");
 			return -Math.abs(price);
 		}
 		else if (this.equals(EXPENSES_INVESTMENT))
 		{
+			Activator.getDefault().log("Exit ProductGroupType.computePrice()");
 			return -Math.abs(price);
 		}
 		else if (this.equals(ALLOCATION))
 		{
+			Activator.getDefault().log("Exit ProductGroupType.computePrice()");
 			return Math.abs(price);
 		}
 		else if (this.equals(WITHDRAWAL))
 		{
+			Activator.getDefault().log("Exit ProductGroupType.computePrice()");
 			return -Math.abs(price);
 		}
 		else

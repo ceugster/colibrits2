@@ -11,6 +11,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -33,6 +34,8 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 
 	private ServiceTracker<ProviderIdService, ProviderIdService> providerIdServiceTracker;
 
+	private ServiceTracker<LogService, LogService> logServiceTracker;
+
 	public ProductGroupAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
@@ -48,11 +51,16 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 		this.providerIdServiceTracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle().getBundleContext(),
 				ProviderIdService.class, null);
 		this.providerIdServiceTracker.open();
-	}
+
+		this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
+				LogService.class, null);
+		this.logServiceTracker.open();
+}
 
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
+		log(LogService.LOG_INFO, "Enter ProductGroupAction.actionPerformed()");
 		if (this.setExternalProductGroup(this.getProductGroup()))
 		{
 			if (this.userPanel.getValueDisplay().testAmount() != 0d)
@@ -61,28 +69,42 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 			}
 			this.userPanel.getPositionListPanel().getModel().actionPerformed(event);
 		}
+		log(LogService.LOG_INFO, "Exit ProductGroupAction.actionPerformed()");
 	}
 
+	protected void log(int level, String message)
+	{
+		LogService logService = logServiceTracker.getService();
+		if (logService != null)
+		{
+			logService.log(level, message);
+		}
+	}
+	
 	@Override
 	public void dispose()
 	{
 		this.persistenceServiceTracker.close();
 		this.providerIdServiceTracker.close();
+		this.logServiceTracker.close();
 	}
 
 	public ProductGroup getProductGroup()
 	{
+		log(LogService.LOG_INFO, "Enter ProductGroupAction.getProductGroup()");
 		ProductGroup productGroup = null;
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			productGroup = (ProductGroup) persistenceService.getCacheService().find(ProductGroup.class, this.key.getParentId());
 		}
+		log(LogService.LOG_INFO, "Exit ProductGroupAction.getProductGroup()");
 		return productGroup;
 	}
 
 	public boolean setExternalProductGroup(final ProductGroup productGroup)
 	{
+		log(LogService.LOG_INFO, "Enter ProductGroupAction.setExternalProductGroup()");
 		if (productGroup == null)
 		{
 			return false;
@@ -111,6 +133,7 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 				}
 			}
 		}
+		log(LogService.LOG_INFO, "Exit ProductGroupAction.setExternalProductGroup()");
 		return true;
 	}
 

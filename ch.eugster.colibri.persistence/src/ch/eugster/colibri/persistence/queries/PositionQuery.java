@@ -309,8 +309,8 @@ public class PositionQuery extends AbstractQuery<Position>
 				defaultCurrency = settlement.getSalespoint().getPaymentType().getCurrency();
 			}
 
-			System.out.println(productGroup.getId() + ", " + productGroup.getName() + ", "
-					+ productGroup.getProductGroupType().toString());
+//			System.out.println(productGroup.getId() + ", " + productGroup.getName() + ", "
+//					+ productGroup.getProductGroupType().toString());
 
 			final SettlementPosition detail = SettlementPosition.newInstance(settlement, productGroup, defaultCurrency);
 
@@ -530,7 +530,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
-//		expression = expression.and(new ExpressionBuilder().get("productGroup").get("productGroupType").get("productGroupGroup").notEqual(ProductGroupGroup.INTERNAL));
+		Expression allocation = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.ALLOCATION);
+		Expression withdrawal = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.WITHDRAWAL);
+		Expression internal = allocation.and(withdrawal);
+		expression = expression.and(internal);
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -635,6 +638,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
+		Expression allocation = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.ALLOCATION);
+		Expression withdrawal = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.WITHDRAWAL);
+		Expression internal = allocation.and(withdrawal);
+		expression = expression.and(internal);
 
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("productGroupType", new ExpressionBuilder().get("productGroup")

@@ -27,6 +27,8 @@ import javax.persistence.TableGenerator;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.persistence.annotations.Convert;
 
+import ch.eugster.colibri.persistence.Activator;
+
 @Entity
 @AttributeOverrides({ @AttributeOverride(name = "timestamp", column = @Column(name = "sp_timestamp")),
 		@AttributeOverride(name = "version", column = @Column(name = "sp_version")),

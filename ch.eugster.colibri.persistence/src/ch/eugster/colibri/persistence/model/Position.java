@@ -60,6 +60,7 @@ import javax.persistence.TableGenerator;
 import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Index;
 
+import ch.eugster.colibri.persistence.Activator;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
@@ -426,11 +427,13 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 
 	public void setPrice(double price)
 	{
+		Activator.getDefault().log("Enter Position.setPrice()");
 		if (this.getProductGroup() != null)
 		{
 			price = this.getProductGroup().getProductGroupType().computePrice(price);
 		}
 		this.propertyChangeSupport.firePropertyChange("price", this.price, this.price = price);
+		Activator.getDefault().log("Exit Position.setPrice()");
 	}
 
 	public void setProduct(final Product product)
@@ -458,6 +461,7 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 
 	public void setProductGroup(final ProductGroup productGroup)
 	{
+		Activator.getDefault().log("Enter Position.setProductGroup()");
 		this.propertyChangeSupport.firePropertyChange("productGroup", this.productGroup,
 				this.productGroup = productGroup);
 		if (productGroup == null)
@@ -507,6 +511,7 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 			}
 		}
 		setBookProvider();
+		Activator.getDefault().log("Exit Position.setProductGroup()");
 	}
 
 	public void setProvider(final String provider)

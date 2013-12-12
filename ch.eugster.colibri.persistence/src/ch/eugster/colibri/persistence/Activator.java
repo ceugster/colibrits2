@@ -19,16 +19,21 @@ public class Activator extends Plugin
 		this.log(status.getMessage());
 	}
 
-	public void log(final String message)
+	public void log(int level, final String message)
 	{
 		if (this.logServiceTracker != null)
 		{
 			final LogService logService = this.logServiceTracker.getService();
 			if (logService != null)
 			{
-				logService.log(LogService.LOG_INFO, message);
+				logService.log(level, message);
 			}
 		}
+	}
+
+	public void log(final String message)
+	{
+		log(LogService.LOG_INFO, message);
 	}
 
 	/*

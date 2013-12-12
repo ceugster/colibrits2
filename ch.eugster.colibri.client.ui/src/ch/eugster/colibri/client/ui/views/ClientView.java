@@ -327,7 +327,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					final String message = "Die Verbindung zum Server kann zur Zeit nicht hergestellt werden."
 							+ "\nTiteleingaben müssen manuell vorgenommen werden." 
 							+ "\nAktualisierungen können nicht durchgeführt werden."
-							+ "\n\nFalls der Ausfall länger dauert, benachrichtigen Sie bitte den Lieferanten.";
+							+ "\nStarten Sie den Hauptrechner oder Server neu."
+							+ "\n\nFalls das Problem weiterhin besteht, kontaktieren Sie bitte die Hotline von Comelivres AG.";
 					if (message != null)
 					{
 						MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()

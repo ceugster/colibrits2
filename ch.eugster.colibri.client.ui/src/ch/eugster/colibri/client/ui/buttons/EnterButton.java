@@ -163,7 +163,6 @@ public class EnterButton extends NumericPadButton implements PropertyChangeListe
 							this.updateLabel("Zahlungen");
 						}
 					}
-					// System.out.println();
 				}
 			}
 			else if (userPanel.getCurrentState().equals(UserPanel.State.PAYMENT_INPUT))

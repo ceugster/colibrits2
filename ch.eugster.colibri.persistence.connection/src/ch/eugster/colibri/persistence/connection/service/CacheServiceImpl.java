@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.persistence.logging.SessionLog;
 import org.jdom.Element;
+import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
@@ -27,7 +28,7 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class CacheServiceImpl extends AbstractConnectionService implements CacheService
 {
-	final String cache = "COLIBRI";
+//	final String cache = "COLIBRI";
 
 	public CacheServiceImpl(final PersistenceService persistenceService)
 	{
@@ -43,6 +44,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	@Override
 	public Properties getProperties()
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.getProperties()");
 		final Element connection = Activator.getDefault().getCurrentConnectionElement();
 		/*
 		 * Use ONLY the embedded (local) database, no server database!
@@ -55,9 +57,9 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		properties.setProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE, embedded);
 		properties.setProperty(ConnectionService.KEY_PERSISTENCE_UNIT, ConnectionService.PERSISTENCE_UNIT_LOCAL);
 		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER, EmbeddedDriver.class.getName());
-		properties.setProperty(PersistenceUnitProperties.JDBC_URL, "jdbc:derby:" + cache);
-		properties.setProperty(PersistenceUnitProperties.JDBC_USER, cache);
-		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, cache);
+		properties.setProperty(PersistenceUnitProperties.JDBC_URL, "jdbc:derby:" + connection.getText());
+		properties.setProperty(PersistenceUnitProperties.JDBC_USER, connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER));
+		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, connection.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD));
 		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, "Derby");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Activator.getDefault().getLogLevel());
 		
@@ -69,7 +71,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 			{
 				if (dir.getAbsolutePath().equals(Activator.getDefault().getDerbyHome().getAbsolutePath()))
 				{
-					return name.toUpperCase().equals(cache.toUpperCase());
+					return name.toUpperCase().equals(properties.getProperty(ConnectionService.KEY_NAME).toUpperCase());
 				}
 				return false;
 			}
@@ -88,11 +90,13 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 //			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
 //					PersistenceUnitProperties.DDL_SQL_SCRIPT_GENERATION);
 //		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.getProperties()");
 		return properties;
 	}
 
 	private Map<String, Object> getEntityManagerProperties(final Properties properties)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.getEntityManagerProperties()");
 		final Map<String, Object> map = new HashMap<String, Object>();
 
 		@SuppressWarnings("unchecked")
@@ -124,8 +128,9 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 			{
 				if (dir.getAbsolutePath().equals(Activator.getDefault().getDerbyHome().getAbsolutePath()))
 				{
-					return name.toUpperCase().equals(cache.toUpperCase());
+					return name.toUpperCase().equals(properties.getProperty(ConnectionService.KEY_NAME).toUpperCase());
 				}
+				Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.getEntityManagerProperties()");
 				return false;
 			}
 		});
@@ -139,13 +144,16 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 
 //		printProperties(map);
 
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.getEntityManagerProperties()");
 		return map;
 	}
 
 	@Override
 	protected IStatus updateDatabase(final Properties properties)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.updateDatabase()");
 		final DatabaseUpdater databaseUpdater = DatabaseUpdater.newInstance(properties);
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.updateDatabase()");
 		return databaseUpdater.updateDatabase(false);
 	}
 
@@ -158,9 +166,11 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	@Override
 	protected EntityManagerFactory createEntityManagerFactory(IStatus status, Properties properties)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.createEntityManagerFactory()");
 		Map<String, Object> map = getEntityManagerProperties(properties);
 		EntityManagerFactory factory = this.getPersistenceService().getPersistenceProvider()
 				.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_LOCAL, map);
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.createEntityManagerFactory()");
 		return factory;
 	}
 

@@ -15,8 +15,8 @@ import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 
 import javax.swing.JLabel;
-import javax.swing.border.EmptyBorder;
 
+import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.code.Barcode;
@@ -242,6 +242,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 
 	public double testAmount()
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter ValueDisplay.testAmount()");
 		double amount = 0d;
 
 		try
@@ -252,6 +253,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 		{
 			amount = 0d;
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit ValueDisplay.testAmount()");
 		return amount;
 	}
 

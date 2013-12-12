@@ -222,12 +222,15 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	public boolean isPositionComplete()
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter PositionWrapper.isPositionComplete()");
 		if (this.position.getForeignCurrency() == null)
 		{
+			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 			return false;
 		}
 		if (this.position.getProductGroup() == null)
 		{
+			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 			return false;
 		}
 		if (this.position.getProduct() != null)
@@ -236,6 +239,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			{
 				if (this.position.getProduct().getExternalProductGroup() == null)
 				{
+					Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 					return false;
 				}
 			}
@@ -249,6 +253,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			{
 				if (this.position.getCurrentTax() == null)
 				{
+					Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 					return false;
 				}
 			}
@@ -257,22 +262,27 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		{
 			if (this.position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
 			{
+				Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 				return false;
 			}
 		}
 		if (this.position.getPrice() == 0d)
 		{
+			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 			return false;
 		}
 		if (this.position.getQuantity() == 0)
 		{
+			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 			return false;
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 		return true;
 	}
 
 	private void log(int level, String message)
 	{
+		System.out.println(message);
 		LogService service = logServiceTracker.getService();
 		if (service != null)
 		{
@@ -541,6 +551,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	public Position preparePosition(final Receipt receipt)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter PositionWrapper.preparePosition()");
 		final Position newPosition = Position.newInstance(receipt);
 		final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
 		if (providerQuery != null)
@@ -551,6 +562,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				newPosition.setBookProvider(providerQuery.getConfiguration().updateLocalItems());
 			}
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.preparePosition()");
 		return replacePosition(newPosition);
 	}
 	
@@ -598,6 +610,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	public Position replacePosition(final Position position)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter PositionWrapper.replacePosition()");
 		this.firePositionChangeEvent(new PositionChangeEvent(this.position, position));
 		if (this.position != null)
 		{
@@ -609,6 +622,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP, this);
 		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_QUANTITY, this);
 		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRICE, this);
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.replacePosition()");
 		return this.position;
 	}
 

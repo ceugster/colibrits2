@@ -819,7 +819,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 					paymentType.setChange(true);
 					paymentType.setCurrency(currency);
 					paymentType.setCode("BAR " + currency.getCode());
-					paymentType.setName("Bargeld");
+					paymentType.setName("Bargeld" + currency.getCode());
 					paymentType.setOpenCashdrawer(true);
 					paymentType.setUndeletable(true);
 

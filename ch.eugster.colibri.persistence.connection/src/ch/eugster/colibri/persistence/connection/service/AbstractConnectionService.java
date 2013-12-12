@@ -309,6 +309,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 	
 	public EntityManagerFactory getEntityManagerFactory()
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter AbstractConnectionService.getEntityManagerFactory()");
 		if (entityManagerFactory == null || !entityManagerFactory.isOpen())
 		{
 			final Properties properties = this.getProperties();
@@ -318,6 +319,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 			entityManagerFactory = createEntityManagerFactory(status, properties);
 			Activator.getDefault().log(LogService.LOG_INFO, "EntityManagerFactory für Datenbank kreiert.");
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit AbstractConnectionService.getEntityManagerFactory()");
 		return entityManagerFactory;
 	}
 	
@@ -365,6 +367,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 
 	public EntityManager createEntityManager()
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter AbstractConnectionService.createEntityManager()");
 		if (persistenceService.getPersistenceProvider() != null)
 		{
 			if (getEntityManagerFactory() != null)
@@ -372,6 +375,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				connect();
 			}
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit AbstractConnectionService.createEntityManager()");
 		return entityManager;
 	}
 
@@ -496,6 +500,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 	@Override
 	public AbstractEntity find(final Class<? extends AbstractEntity> clazz, final Long id)
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter AbstractConnectionService.find()");
 		AbstractEntity entity = null;
 		EntityManager entityManager = null;
 		try
@@ -517,6 +522,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				closeEntityManager(entityManager);
 			}
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit AbstractConnectionService.find()");
 		return entity;
 	}
 	
@@ -693,6 +699,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 	@Override
 	public EntityManager getEntityManager()
 	{
+		Activator.getDefault().log(LogService.LOG_INFO, "Enter AbstractConnectionService.getEntityManager()");
 		if (entityManager == null || !entityManager.isOpen())
 		{
 			if (entityManagerFactory == null)
@@ -718,6 +725,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		{
 			login();
 		}
+		Activator.getDefault().log(LogService.LOG_INFO, "Exit AbstractConnectionService.getEntityManager()");
 		return entityManager;
 	}
 
