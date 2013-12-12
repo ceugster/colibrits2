@@ -47,8 +47,6 @@ import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 
-import com4j.ComException;
-
 public abstract class AbstractServer implements IServer
 {
 	private Igdserve galserve;
@@ -80,7 +78,7 @@ public abstract class AbstractServer implements IServer
 	
 	public boolean isConnect()
 	{
-		this.status = this.start();
+//		this.status = this.start();
 		return connect;
 	}
 	
@@ -484,7 +482,7 @@ public abstract class AbstractServer implements IServer
 	protected boolean open()
 	{
 		this.wasOpen = this.open;
-		this.status = this.start();
+//		this.status = this.start();
 
 		if (this.status.getSeverity() != IStatus.ERROR)
 		{
@@ -509,6 +507,7 @@ public abstract class AbstractServer implements IServer
 		return this.open;
 	}
 
+	@Override
 	public IStatus start()
 	{
 		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
@@ -527,7 +526,7 @@ public abstract class AbstractServer implements IServer
 			{
 				this.galserve = ClassFactory.creategdserve();
 			}
-			catch (ComException e)
+			catch (Exception e)
 			{
 				this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 						"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);

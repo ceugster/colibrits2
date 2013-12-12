@@ -532,39 +532,13 @@ public interface Ikundenserver extends Com4jObject {
 
   /**
    * <p>
-   * Getter method for the COM property "NKUNDENNR"
+   * Getter method for the COM property "LRGGEWAEHLT"
    * </p>
    * @return  Returns a value of type java.lang.Object
    */
 
   @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
   @VTID(47)
-  @ReturnValue(type=NativeType.VARIANT)
-  java.lang.Object nkundennr();
-
-
-  /**
-   * <p>
-   * Setter method for the COM property "NKUNDENNR"
-   * </p>
-   * @param nkundennr Mandatory java.lang.Object parameter.
-   */
-
-  @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
-  @VTID(48)
-  void nkundennr(
-    @MarshalAs(NativeType.VARIANT) java.lang.Object nkundennr);
-
-
-  /**
-   * <p>
-   * Getter method for the COM property "LRGGEWAEHLT"
-   * </p>
-   * @return  Returns a value of type java.lang.Object
-   */
-
-  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
-  @VTID(49)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lrggewaehlt();
 
@@ -576,8 +550,8 @@ public interface Ikundenserver extends Com4jObject {
    * @param lrggewaehlt Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
-  @VTID(50)
+  @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
+  @VTID(48)
   void lrggewaehlt(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lrggewaehlt);
 
@@ -589,8 +563,8 @@ public interface Ikundenserver extends Com4jObject {
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
-  @VTID(51)
+  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
+  @VTID(49)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object nrgbetrag();
 
@@ -602,8 +576,8 @@ public interface Ikundenserver extends Com4jObject {
    * @param nrgbetrag Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
-  @VTID(52)
+  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
+  @VTID(50)
   void nrgbetrag(
     @MarshalAs(NativeType.VARIANT) java.lang.Object nrgbetrag);
 
@@ -615,8 +589,8 @@ public interface Ikundenserver extends Com4jObject {
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
-  @VTID(53)
+  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
+  @VTID(51)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object nrgnummer();
 
@@ -628,8 +602,8 @@ public interface Ikundenserver extends Com4jObject {
    * @param nrgnummer Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
-  @VTID(54)
+  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
+  @VTID(52)
   void nrgnummer(
     @MarshalAs(NativeType.VARIANT) java.lang.Object nrgnummer);
 
@@ -641,8 +615,8 @@ public interface Ikundenserver extends Com4jObject {
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
-  @VTID(55)
+  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
+  @VTID(53)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object crgdatum();
 
@@ -654,29 +628,29 @@ public interface Ikundenserver extends Com4jObject {
    * @param crgdatum Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
-  @VTID(56)
+  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
+  @VTID(54)
   void crgdatum(
     @MarshalAs(NativeType.VARIANT) java.lang.Object crgdatum);
 
 
   /**
-   * @param cLizpath Mandatory java.lang.String parameter.
+   * @param cDatabase Mandatory java.lang.String parameter.
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(50) //= 0x32. The runtime will prefer the VTID if present
-  @VTID(57)
+  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
+  @VTID(55)
   boolean db_open(
-    java.lang.String cLizpath);
+    java.lang.String cDatabase);
 
 
   /**
    * @return  Returns a value of type int
    */
 
-  @DISPID(51) //= 0x33. The runtime will prefer the VTID if present
-  @VTID(58)
+  @DISPID(49) //= 0x31. The runtime will prefer the VTID if present
+  @VTID(56)
   int getkundennr();
 
 
@@ -684,8 +658,8 @@ public interface Ikundenserver extends Com4jObject {
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(52) //= 0x34. The runtime will prefer the VTID if present
-  @VTID(59)
+  @DISPID(50) //= 0x32. The runtime will prefer the VTID if present
+  @VTID(57)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object db_close();
 
@@ -694,8 +668,8 @@ public interface Ikundenserver extends Com4jObject {
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(53) //= 0x35. The runtime will prefer the VTID if present
-  @VTID(60)
+  @DISPID(51) //= 0x33. The runtime will prefer the VTID if present
+  @VTID(58)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object clearKundenProps();
 

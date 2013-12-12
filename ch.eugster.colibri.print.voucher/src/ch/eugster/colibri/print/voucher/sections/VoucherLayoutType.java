@@ -72,8 +72,22 @@ public class VoucherLayoutType extends AbstractLayoutType
 						.getLayoutSectionTypes();
 				for (final VoucherLayoutSectionType layoutSectionType : layoutSectionTypes)
 				{
-					final ILayoutSection layoutSection = layoutSectionType.getLayoutSection();
-					document.addAll(layoutSection.prepareSection(printable));
+					ILayoutSection layoutSection = null;
+					if (layoutSectionType.equals(VoucherLayoutSectionType.CUSTOMER))
+					{
+						if (receipt.getCustomer() != null && receipt.getCustomer().getHasAccount())
+						{
+							layoutSection = layoutSectionType.getLayoutSection();
+						}
+					}
+					else
+					{
+						layoutSection = layoutSectionType.getLayoutSection();
+					}
+					if (layoutSection != null)
+					{
+						document.addAll(layoutSection.prepareSection(printable));
+					}
 				}
 				final String text = this.finish(document);
 				this.getReceiptPrinterService().print(text);

@@ -87,9 +87,16 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 			@Override
 			public int compare(SettlementPosition pos1, SettlementPosition pos2) 
 			{
-				String name1 = pos1.getName();
-				String name2 = pos2.getName();
-				return name1.compareTo(name2);
+				String code1 = pos1.getCode() == null ? "" : pos1.getCode();
+				String code2 = pos2.getCode() == null ? "" : pos2.getCode();
+				int val = code1.compareTo(code2);
+				if (val == 0)
+				{
+					String name1 = pos1.getName() == null ? "" : pos1.getName();
+					String name2 = pos2.getName() == null ? "" : pos2.getName();
+					val = name1.compareTo(name2);
+				}
+				return val;
 			}
 		});
 		for (SettlementPosition position : positions)
@@ -101,7 +108,7 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 				entry = new SettlementEntry(sectionType);
 				entry.setGroup(position.getProductGroup().getProductGroupType().ordinal());
 				entry.setCode(position.getProductGroup().getCode());
-				entry.setText(position.getProductGroup().getName());
+				entry.setText(position.getProductGroup().getCode().isEmpty() ? position.getProductGroup().getName() : (position.getProductGroup().getCode() + " - " + position.getProductGroup().getName()));
 				section.put(position.getProductGroup().getId(), entry);
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + position.getQuantity();

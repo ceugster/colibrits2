@@ -268,6 +268,7 @@ public class GalileoQueryComponent implements ProviderQuery
 		if (this.findArticleServer == null)
 		{
 			this.findArticleServer = new FindArticleServerCom4j();
+			this.findArticleServer.start();
 		}
 	}
 

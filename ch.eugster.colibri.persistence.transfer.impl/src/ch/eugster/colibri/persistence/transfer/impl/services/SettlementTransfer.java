@@ -63,10 +63,16 @@ public class SettlementTransfer extends AbstractTransfer
 			if (localSettlement.getOtherId() == null)
 			{
 				SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getServerService().getQuery(Salespoint.class);
-				Salespoint salespoint = (Salespoint) salespointQuery.find(localSettlement.getSalespoint().getId());
-				Settlement serverSettlement = Settlement.newInstance(salespoint);
+				Salespoint serverSalespoint = (Salespoint) salespointQuery.find(localSettlement.getSalespoint().getId());
+				Settlement serverSettlement = null;
 				try
 				{
+					if (serverSalespoint.getSettlement() == null || serverSalespoint.getSettlement().getSettled() != null)
+					{
+						serverSalespoint.setSettlement(Settlement.newInstance(serverSalespoint));
+						serverSalespoint = (Salespoint) persistenceService.getServerService().merge(serverSalespoint);
+					}
+					serverSettlement = serverSalespoint.getSettlement();
 					serverSettlement = updateServerSettlement(localSettlement, serverSettlement);
 					localSettlement.setOtherId(serverSettlement.getId());
 					persistenceService.getCacheService().merge(localSettlement);
