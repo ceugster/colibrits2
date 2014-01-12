@@ -29,6 +29,7 @@ import ch.eugster.colibri.persistence.model.SettlementReceipt;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.settlement.model.Section;
 import ch.eugster.colibri.report.settlement.model.SettlementEntry;
@@ -242,16 +243,18 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 	}
 
 	protected Map<Long, SettlementEntry> createInternalSection(Map<Long, SettlementEntry> section,
-			Collection<SettlementInternal> internals)
+			Collection<SettlementInternal> internals, boolean internalDetails)
 	{
 		for (SettlementInternal internal : internals)
 		{
-			SettlementEntry entry = section.get(internal.getPosition().getId());
+			Long id = internalDetails ? internal.getPosition().getId() : internal.getPosition().getProductGroup().getId();
+			int groupId = internal.getPosition().getProductGroup().getProductGroupType().ordinal();
+			SettlementEntry entry = section.get(id);
 			if (entry == null)
 			{
 				entry = new SettlementEntry(Section.INTERNAL);
-				section.put(internal.getPosition().getId(), entry);
-				entry.setGroup(internal.getPosition().getId().intValue());
+				section.put(id, entry);
+				entry.setGroup(groupId);
 				entry.setCode(internal.getPosition().getProductGroup().getCode());
 				entry.setText(internal.getPosition().getProductGroup().getName());
 			}
@@ -259,15 +262,20 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 					+ internal.getPosition().getQuantity();
 			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
 
-			double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
-			amount += internal.getPosition().getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
-					Position.AmountType.NETTO);
-			entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
-
-			amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
-			amount += internal.getPosition().getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-					Position.AmountType.NETTO);
-			entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+			if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.ALLOCATION))
+			{
+				double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
+				amount += Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
+						Position.AmountType.NETTO));
+				entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
+			}
+			else if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.WITHDRAWAL))
+			{
+				double amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
+				amount += Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
+						Position.AmountType.NETTO));
+				entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+			}
 		}
 		return section;
 	}

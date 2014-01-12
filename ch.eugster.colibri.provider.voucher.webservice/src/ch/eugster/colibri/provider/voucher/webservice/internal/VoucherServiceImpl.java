@@ -405,12 +405,6 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	}
 
 	@Override
-	public IStatus checkConnection() 
-	{
-		return Status.OK_STATUS;
-	}
-
-	@Override
 	public IStatus checkConnection(Map<String, IProperty> properties) 
 	{
 		IStatus status = new Status(IStatus.OK, context.getBundleContext().getBundle().getSymbolicName(), "Die Verbindung zu " + this.getName() + " wurde erfolgreich hergestellt.");

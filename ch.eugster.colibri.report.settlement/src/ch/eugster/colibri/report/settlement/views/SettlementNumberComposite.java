@@ -252,7 +252,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 				settlement.getRestitutedPositions()).values());
 		entries.addAll(createPayedInvoiceSection(new HashMap<Long, SettlementEntry>(), settlement.getPayedInvoices())
 				.values());
-		entries.addAll(createInternalSection(new HashMap<Long, SettlementEntry>(), settlement.getInternals()).values());
+		entries.addAll(createInternalSection(new HashMap<Long, SettlementEntry>(), settlement.getInternals(), false).values());
 		entries.addAll(createReceiptSection(new HashMap<Long, SettlementEntry>(), settlement.getReversedReceipts())
 				.values());
 		entries.addAll(createDetailSection(new HashMap<Long, SettlementEntry>(), settlement.getDetails()).values());
