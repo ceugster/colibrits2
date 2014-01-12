@@ -291,15 +291,25 @@ public class ProductView extends AbstractEntityView implements IDoubleClickListe
 				final Object object = cell.getElement();
 				if (object instanceof ProductGroup)
 				{
+					StringBuilder value = new StringBuilder();
+					String del = "";
 					ProductGroup productGroup = (ProductGroup) object;
+					if (productGroup.isDefault())
+					{
+						value = value.append("Default");
+						del = ", ";
+					}
 					if (productGroup.isPayedInvoice())
 					{
-						cell.setText("Bez. Rechnungen");
+						value = value.append(del + "Bez. Rg.");
+						del = ", ";
 					}
-					else if (productGroup.isDefault())
+					if (productGroup.isVoucherDefault())
 					{
-						cell.setText("Default");
+						value = value.append(del + "eGutsch.");
+						del = ", ";
 					}
+					cell.setText(value.toString());
 				}
 			}
 		});

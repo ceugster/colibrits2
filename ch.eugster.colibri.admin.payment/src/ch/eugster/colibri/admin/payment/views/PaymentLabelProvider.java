@@ -11,15 +11,21 @@ import java.text.NumberFormat;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
+import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.payment.Activator;
+import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Money;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class PaymentLabelProvider extends LabelProvider implements ILabelProvider
 {
 	private static NumberFormat moneyFormatter;
+	
+	private CommonSettings settings = null;
 
 	public PaymentLabelProvider()
 	{
@@ -162,6 +168,12 @@ public class PaymentLabelProvider extends LabelProvider implements ILabelProvide
 					sb = sb.append(" " + currency);
 				}
 			}
+			CommonSettings settings = getCommonSettings();
+			
+			if (settings.getDefaultVoucherPaymentType() != null && settings.getDefaultVoucherPaymentType().getId().equals(paymentType.getId()))
+			{
+				sb = sb.append(" (eGutschein)");
+			}
 			return sb.toString();
 		}
 		else if (element instanceof Money)
@@ -174,5 +186,25 @@ public class PaymentLabelProvider extends LabelProvider implements ILabelProvide
 		}
 
 		return "";
+	}
+	
+	private CommonSettings getCommonSettings()
+	{
+		if (settings == null)
+		{
+			ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
+			try
+			{
+				tracker.open();
+				PersistenceService service = tracker.getService();
+				CommonSettingsQuery query = (CommonSettingsQuery) service.getServerService().getQuery(CommonSettings.class);
+				settings = query.findDefault();
+			}
+			finally
+			{
+				tracker.close();
+			}
+		}
+		return settings;
 	}
 }

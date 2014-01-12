@@ -60,10 +60,10 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 				ProviderQueryTracker.open();
 				try
 				{
-					final ProviderQuery ProviderQuery = (ProviderQuery) ProviderQueryTracker.getService();
-					if (ProviderQuery != null)
+					final ProviderQuery providerQuery = (ProviderQuery) ProviderQueryTracker.getService();
+					if (providerQuery != null)
 					{
-						IStatus status = ProviderQuery.selectCustomer(userPanel.getPositionWrapper().getPosition(), getProductGroup());
+						IStatus status = providerQuery.selectCustomer(userPanel.getPositionWrapper().getPosition(), getProductGroup());
 						if (status.getSeverity() == IStatus.OK)
 						{
 							userPanel.getPositionListPanel().getModel().actionPerformed(event);

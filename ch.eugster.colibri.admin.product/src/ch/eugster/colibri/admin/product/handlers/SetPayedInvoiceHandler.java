@@ -17,9 +17,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.product.Activator;
+import ch.eugster.colibri.admin.product.views.ProductView;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 
 public class SetPayedInvoiceHandler extends AbstractPersistenceClientHandler
@@ -30,7 +32,7 @@ public class SetPayedInvoiceHandler extends AbstractPersistenceClientHandler
 		if (event.getApplicationContext() instanceof EvaluationContext)
 		{
 			final EvaluationContext ctx = (EvaluationContext) event.getApplicationContext();
-			final Object object = ctx.getParent().getVariable("selection");
+			Object object = ctx.getVariable("selection");
 
 			if (object instanceof StructuredSelection)
 			{
@@ -49,6 +51,12 @@ public class SetPayedInvoiceHandler extends AbstractPersistenceClientHandler
 							try
 							{
 								settings = (CommonSettings) persistenceService.getServerService().merge(settings);
+								object = ctx.getVariable("activePart");
+								if (object instanceof ProductView)
+								{
+									ProductView view = (ProductView) object;
+									view.getViewer().refresh();
+								}
 							} 
 							catch (Exception e) 
 							{
@@ -79,7 +87,7 @@ public class SetPayedInvoiceHandler extends AbstractPersistenceClientHandler
 				{
 					final ProductGroup productGroup = (ProductGroup) ssel.getFirstElement();
 					ProductGroup payedInvoice = getPayedInvoice();
-					boolean enabled = payedInvoice == null || !payedInvoice.getId().equals(productGroup.getId());
+					boolean enabled = (payedInvoice == null || !payedInvoice.getId().equals(productGroup.getId())) && productGroup.getProductGroupType().equals(ProductGroupType.NON_SALES_RELATED);
 					this.setBaseEnabled(enabled);
 				}
 			}

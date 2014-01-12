@@ -1,6 +1,7 @@
 package ch.eugster.colibri.admin.salespoint.views;
 
 import java.text.NumberFormat;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -324,9 +325,22 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 				}
 				else if (entity instanceof Stock)
 				{
-					Stock stock = (Stock) entity;
-					stock.getSalespoint().addStock(stock);
-					viewer.refresh(stock.getSalespoint());
+					Stock newStock = (Stock) entity;
+					List<Stock> stocks = newStock.getSalespoint().getStocks();
+					boolean found = false;
+					for (Stock stock : stocks)
+					{
+						if (stock.getPaymentType().getId().equals(newStock.getPaymentType().getId()))
+						{
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+					{
+						newStock.getSalespoint().addStock(newStock);
+					}
+					viewer.refresh(newStock.getSalespoint());
 				}
 				return Status.OK_STATUS;
 			}
