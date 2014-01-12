@@ -51,20 +51,18 @@ public class CustomerServer
 	
 	public boolean isConnect()
 	{
+		updateProperties();
 		return connect;
 	}
 
 	public IStatus selectCustomer(final Position position, final ProductGroup productGroup)
 	{
-		if (kserver == null)
+		boolean wasopen = this.open;
+		if (!this.open)
 		{
-			kserver = ClassFactory.createkundenserver();
+			this.open = CustomerServer.this.kserver.db_open(CustomerServer.this.database);
 		}
-		if (!CustomerServer.this.open)
-		{
-			CustomerServer.this.open = CustomerServer.this.kserver.db_open(CustomerServer.this.database);
-		}
-		if (CustomerServer.this.open)
+		if (this.open)
 		{
 			Customer customer = null;
 			final int result = CustomerServer.this.kserver.getkundennr();
@@ -106,7 +104,7 @@ public class CustomerServer
 					position.setProductGroup(productGroup);
 					position.setOption(Option.PAYED_INVOICE);
 				}
-				CustomerServer.this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
+				this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 						Topic.CUSTOMER_UPDATE.topic());
 			}
 			else
@@ -118,7 +116,10 @@ public class CustomerServer
 
 			if (!CustomerServer.this.keepConnection)
 			{
-				this.open = !((Boolean) CustomerServer.this.kserver.db_close()).booleanValue();
+				if (!wasopen)
+				{
+					this.open = !((Boolean) CustomerServer.this.kserver.db_close()).booleanValue();
+				}
 			}
 		}
 		else
@@ -127,11 +128,25 @@ public class CustomerServer
 		}
 		return this.status;
 	}
+	
+	public IStatus start()
+	{
+		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		try
+		{
+			kserver = ClassFactory.createkundenserver();
+		}
+		catch(Throwable e)
+		{
+			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+					"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
+		}
+		return this.status;
+	}
 
-	public void start()
+	private void updateProperties()
 	{
 		final GalileoConfiguration configuration = new GalileoConfiguration();
-
 		final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
 		serviceTracker.open();
@@ -176,7 +191,6 @@ public class CustomerServer
 	{
 		if (this.kserver != null)
 		{
-			this.kserver.db_close();
 			this.kserver = null;
 		}
 	}

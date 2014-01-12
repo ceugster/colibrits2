@@ -76,6 +76,8 @@ public class SettlementTransfer extends AbstractTransfer
 					serverSettlement = updateServerSettlement(localSettlement, serverSettlement);
 					localSettlement.setOtherId(serverSettlement.getId());
 					persistenceService.getCacheService().merge(localSettlement);
+					serverSalespoint.setSettlement(Settlement.newInstance(serverSalespoint));
+					serverSalespoint = (Salespoint) persistenceService.getServerService().merge(serverSalespoint);
 				}
 				catch (Exception e)
 				{

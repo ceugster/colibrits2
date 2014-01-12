@@ -54,6 +54,8 @@ public abstract class AbstractProviderUpdater implements ProviderUpdater
 		return query.selectProviderUpdates(salespoint, getProviderId(), max);
 	}
 	
+	protected abstract IStatus checkConnection();
+	
 	@Override
 	public IStatus updatePositions(PersistenceService persistenceService,
 			Collection<Position> positions)
@@ -67,12 +69,12 @@ public abstract class AbstractProviderUpdater implements ProviderUpdater
 		{
 			for (Position position : positions)
 			{
-				if (!position.isProviderBooked() || ! position.isServerUpdated())
-				{
-					if (!position.isProviderBooked())
-					{
+//				if (!position.isProviderBooked() || ! position.isServerUpdated())
+//				{
+//					if (!position.isProviderBooked())
+//					{
 						status = updateProvider(position);
-					}
+//					}
 					if (status.getSeverity() == IStatus.ERROR)
 					{
 						break;
@@ -118,7 +120,7 @@ public abstract class AbstractProviderUpdater implements ProviderUpdater
 							}
 						}
 					}
-				}
+//				}
 			}
 		}
 		return status;
@@ -199,5 +201,4 @@ public abstract class AbstractProviderUpdater implements ProviderUpdater
 		}
 		return status;
 	}
-
 }

@@ -299,7 +299,7 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		else
 		{
-			updateProperties();
+//			updateProperties();
 			if (status.getSeverity() == IStatus.OK && this.isConnect())
 			{
 				status = this.synchronizeExternalProductGroups(monitor, status);
@@ -591,6 +591,11 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 	{
 		if (!this.open)
 		{
+			Object object = this.wgserve.do_open(this.database);
+			if (object != null)
+			{
+				
+			}
 			this.open = ((Boolean) this.wgserve.do_open(this.database)).booleanValue();
 		}
 		return this.open;

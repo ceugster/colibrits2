@@ -46,7 +46,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		{
 			this.printer = new PrintStream(deviceName);
 			this.printer.print(new char[] { 27, 116, 0 });
-			this.printer.print(new char[] { 27, 82, 2 });
+//			this.printer.print(new char[] { 27, 82, 2 });
 		}
 		catch (final Exception e)
 		{

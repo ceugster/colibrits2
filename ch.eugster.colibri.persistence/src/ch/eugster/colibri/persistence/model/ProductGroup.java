@@ -418,6 +418,19 @@ public class ProductGroup extends AbstractEntity implements IReplicatable
 		return false;
 	}
 
+	public boolean isVoucherDefault()
+	{
+		if (this.getId() == null)
+		{
+			return false;
+		}
+		if (this.getCommonSettings().getDefaultVoucherProductGroup() != null && this.getCommonSettings().getDefaultVoucherProductGroup().getId().equals(this.getId()))
+		{
+			return true;
+		}
+		return false;
+	}
+
 	public boolean isDefault()
 	{
 		if (this.getId() == null)

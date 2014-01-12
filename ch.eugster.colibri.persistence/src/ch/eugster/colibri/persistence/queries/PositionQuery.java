@@ -56,8 +56,8 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	public long countProviderUpdates(Salespoint salespoint, String providerId)
 	{
-		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
+//		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+//		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
@@ -72,7 +72,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
-		final Expression states = expression.and(deleted).and(saved.or(reversed));
+		final Expression states = deleted.and(saved.or(reversed));
 		final long value = this.count(states);
 		return value;
 	}
@@ -126,8 +126,8 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows)
 	{
-		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
+//		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
+//		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
@@ -142,7 +142,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
-		final Expression states = expression.and(deleted).and(saved.or(reversed));
+		final Expression states = deleted.and(saved.or(reversed));
 		final Collection<Position> positions = this.select(states, maxRows);
 		return positions;
 	}

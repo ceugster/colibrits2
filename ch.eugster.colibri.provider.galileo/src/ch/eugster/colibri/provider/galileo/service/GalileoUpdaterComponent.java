@@ -32,7 +32,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	private ProviderQuery providerQuery;
 
 	private IUpdateProviderServer updateProviderServer;
-
+	
 	private final Collection<BarcodeVerifier> barcodeVerifiers = new ArrayList<BarcodeVerifier>();
 
 	public GalileoUpdaterComponent()

@@ -15,7 +15,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
@@ -47,38 +46,16 @@ import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 
-public abstract class AbstractServer implements IServer
+public abstract class AbstractServer extends AbstractGalileoServer
 {
-	private Igdserve galserve;
-
-	private GalileoConfiguration configuration = new GalileoConfiguration();
-
-	private String database;
-
-	private boolean keepConnection;
-
-	private boolean connect;
-	
-	private boolean open = false;
-
-	private boolean wasOpen;
-	
-	private ServiceTracker<LogService, LogService> logServiceTracker;
-
-	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
-	
-	private ServiceTracker<BarcodeVerifier, BarcodeVerifier> barcodeVerifierTracker;
-
-	protected IStatus status;
-
-	protected GalileoConfiguration getConfiguration()
+	public GalileoConfiguration getConfiguration()
 	{
 		return configuration;
 	}
 	
 	public boolean isConnect()
 	{
-//		this.status = this.start();
+		updateProperties();
 		return connect;
 	}
 	
@@ -427,29 +404,14 @@ public abstract class AbstractServer implements IServer
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 				"Die Verbindung zur Warenbewirtschaftung Galileo wurde erfolgreich hergestellt.");
-		if (galserve == null || this.status.getSeverity() != IStatus.OK)
+		if (this.open())
 		{
-			try
-			{
-				galserve = ClassFactory.creategdserve();
-				boolean result = galserve.do_NOpen(path);
-				if (result)
-				{
-					galserve.do_NClose();
-				}
-				else
-				{
-					status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-							Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
-				}
-				galserve.dispose();
-				galserve = null;
-			}
-			catch (Exception e)
-			{
-				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-						Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
-			}
+			this.close();
+		}
+		else
+		{
+			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
 		}
 		return status;
 	}
@@ -474,99 +436,6 @@ public abstract class AbstractServer implements IServer
 		return this.status;
 	}
 	
-	protected Igdserve getGalserve()
-	{
-		return this.galserve;
-	}
-	
-	protected boolean open()
-	{
-		this.wasOpen = this.open;
-//		this.status = this.start();
-
-		if (this.status.getSeverity() != IStatus.ERROR)
-		{
-			if (!this.open)
-			{
-				try
-				{
-					this.open = this.getGalserve().do_NOpen(this.database);
-					if (!this.open)
-					{
-						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + this.configuration.getName() + " kann nicht hergestellt werden."));
-					}
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
-				}
-			}
-		}
-		
-		return this.open;
-	}
-
-	@Override
-	public IStatus start()
-	{
-		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
-		if ((this.getGalserve() == null) || (this.status.getSeverity() == IStatus.ERROR))
-		{
-			this.logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(),
-					LogService.class, null);
-			this.logServiceTracker.open();
-			this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-					PersistenceService.class, null);
-			this.persistenceServiceTracker.open();
-			this.barcodeVerifierTracker = new ServiceTracker<BarcodeVerifier, BarcodeVerifier>(Activator.getDefault().getBundle().getBundleContext(), BarcodeVerifier.class, null);
-			this.barcodeVerifierTracker.open();
-			updateProperties();
-			try
-			{
-				this.galserve = ClassFactory.creategdserve();
-			}
-			catch (Exception e)
-			{
-				this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-						"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
-			}
-		}
-		return this.status;
-	}
-
-	protected void updateProperties()
-	{
-		Map<String, IProperty> properties = GalileoConfiguration.GalileoProperty.asMap();
-		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
-		if (persistenceService != null)
-		{
-			final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
-					.getQuery(ProviderProperty.class);
-			Map<String, ProviderProperty>  providerProperties = query.selectByProviderAsMap(this.configuration.getProviderId());
-			for (final ProviderProperty providerProperty : providerProperties.values())
-			{
-				IProperty property = properties.get(providerProperty.getKey());
-				property.setPersistedProperty(providerProperty);
-			}
-			final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
-					Salespoint.class);
-			Salespoint salespoint = salespointQuery.getCurrentSalespoint();
-			if (salespoint != null)
-			{
-				providerProperties = query.selectByProviderAndSalespointAsMap(this.configuration.getProviderId(), salespoint);
-				for (final ProviderProperty providerProperty : providerProperties.values())
-				{
-					IProperty property = properties.get(providerProperty.getKey());
-					property.setPersistedProperty(providerProperty);
-				}
-			}
-			this.database = properties.get(GalileoProperty.DATABASE_PATH.key()).value();
-			this.connect = Boolean.valueOf(properties.get(GalileoProperty.CONNECT.key()).value()).booleanValue();
-			this.keepConnection = Boolean.valueOf(properties.get(GalileoProperty.KEEP_CONNECTION.key()).value()).booleanValue();
-		}
-	}
-	
 	protected void close()
 	{
 		if (!this.wasOpen && this.open && !this.keepConnection)
@@ -575,29 +444,6 @@ public abstract class AbstractServer implements IServer
 			this.open = false;
 			this.wasOpen = false;
 		}
-	}
-
-	@Override
-	public void stop()
-	{
-		if (this.galserve != null)
-		{
-			this.galserve.dispose();
-			this.galserve = null;
-		}
-		if (this.persistenceServiceTracker != null)
-		{
-			this.persistenceServiceTracker.close();
-		}
-		if (this.barcodeVerifierTracker != null)
-		{
-			this.barcodeVerifierTracker.close();
-		}
-		if (this.logServiceTracker != null)
-		{
-			this.logServiceTracker.close();
-		}
-		this.status = Status.CANCEL_STATUS;
 	}
 
 	protected void log(int severity, String message)

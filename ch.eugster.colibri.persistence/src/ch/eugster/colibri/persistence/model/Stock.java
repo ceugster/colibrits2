@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.PostPersist;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
@@ -61,6 +62,12 @@ public class Stock extends AbstractEntity implements Comparable<Stock>, IReplica
 	{
 		super();
 	}
+	
+//	@PostPersist
+//	public void postPersist()
+//	{
+//		this.getSalespoint().addStock(this);
+//	}
 
 	protected Stock(final Salespoint salespoint)
 	{

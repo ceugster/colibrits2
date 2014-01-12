@@ -48,6 +48,8 @@ public class Activator extends AbstractUIPlugin
 		{
 			logService.log(LogService.LOG_INFO, "Plugin " + context.getBundle().getSymbolicName() + " gestartet.");
 		}
+		
+		
 	}
 
 	/*
@@ -71,7 +73,7 @@ public class Activator extends AbstractUIPlugin
 		Activator.plugin = null;
 		super.stop(context);
 	}
-
+	
 	/**
 	 * Returns the shared instance
 	 * 

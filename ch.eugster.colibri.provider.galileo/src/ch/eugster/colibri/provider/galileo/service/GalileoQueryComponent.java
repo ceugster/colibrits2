@@ -76,7 +76,7 @@ public class GalileoQueryComponent implements ProviderQuery
 	
 	public boolean isConnect()
 	{
-		return this.getFindArticleServer().isConnect();
+		return this.findArticleServer.isConnect();
 	}
 
 	@Override
@@ -86,10 +86,10 @@ public class GalileoQueryComponent implements ProviderQuery
 		if (status.getException() == null)
 		{
 			log(LogService.LOG_INFO, "Verbindung checken.");
-			if (getFindArticleServer().isConnect())
+			if (findArticleServer.isConnect())
 			{
 				log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
-				status = this.getFindArticleServer().findAndRead(barcode, position);
+				status = this.findArticleServer.findAndRead(barcode, position);
 				if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
 				{
 					log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
@@ -130,12 +130,12 @@ public class GalileoQueryComponent implements ProviderQuery
 	public IStatus selectCustomer(final Position position, ProductGroup productGroup)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
-		if (this.getCustomerServer().isConnect())
+		if (this.customerServer.isConnect())
 		{
 			log(LogService.LOG_INFO, "Starte Kundensuche...");
 			try
 			{
-				status = this.getCustomerServer().selectCustomer(position, productGroup);
+				status = this.customerServer.selectCustomer(position, productGroup);
 			}
 			catch (Exception e)
 			{
@@ -164,13 +164,15 @@ public class GalileoQueryComponent implements ProviderQuery
 	{
 		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
 		this.context = componentContext;
+		this.startFindArticleServer();
+		this.startCustomerServer();
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
 	{
-		this.stopFindArticleServer();
 		this.stopCustomerServer();
+		this.stopFindArticleServer();
 
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
 					+ " deaktiviert.");
@@ -205,18 +207,6 @@ public class GalileoQueryComponent implements ProviderQuery
 	protected void unsetLogService(final LogService logService)
 	{
 		this.logService = null;
-	}
-
-	private IFindArticleServer getFindArticleServer()
-	{
-		this.startFindArticleServer();
-		return this.findArticleServer;
-	}
-
-	private CustomerServer getCustomerServer()
-	{
-		this.startCustomerServer();
-		return this.customerServer;
 	}
 
 	private Event getEvent(final IStatus status, boolean force)
