@@ -3,11 +3,11 @@ package ch.eugster.colibri.provider.galileo.galserve.old  ;
 import com4j.*;
 
 @IID("{B94E7B41-4E78-11D8-B851-0002E3178697}")
-public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galileo.galserve.Igdserve {
+public interface Igdserve extends Com4jObject {
   // Methods:
   /**
    * <p>
-   * Getter method for the COM property "GEFUNDEN"
+   * Getter method for the COM property "CVERSION"
    * </p>
    * @return  Returns a value of type java.lang.Object
    */
@@ -16,19 +16,71 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
   @VTID(7)
   @DefaultMethod
   @ReturnValue(type=NativeType.VARIANT)
-  java.lang.Object gefunden();
+  java.lang.Object cversion();
 
 
   /**
    * <p>
-   * Setter method for the COM property "GEFUNDEN"
+   * Setter method for the COM property "CVERSION"
    * </p>
-   * @param gefunden Mandatory java.lang.Object parameter.
+   * @param cversion Mandatory java.lang.Object parameter.
    */
 
   @DISPID(0) //= 0x0. The runtime will prefer the VTID if present
   @VTID(8)
   @DefaultMethod
+  void cversion(
+    @MarshalAs(NativeType.VARIANT) java.lang.Object cversion);
+
+
+  /**
+   * <p>
+   * Getter method for the COM property "CVERSIONSNR"
+   * </p>
+   * @return  Returns a value of type java.lang.Object
+   */
+
+  @DISPID(2) //= 0x2. The runtime will prefer the VTID if present
+  @VTID(9)
+  @ReturnValue(type=NativeType.VARIANT)
+  java.lang.Object cversionsnr();
+
+
+  /**
+   * <p>
+   * Setter method for the COM property "CVERSIONSNR"
+   * </p>
+   * @param cversionsnr Mandatory java.lang.Object parameter.
+   */
+
+  @DISPID(2) //= 0x2. The runtime will prefer the VTID if present
+  @VTID(10)
+  void cversionsnr(
+    @MarshalAs(NativeType.VARIANT) java.lang.Object cversionsnr);
+
+
+  /**
+   * <p>
+   * Getter method for the COM property "gefunden"
+   * </p>
+   * @return  Returns a value of type java.lang.Object
+   */
+
+  @DISPID(4) //= 0x4. The runtime will prefer the VTID if present
+  @VTID(11)
+  @ReturnValue(type=NativeType.VARIANT)
+  java.lang.Object gefunden();
+
+
+  /**
+   * <p>
+   * Setter method for the COM property "gefunden"
+   * </p>
+   * @param gefunden Mandatory java.lang.Object parameter.
+   */
+
+  @DISPID(4) //= 0x4. The runtime will prefer the VTID if present
+  @VTID(12)
   void gefunden(
     @MarshalAs(NativeType.VARIANT) java.lang.Object gefunden);
 
@@ -40,8 +92,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(2) //= 0x2. The runtime will prefer the VTID if present
-  @VTID(9)
+  @DISPID(6) //= 0x6. The runtime will prefer the VTID if present
+  @VTID(13)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object autor();
 
@@ -53,8 +105,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param autor Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(2) //= 0x2. The runtime will prefer the VTID if present
-  @VTID(10)
+  @DISPID(6) //= 0x6. The runtime will prefer the VTID if present
+  @VTID(14)
   void autor(
     @MarshalAs(NativeType.VARIANT) java.lang.Object autor);
 
@@ -66,8 +118,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(4) //= 0x4. The runtime will prefer the VTID if present
-  @VTID(11)
+  @DISPID(8) //= 0x8. The runtime will prefer the VTID if present
+  @VTID(15)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object titel();
 
@@ -79,8 +131,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param titel Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(4) //= 0x4. The runtime will prefer the VTID if present
-  @VTID(12)
+  @DISPID(8) //= 0x8. The runtime will prefer the VTID if present
+  @VTID(16)
   void titel(
     @MarshalAs(NativeType.VARIANT) java.lang.Object titel);
 
@@ -92,8 +144,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(6) //= 0x6. The runtime will prefer the VTID if present
-  @VTID(13)
+  @DISPID(10) //= 0xa. The runtime will prefer the VTID if present
+  @VTID(17)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object verlag();
 
@@ -105,8 +157,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param verlag Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(6) //= 0x6. The runtime will prefer the VTID if present
-  @VTID(14)
+  @DISPID(10) //= 0xa. The runtime will prefer the VTID if present
+  @VTID(18)
   void verlag(
     @MarshalAs(NativeType.VARIANT) java.lang.Object verlag);
 
@@ -118,8 +170,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(8) //= 0x8. The runtime will prefer the VTID if present
-  @VTID(15)
+  @DISPID(12) //= 0xc. The runtime will prefer the VTID if present
+  @VTID(19)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object mwst();
 
@@ -131,8 +183,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param mwst Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(8) //= 0x8. The runtime will prefer the VTID if present
-  @VTID(16)
+  @DISPID(12) //= 0xc. The runtime will prefer the VTID if present
+  @VTID(20)
   void mwst(
     @MarshalAs(NativeType.VARIANT) java.lang.Object mwst);
 
@@ -144,8 +196,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(10) //= 0xa. The runtime will prefer the VTID if present
-  @VTID(17)
+  @DISPID(14) //= 0xe. The runtime will prefer the VTID if present
+  @VTID(21)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object preis();
 
@@ -157,8 +209,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param preis Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(10) //= 0xa. The runtime will prefer the VTID if present
-  @VTID(18)
+  @DISPID(14) //= 0xe. The runtime will prefer the VTID if present
+  @VTID(22)
   void preis(
     @MarshalAs(NativeType.VARIANT) java.lang.Object preis);
 
@@ -170,8 +222,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(12) //= 0xc. The runtime will prefer the VTID if present
-  @VTID(19)
+  @DISPID(16) //= 0x10. The runtime will prefer the VTID if present
+  @VTID(23)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object wgruppe();
 
@@ -183,8 +235,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param wgruppe Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(12) //= 0xc. The runtime will prefer the VTID if present
-  @VTID(20)
+  @DISPID(16) //= 0x10. The runtime will prefer the VTID if present
+  @VTID(24)
   void wgruppe(
     @MarshalAs(NativeType.VARIANT) java.lang.Object wgruppe);
 
@@ -196,8 +248,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(14) //= 0xe. The runtime will prefer the VTID if present
-  @VTID(21)
+  @DISPID(18) //= 0x12. The runtime will prefer the VTID if present
+  @VTID(25)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object bestellt();
 
@@ -209,8 +261,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param bestellt Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(14) //= 0xe. The runtime will prefer the VTID if present
-  @VTID(22)
+  @DISPID(18) //= 0x12. The runtime will prefer the VTID if present
+  @VTID(26)
   void bestellt(
     @MarshalAs(NativeType.VARIANT) java.lang.Object bestellt);
 
@@ -222,8 +274,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(16) //= 0x10. The runtime will prefer the VTID if present
-  @VTID(23)
+  @DISPID(20) //= 0x14. The runtime will prefer the VTID if present
+  @VTID(27)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lagerabholfach();
 
@@ -235,8 +287,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lagerabholfach Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(16) //= 0x10. The runtime will prefer the VTID if present
-  @VTID(24)
+  @DISPID(20) //= 0x14. The runtime will prefer the VTID if present
+  @VTID(28)
   void lagerabholfach(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lagerabholfach);
 
@@ -248,8 +300,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(18) //= 0x12. The runtime will prefer the VTID if present
-  @VTID(25)
+  @DISPID(22) //= 0x16. The runtime will prefer the VTID if present
+  @VTID(29)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object isbn();
 
@@ -261,8 +313,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param isbn Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(18) //= 0x12. The runtime will prefer the VTID if present
-  @VTID(26)
+  @DISPID(22) //= 0x16. The runtime will prefer the VTID if present
+  @VTID(30)
   void isbn(
     @MarshalAs(NativeType.VARIANT) java.lang.Object isbn);
 
@@ -274,8 +326,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(20) //= 0x14. The runtime will prefer the VTID if present
-  @VTID(27)
+  @DISPID(24) //= 0x18. The runtime will prefer the VTID if present
+  @VTID(31)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object bznr();
 
@@ -287,8 +339,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param bznr Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(20) //= 0x14. The runtime will prefer the VTID if present
-  @VTID(28)
+  @DISPID(24) //= 0x18. The runtime will prefer the VTID if present
+  @VTID(32)
   void bznr(
     @MarshalAs(NativeType.VARIANT) java.lang.Object bznr);
 
@@ -300,8 +352,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(22) //= 0x16. The runtime will prefer the VTID if present
-  @VTID(29)
+  @DISPID(26) //= 0x1a. The runtime will prefer the VTID if present
+  @VTID(33)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object bestnummer();
 
@@ -313,8 +365,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param bestnummer Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(22) //= 0x16. The runtime will prefer the VTID if present
-  @VTID(30)
+  @DISPID(26) //= 0x1a. The runtime will prefer the VTID if present
+  @VTID(34)
   void bestnummer(
     @MarshalAs(NativeType.VARIANT) java.lang.Object bestnummer);
 
@@ -326,8 +378,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(24) //= 0x18. The runtime will prefer the VTID if present
-  @VTID(31)
+  @DISPID(28) //= 0x1c. The runtime will prefer the VTID if present
+  @VTID(35)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object geloescht();
 
@@ -339,8 +391,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param geloescht Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(24) //= 0x18. The runtime will prefer the VTID if present
-  @VTID(32)
+  @DISPID(28) //= 0x1c. The runtime will prefer the VTID if present
+  @VTID(36)
   void geloescht(
     @MarshalAs(NativeType.VARIANT) java.lang.Object geloescht);
 
@@ -352,8 +404,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(26) //= 0x1a. The runtime will prefer the VTID if present
-  @VTID(33)
+  @DISPID(30) //= 0x1e. The runtime will prefer the VTID if present
+  @VTID(37)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object kundennr();
 
@@ -365,8 +417,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param kundennr Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(26) //= 0x1a. The runtime will prefer the VTID if present
-  @VTID(34)
+  @DISPID(30) //= 0x1e. The runtime will prefer the VTID if present
+  @VTID(38)
   void kundennr(
     @MarshalAs(NativeType.VARIANT) java.lang.Object kundennr);
 
@@ -378,8 +430,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(28) //= 0x1c. The runtime will prefer the VTID if present
-  @VTID(35)
+  @DISPID(32) //= 0x20. The runtime will prefer the VTID if present
+  @VTID(39)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object keinrabatt();
 
@@ -391,8 +443,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param keinrabatt Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(28) //= 0x1c. The runtime will prefer the VTID if present
-  @VTID(36)
+  @DISPID(32) //= 0x20. The runtime will prefer the VTID if present
+  @VTID(40)
   void keinrabatt(
     @MarshalAs(NativeType.VARIANT) java.lang.Object keinrabatt);
 
@@ -404,8 +456,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(30) //= 0x1e. The runtime will prefer the VTID if present
-  @VTID(37)
+  @DISPID(34) //= 0x22. The runtime will prefer the VTID if present
+  @VTID(41)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vtranswrite();
 
@@ -417,8 +469,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vtranswrite Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(30) //= 0x1e. The runtime will prefer the VTID if present
-  @VTID(38)
+  @DISPID(34) //= 0x22. The runtime will prefer the VTID if present
+  @VTID(42)
   void vtranswrite(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vtranswrite);
 
@@ -430,8 +482,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(32) //= 0x20. The runtime will prefer the VTID if present
-  @VTID(39)
+  @DISPID(36) //= 0x24. The runtime will prefer the VTID if present
+  @VTID(43)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vlagerupdate();
 
@@ -443,8 +495,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vlagerupdate Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(32) //= 0x20. The runtime will prefer the VTID if present
-  @VTID(40)
+  @DISPID(36) //= 0x24. The runtime will prefer the VTID if present
+  @VTID(44)
   void vlagerupdate(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vlagerupdate);
 
@@ -456,8 +508,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(34) //= 0x22. The runtime will prefer the VTID if present
-  @VTID(41)
+  @DISPID(38) //= 0x26. The runtime will prefer the VTID if present
+  @VTID(45)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vnummer();
 
@@ -469,8 +521,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vnummer Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(34) //= 0x22. The runtime will prefer the VTID if present
-  @VTID(42)
+  @DISPID(38) //= 0x26. The runtime will prefer the VTID if present
+  @VTID(46)
   void vnummer(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vnummer);
 
@@ -482,8 +534,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(36) //= 0x24. The runtime will prefer the VTID if present
-  @VTID(43)
+  @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
+  @VTID(47)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vpreis();
 
@@ -495,8 +547,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vpreis Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(36) //= 0x24. The runtime will prefer the VTID if present
-  @VTID(44)
+  @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
+  @VTID(48)
   void vpreis(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vpreis);
 
@@ -508,8 +560,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(38) //= 0x26. The runtime will prefer the VTID if present
-  @VTID(45)
+  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
+  @VTID(49)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vmwst();
 
@@ -521,8 +573,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vmwst Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(38) //= 0x26. The runtime will prefer the VTID if present
-  @VTID(46)
+  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
+  @VTID(50)
   void vmwst(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vmwst);
 
@@ -534,8 +586,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
-  @VTID(47)
+  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
+  @VTID(51)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vwgruppe();
 
@@ -547,8 +599,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vwgruppe Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(40) //= 0x28. The runtime will prefer the VTID if present
-  @VTID(48)
+  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
+  @VTID(52)
   void vwgruppe(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vwgruppe);
 
@@ -560,8 +612,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
-  @VTID(49)
+  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
+  @VTID(53)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vmenge();
 
@@ -573,8 +625,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vmenge Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(42) //= 0x2a. The runtime will prefer the VTID if present
-  @VTID(50)
+  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
+  @VTID(54)
   void vmenge(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vmenge);
 
@@ -586,8 +638,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
-  @VTID(51)
+  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
+  @VTID(55)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vrabatt();
 
@@ -599,8 +651,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vrabatt Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(44) //= 0x2c. The runtime will prefer the VTID if present
-  @VTID(52)
+  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
+  @VTID(56)
   void vrabatt(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vrabatt);
 
@@ -612,8 +664,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
-  @VTID(53)
+  @DISPID(50) //= 0x32. The runtime will prefer the VTID if present
+  @VTID(57)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vbestellt();
 
@@ -625,8 +677,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vbestellt Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(46) //= 0x2e. The runtime will prefer the VTID if present
-  @VTID(54)
+  @DISPID(50) //= 0x32. The runtime will prefer the VTID if present
+  @VTID(58)
   void vbestellt(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vbestellt);
 
@@ -638,8 +690,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
-  @VTID(55)
+  @DISPID(52) //= 0x34. The runtime will prefer the VTID if present
+  @VTID(59)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vlagerabholfach();
 
@@ -651,8 +703,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vlagerabholfach Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(48) //= 0x30. The runtime will prefer the VTID if present
-  @VTID(56)
+  @DISPID(52) //= 0x34. The runtime will prefer the VTID if present
+  @VTID(60)
   void vlagerabholfach(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vlagerabholfach);
 
@@ -664,8 +716,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(50) //= 0x32. The runtime will prefer the VTID if present
-  @VTID(57)
+  @DISPID(54) //= 0x36. The runtime will prefer the VTID if present
+  @VTID(61)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vkundennr();
 
@@ -677,8 +729,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vkundennr Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(50) //= 0x32. The runtime will prefer the VTID if present
-  @VTID(58)
+  @DISPID(54) //= 0x36. The runtime will prefer the VTID if present
+  @VTID(62)
   void vkundennr(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vkundennr);
 
@@ -690,8 +742,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(52) //= 0x34. The runtime will prefer the VTID if present
-  @VTID(59)
+  @DISPID(56) //= 0x38. The runtime will prefer the VTID if present
+  @VTID(63)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vcouponnr();
 
@@ -703,8 +755,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vcouponnr Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(52) //= 0x34. The runtime will prefer the VTID if present
-  @VTID(60)
+  @DISPID(56) //= 0x38. The runtime will prefer the VTID if present
+  @VTID(64)
   void vcouponnr(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vcouponnr);
 
@@ -716,8 +768,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(54) //= 0x36. The runtime will prefer the VTID if present
-  @VTID(61)
+  @DISPID(58) //= 0x3a. The runtime will prefer the VTID if present
+  @VTID(65)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vwgname();
 
@@ -729,8 +781,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vwgname Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(54) //= 0x36. The runtime will prefer the VTID if present
-  @VTID(62)
+  @DISPID(58) //= 0x3a. The runtime will prefer the VTID if present
+  @VTID(66)
   void vwgname(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vwgname);
 
@@ -742,8 +794,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(56) //= 0x38. The runtime will prefer the VTID if present
-  @VTID(63)
+  @DISPID(60) //= 0x3c. The runtime will prefer the VTID if present
+  @VTID(67)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object vebook();
 
@@ -755,8 +807,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param vebook Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(56) //= 0x38. The runtime will prefer the VTID if present
-  @VTID(64)
+  @DISPID(60) //= 0x3c. The runtime will prefer the VTID if present
+  @VTID(68)
   void vebook(
     @MarshalAs(NativeType.VARIANT) java.lang.Object vebook);
 
@@ -768,8 +820,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(58) //= 0x3a. The runtime will prefer the VTID if present
-  @VTID(65)
+  @DISPID(62) //= 0x3e. The runtime will prefer the VTID if present
+  @VTID(69)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object bestand();
 
@@ -781,8 +833,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param bestand Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(58) //= 0x3a. The runtime will prefer the VTID if present
-  @VTID(66)
+  @DISPID(62) //= 0x3e. The runtime will prefer the VTID if present
+  @VTID(70)
   void bestand(
     @MarshalAs(NativeType.VARIANT) java.lang.Object bestand);
 
@@ -794,8 +846,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(60) //= 0x3c. The runtime will prefer the VTID if present
-  @VTID(67)
+  @DISPID(64) //= 0x40. The runtime will prefer the VTID if present
+  @VTID(71)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lastvkdat();
 
@@ -807,8 +859,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lastvkdat Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(60) //= 0x3c. The runtime will prefer the VTID if present
-  @VTID(68)
+  @DISPID(64) //= 0x40. The runtime will prefer the VTID if present
+  @VTID(72)
   void lastvkdat(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lastvkdat);
 
@@ -820,8 +872,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(62) //= 0x3e. The runtime will prefer the VTID if present
-  @VTID(69)
+  @DISPID(66) //= 0x42. The runtime will prefer the VTID if present
+  @VTID(73)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object menge();
 
@@ -833,8 +885,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param menge Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(62) //= 0x3e. The runtime will prefer the VTID if present
-  @VTID(70)
+  @DISPID(66) //= 0x42. The runtime will prefer the VTID if present
+  @VTID(74)
   void menge(
     @MarshalAs(NativeType.VARIANT) java.lang.Object menge);
 
@@ -846,8 +898,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(64) //= 0x40. The runtime will prefer the VTID if present
-  @VTID(71)
+  @DISPID(68) //= 0x44. The runtime will prefer the VTID if present
+  @VTID(75)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object galdb();
 
@@ -859,8 +911,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param galdb Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(64) //= 0x40. The runtime will prefer the VTID if present
-  @VTID(72)
+  @DISPID(68) //= 0x44. The runtime will prefer the VTID if present
+  @VTID(76)
   void galdb(
     @MarshalAs(NativeType.VARIANT) java.lang.Object galdb);
 
@@ -872,8 +924,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(66) //= 0x42. The runtime will prefer the VTID if present
-  @VTID(73)
+  @DISPID(70) //= 0x46. The runtime will prefer the VTID if present
+  @VTID(77)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object galversion();
 
@@ -885,8 +937,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param galversion Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(66) //= 0x42. The runtime will prefer the VTID if present
-  @VTID(74)
+  @DISPID(70) //= 0x46. The runtime will prefer the VTID if present
+  @VTID(78)
   void galversion(
     @MarshalAs(NativeType.VARIANT) java.lang.Object galversion);
 
@@ -898,8 +950,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(68) //= 0x44. The runtime will prefer the VTID if present
-  @VTID(75)
+  @DISPID(72) //= 0x48. The runtime will prefer the VTID if present
+  @VTID(79)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lcdgefunden();
 
@@ -911,8 +963,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lcdgefunden Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(68) //= 0x44. The runtime will prefer the VTID if present
-  @VTID(76)
+  @DISPID(72) //= 0x48. The runtime will prefer the VTID if present
+  @VTID(80)
   void lcdgefunden(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lcdgefunden);
 
@@ -924,8 +976,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(70) //= 0x46. The runtime will prefer the VTID if present
-  @VTID(77)
+  @DISPID(74) //= 0x4a. The runtime will prefer the VTID if present
+  @VTID(81)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lcdsuche();
 
@@ -937,8 +989,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lcdsuche Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(70) //= 0x46. The runtime will prefer the VTID if present
-  @VTID(78)
+  @DISPID(74) //= 0x4a. The runtime will prefer the VTID if present
+  @VTID(82)
   void lcdsuche(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lcdsuche);
 
@@ -950,8 +1002,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(72) //= 0x48. The runtime will prefer the VTID if present
-  @VTID(79)
+  @DISPID(76) //= 0x4c. The runtime will prefer the VTID if present
+  @VTID(83)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cbibini();
 
@@ -963,8 +1015,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cbibini Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(72) //= 0x48. The runtime will prefer the VTID if present
-  @VTID(80)
+  @DISPID(76) //= 0x4c. The runtime will prefer the VTID if present
+  @VTID(84)
   void cbibini(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cbibini);
 
@@ -976,8 +1028,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(74) //= 0x4a. The runtime will prefer the VTID if present
-  @VTID(81)
+  @DISPID(78) //= 0x4e. The runtime will prefer the VTID if present
+  @VTID(85)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lcderror();
 
@@ -989,8 +1041,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lcderror Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(74) //= 0x4a. The runtime will prefer the VTID if present
-  @VTID(82)
+  @DISPID(78) //= 0x4e. The runtime will prefer the VTID if present
+  @VTID(86)
   void lcderror(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lcderror);
 
@@ -1002,8 +1054,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(76) //= 0x4c. The runtime will prefer the VTID if present
-  @VTID(83)
+  @DISPID(80) //= 0x50. The runtime will prefer the VTID if present
+  @VTID(87)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object ccderror();
 
@@ -1015,8 +1067,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param ccderror Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(76) //= 0x4c. The runtime will prefer the VTID if present
-  @VTID(84)
+  @DISPID(80) //= 0x50. The runtime will prefer the VTID if present
+  @VTID(88)
   void ccderror(
     @MarshalAs(NativeType.VARIANT) java.lang.Object ccderror);
 
@@ -1028,8 +1080,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(78) //= 0x4e. The runtime will prefer the VTID if present
-  @VTID(85)
+  @DISPID(82) //= 0x52. The runtime will prefer the VTID if present
+  @VTID(89)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cdatapath();
 
@@ -1041,8 +1093,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cdatapath Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(78) //= 0x4e. The runtime will prefer the VTID if present
-  @VTID(86)
+  @DISPID(82) //= 0x52. The runtime will prefer the VTID if present
+  @VTID(90)
   void cdatapath(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cdatapath);
 
@@ -1054,8 +1106,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(80) //= 0x50. The runtime will prefer the VTID if present
-  @VTID(87)
+  @DISPID(84) //= 0x54. The runtime will prefer the VTID if present
+  @VTID(91)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object nichtbuchen();
 
@@ -1067,8 +1119,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param nichtbuchen Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(80) //= 0x50. The runtime will prefer the VTID if present
-  @VTID(88)
+  @DISPID(84) //= 0x54. The runtime will prefer the VTID if present
+  @VTID(92)
   void nichtbuchen(
     @MarshalAs(NativeType.VARIANT) java.lang.Object nichtbuchen);
 
@@ -1080,8 +1132,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(82) //= 0x52. The runtime will prefer the VTID if present
-  @VTID(89)
+  @DISPID(86) //= 0x56. The runtime will prefer the VTID if present
+  @VTID(93)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object llog();
 
@@ -1093,8 +1145,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param llog Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(82) //= 0x52. The runtime will prefer the VTID if present
-  @VTID(90)
+  @DISPID(86) //= 0x56. The runtime will prefer the VTID if present
+  @VTID(94)
   void llog(
     @MarshalAs(NativeType.VARIANT) java.lang.Object llog);
 
@@ -1106,8 +1158,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(84) //= 0x54. The runtime will prefer the VTID if present
-  @VTID(91)
+  @DISPID(88) //= 0x58. The runtime will prefer the VTID if present
+  @VTID(95)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object clogname();
 
@@ -1119,8 +1171,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param clogname Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(84) //= 0x54. The runtime will prefer the VTID if present
-  @VTID(92)
+  @DISPID(88) //= 0x58. The runtime will prefer the VTID if present
+  @VTID(96)
   void clogname(
     @MarshalAs(NativeType.VARIANT) java.lang.Object clogname);
 
@@ -1132,8 +1184,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(86) //= 0x56. The runtime will prefer the VTID if present
-  @VTID(93)
+  @DISPID(90) //= 0x5a. The runtime will prefer the VTID if present
+  @VTID(97)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object canrede();
 
@@ -1145,8 +1197,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param canrede Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(86) //= 0x56. The runtime will prefer the VTID if present
-  @VTID(94)
+  @DISPID(90) //= 0x5a. The runtime will prefer the VTID if present
+  @VTID(98)
   void canrede(
     @MarshalAs(NativeType.VARIANT) java.lang.Object canrede);
 
@@ -1158,8 +1210,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(88) //= 0x58. The runtime will prefer the VTID if present
-  @VTID(95)
+  @DISPID(92) //= 0x5c. The runtime will prefer the VTID if present
+  @VTID(99)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object ctitel();
 
@@ -1171,8 +1223,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param ctitel Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(88) //= 0x58. The runtime will prefer the VTID if present
-  @VTID(96)
+  @DISPID(92) //= 0x5c. The runtime will prefer the VTID if present
+  @VTID(100)
   void ctitel(
     @MarshalAs(NativeType.VARIANT) java.lang.Object ctitel);
 
@@ -1184,8 +1236,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(90) //= 0x5a. The runtime will prefer the VTID if present
-  @VTID(97)
+  @DISPID(94) //= 0x5e. The runtime will prefer the VTID if present
+  @VTID(101)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cvorname();
 
@@ -1197,8 +1249,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cvorname Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(90) //= 0x5a. The runtime will prefer the VTID if present
-  @VTID(98)
+  @DISPID(94) //= 0x5e. The runtime will prefer the VTID if present
+  @VTID(102)
   void cvorname(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cvorname);
 
@@ -1210,8 +1262,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(92) //= 0x5c. The runtime will prefer the VTID if present
-  @VTID(99)
+  @DISPID(96) //= 0x60. The runtime will prefer the VTID if present
+  @VTID(103)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cnamE1();
 
@@ -1223,8 +1275,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cnamE1 Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(92) //= 0x5c. The runtime will prefer the VTID if present
-  @VTID(100)
+  @DISPID(96) //= 0x60. The runtime will prefer the VTID if present
+  @VTID(104)
   void cnamE1(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cnamE1);
 
@@ -1236,8 +1288,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(94) //= 0x5e. The runtime will prefer the VTID if present
-  @VTID(101)
+  @DISPID(98) //= 0x62. The runtime will prefer the VTID if present
+  @VTID(105)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cnamE2();
 
@@ -1249,8 +1301,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cnamE2 Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(94) //= 0x5e. The runtime will prefer the VTID if present
-  @VTID(102)
+  @DISPID(98) //= 0x62. The runtime will prefer the VTID if present
+  @VTID(106)
   void cnamE2(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cnamE2);
 
@@ -1262,8 +1314,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(96) //= 0x60. The runtime will prefer the VTID if present
-  @VTID(103)
+  @DISPID(100) //= 0x64. The runtime will prefer the VTID if present
+  @VTID(107)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cnamE3();
 
@@ -1275,8 +1327,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cnamE3 Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(96) //= 0x60. The runtime will prefer the VTID if present
-  @VTID(104)
+  @DISPID(100) //= 0x64. The runtime will prefer the VTID if present
+  @VTID(108)
   void cnamE3(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cnamE3);
 
@@ -1288,8 +1340,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(98) //= 0x62. The runtime will prefer the VTID if present
-  @VTID(105)
+  @DISPID(102) //= 0x66. The runtime will prefer the VTID if present
+  @VTID(109)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cstrasse();
 
@@ -1301,8 +1353,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cstrasse Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(98) //= 0x62. The runtime will prefer the VTID if present
-  @VTID(106)
+  @DISPID(102) //= 0x66. The runtime will prefer the VTID if present
+  @VTID(110)
   void cstrasse(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cstrasse);
 
@@ -1314,8 +1366,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(100) //= 0x64. The runtime will prefer the VTID if present
-  @VTID(107)
+  @DISPID(104) //= 0x68. The runtime will prefer the VTID if present
+  @VTID(111)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cland();
 
@@ -1327,8 +1379,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cland Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(100) //= 0x64. The runtime will prefer the VTID if present
-  @VTID(108)
+  @DISPID(104) //= 0x68. The runtime will prefer the VTID if present
+  @VTID(112)
   void cland(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cland);
 
@@ -1340,8 +1392,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(102) //= 0x66. The runtime will prefer the VTID if present
-  @VTID(109)
+  @DISPID(106) //= 0x6a. The runtime will prefer the VTID if present
+  @VTID(113)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cplz();
 
@@ -1353,8 +1405,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cplz Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(102) //= 0x66. The runtime will prefer the VTID if present
-  @VTID(110)
+  @DISPID(106) //= 0x6a. The runtime will prefer the VTID if present
+  @VTID(114)
   void cplz(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cplz);
 
@@ -1366,8 +1418,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(104) //= 0x68. The runtime will prefer the VTID if present
-  @VTID(111)
+  @DISPID(108) //= 0x6c. The runtime will prefer the VTID if present
+  @VTID(115)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cort();
 
@@ -1379,8 +1431,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cort Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(104) //= 0x68. The runtime will prefer the VTID if present
-  @VTID(112)
+  @DISPID(108) //= 0x6c. The runtime will prefer the VTID if present
+  @VTID(116)
   void cort(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cort);
 
@@ -1392,8 +1444,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(106) //= 0x6a. The runtime will prefer the VTID if present
-  @VTID(113)
+  @DISPID(110) //= 0x6e. The runtime will prefer the VTID if present
+  @VTID(117)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object ctelefon();
 
@@ -1405,8 +1457,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param ctelefon Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(106) //= 0x6a. The runtime will prefer the VTID if present
-  @VTID(114)
+  @DISPID(110) //= 0x6e. The runtime will prefer the VTID if present
+  @VTID(118)
   void ctelefon(
     @MarshalAs(NativeType.VARIANT) java.lang.Object ctelefon);
 
@@ -1418,8 +1470,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(108) //= 0x6c. The runtime will prefer the VTID if present
-  @VTID(115)
+  @DISPID(112) //= 0x70. The runtime will prefer the VTID if present
+  @VTID(119)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object ctelefoN2();
 
@@ -1431,8 +1483,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param ctelefoN2 Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(108) //= 0x6c. The runtime will prefer the VTID if present
-  @VTID(116)
+  @DISPID(112) //= 0x70. The runtime will prefer the VTID if present
+  @VTID(120)
   void ctelefoN2(
     @MarshalAs(NativeType.VARIANT) java.lang.Object ctelefoN2);
 
@@ -1444,8 +1496,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(110) //= 0x6e. The runtime will prefer the VTID if present
-  @VTID(117)
+  @DISPID(114) //= 0x72. The runtime will prefer the VTID if present
+  @VTID(121)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object ctelefax();
 
@@ -1457,8 +1509,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param ctelefax Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(110) //= 0x6e. The runtime will prefer the VTID if present
-  @VTID(118)
+  @DISPID(114) //= 0x72. The runtime will prefer the VTID if present
+  @VTID(122)
   void ctelefax(
     @MarshalAs(NativeType.VARIANT) java.lang.Object ctelefax);
 
@@ -1470,8 +1522,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(112) //= 0x70. The runtime will prefer the VTID if present
-  @VTID(119)
+  @DISPID(116) //= 0x74. The runtime will prefer the VTID if present
+  @VTID(123)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cnatel();
 
@@ -1483,8 +1535,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cnatel Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(112) //= 0x70. The runtime will prefer the VTID if present
-  @VTID(120)
+  @DISPID(116) //= 0x74. The runtime will prefer the VTID if present
+  @VTID(124)
   void cnatel(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cnatel);
 
@@ -1496,8 +1548,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(114) //= 0x72. The runtime will prefer the VTID if present
-  @VTID(121)
+  @DISPID(118) //= 0x76. The runtime will prefer the VTID if present
+  @VTID(125)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object cemail();
 
@@ -1509,8 +1561,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param cemail Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(114) //= 0x72. The runtime will prefer the VTID if present
-  @VTID(122)
+  @DISPID(118) //= 0x76. The runtime will prefer the VTID if present
+  @VTID(126)
   void cemail(
     @MarshalAs(NativeType.VARIANT) java.lang.Object cemail);
 
@@ -1522,8 +1574,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(116) //= 0x74. The runtime will prefer the VTID if present
-  @VTID(123)
+  @DISPID(120) //= 0x78. The runtime will prefer the VTID if present
+  @VTID(127)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object nnachlass();
 
@@ -1535,8 +1587,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param nnachlass Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(116) //= 0x74. The runtime will prefer the VTID if present
-  @VTID(124)
+  @DISPID(120) //= 0x78. The runtime will prefer the VTID if present
+  @VTID(128)
   void nnachlass(
     @MarshalAs(NativeType.VARIANT) java.lang.Object nnachlass);
 
@@ -1548,8 +1600,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(118) //= 0x76. The runtime will prefer the VTID if present
-  @VTID(125)
+  @DISPID(122) //= 0x7a. The runtime will prefer the VTID if present
+  @VTID(129)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object ocheck();
 
@@ -1561,8 +1613,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param ocheck Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(118) //= 0x76. The runtime will prefer the VTID if present
-  @VTID(126)
+  @DISPID(122) //= 0x7a. The runtime will prefer the VTID if present
+  @VTID(130)
   void ocheck(
     @MarshalAs(NativeType.VARIANT) java.lang.Object ocheck);
 
@@ -1574,8 +1626,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(120) //= 0x78. The runtime will prefer the VTID if present
-  @VTID(127)
+  @DISPID(124) //= 0x7c. The runtime will prefer the VTID if present
+  @VTID(131)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lkundkarte();
 
@@ -1587,8 +1639,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lkundkarte Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(120) //= 0x78. The runtime will prefer the VTID if present
-  @VTID(128)
+  @DISPID(124) //= 0x7c. The runtime will prefer the VTID if present
+  @VTID(132)
   void lkundkarte(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lkundkarte);
 
@@ -1600,8 +1652,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(122) //= 0x7a. The runtime will prefer the VTID if present
-  @VTID(129)
+  @DISPID(126) //= 0x7e. The runtime will prefer the VTID if present
+  @VTID(133)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object nkundkonto();
 
@@ -1613,8 +1665,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param nkundkonto Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(122) //= 0x7a. The runtime will prefer the VTID if present
-  @VTID(130)
+  @DISPID(126) //= 0x7e. The runtime will prefer the VTID if present
+  @VTID(134)
   void nkundkonto(
     @MarshalAs(NativeType.VARIANT) java.lang.Object nkundkonto);
 
@@ -1626,8 +1678,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(124) //= 0x7c. The runtime will prefer the VTID if present
-  @VTID(131)
+  @DISPID(128) //= 0x80. The runtime will prefer the VTID if present
+  @VTID(135)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object crgerror();
 
@@ -1639,8 +1691,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param crgerror Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(124) //= 0x7c. The runtime will prefer the VTID if present
-  @VTID(132)
+  @DISPID(128) //= 0x80. The runtime will prefer the VTID if present
+  @VTID(136)
   void crgerror(
     @MarshalAs(NativeType.VARIANT) java.lang.Object crgerror);
 
@@ -1652,8 +1704,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(126) //= 0x7e. The runtime will prefer the VTID if present
-  @VTID(133)
+  @DISPID(130) //= 0x82. The runtime will prefer the VTID if present
+  @VTID(137)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object lkundfound();
 
@@ -1665,8 +1717,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @param lkundfound Mandatory java.lang.Object parameter.
    */
 
-  @DISPID(126) //= 0x7e. The runtime will prefer the VTID if present
-  @VTID(134)
+  @DISPID(130) //= 0x82. The runtime will prefer the VTID if present
+  @VTID(138)
   void lkundfound(
     @MarshalAs(NativeType.VARIANT) java.lang.Object lkundfound);
 
@@ -1675,8 +1727,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(128) //= 0x80. The runtime will prefer the VTID if present
-  @VTID(135)
+  @DISPID(132) //= 0x84. The runtime will prefer the VTID if present
+  @VTID(139)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object iswws();
 
@@ -1686,8 +1738,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(129) //= 0x81. The runtime will prefer the VTID if present
-  @VTID(136)
+  @DISPID(133) //= 0x85. The runtime will prefer the VTID if present
+  @VTID(140)
   boolean do_NOpen(
     java.lang.String cDatabase);
 
@@ -1696,8 +1748,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type java.lang.Object
    */
 
-  @DISPID(130) //= 0x82. The runtime will prefer the VTID if present
-  @VTID(137)
+  @DISPID(134) //= 0x86. The runtime will prefer the VTID if present
+  @VTID(141)
   @ReturnValue(type=NativeType.VARIANT)
   java.lang.Object do_NClose();
 
@@ -1707,8 +1759,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(131) //= 0x83. The runtime will prefer the VTID if present
-  @VTID(138)
+  @DISPID(135) //= 0x87. The runtime will prefer the VTID if present
+  @VTID(142)
   boolean do_NSearch(
     java.lang.String cNummer);
 
@@ -1719,8 +1771,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(132) //= 0x84. The runtime will prefer the VTID if present
-  @VTID(139)
+  @DISPID(136) //= 0x88. The runtime will prefer the VTID if present
+  @VTID(143)
   boolean do_delabholfach(
     java.lang.String cNummer,
     int nMenge);
@@ -1731,8 +1783,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(133) //= 0x85. The runtime will prefer the VTID if present
-  @VTID(140)
+  @DISPID(137) //= 0x89. The runtime will prefer the VTID if present
+  @VTID(144)
   boolean do_verkauf(
     java.lang.String cNummer);
 
@@ -1741,8 +1793,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(134) //= 0x86. The runtime will prefer the VTID if present
-  @VTID(141)
+  @DISPID(138) //= 0x8a. The runtime will prefer the VTID if present
+  @VTID(145)
   boolean do_wgverkauf();
 
 
@@ -1750,53 +1802,9 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(135) //= 0x87. The runtime will prefer the VTID if present
-  @VTID(142)
-  boolean do_wgstorno();
-
-
-  /**
-   * @param cNummer Mandatory java.lang.String parameter.
-   * @return  Returns a value of type boolean
-   */
-
-  @DISPID(136) //= 0x88. The runtime will prefer the VTID if present
-  @VTID(143)
-  boolean do_storno(
-    java.lang.String cNummer);
-
-
-  /**
-   * @param cBSWG Mandatory java.lang.String parameter.
-   * @return  Returns a value of type java.lang.String
-   */
-
-  @DISPID(137) //= 0x89. The runtime will prefer the VTID if present
-  @VTID(144)
-  java.lang.String getgalwg(
-    java.lang.String cBSWG);
-
-
-  /**
-   * @param cWGruppe Mandatory java.lang.String parameter.
-   * @return  Returns a value of type double
-   */
-
-  @DISPID(138) //= 0x8a. The runtime will prefer the VTID if present
-  @VTID(145)
-  double getekrabatt(
-    java.lang.String cWGruppe);
-
-
-  /**
-   * @param nKundennr Mandatory int parameter.
-   * @return  Returns a value of type boolean
-   */
-
   @DISPID(139) //= 0x8b. The runtime will prefer the VTID if present
   @VTID(146)
-  boolean do_getkunde(
-    int nKundennr);
+  boolean do_wgstorno();
 
 
   /**
@@ -1806,6 +1814,50 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
 
   @DISPID(140) //= 0x8c. The runtime will prefer the VTID if present
   @VTID(147)
+  boolean do_storno(
+    java.lang.String cNummer);
+
+
+  /**
+   * @param cBSWG Mandatory java.lang.String parameter.
+   * @return  Returns a value of type java.lang.String
+   */
+
+  @DISPID(141) //= 0x8d. The runtime will prefer the VTID if present
+  @VTID(148)
+  java.lang.String getgalwg(
+    java.lang.String cBSWG);
+
+
+  /**
+   * @param cWGruppe Mandatory java.lang.String parameter.
+   * @return  Returns a value of type double
+   */
+
+  @DISPID(142) //= 0x8e. The runtime will prefer the VTID if present
+  @VTID(149)
+  double getekrabatt(
+    java.lang.String cWGruppe);
+
+
+  /**
+   * @param nKundennr Mandatory int parameter.
+   * @return  Returns a value of type boolean
+   */
+
+  @DISPID(143) //= 0x8f. The runtime will prefer the VTID if present
+  @VTID(150)
+  boolean do_getkunde(
+    int nKundennr);
+
+
+  /**
+   * @param cNummer Mandatory java.lang.String parameter.
+   * @return  Returns a value of type boolean
+   */
+
+  @DISPID(144) //= 0x90. The runtime will prefer the VTID if present
+  @VTID(151)
   boolean do_teststorno(
     java.lang.String cNummer);
 
@@ -1815,8 +1867,8 @@ public interface Igdserve extends Com4jObject, ch.eugster.colibri.provider.galil
    * @return  Returns a value of type boolean
    */
 
-  @DISPID(141) //= 0x8d. The runtime will prefer the VTID if present
-  @VTID(148)
+  @DISPID(145) //= 0x91. The runtime will prefer the VTID if present
+  @VTID(152)
   boolean do_BucheRechnung(
     int nRgNummer);
 
