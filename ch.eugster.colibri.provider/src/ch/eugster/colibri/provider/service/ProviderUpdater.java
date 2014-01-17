@@ -26,11 +26,11 @@ public interface ProviderUpdater extends Comparable<ProviderUpdater>
 
 	Map<String, IProperty> getDefaultProperties();
 	
-	boolean canCheckConnection();
+	boolean canTestConnection();
 
 	boolean doCheckFailover();
 	
-	IStatus checkConnection(Map<String, IProperty> properties);
+	IStatus testConnection(Map<String, IProperty> properties);
 	
 	boolean isSalespointSpecificPossible();
 	
@@ -49,4 +49,6 @@ public interface ProviderUpdater extends Comparable<ProviderUpdater>
 	boolean doUpdatePositions();
 
 	boolean doUpdatePayments();
+	
+	boolean isActive();
 }

@@ -1652,6 +1652,8 @@ ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IDirty
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IProperty.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderConfiguration.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderTaxCode.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/AbstractProviderQuery.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/AbstractProviderService.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/AbstractProviderUpdater.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderConfigurator.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderFailoverService.java -text

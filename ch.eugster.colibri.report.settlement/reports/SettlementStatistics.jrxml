@@ -444,7 +444,7 @@ null]]></textFieldExpression>
 				<textElement verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{text}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{code} == null ? $F{text} : $F{code} + " - " + $F{text}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0" isBlankWhenNull="true">
 				<reportElement key="textField" positionType="Float" x="264" y="2" width="64" height="11" uuid="a2b0bdf7-99e5-454e-a655-888bd46711e0"/>

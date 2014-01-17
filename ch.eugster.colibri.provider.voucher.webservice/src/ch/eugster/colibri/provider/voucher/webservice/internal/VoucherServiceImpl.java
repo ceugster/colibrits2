@@ -399,13 +399,18 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	}
 
 	@Override
-	public boolean canCheckConnection() 
+	public boolean canTestConnection() 
+	{
+		return true;
+	}
+	
+	public boolean isActive()
 	{
 		return true;
 	}
 
 	@Override
-	public IStatus checkConnection(Map<String, IProperty> properties) 
+	public IStatus testConnection(Map<String, IProperty> properties) 
 	{
 		IStatus status = new Status(IStatus.OK, context.getBundleContext().getBundle().getSymbolicName(), "Die Verbindung zu " + this.getName() + " wurde erfolgreich hergestellt.");
 		if (Desktop.isDesktopSupported())
@@ -734,11 +739,11 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		}
 
 		@Override
-		public String value(org.eclipse.swt.widgets.Control control) 
+		public String value(IProperty property, org.eclipse.swt.widgets.Control control) 
 		{
 			for (AvailableControl availableControl : AvailableControl.values())
 			{
-				if (availableControl.controlName().equals(control.getClass().getName()))
+				if (availableControl.controlName().equals(property.control()))
 				{
 					return availableControl.value(control);
 				}
@@ -747,24 +752,24 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		}
 
 		@Override
-		public org.eclipse.swt.widgets.Control createControl(Composite parent, FormToolkit formToolkit, IDirtyable dirtyable, int cols) 
+		public org.eclipse.swt.widgets.Control createControl(Composite parent, FormToolkit formToolkit, IDirtyable dirtyable, int cols, int[] validValues) 
 		{
 			for (AvailableControl availableControl : AvailableControl.values())
 			{
 				if (availableControl.controlName().equals(this.control()))
 				{
-					return availableControl.create(parent, formToolkit, this, dirtyable, cols);
+					return availableControl.create(parent, formToolkit, this, dirtyable, cols, validValues);
 				}
 			}
 			return null;
 		}
 
 		@Override
-		public void set(org.eclipse.swt.widgets.Control control, String value) 
+		public void set(IProperty property, org.eclipse.swt.widgets.Control control, String value) 
 		{
 			for (AvailableControl availableControl : AvailableControl.values())
 			{
-				if (availableControl.controlName().equals(control.getClass().getName()))
+				if (availableControl.controlName().equals(property.control()))
 				{
 					availableControl.value(control, value);
 				}
@@ -777,14 +782,11 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			return Activator.getDefault().getContext().getBundle().getSymbolicName();
 		}
 
-//		@Override
-//		public void update(String value) 
-//		{
-//			if (this.persistedProperty == null)
-//			{
-//				this.persistedProperty = ProviderProperty.newInstance();
-//			}
-//		}
+		@Override
+		public int[] validValues() 
+		{
+			return null;
+		}
 	}
 
 	public enum Command implements ICommand

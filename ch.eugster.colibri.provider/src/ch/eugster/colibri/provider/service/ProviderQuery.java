@@ -5,8 +5,10 @@ import java.io.IOException;
 import org.eclipse.core.runtime.IStatus;
 
 import ch.eugster.colibri.barcode.code.Barcode;
+import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.ProviderConfiguration;
 
@@ -26,8 +28,12 @@ public interface ProviderQuery extends ProviderService
 
 	ProviderConfiguration getConfiguration();
 	
-	String getProviderId();
-	
+	boolean canMap(CurrentTax currentTax);
+
+	boolean canMap(Tax tax);
+
+	String getImageName();
+
 	boolean isConnect();
 	
 	String getName();

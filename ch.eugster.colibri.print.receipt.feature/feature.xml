@@ -212,6 +212,14 @@ Each party waives its rights to a jury trial in any resulting
 litigation.
    </license>
 
+   <requires>
+      <import plugin="ch.eugster.colibri.periphery.printer"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="ch.eugster.colibri.print"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.services"/>
+   </requires>
+
    <plugin
          id="ch.eugster.colibri.print.receipt"
          download-size="0"

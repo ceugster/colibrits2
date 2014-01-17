@@ -268,26 +268,33 @@ public class UpdateSchedulerComponent implements UpdateScheduler
 				monitor.beginTask("Update Positions...", providerUpdaters.length * 2);
 				for (ProviderUpdater providerUpdater : providerUpdaters)
 				{
-					if (providerUpdater.doUpdatePositions())
+					if (providerUpdater.isActive())
 					{
-						IStatus status = updatePositions(providerUpdater, persistenceService);
-						if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+						if (providerUpdater.doUpdatePositions())
 						{
-							return status;
+							IStatus status = updatePositions(providerUpdater, persistenceService);
+							if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+							{
+								return status;
+							}
 						}
-					}
-					monitor.worked(1);
-
-					if (providerUpdater.doUpdatePayments())
-					{
-						IStatus status = updatePayments(providerUpdater, persistenceService);
 						monitor.worked(1);
-						if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+
+						if (providerUpdater.doUpdatePayments())
 						{
-							return status;
+							IStatus status = updatePayments(providerUpdater, persistenceService);
+							monitor.worked(1);
+							if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+							{
+								return status;
+							}
 						}
+						monitor.worked(1);
 					}
-					monitor.worked(1);
+					else
+					{
+						monitor.worked(2);
+					}
 				}
 			}
 			finally

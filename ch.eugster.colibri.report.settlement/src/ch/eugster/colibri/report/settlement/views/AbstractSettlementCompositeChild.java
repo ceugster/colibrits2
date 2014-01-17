@@ -28,6 +28,7 @@ import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.SettlementReceipt;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.report.engine.ReportService;
@@ -108,8 +109,8 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 				Section sectionType = position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL) ? Section.INTERNAL : Section.POSITION;
 				entry = new SettlementEntry(sectionType);
 				entry.setGroup(position.getProductGroup().getProductGroupType().ordinal());
-				entry.setCode(position.getProductGroup().getCode());
-				entry.setText(position.getProductGroup().getCode().isEmpty() ? position.getProductGroup().getName() : (position.getProductGroup().getCode() + " - " + position.getProductGroup().getName()));
+				entry.setCode(position.getCode());
+				entry.setText(position.getName());
 				section.put(position.getProductGroup().getId(), entry);
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + position.getQuantity();
@@ -133,15 +134,23 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 	{
 		for (SettlementPayment payment : payments)
 		{
-			long id = payment.getDefaultCurrencyAmount() < 0D ? -payment.getPaymentType().getId().longValue() : payment.getPaymentType().getId().longValue();
+			long id = 0L;
+			if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+			{
+				id = payment.getDefaultCurrencyAmount() < 0D ? -payment.getPaymentType().getId().longValue() : payment.getPaymentType().getId().longValue();
+			}
+			else
+			{
+				id = payment.getPaymentType().getId().longValue();
+			}
 			SettlementEntry entry = section.get(Long.valueOf(id));
 			if (entry == null)
 			{
 				entry = new SettlementEntry(Section.PAYMENT);
-				section.put(payment.getPaymentType().getId(), entry);
+				section.put(id, entry);
 				entry.setGroup(payment.getPaymentType().getCurrency().getId().equals(referenceCurrency.getId()) ? 0 : 1);
 				entry.setCode(payment.getPaymentType().getCode());
-				entry.setText((id < 0D ? "Rückgeld " : "") + payment.getPaymentType().getName());
+				entry.setText((id < 0L ? "Rückgeld " : "") + payment.getPaymentType().getName());
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + payment.getQuantity();
 			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));

@@ -319,11 +319,11 @@ public interface UpdateScheduler
 		}
 
 		@Override
-		public String value(org.eclipse.swt.widgets.Control control) 
+		public String value(IProperty property, org.eclipse.swt.widgets.Control control) 
 		{
 			for (AvailableControl availableControl : AvailableControl.values())
 			{
-				if (availableControl.controlName().equals(control.getClass().getName()))
+				if (availableControl.controlName().equals(property.control()))
 				{
 					return availableControl.value(control);
 				}
@@ -338,24 +338,24 @@ public interface UpdateScheduler
 		}
 
 		@Override
-		public org.eclipse.swt.widgets.Control createControl(Composite parent, FormToolkit formToolkit, IDirtyable dirtyable, int cols) 
+		public org.eclipse.swt.widgets.Control createControl(Composite parent, FormToolkit formToolkit, IDirtyable dirtyable, int cols, int[] validValues) 
 		{
 			for (AvailableControl availableControl : AvailableControl.values())
 			{
 				if (availableControl.controlName().equals(this.control()))
 				{
-					return availableControl.create(parent, formToolkit, this, dirtyable, cols);
+					return availableControl.create(parent, formToolkit, this, dirtyable, cols, validValues);
 				}
 			}
 			return null;
 		}
 
 		@Override
-		public void set(org.eclipse.swt.widgets.Control control, String value) 
+		public void set(IProperty property, org.eclipse.swt.widgets.Control control, String value) 
 		{
 			for (AvailableControl availableControl : AvailableControl.values())
 			{
-				if (availableControl.controlName().equals(control.getClass().getName()))
+				if (availableControl.controlName().equals(property.control()))
 				{
 					availableControl.value(control, value);
 				}
@@ -366,6 +366,12 @@ public interface UpdateScheduler
 		public String providerId() 
 		{
 			return Activator.getDefault().getBundleContext().getBundle().getSymbolicName();
+		}
+
+		@Override
+		public int[] validValues() 
+		{
+			return null;
 		}
 
 	}

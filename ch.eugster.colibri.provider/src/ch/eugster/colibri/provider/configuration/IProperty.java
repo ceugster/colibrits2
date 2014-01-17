@@ -10,6 +10,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -50,13 +51,18 @@ public interface IProperty
 
 	boolean isDefaultValue(String value);
 	
-	String value(org.eclipse.swt.widgets.Control control);
+	String value(IProperty property, org.eclipse.swt.widgets.Control control);
 	
-	void set(org.eclipse.swt.widgets.Control control, String value);
-//	
-//	void update(String value);
+	void set(IProperty property, org.eclipse.swt.widgets.Control control, String value);
 	
-	org.eclipse.swt.widgets.Control createControl(Composite composite, FormToolkit formToolkit, IDirtyable dirtyable, int cols);
+	/*
+	 * Wichtig bei Buttons: wenn kein Wert angegeben ist, wird 0 und 1 als Range genommen (false und true) und es wird eine
+	 * Checkbox gemacht.
+	 * Bei mehr als 2 Werten werden Radiobuttons gemacht. Dann braucht label2 evtl für jede Radiobox einen Wert, alle getrennt durch |
+	 */
+	int[] validValues();
+	
+	org.eclipse.swt.widgets.Control createControl(Composite composite, FormToolkit formToolkit, IDirtyable dirtyable, int cols, int[] validValues);
 
 	public interface Control
 	{
@@ -70,7 +76,7 @@ public interface IProperty
 		
 		void value(org.eclipse.swt.widgets.Control control, String value);
 		
-		org.eclipse.swt.widgets.Control create(Composite composite, FormToolkit formToolkit, IProperty property, IDirtyable dirtyable, int cols);
+		org.eclipse.swt.widgets.Control create(Composite composite, FormToolkit formToolkit, IProperty property, IDirtyable dirtyable, int cols, int[] validValues);
 	}
 	
 	public enum AvailableControl implements Control
@@ -126,8 +132,8 @@ public interface IProperty
 			}
 			case BUTTON:
 			{
-				Button button = (Button) control;
-				return Boolean.toString(button.getSelection());
+				Composite composite = (Composite) control;
+				return Integer.toString((Integer) composite.getData("value"));
 			}
 			case SPINNER:
 			{
@@ -143,7 +149,7 @@ public interface IProperty
 
 		@Override
 		public org.eclipse.swt.widgets.Control create(
-				Composite parent, FormToolkit formToolkit, IProperty property, IDirtyable dirtyable, int cols) 
+				Composite parent, FormToolkit formToolkit, IProperty property, IDirtyable dirtyable, int cols, int[] validValues) 
 		{
 			switch(this)
 			{
@@ -274,34 +280,115 @@ public interface IProperty
 			return text;
 		}
 
+//		private org.eclipse.swt.widgets.Control createButton(final Composite parent, FormToolkit formToolkit, IProperty property, final IDirtyable dirtyable, int cols)
+//		{
+//			Label label = formToolkit.createLabel(parent, property.label());
+//			label.setLayoutData(new GridData());
+//	
+//			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+//			gridData.horizontalSpan = cols - this.columns(property);
+//			
+//			final Button button = formToolkit.createButton(parent, property.label2(), SWT.CHECK);
+//			button.setLayoutData(gridData);
+//			button.setData("key", property.key());
+//			button.addSelectionListener(new SelectionListener()
+//			{
+//				@Override
+//				public void widgetDefaultSelected(final SelectionEvent event)
+//				{
+//					this.widgetSelected(event);
+//				}
+//
+//				@Override
+//				public void widgetSelected(final SelectionEvent event)
+//				{
+//					final Button button = (Button) event.getSource();
+//					button.setData("value", Boolean.toString(button.getSelection()));
+//					dirtyable.setDirty(true);
+//				}
+//			});
+//			return button;
+//		}
+
 		private org.eclipse.swt.widgets.Control createButton(final Composite parent, FormToolkit formToolkit, IProperty property, final IDirtyable dirtyable, int cols)
 		{
 			Label label = formToolkit.createLabel(parent, property.label());
 			label.setLayoutData(new GridData());
-	
+			
 			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 			gridData.horizontalSpan = cols - this.columns(property);
 			
-			final Button button = formToolkit.createButton(parent, property.label2(), SWT.CHECK);
-			button.setLayoutData(gridData);
-			button.setData("key", property.key());
-			button.addSelectionListener(new SelectionListener()
+			final Composite composite = formToolkit.createComposite(parent);
+			composite.setLayout(new GridLayout());
+			composite.setLayoutData(gridData);
+			
+			String[] labels = null;
+			int[] values = property.validValues();
+			if (values.length <= 2)
 			{
-				@Override
-				public void widgetDefaultSelected(final SelectionEvent event)
+				/*
+				 * Checkbox
+				 */
+				labels = new String[] { property.label2() };
+				if (values.length < 2)
 				{
-					this.widgetSelected(event);
+					values = new int[] { 0, 1 };
 				}
+				final Button button = formToolkit.createButton(composite, labels[0], SWT.CHECK);
+				button.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+				button.setData("value", Integer.valueOf(values[0]));
+				button.addSelectionListener(new SelectionListener()
+				{
+					@Override
+					public void widgetDefaultSelected(final SelectionEvent event)
+					{
+						this.widgetSelected(event);
+					}
 
-				@Override
-				public void widgetSelected(final SelectionEvent event)
+					@Override
+					public void widgetSelected(final SelectionEvent event)
+					{
+						final Button button = (Button) event.getSource();
+						button.setData("value", Integer.valueOf(button.getSelection() ? 1 : 0));
+						composite.setData("value", (Integer) button.getData("value"));
+						dirtyable.setDirty(true);
+					}
+				});
+			}
+			else
+			{
+				/*
+				 * Radiobuttons
+				 */
+				labels = property.label2().split("[|]");
+				
+				if (values.length == labels.length)
 				{
-					final Button button = (Button) event.getSource();
-					button.setData("value", Boolean.toString(button.getSelection()));
-					dirtyable.setDirty(true);
+					for (int i = 0; i < values.length; i++)
+					{
+						final Button button = formToolkit.createButton(composite, labels[i], SWT.RADIO);
+						button.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+						button.setData("value", Integer.valueOf(values[i]));
+						button.addSelectionListener(new SelectionListener()
+						{
+							@Override
+							public void widgetDefaultSelected(final SelectionEvent event)
+							{
+								this.widgetSelected(event);
+							}
+
+							@Override
+							public void widgetSelected(final SelectionEvent event)
+							{
+								final Button button = (Button) event.getSource();
+								composite.setData("value", (Integer) button.getData("value"));
+								dirtyable.setDirty(true);
+							}
+						});
+					}
 				}
-			});
-			return button;
+			}
+			return composite;
 		}
 
 		private org.eclipse.swt.widgets.Control createSpinner(final Composite parent, FormToolkit formToolkit, IProperty property, final IDirtyable dirtyable, int cols)
@@ -413,8 +500,22 @@ public interface IProperty
 			}
 			case BUTTON:
 			{
-				Button button = (Button) control;
-				button.setSelection(Boolean.valueOf(value));
+				int val = getInt(value);
+				Composite composite = (Composite) control;
+				org.eclipse.swt.widgets.Control[] children = composite.getChildren();
+				for (org.eclipse.swt.widgets.Control child : children)
+				{
+					if (child instanceof Button)
+					{
+						Button button = (Button) child;
+						Integer i = (Integer) button.getData("value");
+						if (i.intValue() == val)
+						{
+							button.setSelection(true);
+							composite.setData("value", i);
+						}
+					}
+				}
 				break;
 			}
 			case SPINNER:

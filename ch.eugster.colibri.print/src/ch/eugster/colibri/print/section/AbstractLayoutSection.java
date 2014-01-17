@@ -41,6 +41,8 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 	private PrintOption detailPrintOption;
 
 	private PrintOption totalPrintOption;
+	
+	protected static String receiptNumberFormat;
 
 	public AbstractLayoutSection(final ILayoutSectionType layoutSectionType)
 	{
@@ -48,6 +50,7 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 		simpleIntegerFormatter.setGroupingUsed(false);
 		simpleIntegerFormatter.setMaximumFractionDigits(0);
 		simpleIntegerFormatter.setMinimumFractionDigits(0);
+		receiptNumberFormat = this.getCommonSettingsReceiptNumberFormat();
 	}
 
 	@Override
@@ -499,6 +502,20 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 			CommonSettingsQuery query = (CommonSettingsQuery) service.getCacheService().getQuery(CommonSettings.class);
 			CommonSettings settings = query.findDefault();
 			return settings.getTaxNumber();
+		}
+		return null;
+	}
+	
+	protected String getCommonSettingsReceiptNumberFormat()
+	{
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundleContext(), PersistenceService.class, null);
+		tracker.open();
+		PersistenceService service = tracker.getService();
+		if (service != null)
+		{
+			CommonSettingsQuery query = (CommonSettingsQuery) service.getCacheService().getQuery(CommonSettings.class);
+			CommonSettings settings = query.findDefault();
+			return settings.getReceiptNumberFormat();
 		}
 		return null;
 	}
