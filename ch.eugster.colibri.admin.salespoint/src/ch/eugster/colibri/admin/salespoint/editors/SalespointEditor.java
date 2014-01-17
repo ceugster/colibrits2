@@ -1582,7 +1582,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		Map<String, IProperty> properties = this.providerProperties.get(providerUpdater.getProviderId());
 		for (final IProperty property : properties.values())
 		{
-			Control control = property.createControl(composite, this.formToolkit, this, propertySection.columns());
+			Control control = property.createControl(composite, this.formToolkit, this, propertySection.columns(), property.validValues());
 			if (control != null)
 			{
 				Map<String, Control> controls = this.providerPropertyControls.get(providerUpdater.getProviderId());
@@ -1638,7 +1638,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		Map<String, IProperty> properties = this.providerProperties.get(scheduler.getProviderId());
 		for (final IProperty property : properties.values())
 		{
-			Control control = property.createControl(composite, this.formToolkit, this, propertySection.columns());
+			Control control = property.createControl(composite, this.formToolkit, this, propertySection.columns(), property.validValues());
 			if (control != null)
 			{
 				Map<String, Control> controls = this.providerPropertyControls.get(scheduler.getProviderId());
@@ -2264,7 +2264,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 				{
 					IProperty property = properties.get(propertyKey);
 					Control control = controls.get(propertyKey);
-					property.set(control, property.value());
+					property.set(property, control, property.value());
 					control.setEnabled(salespointSpecific);
 				}
 			}
@@ -2303,7 +2303,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 				if (controls != null)
 				{
 					Control control = controls.get(propertyKey);
-					String value = property.value(control);
+					String value = property.value(property, control);
 					ProviderProperty parent = getParentProperty(providerKey, property.key(), property.getPersistedProperty());
 					ProviderProperty providerProperty = property.getPersistedProperty();
 					if (property.isDefaultValue(value))

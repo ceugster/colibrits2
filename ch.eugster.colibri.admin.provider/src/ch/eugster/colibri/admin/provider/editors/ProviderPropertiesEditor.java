@@ -160,8 +160,8 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 					}
 					else if (property.control().equals(Button.class.getName()))
 					{
-						final Button button = (Button) this.controls.get(property.key());
-						value = Boolean.toString(button.getSelection());
+						final Composite composite = (Composite) this.controls.get(property.key());
+						value = Integer.toString(((Integer)composite.getData("value")).intValue());
 					}
 					if (setValue(property, value, property.getPersistedProperty()))
 					{
@@ -295,7 +295,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 
 		for (final IProperty property : input.getProperties().values())
 		{
-			Control control = property.createControl(composite, this.formToolkit, this, section.columns());
+			Control control = property.createControl(composite, this.formToolkit, this, section.columns(), property.validValues());
 			if (control != null)
 			{
 				this.controls.put(property.key(), control);
@@ -321,7 +321,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 						Control control = controls.get(key);
 						if (control != null)
 						{
-							String value = property.value(control);
+							String value = property.value(property, control);
 							ProviderProperty providerProperty = ProviderProperty.newInstance(input.getProviderId());
 							providerProperty.setKey(key);
 							providerProperty.setValue(value, property.defaultValue());
@@ -372,7 +372,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 			final Control control = this.controls.get(property.key());
 			if (control != null)
 			{
-				property.set(control, property.value());
+				property.set(property, control, property.value());
 			}
 		}
 	}

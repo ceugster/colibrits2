@@ -9,12 +9,19 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -22,11 +29,13 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListModel;
 import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListSelectionModel;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.RoleProperty;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
+import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderQuery;
 
@@ -43,6 +52,8 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 	private final CurrentReceiptListSelectionModel selectionModel;
 
 	private PrintReceiptAction printReceiptAction;
+
+	private ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
 	
 	public ReverseReceiptAction(final UserPanel userPanel, final Profile profile,
 			final CurrentReceiptListModel tableModel, final CurrentReceiptListSelectionModel selectionModel)
@@ -50,6 +61,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 		super(ReverseReceiptAction.TEXT, ReverseReceiptAction.ACTION_COMMAND, userPanel, profile);
 		this.tableModel = tableModel;
 		this.selectionModel = selectionModel;
+		this.tracker.open();
 	}
 
 	@Override
@@ -73,7 +85,6 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 				{
 					receipt.setState(Receipt.State.SAVED);
 				}
-				receipt.setTransferred(false);
 				try
 				{
 					this.tableModel.setReceipt((Receipt) persistenceService.getCacheService().merge(receipt, false),
@@ -91,11 +102,35 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 				}
 
 				this.tableModel.fireTableDataChanged();
+				final EventAdmin eventAdmin = (EventAdmin) this.tracker.getService();
+				if (eventAdmin != null)
+				{
+					eventAdmin.sendEvent(this.getEvent(Topic.STORE_RECEIPT.topic(), receipt));
+				}
 			}
 			serviceTracker.close();
 		}
 	}
 	
+	private Event getEvent(final String topics, final Receipt receipt)
+	{
+		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
+		properties.put(EventConstants.BUNDLE_ID,
+				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
+		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
+		properties.put(EventConstants.SERVICE, this.tracker.getServiceReference());
+		properties.put(EventConstants.SERVICE_ID,
+				this.tracker.getServiceReference().getProperty("service.id"));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.STORE_RECEIPT.topic());
+		properties.put(IPrintable.class.getName(), receipt);
+		properties.put("status", status);
+		properties.put("open.drawer", Boolean.valueOf(false));
+		properties.put("copies", Integer.valueOf(0));
+		return new Event(topics, properties);
+	}
+
 	public void addPrintReceiptAction(PrintReceiptAction action)
 	{
 		this.printReceiptAction = action;

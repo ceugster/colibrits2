@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.progress.UIJob;
@@ -392,11 +391,16 @@ public class SalespointView extends AbstractEntityView implements IDoubleClickLi
 		UIJob job = new UIJob("update columns width")
 		{
 			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				for (final TreeColumn treeColumn : viewer.getTree().getColumns())
+			public IStatus runInUIThread(IProgressMonitor monitor) 
+			{
+				int totalColumnWidth = 0;
+				int columns = viewer.getTree().getColumnCount();
+				for (int column = 0; column < columns; column++)
 				{
-					treeColumn.pack();
+					viewer.getTree().getColumn(column).pack();
+					totalColumnWidth += viewer.getTree().getColumn(column).getWidth();
 				}
+				viewer.getTree().getColumn(0).setWidth(viewer.getTree().getClientArea().width > totalColumnWidth ? viewer.getTree().getClientArea().width - totalColumnWidth + viewer.getTree().getColumn(0).getWidth() : 264);
 				return Status.OK_STATUS;
 			}
 		};

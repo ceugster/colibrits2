@@ -34,3 +34,7 @@ Import-Package: ch.eugster.colibri.admin.ui.editors,
  org.eclipse.ui.progress,
  org.osgi.framework;version="1.6.0",
  org.osgi.util.tracker;version="1.5.0"
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.ui.forms;bundle-version="3.5.101",
+ org.eclipse.core.expressions;bundle-version="3.4.300"

@@ -114,12 +114,12 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 
 	public boolean canCheckConnection()
 	{
-		return updateScheduler == null ? providerUpdater.canCheckConnection() : false;
+		return updateScheduler == null ? providerUpdater.canTestConnection() : false;
 	}
 
 	public IStatus checkConnection(Map<String, IProperty> properties)
 	{
-		return updateScheduler == null ? providerUpdater.checkConnection(properties) : Status.OK_STATUS;
+		return updateScheduler == null ? providerUpdater.testConnection(properties) : Status.OK_STATUS;
 	}
 	
 	public Map<String, IProperty> getDefaultProperties()
