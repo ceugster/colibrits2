@@ -19,22 +19,21 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.IProperty.Section;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoSection;
+import ch.eugster.colibri.provider.galileo.galserve.GalserverFactory;
 import ch.eugster.colibri.provider.galileo.galserve.IUpdateProviderServer;
-import ch.eugster.colibri.provider.galileo.galserve.UpdateProviderServerCom4j;
 import ch.eugster.colibri.provider.service.AbstractProviderUpdater;
 import ch.eugster.colibri.provider.service.ProviderQuery;
 
 public class GalileoUpdaterComponent extends AbstractProviderUpdater
 {
-	private LogService logService;
-
 	private ProviderQuery providerQuery;
 
 	private IUpdateProviderServer updateProviderServer;
 	
 	private final Collection<BarcodeVerifier> barcodeVerifiers = new ArrayList<BarcodeVerifier>();
-
+	
 	public GalileoUpdaterComponent()
 	{
 	}
@@ -79,7 +78,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	public IStatus updateProvider(final Position position)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
-		if (getUpdateProviderServer().isConnect())
+		if (updateProviderServer != null && updateProviderServer.isConnect())
 		{
 			log(LogService.LOG_INFO, "Aktualisiere Warenbewirtschaftung...");
 			/*
@@ -89,42 +88,60 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 			status = this.checkPosition(position);
 			if (status.getSeverity() == IStatus.OK)
 			{
-				status = this.getUpdateProviderServer().updateProvider(position);
+				status = this.updateProviderServer.updateProvider(position);
 			}
 			log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
 		}
 		return status;
 	}
 
-	private void log(int severity, String msg)
+	public boolean isActive()
 	{
-		if (this.logService != null)
-		{
-			this.logService.log(severity, msg);
-		}
+		return this.updateProviderServer != null && this.updateProviderServer.isConnect();
 	}
 	
 	@Override
 	public IStatus checkConnection()
 	{
-		return checkConnection(this.getProperties());
+		IStatus status = null;
+		if (updateProviderServer != null && updateProviderServer.isConnect())
+		{
+			status = this.updateProviderServer.checkConnection();
+		}
+		else
+		{
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " ist inaktiv.");
+		}
+		return status;
 	}
 
 	@Override
-	public IStatus checkConnection(Map<String, IProperty> properties)
+	public IStatus testConnection(Map<String, IProperty> properties)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " wurde erfolgreich hergestellt.");
-		if (getUpdateProviderServer().isConnect())
+		int connect = Integer.valueOf(properties.get(GalileoProperty.CONNECT.key()).value());
+		if (connect > 0)
 		{
-			IProperty property = properties.get(GalileoConfiguration.GalileoProperty.DATABASE_PATH.key());
-			status = this.getUpdateProviderServer().checkConnection(property.value());
+			IUpdateProviderServer server = GalserverFactory.createUpdateProviderServer(persistenceService, properties);
+			status = server.start();
+			if (status.isOK())
+			{
+				server.open();
+				status = server.getStatus();	
+				server.close(true);
+			}
+		}
+		else
+		{
+			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " ist nicht verfügbar.");
 		}
 		return status;
 	}
 
 	protected void activate(final ComponentContext componentContext)
 	{
-		this.context = componentContext;
+		super.activate(componentContext);
+		this.loadProperties(persistenceService.getCacheService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
 		this.startUpdateProviderServer();
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
@@ -132,22 +149,15 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	protected void deactivate(final ComponentContext componentContext)
 	{
 		this.stopUpdateProviderServer();
-		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
-					+ " deaktiviert.");
-		this.context = null;
+		super.deactivate(componentContext);
 	}
 
-	protected void setBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
+	protected void addBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
 	{
 		this.barcodeVerifiers.add(barcodeVerifier);
 	}
 
-	protected void setLogService(final LogService logService)
-	{
-		this.logService = logService;
-	}
-
-	protected void unsetBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
+	protected void removeBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
 	{
 		this.barcodeVerifiers.remove(barcodeVerifier);
 	}
@@ -162,11 +172,6 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 		this.providerQuery = null;
 	}
 	
-	protected void unsetLogService(final LogService logService)
-	{
-		this.logService = null;
-	}
-
 	private IStatus checkPosition(final Position position)
 	{
 		/*
@@ -177,39 +182,40 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		if (position.getProduct() == null)
 		{
-			final BarcodeVerifier[] verifiers = this.barcodeVerifiers.toArray(new BarcodeVerifier[0]);
-			for (final BarcodeVerifier verifier : verifiers)
+			if (position.getSearchValue() != null)
 			{
-				final Barcode barcode = verifier.verify(position.getSearchValue());
-				if (barcode instanceof Barcode)
+				final BarcodeVerifier[] verifiers = this.barcodeVerifiers.toArray(new BarcodeVerifier[0]);
+				for (final BarcodeVerifier verifier : verifiers)
 				{
-					if (this.logService != null)
+					final Barcode barcode = verifier.verify(position.getSearchValue());
+					if (barcode instanceof Barcode)
 					{
-						log(LogService.LOG_INFO, "Prüfe Position " + position.getSearchValue() + "...");
+						if (this.logService != null)
+						{
+							log(LogService.LOG_INFO, "Prüfe Position " + position.getSearchValue() + "...");
+						}
+						status = providerQuery.findAndRead(barcode, position);
+						if (this.logService != null)
+						{
+							log(LogService.LOG_INFO, "Position " + (status.getSeverity() == IStatus.OK ? "OK." :  "FEHLER."));
+						}
+						break;
 					}
-					status = providerQuery.findAndRead(barcode, position);
-					if (this.logService != null)
-					{
-						log(LogService.LOG_INFO, "Position " + (status.getSeverity() == IStatus.OK ? "OK." :  "FEHLER."));
-					}
-					break;
 				}
 			}
 		}
 		return status;
 	}
 
-	private IUpdateProviderServer getUpdateProviderServer()
-	{
-		return this.updateProviderServer;
-	}
-
 	private void startUpdateProviderServer()
 	{
 		if (this.updateProviderServer == null)
 		{
-			this.updateProviderServer = new UpdateProviderServerCom4j();
-			this.updateProviderServer.start();
+			this.updateProviderServer = GalserverFactory.createUpdateProviderServer(persistenceService, properties);
+			if (this.updateProviderServer != null)
+			{
+				this.updateProviderServer.start();
+			}
 		}
 	}
 
@@ -235,7 +241,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	}
 
 	@Override
-	public boolean canCheckConnection() 
+	public boolean canTestConnection() 
 	{
 		return true;
 	}

@@ -5,13 +5,11 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.log.LogService;
 
@@ -25,27 +23,22 @@ import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
-import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.ProviderConfiguration;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
-import ch.eugster.colibri.provider.galileo.galserve.FindArticleServerCom4j;
+import ch.eugster.colibri.provider.galileo.galserve.GalserverFactory;
 import ch.eugster.colibri.provider.galileo.galserve.IFindArticleServer;
-import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
+import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServerFactory;
+import ch.eugster.colibri.provider.galileo.kundenserver.ICustomerServer;
 import ch.eugster.colibri.provider.galileo.service.GalileoConfiguratorComponent.GalileoTaxCode;
+import ch.eugster.colibri.provider.service.AbstractProviderQuery;
 import ch.eugster.colibri.provider.service.ProviderQuery;
 
-public class GalileoQueryComponent implements ProviderQuery
+public class GalileoQueryComponent extends AbstractProviderQuery implements ProviderQuery
 {
-	private LogService logService;
-
-	private EventAdmin eventAdmin;
-
-	private ComponentContext context;
-
 	private IFindArticleServer findArticleServer;
 
-	private CustomerServer customerServer;
+	private ICustomerServer customerServer;
 
 	private boolean showFailoverMessage = true;
 	
@@ -79,6 +72,11 @@ public class GalileoQueryComponent implements ProviderQuery
 		return this.findArticleServer.isConnect();
 	}
 
+	public String getProviderId()
+	{
+		return Activator.getDefault().getConfiguration().getProviderId();
+	}
+	
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
@@ -115,18 +113,6 @@ public class GalileoQueryComponent implements ProviderQuery
 	}
 
 	@Override
-	public Map<String, IProperty> getProperties()
-	{
-		return GalileoConfiguration.GalileoProperty.asMap();
-	}
-
-	@Override
-	public String getProviderId()
-	{
-		return Activator.getDefault().getConfiguration().getProviderId();
-	}
-
-	@Override
 	public IStatus selectCustomer(final Position position, ProductGroup productGroup)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
@@ -152,18 +138,11 @@ public class GalileoQueryComponent implements ProviderQuery
 		return status;
 	}
 
-	private void log(int severity, String msg)
-	{
-		if (this.logService != null)
-		{
-			this.logService.log(severity, msg);
-		}
-	}
-	
 	protected void activate(final ComponentContext componentContext)
 	{
+		super.activate(componentContext);
 		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
-		this.context = componentContext;
+		this.loadProperties(persistenceService.getCacheService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
 		this.startFindArticleServer();
 		this.startCustomerServer();
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
@@ -173,40 +152,17 @@ public class GalileoQueryComponent implements ProviderQuery
 	{
 		this.stopCustomerServer();
 		this.stopFindArticleServer();
-
-		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
-					+ " deaktiviert.");
-		this.context = null;
+		super.deactivate(componentContext);
 	}
 
-	protected void setBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
+	protected void addBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
 	{
 		this.barcodeVerifiers.add(barcodeVerifier);
 	}
 
-	protected void setEventAdmin(final EventAdmin eventAdmin)
-	{
-		this.eventAdmin = eventAdmin;
-	}
-
-	protected void setLogService(final LogService logService)
-	{
-		this.logService = logService;
-	}
-
-	protected void unsetBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
+	protected void removeBarcodeVerifier(final BarcodeVerifier barcodeVerifier)
 	{
 		this.barcodeVerifiers.remove(barcodeVerifier);
-	}
-
-	protected void unsetEventAdmin(final EventAdmin eventAdmin)
-	{
-		this.eventAdmin = null;
-	}
-
-	protected void unsetLogService(final LogService logService)
-	{
-		this.logService = null;
 	}
 
 	private Event getEvent(final IStatus status, boolean force)
@@ -257,8 +213,11 @@ public class GalileoQueryComponent implements ProviderQuery
 	{
 		if (this.findArticleServer == null)
 		{
-			this.findArticleServer = new FindArticleServerCom4j();
-			this.findArticleServer.start();
+			this.findArticleServer = GalserverFactory.createFindArticleServer(persistenceService, properties);
+			if (this.findArticleServer != null)
+			{
+				this.findArticleServer.start();
+			}
 		}
 	}
 
@@ -266,8 +225,11 @@ public class GalileoQueryComponent implements ProviderQuery
 	{
 		if (this.customerServer == null)
 		{
-			this.customerServer = new CustomerServer();
-			this.customerServer.start();
+			this.customerServer = CustomerServerFactory.createCustomerServer(properties);
+			if (this.customerServer != null)
+			{
+				this.customerServer.start();
+			}
 		}
 	}
 
@@ -302,12 +264,6 @@ public class GalileoQueryComponent implements ProviderQuery
 	}
 
 	@Override
-	public Map<String, IProperty> getDefaultProperties() 
-	{
-		return GalileoConfiguration.GalileoProperty.asMap();
-	}
-
-	@Override
 	public IStatus checkTaxCodes(PersistenceService service)
 	{
 		if (service != null)
@@ -316,7 +272,7 @@ public class GalileoQueryComponent implements ProviderQuery
 			GalileoTaxCode[] taxCodes = GalileoConfiguratorComponent.GalileoTaxCode.values();
 			for (GalileoTaxCode taxCode : taxCodes)
 			{
-				String providerId = this.getProviderId();
+				String providerId = Activator.getDefault().getConfiguration().getProviderId();
 				String code = GalileoTaxCode.getCode(taxCode.name());
 				TaxCodeMapping mapping = query.selectTaxCodeMappingByProviderAndCode(providerId, code);
 				if (mapping == null || mapping.isDeleted())

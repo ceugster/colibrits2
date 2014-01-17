@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
-import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
@@ -38,19 +37,16 @@ import ch.eugster.colibri.provider.configuration.ProviderTaxCode;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
-import ch.eugster.colibri.provider.galileo.wgserve.ClassFactory;
-import ch.eugster.colibri.provider.galileo.wgserve.Iwgserve;
+import ch.eugster.colibri.provider.galileo.wgserve.GalileoProductGroup;
+import ch.eugster.colibri.provider.galileo.wgserve.WgserveProxy;
+import ch.eugster.colibri.provider.galileo.wgserve.old.WgserveOldProxy;
+import ch.eugster.colibri.provider.galileo.wgserve.sql.WgserveSqlProxy;
+import ch.eugster.colibri.provider.service.AbstractProviderService;
 import ch.eugster.colibri.provider.service.ProviderConfigurator;
 
-public class GalileoConfiguratorComponent implements ProviderConfigurator
+public class GalileoConfiguratorComponent extends AbstractProviderService implements ProviderConfigurator
 {
-	private String database;
-
-	private boolean connect;
-	
-	private boolean open;
-
-	private Iwgserve wgserve;
+	private WgserveProxy wgserveProxy;
 
 	protected int countInserted = 0;
 
@@ -64,16 +60,8 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 	protected boolean notMapped;
 
-	protected IStatus status;
-
-	private LogService logService;
-
-	private PersistenceService persistenceService;
-
 	private Collection<String> codesWithError;
 
-	private Map<String, IProperty> properties;
-	
 	public GalileoConfiguratorComponent()
 	{
 	}
@@ -102,31 +90,15 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		return Activator.getDefault().getConfiguration().getName();
 	}
 
-	@Override
-	public Map<String, IProperty> getProperties()
-	{
-		if (this.properties == null)
-		{
-			updateProperties();
-		}
-		return this.properties;
-	}
-	
 	public Map<String, IProperty> getDefaultProperties()
 	{
 		return GalileoConfiguration.GalileoProperty.asMap();
 	}
-
-	@Override
-	public String getProviderId()
-	{
-		return Activator.getDefault().getConfiguration().getProviderId();
-	}
 	
 	public boolean isConnect()
 	{
-		this.updateProperties();
-		return connect;
+		IProperty property = properties.get(GalileoProperty.CONNECT.key());
+		return Integer.valueOf(property.value()).intValue() > 0;
 	}
 
 	private IStatus importExternalProductGroups(final IProgressMonitor monitor, IStatus status)
@@ -137,26 +109,26 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		try
 		{
-			final boolean open = this.openDatabase(this.database);
-			if (!open)
+			IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
+			String database = property.value();
+			status = this.wgserveProxy.openDatabase(database);
+			if (status.getSeverity() == IStatus.OK)
 			{
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-						"Die Verbindung zur Warenbewirtschaftung kann nicht hergestellt werden.");
+				final String[] codes = this.wgserveProxy.selectAllCodes();
+				monitor.beginTask("Warengruppen importieren", codes.length);
+				status = this.update(codes, monitor, status);
+				monitor.done();
 			}
-
-			final String[] codes = this.selectAllCodes();
-			monitor.beginTask("Warengruppen importieren", codes.length);
-			status = this.update(codes, monitor, status);
-			monitor.done();
-
-			this.closeDatabase();
 		}
 		catch (final Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Anfordern der Warengruppen aus Galileo ist ein Fehler aufgetreten.", e);
 		}
-
+		finally
+		{
+			this.wgserveProxy.closeDatabase();
+		}
 		return status;
 	}
 
@@ -174,56 +146,16 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		else
 		{
-			updateProperties();
-			if (this.status.getSeverity() == IStatus.OK && this.isConnect())
+			status = start(status);
+			if (status.getSeverity() == IStatus.OK && this.isConnect())
 			{
 				status = this.importExternalProductGroups(monitor, status);
+				status = stop(status);
 			}
 		}
 		return status;
 	}
 
-	private void updateProperties()
-	{
-		final ServiceTracker<PersistenceService, PersistenceService> serviceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-				PersistenceService.class, null);
-		serviceTracker.open();
-		try
-		{
-			Map<String, IProperty> properties = GalileoConfiguration.GalileoProperty.asMap();
-			final PersistenceService persistenceService = (PersistenceService) serviceTracker.getService();
-			if (persistenceService != null)
-			{
-				final ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getCacheService()
-						.getQuery(ProviderProperty.class);
-				Map<String, ProviderProperty>  providerProperties = query.selectByProviderAsMap(Activator.getDefault().getConfiguration().getProviderId());
-				for (final ProviderProperty providerProperty : providerProperties.values())
-				{
-					IProperty property = properties.get(providerProperty.getKey());
-					property.setPersistedProperty(providerProperty);
-				}
-				final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
-						Salespoint.class);
-				Salespoint salespoint = salespointQuery.getCurrentSalespoint();
-				if (salespoint != null)
-				{
-					providerProperties = query.selectByProviderAndSalespointAsMap(Activator.getDefault().getConfiguration().getProviderId(), salespoint);
-					for (final ProviderProperty providerProperty : providerProperties.values())
-					{
-						IProperty property = properties.get(providerProperty.getKey());
-						property.setPersistedProperty(providerProperty);
-					}
-				}
-				this.database = properties.get(GalileoProperty.DATABASE_PATH.key()).value();
-				this.connect = Boolean.valueOf(properties.get(GalileoProperty.CONNECT.key()).value()).booleanValue();
-			}
-		}
-		finally
-		{
-			serviceTracker.close();
-		}
-	}
-	
 	private IStatus start(IStatus status)
 	{
 		if (status.getSeverity() != IStatus.OK)
@@ -233,12 +165,27 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 		try
 		{
-			this.wgserve = ClassFactory.createwgserve();
+			if (this.isConnect())
+			{
+				IProperty property = properties.get(GalileoProperty.CONNECT.key());
+				int connect = Integer.valueOf(property.value()).intValue();
+				if (connect == 1 || connect == 2)
+				{
+					if (connect == 1)
+					{
+						this.wgserveProxy = new WgserveOldProxy();
+					}
+					else if (connect == 2)
+					{
+						this.wgserveProxy = new WgserveSqlProxy();
+					}
+				}
+			}
 		}
 		catch (final Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception(" Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
+					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
 			e.printStackTrace();
 		}
 		return status;
@@ -246,9 +193,9 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 	private IStatus stop(final IStatus status)
 	{
-		if (wgserve != null)
+		if (this.wgserveProxy != null)
 		{
-			this.wgserve.dispose();
+			this.wgserveProxy.dispose();
 		}
 		return status;
 	}
@@ -259,29 +206,28 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		{
 			return status;
 		}
-
 		try
 		{
-			final boolean open = this.openDatabase(this.database);
-			if (!open)
+			IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
+			String database = property.value();
+			status = this.wgserveProxy.openDatabase(database);
+			if (status.isOK())
 			{
-				return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-						"Die Verbindung zur Warenbewirtschaftung kann nicht hergestellt werden.");
+				final String[] codes = this.wgserveProxy.selectChangedCodes();
+				monitor.beginTask("Warengruppen synchronisieren", codes.length);
+				status = this.update(codes, monitor, status);
+				monitor.done();
 			}
-
-			final String[] codes = this.selectChangedCodes();
-			monitor.beginTask("Warengruppen synchronisieren", codes.length);
-			status = this.update(codes, monitor, status);
-			monitor.done();
-
-			this.closeDatabase();
 		}
 		catch (final Exception e)
 		{
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Beim Anfordern der Warengruppen aus Galileo ist ein Fehler aufgetreten.", e);
 		}
-
+		finally
+		{
+			this.wgserveProxy.closeDatabase();
+		}
 		return status;
 	}
 
@@ -299,10 +245,11 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		else
 		{
-//			updateProperties();
-			if (status.getSeverity() == IStatus.OK && this.isConnect())
+			status = start(status);
+			if (status.getSeverity() == IStatus.OK && isConnect())
 			{
 				status = this.synchronizeExternalProductGroups(monitor, status);
+				status = stop(status);
 			}
 		}
 		return status;
@@ -310,30 +257,14 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 	protected void activate(final ComponentContext componentContext)
 	{
-		if (logService != null)
-		{
-			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name") + " aktiviert.");
-		}
-		this.status = this.start(Status.OK_STATUS);
-		System.out.println(this.status);
+		super.activate(componentContext);
+		this.loadProperties(persistenceService.getServerService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
+		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void confirmChanges(final String code)
 	{
-		this.wgserve.do_setbestaetigt(code);
-	}
-
-	protected GalileoProductGroup createGalileoProductGroup(final String code)
-	{
-		final GalileoProductGroup group = new GalileoProductGroup();
-		group.setCode(code);
-		group.setText((String) this.wgserve.wgtext());
-		group.setAccount((String) this.wgserve.konto());
-		group.setBox1((String) this.wgserve.boX1());
-		group.setBox2((String) this.wgserve.boX2());
-		group.setDescBox1((String) this.wgserve.descboX1());
-		group.setDescBox2((String) this.wgserve.descboX2());
-		return group;
+		this.wgserveProxy.confirmChanges(code);
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
@@ -343,7 +274,6 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name")
 					+ " deaktiviert.");
 		}
-		this.stop(status);
 	}
 
 	protected ExternalProductGroup getExternalProductGroup(final GalileoProductGroup group)
@@ -446,9 +376,9 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 
 				if (code.length() > 0)
 				{
-					if (wgserve.do_getwg(code).equals(Boolean.TRUE))
+					if (this.wgserveProxy.getWg(code))
 					{
-						final GalileoProductGroup group = this.createGalileoProductGroup(code);
+						final GalileoProductGroup group = this.wgserveProxy.createGalileoProductGroup(code);
 						ExternalProductGroup externalProductGroup = this.getExternalProductGroup(group);
 
 						if (this.persistenceService != null)
@@ -537,14 +467,6 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		return status;
 	}
 
-	private void closeDatabase()
-	{
-		if (this.open)
-		{
-			this.open = !((Boolean) this.wgserve.do_close()).booleanValue();
-		}
-	}
-
 	private ProductGroup getProductGroup(final GalileoProductGroup group)
 	{
 		ProductGroup productGroup = null;
@@ -586,156 +508,16 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 		}
 		return productGroup;
 	}
-
-	private boolean openDatabase(final String database)
+	
+	public String getProviderId()
 	{
-		if (!this.open)
-		{
-			Object object = this.wgserve.do_open(this.database);
-			if (object != null)
-			{
-				
-			}
-			this.open = ((Boolean) this.wgserve.do_open(this.database)).booleanValue();
-		}
-		return this.open;
-	}
-
-	private String[] readCodes()
-	{
-		final String codeList = (String) this.wgserve.wglist();
-		if (codeList.length() > 0)
-		{
-			return codeList.split("[|]");
-		}
-		else
-		{
-			return new String[0];
-		}
-	}
-
-	private String[] selectAllCodes()
-	{
-		if (((Boolean) this.wgserve.do_getwglist()).booleanValue())
-		{
-			return this.readCodes();
-		}
-		return new String[0];
-	}
-
-	private String[] selectChangedCodes()
-	{
-		if (((Boolean) this.wgserve.do_getchangedwglist()).booleanValue())
-		{
-			return this.readCodes();
-		}
-		return new String[0];
-	}
-
-	public class GalileoProductGroup
-	{
-		public static final String CODE = "code";
-
-		public static final String PROPERTY_TEXT = "WGTEXT";
-
-		public static final String PROPERTY_ACCOUNT = "KONTO";
-
-		public static final String PROPERTY_BOX_1 = "BOX1";
-
-		public static final String PROPERTY_BOX_2 = "BOX2";
-
-		public static final String PROPERTY_DESC_BOX_1 = "DESCBOX1";
-
-		public static final String PROPERTY_DESC_BOX_2 = "DESCBOX2";
-
-		private String code;
-
-		private String text;
-
-		private String account;
-
-		private String box1;
-
-		private String box2;
-
-		private String descBox1;
-
-		private String descBox2;
-
-		public String getAccount()
-		{
-			return this.account;
-		}
-
-		public String getBox1()
-		{
-			return this.box1;
-		}
-
-		public String getBox2()
-		{
-			return this.box2;
-		}
-
-		public String getCode()
-		{
-			return this.code;
-		}
-
-		public String getDescBox1()
-		{
-			return this.descBox1;
-		}
-
-		public String getDescBox2()
-		{
-			return this.descBox2;
-		}
-
-		public String getText()
-		{
-			return this.text;
-		}
-
-		public void setAccount(final String account)
-		{
-			this.account = account;
-		}
-
-		public void setBox1(final String box1)
-		{
-			this.box1 = box1;
-		}
-
-		public void setBox2(final String box2)
-		{
-			this.box2 = box2;
-		}
-
-		public void setCode(final String code)
-		{
-			this.code = code;
-		}
-
-		public void setDescBox1(final String descBox1)
-		{
-			this.descBox1 = descBox1;
-		}
-
-		public void setDescBox2(final String descBox2)
-		{
-			this.descBox2 = descBox2;
-		}
-
-		public void setText(final String text)
-		{
-			this.text = text;
-		}
+		return Activator.getDefault().getConfiguration().getProviderId();
 	}
 
 	@Override
 	public IStatus setTaxCodes(IProgressMonitor monitor) 
 	{
+		IStatus status = null;
 		if (persistenceService != null)
 		{
 			int count = 0;
@@ -745,13 +527,13 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 			Collection<Tax> taxes = taxType.getTaxes();
 			for (Tax tax : taxes)
 			{
-				TaxCodeMapping mapping = tax.getTaxCodeMapping(this.getProviderId());
+				TaxCodeMapping mapping = tax.getTaxCodeMapping(Activator.getDefault().getConfiguration().getProviderId());
 				if (mapping == null)
 				{
 					String code = GalileoTaxCode.getCode(tax.getTaxRate().getCode());
 					mapping = TaxCodeMapping.newInstance(tax);
 					mapping.setCode(code);
-					mapping.setProvider(this.getProviderId());
+					mapping.setProvider(Activator.getDefault().getConfiguration().getProviderId());
 					mapping.setTax(tax);
 					tax.addTaxCodeMapping(mapping);
 					try
@@ -761,12 +543,15 @@ public class GalileoConfiguratorComponent implements ProviderConfigurator
 					}
 					catch (Exception e)
 					{
-						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Einige Zuordnungen konnten nicht durchgeführt werden, versuchen Sie es nach einem Neustart des Programms noch einmal.");
+						status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Einige Zuordnungen konnten nicht durchgeführt werden, versuchen Sie es nach einem Neustart des Programms noch einmal.", e);
 					}
 				}
 				count++;
 			}
-			status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Zuordnung ist abgeschlossen. Es wurden " + count + " Steuersätze geprüft. Es " + (newCodes == 0 ? "mussten keine neuen Codes hinzugefügt werden." : (newCodes == 1 ? "wurde ein Code zugeordnet." : "wurden " + newCodes + " zugeordnet.")));
+			if (status == null)
+			{
+				status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Zuordnung ist abgeschlossen. Es wurden " + count + " Steuersätze geprüft. Es " + (newCodes == 0 ? "mussten keine neuen Codes hinzugefügt werden." : (newCodes == 1 ? "wurde ein Code zugeordnet." : "wurden " + newCodes + " zugeordnet.")));
+			}
 		}
 		else
 		{
