@@ -1583,8 +1583,8 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/gals
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/UpdateProviderServerCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/Igdserve.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/sql/ClassFactory.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/sql/Igdserve.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/sql/FindArticleServerSqlCom4j.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/sql/UpdateProviderServerSqlCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/AddGalileoTaxCodes.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/ImportProductGroupHandler.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/SynchronizeProductGroupsHandler.java -text
