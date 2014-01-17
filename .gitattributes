@@ -1099,6 +1099,7 @@ ch.eugster.colibri.periphery.printer/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.printer/build.properties -text
 ch.eugster.colibri.periphery.printer/src/ch/eugster/colibri/periphery/printer/Activator.java -text
 ch.eugster.colibri.periphery.printer/src/ch/eugster/colibri/periphery/printer/service/AbstractReceiptPrinterService.java -text
+ch.eugster.colibri.periphery.printer/src/ch/eugster/colibri/periphery/printer/service/AsciiConstants.java -text
 ch.eugster.colibri.periphery.printer/src/ch/eugster/colibri/periphery/printer/service/ReceiptPrinterService.java -text
 ch.eugster.colibri.periphery/.classpath -text
 ch.eugster.colibri.periphery/.project -text

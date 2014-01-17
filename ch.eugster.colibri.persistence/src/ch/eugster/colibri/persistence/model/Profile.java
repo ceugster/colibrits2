@@ -555,8 +555,8 @@ public class Profile extends AbstractEntity implements IReplicatable
 		 */
 		this.setTabbedPaneFontSize(18f);
 		this.setTabbedPaneFontStyle(java.awt.Font.PLAIN);
-		this.setTabbedPaneFgSelected(java.awt.Color.RED.getRGB());
-		this.setTabbedPaneFg(java.awt.Color.GREEN.getRGB());
+		this.setTabbedPaneFgSelected(new Color(0, 0, 255).getRGB());
+		this.setTabbedPaneFg(new Color(0, 166, 166).getRGB());
 		this.setTabbedPaneBg(java.awt.Color.WHITE.getRGB());
 		/*
 		 * Buttons
@@ -573,7 +573,7 @@ public class Profile extends AbstractEntity implements IReplicatable
 		this.setButtonFailOverHorizontalAlign(SwingConstants.CENTER);
 		this.setButtonFailOverVerticalAlign(SwingConstants.CENTER);
 		this.setButtonFailOverFg(java.awt.Color.BLACK.getRGB());
-		this.setButtonFailOverBg(java.awt.Color.GRAY.getRGB());
+		this.setButtonFailOverBg(new java.awt.Color(255, 239, 128).getRGB());
 		/*
 		 * Input Labels
 		 */

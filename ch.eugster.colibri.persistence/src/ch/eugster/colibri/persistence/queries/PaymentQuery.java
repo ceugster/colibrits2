@@ -130,8 +130,10 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		reportQuery.addSum("foreignCurrencyAmount", roundedFcAmount, Double.class);
 
 		reportQuery.addOrdering(new ExpressionBuilder().get("paymentType").get("id").ascending());
+		reportQuery.addOrdering(new ExpressionBuilder().get("back").ascending());
 
 		reportQuery.addGrouping(new ExpressionBuilder().get("paymentType").get("id"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("back"));
 
 		return super.selectReportQueryResults(reportQuery);
 	}
@@ -295,9 +297,16 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		final Map<Long, SettlementPayment> details = new HashMap<Long, SettlementPayment>();
 		for (final ReportQueryResult result : results)
 		{
-			final Long id = (Long) result.get("paymentType");
-			final PaymentType paymentType = (PaymentType) this.getConnectionService().find(PaymentType.class, id);
-
+			Long id = (Long) result.get("paymentType");
+			PaymentType paymentType = (PaymentType) this.getConnectionService().find(PaymentType.class, id);
+			Double amount = (Double) result.get("defaultCurrencyAmount");
+			if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+			{
+				if (amount.doubleValue() < 0)
+				{
+					id = -id;
+				}
+			}
 			SettlementPayment detail = details.get(id);
 			if (detail == null)
 			{
@@ -307,7 +316,6 @@ public class PaymentQuery extends AbstractQuery<Payment>
 			final Long quantity = (Long) result.get("id");
 			detail.setQuantity(detail.getQuantity() + (quantity == null ? 0 : quantity.intValue()));
 
-			Double amount = (Double) result.get("defaultCurrencyAmount");
 			detail.setDefaultCurrencyAmount(detail.getDefaultCurrencyAmount() + (amount == null ? 0D : amount));
 			amount = (Double) result.get("foreignCurrencyAmount");
 			detail.setForeignCurrencyAmount(detail.getForeignCurrencyAmount() + (amount == null ? 0d : amount));

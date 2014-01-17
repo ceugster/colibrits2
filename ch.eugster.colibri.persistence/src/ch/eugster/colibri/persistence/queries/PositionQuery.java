@@ -313,7 +313,6 @@ public class PositionQuery extends AbstractQuery<Position>
 //					+ productGroup.getProductGroupType().toString());
 
 			final SettlementPosition detail = SettlementPosition.newInstance(settlement, productGroup, defaultCurrency);
-
 			detail.setProductGroupType(productGroup.getProductGroupType());
 
 			final Integer quantity = (Integer) result.get("quantity");

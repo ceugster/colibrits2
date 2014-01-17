@@ -31,7 +31,27 @@ public class Converter
 				}
 			}
 		}
-		return new String(target);
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < target.length; i++)
+		{
+			char c = target[i];
+			if (c == '@')
+			{
+				builder.append((char)27);
+				builder.append((char)82);
+				builder.append((char) 0);
+				builder.append(c);
+				builder.append((char) 27);
+				builder.append((char) 82);
+				builder.append((char) 2);
+			}
+			else
+			{
+				builder.append(c);
+			}
+		}
+		return builder.toString();
+//		return new String(target);
 	}
 
 	public void setConverter(final String converter)
@@ -68,6 +88,8 @@ public class Converter
 						try
 						{
 							final int char0 = Integer.valueOf(vals[0]).intValue();
+//							String[] parts = vals[1].split("[|]");
+//							
 							final int char1 = Integer.valueOf(vals[1]).intValue();
 							if (max < char0)
 							{

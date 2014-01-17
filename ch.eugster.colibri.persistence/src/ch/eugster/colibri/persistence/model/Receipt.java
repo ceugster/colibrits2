@@ -912,6 +912,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 			if (state.equals(State.REVERSED) || state.equals(State.SAVED))
 			{
 				this.setProviderUpdated(false);
+				this.setTransferred(false);
 			}
 			// else if (state.equals(State.CLOSED))
 			// {

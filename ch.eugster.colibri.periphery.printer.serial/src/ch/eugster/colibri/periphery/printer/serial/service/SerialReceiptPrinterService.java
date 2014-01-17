@@ -10,6 +10,7 @@ import org.osgi.service.component.ComponentContext;
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.printer.serial.Activator;
 import ch.eugster.colibri.periphery.printer.service.AbstractReceiptPrinterService;
+import ch.eugster.colibri.periphery.printer.service.AsciiConstants;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Salespoint;
@@ -45,8 +46,9 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		try
 		{
 			this.printer = new PrintStream(deviceName);
-			this.printer.print(new char[] { 27, 116, 0 });
-//			this.printer.print(new char[] { 27, 82, 2 });
+			this.printer.print(new char[] { AsciiConstants.ESC, AsciiConstants.AT });
+			this.printer.print(new char[] { AsciiConstants.ESC, AsciiConstants.S });
+			this.printer.print(new char[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
 		}
 		catch (final Exception e)
 		{

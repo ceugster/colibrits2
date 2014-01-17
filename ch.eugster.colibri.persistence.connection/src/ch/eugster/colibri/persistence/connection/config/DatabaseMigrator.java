@@ -603,6 +603,12 @@ public class DatabaseMigrator extends AbstractConfigurator
 			}
 			numberFormat = builder.toString();
 		}
+		else
+		{
+			numberFormat = "000000";
+		}
+		boolean forceSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-settlement")).booleanValue();
+		boolean forceStockCount = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-stock-count")).booleanValue();
 
 		IStatus status = Status.OK_STATUS;
 		monitor.beginTask("Allgemeine Einstellungen werden übernommen...", 1);
@@ -631,8 +637,10 @@ public class DatabaseMigrator extends AbstractConfigurator
 
 				commonSettings = CommonSettings.newInstance();
 				commonSettings.setId(Long.valueOf(1l));
-				commonSettings.setTaxInclusive(true);
+				commonSettings.setForceCashCheck(forceStockCount);
+				commonSettings.setForceSettlement(forceSettlement);
 				commonSettings.setHostnameResolver(CommonSettings.HostnameResolver.HOSTNAME);
+				commonSettings.setMaximizedClientWindow(true);
 				commonSettings.setMaxPaymentAmount(10000d);
 				commonSettings.setMaxPaymentRange(1000d);
 				commonSettings.setMaxPriceAmount(10000d);
@@ -642,6 +650,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 				commonSettings.setReferenceCurrency(currency);
 				commonSettings.setDefaultProductGroup(productGroup);
 				commonSettings.setReceiptNumberFormat(numberFormat);
+				commonSettings.setTaxInclusive(true);
 
 				this.getEntityManager().getTransaction().begin();
 				commonSettings = this.getEntityManager().merge(commonSettings);
