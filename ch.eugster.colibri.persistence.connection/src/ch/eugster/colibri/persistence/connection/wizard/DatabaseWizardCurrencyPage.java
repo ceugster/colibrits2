@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Text;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 
@@ -37,6 +38,8 @@ public class DatabaseWizardCurrencyPage extends WizardPage implements Listener
 	private ComboViewer currencyViewer;
 
 	private String[] selectedCurrency;
+	
+	private Text startReceiptNumber;
 
 	public DatabaseWizardCurrencyPage(final String name)
 	{
@@ -50,6 +53,20 @@ public class DatabaseWizardCurrencyPage extends WizardPage implements Listener
 		return false;
 	}
 
+	public Long getStartReceiptNumber()
+	{
+		Long receiptNumber = null;
+		try
+		{
+			receiptNumber = Long.valueOf(startReceiptNumber.getText());
+		}
+		catch (NumberFormatException e)
+		{
+			receiptNumber = Long.valueOf(1L);
+		}
+		return receiptNumber;
+	}
+	
 	@Override
 	public void createControl(final Composite parent)
 	{
@@ -91,6 +108,14 @@ public class DatabaseWizardCurrencyPage extends WizardPage implements Listener
 		});
 		this.currencyViewer.setSelection(new StructuredSelection(new Object[] { this.selectedCurrency }));
 
+		label = new Label(composite, SWT.None);
+		label.setText("Start Belegnummer");
+		label.setLayoutData(new GridData());
+		
+		startReceiptNumber = new Text(composite, SWT.BORDER);
+		startReceiptNumber.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		startReceiptNumber.setText("1");
+		
 		this.setPageComplete(this.validatePage());
 
 		this.setControl(composite);
@@ -160,6 +185,14 @@ public class DatabaseWizardCurrencyPage extends WizardPage implements Listener
 
 	private boolean validatePage()
 	{
+		try
+		{
+			Long.valueOf(startReceiptNumber.getText());
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
 		return this.currencyViewer.getSelection().isEmpty() ? false : true;
 	}
 }

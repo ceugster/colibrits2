@@ -9,7 +9,6 @@ package ch.eugster.colibri.persistence.connection.wizard;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.jface.wizard.IWizardPage;
@@ -25,10 +24,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseConfigurator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseMigrator;
-import ch.eugster.colibri.persistence.connection.service.PersistenceServiceImpl;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.replication.service.ReplicationService;
-import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.pos.db.Salespoint;
 
 public class DatabaseWizard extends Wizard
@@ -212,7 +209,8 @@ public class DatabaseWizard extends Wizard
 				final DatabaseWizardCurrencyPage currencyWizardPage = (DatabaseWizardCurrencyPage) this
 						.getPage("currency.wizard.page");
 				final Long currencyId = currencyWizardPage.getSelectedCurrency();
-				this.startConfiguration(newSelection, currencyId);
+				final Long startReceiptNumber = currencyWizardPage.getStartReceiptNumber();
+				this.startConfiguration(newSelection, currencyId, startReceiptNumber);
 			}
 			ServiceTracker<ReplicationService, ReplicationService> tracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle().getBundleContext(), ReplicationService.class, null);
 			tracker.open();
@@ -290,9 +288,9 @@ public class DatabaseWizard extends Wizard
 		return document;
 	}
 
-	private void startConfiguration(final Element connection, final Long currencyId)
+	private void startConfiguration(final Element connection, final Long currencyId, Long startReceiptNumber)
 	{
-		final DatabaseConfigurator configurator = new DatabaseConfigurator(this.getShell(), connection, currencyId);
+		final DatabaseConfigurator configurator = new DatabaseConfigurator(this.getShell(), connection, currencyId, startReceiptNumber);
 		configurator.configureDatabase();
 	}
 

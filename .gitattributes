@@ -1180,7 +1180,6 @@ ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/con
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/DriverViewerFilter.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/EntityManagerWrapper.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/HostEditingSupport.java -text
-ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/MigrationWizard.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/PrerequisiteWrapper.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/SalespointContentProvider.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/wizard/SalespointLabelProvider.java -text
