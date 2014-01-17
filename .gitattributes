@@ -1575,6 +1575,7 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/conf
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/AbstractGalileoServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/AbstractServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/FindArticleServerCom4j.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/GalserverFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IFindArticleServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IUpdateProviderServer.java -text
