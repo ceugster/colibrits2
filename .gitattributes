@@ -1591,10 +1591,14 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/gals
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/AddGalileoTaxCodes.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/ImportProductGroupHandler.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/SynchronizeProductGroupsHandler.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/CustomerServer.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/Ikundenserver.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/package.html -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/CustomerServerFactory.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/ICustomerServer.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/ClassFactory.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/CustomerServerOld.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/Ikundenserver.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/package.html -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/sql/CustomerServerSql.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/lagerinfo/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/lagerinfo/Ilainfo.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/lagerinfo/package.html -text
