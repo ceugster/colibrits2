@@ -1582,7 +1582,10 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/gals
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/Igdserve.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/UpdateProviderServerCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/ClassFactory.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/FindArticleServerOldCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/Igdserve.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/UpdateProviderServerOldCom4j.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/package.html -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/sql/FindArticleServerSqlCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/sql/UpdateProviderServerSqlCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/handler/AddGalileoTaxCodes.java -text
