@@ -11,23 +11,6 @@
       </view>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="ch.eugster.colibri.report.*">
-         <view
-               closeable="true"
-               id="ch.eugster.colibri.report.salespoint.view"
-               minimized="false"
-               moveable="true"
-               relationship="top"
-               relative="ch.eugster.colibri.report.daterange.view"
-               showTitle="true"
-               standalone="true"
-               visible="true">
-         </view>
-      </perspectiveExtension>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"

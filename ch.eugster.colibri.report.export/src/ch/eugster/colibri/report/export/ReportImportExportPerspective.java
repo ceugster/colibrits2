@@ -15,11 +15,11 @@ public class ReportImportExportPerspective implements IPerspectiveFactory
 	@Override
 	public void createInitialLayout(final IPageLayout layout)
 	{
-//		layout.setEditorAreaVisible(true);
-//		layout.addView(ImportExportView.ID, IPageLayout.RIGHT, .7F, "org.eclipse.ui.editorss");
-//		layout.addView(SalespointView.ID, IPageLayout.LEFT, .3F, "org.eclipse.ui.editorss");
-//		layout.addView(DateView.ID, IPageLayout.BOTTOM, .7F, SalespointView.ID);
+		layout.setEditorAreaVisible(true);
+		layout.addView(SalespointView.ID, IPageLayout.LEFT, .3F, "org.eclipse.ui.editorss");
+		layout.addView(DateView.ID, IPageLayout.BOTTOM, .7F, SalespointView.ID);
+		layout.addView(DestinationView.ID, IPageLayout.BOTTOM, .5F, DateView.ID);
+		layout.addView(ImportExportView.ID, IPageLayout.RIGHT, .7F, "org.eclipse.ui.editorss");
 		layout.setEditorAreaVisible(false);
 	}
-
 }

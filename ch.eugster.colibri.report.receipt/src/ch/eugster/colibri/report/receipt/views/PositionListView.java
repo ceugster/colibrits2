@@ -35,6 +35,8 @@ import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
 public class PositionListView extends ViewPart implements ISelectionListener, ISelectionChangedListener
 {
+	public static final String ID = "ch.eugster.colibri.report.receipt.positionview";
+
 	private TableViewer viewer;
 
 //	private SettlementViewerFilter settlementFilter;

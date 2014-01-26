@@ -28,7 +28,14 @@ public class SettlementEntry extends HashMap<String, Object> implements Comparab
 				comparison = this.getCashtype() - other.getCashtype();
 				if (comparison == 0)
 				{
+					if (getCode().isEmpty() || other.getCode().isEmpty())
+					{
+						comparison = -getCode().compareTo(other.getCode());
+					}
+					else
+					{
 					comparison = getCode().compareTo(other.getCode());
+					}
 				}
 			}
 		}
@@ -59,7 +66,8 @@ public class SettlementEntry extends HashMap<String, Object> implements Comparab
 
 	public String getCode()
 	{
-		return (String) get("code");
+		String code = (String) get("code");
+		return code == null ? "" : code;
 	}
 
 	public void setCode(String code)

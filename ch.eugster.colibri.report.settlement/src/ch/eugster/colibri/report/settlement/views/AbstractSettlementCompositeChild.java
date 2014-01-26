@@ -84,23 +84,27 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 	protected Map<Long, SettlementEntry> createPositionSection(Map<Long, SettlementEntry> section,
 			List<SettlementPosition> positions)
 	{
-		Collections.sort(positions, new Comparator<SettlementPosition>() 
-		{
-			@Override
-			public int compare(SettlementPosition pos1, SettlementPosition pos2) 
-			{
-				String code1 = pos1.getCode() == null ? "" : pos1.getCode();
-				String code2 = pos2.getCode() == null ? "" : pos2.getCode();
-				int val = code1.compareTo(code2);
-				if (val == 0)
-				{
-					String name1 = pos1.getName() == null ? "" : pos1.getName();
-					String name2 = pos2.getName() == null ? "" : pos2.getName();
-					val = name1.compareTo(name2);
-				}
-				return val;
-			}
-		});
+//		Collections.sort(positions, new Comparator<SettlementPosition>() 
+//		{
+//			@Override
+//			public int compare(SettlementPosition pos1, SettlementPosition pos2) 
+//			{
+//				String code1 = pos1.getCode() == null ? "" : pos1.getCode();
+//				String code2 = pos2.getCode() == null ? "" : pos2.getCode();
+//				if (code1.isEmpty() || code2.isEmpty())
+//				{
+//					return -code1.compareTo(code2);
+//				}
+//				int val = code1.compareTo(code2);
+//				if (val == 0)
+//				{
+//					String name1 = pos1.getName() == null ? "" : pos1.getName();
+//					String name2 = pos2.getName() == null ? "" : pos2.getName();
+//					val = name1.compareTo(name2);
+//				}
+//				return val;
+//			}
+//		});
 		for (SettlementPosition position : positions)
 		{
 			SettlementEntry entry = section.get(position.getProductGroup().getId());

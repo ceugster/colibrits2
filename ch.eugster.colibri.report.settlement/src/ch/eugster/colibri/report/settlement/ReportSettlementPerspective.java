@@ -16,10 +16,10 @@ public class ReportSettlementPerspective implements IPerspectiveFactory
 	public void createInitialLayout(final IPageLayout layout)
 	{
 		layout.setEditorAreaVisible(true);
-		layout.addView(SettlementView.ID, IPageLayout.LEFT, .7F, "org.eclipse.ui.editorss");
-		layout.addView(SalespointView.ID, IPageLayout.RIGHT, .3F, "org.eclipse.ui.editorss");
+		layout.addView(SalespointView.ID, IPageLayout.LEFT, .3F, "org.eclipse.ui.editorss");
 		layout.addView(DateView.ID, IPageLayout.BOTTOM, .7F, SalespointView.ID);
 		layout.addView(DestinationView.ID, IPageLayout.BOTTOM, .5F, DateView.ID);
+		layout.addView(SettlementView.ID, IPageLayout.RIGHT, .7F, "org.eclipse.ui.editorss");
 		layout.setEditorAreaVisible(false);
 	}
 

@@ -1,5 +1,6 @@
 package ch.eugster.colibri.provider.configuration;
 
+import java.io.File;
 import java.util.Properties;
 
 import org.eclipse.swt.SWT;
@@ -495,7 +496,8 @@ public interface IProperty
 			case FILE_DIALOG:
 			{
 				Text text = (Text) control;
-				text.setText(value);
+				File path = new File(value);
+				text.setText(path.getAbsolutePath());
 				break;
 			}
 			case BUTTON:

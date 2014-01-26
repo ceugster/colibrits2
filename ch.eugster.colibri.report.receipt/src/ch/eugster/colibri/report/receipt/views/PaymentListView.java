@@ -31,6 +31,8 @@ import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
 public class PaymentListView extends ViewPart implements ISelectionListener
 {
+	public static final String ID = "ch.eugster.colibri.report.receipt.paymentview";
+
 	private TableViewer viewer;
 
 //	private SettlementViewerFilter settlementFilter;

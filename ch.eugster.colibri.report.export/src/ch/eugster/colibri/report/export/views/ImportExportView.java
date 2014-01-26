@@ -86,6 +86,7 @@ import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.CurrentTaxQuery;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
 import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
@@ -1537,13 +1538,24 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		position.setOrder(order == null || order.isEmpty() ? null : order);
 		position.setOrdered(Boolean.valueOf(element.getAttributeValue("ordered")));
 		position.setOtherId(null);
-		position.setPrice(Double.valueOf(element.getAttributeValue("price")));
 		position.setProduct(null);
 		position.setProductGroup(getProductGroup(element.getAttributeValue("product-group-id")));
 		position.setProvider("ch.eugster.colibri.provider.galileo");
 		position.setProviderBooked(Boolean.valueOf(element.getAttributeValue("galileo-booked")));
 		position.setProviderState(position.isProviderBooked() ? ProviderState.BOOKED : ProviderState.OPEN);
-		position.setQuantity(Integer.valueOf(element.getAttributeValue("quantity")).intValue());
+		int quantity = Integer.valueOf(element.getAttributeValue("quantity")).intValue();
+		if (quantity < 0)
+		{
+			if (!position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.SALES))
+			{
+				quantity = -Math.abs(quantity);
+			}
+		}
+		double price = Math.abs(Double.valueOf(element.getAttributeValue("price")).doubleValue());
+		if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.EXPENSES) || position.getProductGroup().getProductGroupType().equals(ProductGroupType.WITHDRAWAL))
+		{
+			price = -price;
+		}
 		position.setSearchValue(element.getAttributeValue("product-number"));
 		String code = element.getAttributeValue("tax-id");
 		Tax tax = getTax(code);

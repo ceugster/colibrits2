@@ -59,23 +59,40 @@
       <perspectiveExtension
             targetID="ch.eugster.colibri.report.export.perspective">
          <view
-               id="ch.eugster.colibri.report.export.view"
-               minimized="false"
-               relationship="right"
-               relative="org.eclipse.ui.editorss">
-         </view>
-         <view
-               id="ch.eugster.colibri.report.salespoint.view"
+               id="ch.eugster.colibri.report.daterange.view"
                minimized="false"
                ratio=".2"
                relationship="left"
                relative="org.eclipse.ui.editorss">
          </view>
          <view
-               id="ch.eugster.colibri.report.daterange.view"
+               closeable="true"
+               id="ch.eugster.colibri.report.salespoint.view"
                minimized="false"
+               moveable="true"
+               ratio=".5"
+               relationship="top"
+               relative="ch.eugster.colibri.report.daterange.view"
+               showTitle="true"
+               visible="true">
+         </view>
+         <view
+               closeable="true"
+               id="ch.eugster.colibri.report.destination.view"
+               minimized="false"
+               moveable="true"
+               ratio=".2"
                relationship="bottom"
-               relative="ch.eugster.colibri.report.salespoint.view">
+               relative="ch.eugster.colibri.report.daterange.view"
+               showTitle="true"
+               visible="true">
+         </view>
+         <view
+               id="ch.eugster.colibri.report.export.view"
+               minimized="false"
+               relationship="right"
+               relative="org.eclipse.ui.editorss"
+               visible="true">
          </view>
       </perspectiveExtension>
    </extension>

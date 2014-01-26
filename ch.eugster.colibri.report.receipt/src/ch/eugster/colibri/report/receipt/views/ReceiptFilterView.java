@@ -61,6 +61,8 @@ import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
 public class ReceiptFilterView extends ViewPart implements ISelectionProvider, ISelectionChangedListener
 {
+	public static final String ID = "ch.eugster.colibri.report.receipt.filterview";
+
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
 	private IDialogSettings settings;

@@ -92,9 +92,8 @@ public class DateView extends ViewPart implements ISelectionProvider
 			}
 		});
 
-		initDates();
-
 		getSite().setSelectionProvider(this);
+		initDates();
 	}
 
 	private void initDates()

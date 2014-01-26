@@ -10,59 +10,6 @@
       </perspective>
    </extension>
    <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="ch.eugster.colibri.report.receipt.perspective">
-         <view
-               closeable="true"
-               id="ch.eugster.colibri.report.receipt.filterview"
-               minimized="false"
-               moveable="true"
-               ratio=".3"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="true"
-               visible="true">
-         </view>
-         <view
-               closeable="true"
-               id="ch.eugster.colibri.report.receipt.receiptview"
-               minimized="false"
-               moveable="true"
-               ratio=".6"
-               relationship="right"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="true"
-               visible="true">
-         </view>
-         <view
-               closeable="true"
-               id="ch.eugster.colibri.report.receipt.positionview"
-               minimized="false"
-               moveable="true"
-               ratio=".4"
-               relationship="bottom"
-               relative="ch.eugster.colibri.report.receipt.receiptview"
-               showTitle="true"
-               standalone="false"
-               visible="true">
-         </view>
-         <view
-               closeable="true"
-               id="ch.eugster.colibri.report.receipt.paymentview"
-               minimized="false"
-               moveable="true"
-               relationship="stack"
-               relative="ch.eugster.colibri.report.receipt.positionview"
-               showTitle="true"
-               standalone="false"
-               visible="true">
-         </view>
-      </perspectiveExtension>
-   </extension>
-   <extension
          point="org.eclipse.ui.views">
       <category
             id="ch.eugster.colibri.report.receipt.category"

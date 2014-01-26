@@ -20,6 +20,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.events.Topic;
@@ -35,7 +36,7 @@ import ch.eugster.colibri.provider.configuration.IProperty.Section;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
 import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
-public class UpdateSchedulerComponent implements UpdateScheduler
+public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 {
 	private PersistenceService persistenceService;
 
@@ -107,6 +108,15 @@ public class UpdateSchedulerComponent implements UpdateScheduler
 	{
 		this.context = componentContext;
 	
+		String topics[] = new String[] {"ch/eugster/colibri/persistence/replication/completed" };
+		Hashtable<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.EVENT_TOPIC, topics);
+		Activator.getDefault().getBundleContext().registerService(EventHandler.class, this, properties);
+		
+	}
+	
+	public void handleEvent(Event event)
+	{
 		schedulerProperties = UpdateScheduler.SchedulerProperty.asMap();
 		ProviderPropertyQuery providerPropertyQuery = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
 		Collection<ProviderProperty> providerProperties = providerPropertyQuery.selectByProvider(this.context.getBundleContext().getBundle().getSymbolicName());
