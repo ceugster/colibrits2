@@ -23,12 +23,11 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
-import ch.eugster.colibri.provider.galileo.kundenserver.old.ClassFactory;
-import ch.eugster.colibri.provider.galileo.kundenserver.old.Ikundenserver;
+import ch.eugster.colibri.provider.galileo.kundenserver.sql.ClassFactory;
 
 public class CustomerServerSql extends CustomerServer
 {
-	private Ikundenserver kserver;
+	private Ikundenserver2g kserver;
 
 	public CustomerServerSql(Map<String, IProperty> properties)
 	{
@@ -124,7 +123,7 @@ public class CustomerServerSql extends CustomerServer
 		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		try
 		{
-			kserver = ClassFactory.createkundenserver();
+			kserver = (Ikundenserver2g) ClassFactory.createkundenserver2g();
 		}
 		catch(Throwable e)
 		{

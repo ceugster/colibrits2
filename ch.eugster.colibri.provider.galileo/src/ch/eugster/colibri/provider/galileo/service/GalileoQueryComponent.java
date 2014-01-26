@@ -144,6 +144,11 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
 		this.loadProperties(persistenceService.getCacheService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
 		this.startFindArticleServer();
+		if (this.findArticleServer == null)
+		{
+			this.loadProperties(persistenceService.getServerService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
+			this.startFindArticleServer();
+		}
 		this.startCustomerServer();
 		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
