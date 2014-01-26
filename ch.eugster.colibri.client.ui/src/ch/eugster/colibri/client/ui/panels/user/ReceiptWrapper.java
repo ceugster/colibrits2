@@ -41,6 +41,7 @@ import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Receipt.QuotationType;
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.rules.LocalDatabaseRule;
@@ -324,6 +325,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 						{
 							ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
 						}
+						userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
 						ReceiptWrapper.this.prepareReceipt();
 //						ReceiptWrapper.this.receipt = ReceiptWrapper.this.prepareReceipt();
 						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);

@@ -33,6 +33,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -113,6 +115,8 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 
 	private ComboViewer paymentTypes;
 
+	private Text startReceiptNumber;
+	
 	private Text mappingId;
 
 	private FormattedText quantity;
@@ -536,7 +540,18 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		salespoint.setForceSettlement(forceSettlement.getSelection());
 		salespoint.setAllowTestSettlement(allowTestSettlement.getSelection());
 		salespoint.setForceCashCheck(forceCashCheck.getSelection());
-		
+		if (startReceiptNumber != null)
+		{
+			try
+			{
+				long number = Long.valueOf(startReceiptNumber.getText()).longValue();
+				salespoint.setCurrentReceiptNumber(Long.valueOf(number));
+			}
+			catch (Exception e)
+			{
+				salespoint.setCurrentReceiptNumber(Long.valueOf(1L));
+			}
+		}
 		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
 		for (Bundle bundle : bundles)
 		{
@@ -727,6 +742,11 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 
 		if (msg == null)
 		{
+			msg = this.validateReceiptNumber();
+		}
+
+		if (msg == null)
+		{
 			msg = this.validateExportPath();
 		}
 
@@ -736,6 +756,22 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		}
 
 		return msg == null;
+	}
+
+	private Message validateReceiptNumber()
+	{
+		if (startReceiptNumber != null)
+		{
+			try
+			{
+				Long.valueOf(startReceiptNumber.getText());
+			}
+			catch (NumberFormatException e)
+			{
+				return new Message(this.startReceiptNumber, "Ungültige Belegnummer");
+			}
+		}
+		return null;
 	}
 
 	private Message validateExportPath()
@@ -1940,25 +1976,40 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 								.getAdapter(Salespoint.class);
 						final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getServerService()
 								.getQuery(Salespoint.class);
-						Salespoint other = salespointQuery.getCurrentSalespoint();
-						if (other == null)
+						Collection<Salespoint> others = salespointQuery.selectByHost(host);
+						if (others.isEmpty())
 						{
 							SalespointEditor.this.host.setText(host);
 						}
 						else
 						{
-							if ((editedSalespoint.getId() == null) || !other.getId().equals(editedSalespoint.getId()))
+							if (others.size() > 1)
 							{
 								final Shell shell = SalespointEditor.this.getSite().getShell();
 								final String title = "Registration nicht möglich";
-								final String msg = "Die Kasse "
-										+ other.getName()
-										+ " ist für diesen Arbeitsplatz registriert. Bevor Sie diese Kasse für diesen Arbeitsplatz registriert werden kann, muss die bestehende Registration aufgehoben werden.";
+								final String msg = "Andere Kassen sind für diesen Arbeitsplatz registriert. Bevor Sie diese Kasse für diesen Arbeitsplatz registriert werden kann, müssen die bestehenden Registrationen aufgehoben werden.";
 								final int type = MessageDialog.WARNING;
 								final String[] buttons = new String[] { "OK" };
 								final MessageDialog dialog = new MessageDialog(shell, title, null, msg, type, buttons,
 										0);
 								dialog.open();
+							}
+							else
+							{
+								Salespoint other = others.iterator().next();
+								if ((editedSalespoint.getId() == null) || !other.getId().equals(editedSalespoint.getId()))
+								{
+									final Shell shell = SalespointEditor.this.getSite().getShell();
+									final String title = "Registration nicht möglich";
+									final String msg = "Die Kasse "
+											+ other.getName()
+											+ " ist für diesen Arbeitsplatz registriert. Bevor Sie diese Kasse für diesen Arbeitsplatz registriert werden kann, muss die bestehende Registration aufgehoben werden.";
+									final int type = MessageDialog.WARNING;
+									final String[] buttons = new String[] { "OK" };
+									final MessageDialog dialog = new MessageDialog(shell, title, null, msg, type, buttons,
+											0);
+									dialog.open();
+								}
 							}
 						}
 					}
@@ -1982,6 +2033,43 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 				SalespointEditor.this.setDirty(true);
 			}
 		});
+
+		final Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
+				.getAdapter(Salespoint.class);
+		if (salespoint.getId() == null)
+		{
+			label = this.formToolkit.createLabel(composite, "Start Belegnummer", SWT.NONE);
+			label.setLayoutData(new GridData());
+
+			gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.horizontalSpan = 2;
+
+			this.startReceiptNumber = this.formToolkit.createText(composite, "", SWT.SINGLE);
+			this.startReceiptNumber.setLayoutData(gridData);
+			this.startReceiptNumber.addModifyListener(new ModifyListener()
+			{
+				@Override
+				public void modifyText(final ModifyEvent e)
+				{
+					SalespointEditor.this.setDirty(true);
+				}
+			});
+			this.startReceiptNumber.addVerifyListener(new VerifyListener()
+			{
+				@Override
+				public void verifyText(VerifyEvent e) 
+				{
+					try
+					{
+						Integer.valueOf(e.text);
+					}
+					catch (NumberFormatException nfe)
+					{
+						e.doit = false;
+					}
+				}
+			});
+		}
 
 		label = this.formToolkit.createLabel(composite, "ExportId", SWT.NONE);
 		label.setLayoutData(new GridData());

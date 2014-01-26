@@ -356,7 +356,10 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 											this.position.setProductGroup(this.getDefaultVoucherProductGroup());
 											this.position.setBookProvider(true);
 											this.position.setProviderBooked(false);
-											this.position.setProviderState(ProviderState.OPEN);
+											this.position.setPrice(creditAmount);
+											this.position.setQuantity(1);
+//											this.position.getReceipt().setState(Receipt.State.)
+//											this.position.setProviderState(ProviderState.OPEN);
 											this.position.setProvider(service.getProviderId());
 											if (this.position.getQuantity() == 0)
 											{

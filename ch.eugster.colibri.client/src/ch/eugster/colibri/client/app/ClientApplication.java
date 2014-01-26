@@ -1,5 +1,7 @@
 package ch.eugster.colibri.client.app;
 
+import java.util.HashMap;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -9,6 +11,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -70,12 +74,20 @@ public class ClientApplication implements IApplication
 				IStatus status = replicationService.replicate(shell, false);
 				if (status.getSeverity() == IStatus.ERROR)
 				{
-					Activator.getDefault().log(LogService.LOG_INFO, "Replikation erfolgreich durchgeführt.");
+					Activator.getDefault().log(LogService.LOG_INFO, "Replikation mit Fehler beendet.");
 					MessageDialog.open(MessageDialog.ERROR, shell, "Replikationsfehler", status.getMessage(), SWT.None);
 				}
 				else
 				{
-					Activator.getDefault().log(LogService.LOG_INFO, "Replikation mit Fehler beendet.");
+					Activator.getDefault().log(LogService.LOG_INFO, "Replikation erfolgreich durchgeführt.");
+					ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+					tracker.open();
+					EventAdmin eventAdmin = tracker.getService();
+					if (eventAdmin != null)
+					{
+						Event event = new Event("ch/eugster/colibri/persistence/replication/completed", new HashMap<String, Object>());
+						eventAdmin.sendEvent(event);
+					}
 				}
 			}
 		}
