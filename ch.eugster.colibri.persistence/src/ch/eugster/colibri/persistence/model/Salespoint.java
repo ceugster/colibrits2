@@ -256,8 +256,9 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 		{
 			this.currentReceiptNumber = new Long(0L);
 		}
-		this.setCurrentReceiptNumber(new Long(this.currentReceiptNumber.longValue() + 1L));
-		return this.getCurrentReceiptNumber();
+		Long receiptNumber = this.currentReceiptNumber;
+		this.setCurrentReceiptNumber(new Long(receiptNumber).longValue() + 1L);
+		return receiptNumber;
 	}
 
 	public PaymentType getPaymentType()

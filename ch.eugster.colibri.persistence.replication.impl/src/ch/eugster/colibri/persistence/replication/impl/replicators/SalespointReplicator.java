@@ -260,7 +260,10 @@ public class SalespointReplicator extends AbstractEntityReplicator<Salespoint>
 		target.setCommonSettings((CommonSettings) this.persistenceService.getCacheService().find(CommonSettings.class,
 				source.getCommonSettings().getId()));
 		target.setCurrentParkedReceiptNumber(source.getCurrentParkedReceiptNumber());
-		target.setCurrentReceiptNumber(source.getCurrentReceiptNumber());
+		if (source.getCurrentReceiptNumber().longValue() > target.getCurrentReceiptNumber())
+		{
+			target.setCurrentReceiptNumber(source.getCurrentReceiptNumber());
+		}
 		target.setExport(source.isExport());
 		target.setExportPath(source.getExportPath());
 		target.setForceCashCheck(source.isForceCashCheck());

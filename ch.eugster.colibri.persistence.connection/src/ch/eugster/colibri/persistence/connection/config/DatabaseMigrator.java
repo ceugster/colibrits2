@@ -1157,20 +1157,20 @@ public class DatabaseMigrator extends AbstractConfigurator
 				if (target == null)
 				{
 					target = Salespoint.newInstance(settings);
-					boolean allowTestSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("settlement").getAttributeValue("admit-test-settlement"));
-					target.setAllowTestSettlement(allowTestSettlement);
-					boolean forceSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-settlement"));
-					target.setForceSettlement(forceSettlement);
+//					boolean allowTestSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("settlement").getAttributeValue("admit-test-settlement"));
+//					target.setAllowTestSettlement(allowTestSettlement);
+//					boolean forceSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-settlement"));
+//					target.setForceSettlement(forceSettlement);
 					boolean export = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("export"));
 					target.setExport(export);
 					String path = this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("path");
 					target.setExportPath(path);
-					boolean forceCashCheck = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-stock-count"));
-					target.setForceCashCheck(forceCashCheck);
+//					boolean forceCashCheck = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-stock-count"));
+//					target.setForceCashCheck(forceCashCheck);
 					target.setMapping(source.exportId);
 					target.setSettlement(null);
 					target.setId(source.getId());
-					target.setCurrentReceiptNumber(source.currentReceiptId);
+					target.setCurrentReceiptNumber(source.currentReceiptId.longValue());
 					target.setCurrentParkedReceiptNumber(0);
 					target.setDeleted(source.deleted);
 					target.setLocation(source.place);
@@ -1255,7 +1255,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 					target.setSettlement(null);
 					target.setMapping(source.exportId);
 					target.setId(source.getId());
-					target.setCurrentReceiptNumber(source.currentReceiptId);
+					target.setCurrentReceiptNumber(source.currentReceiptId.longValue());
 					target.setCurrentParkedReceiptNumber(0);
 					target.setDeleted(source.deleted);
 					target.setLocation(source.place);

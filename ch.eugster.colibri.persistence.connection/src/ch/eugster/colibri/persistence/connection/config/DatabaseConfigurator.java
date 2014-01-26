@@ -56,13 +56,16 @@ import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 public class DatabaseConfigurator extends AbstractConfigurator
 {
 	private final Long currencyId;
+	
+	private final Long startReceiptNumber;
 
 	private Long payedInvoiceProductGroupId = null;
 
-	public DatabaseConfigurator(final Shell shell, final Element connection, final Long currencyId)
+	public DatabaseConfigurator(final Shell shell, final Element connection, final Long currencyId, Long startReceiptNumber)
 	{
 		super(shell);
 		this.currencyId = currencyId;
+		this.startReceiptNumber = startReceiptNumber;
 	}
 
 	public void configureDatabase()
@@ -293,9 +296,12 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			if (commonSettings == null)
 			{
 				commonSettings = CommonSettings.newInstance();
-				commonSettings.setId(Long.valueOf(1l));
+				commonSettings.setAllowTestSettlement(false);
+				commonSettings.setForceCashCheck(true);
+				commonSettings.setForceSettlement(true);
 				commonSettings.setHostnameResolver(HostnameResolver.HOSTNAME);
-				commonSettings.setTaxInclusive(true);
+				commonSettings.setId(Long.valueOf(1l));
+				commonSettings.setMaximizedClientWindow(true);
 				commonSettings.setMaxPaymentAmount(10000d);
 				commonSettings.setMaxPaymentRange(1000d);
 				commonSettings.setMaxPriceAmount(10000d);
@@ -305,10 +311,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				commonSettings.setTransferDelay(60000);
 				commonSettings.setTransferRepeatDelay(15000);
 				commonSettings.setTransferReceiptCount(5);
-				commonSettings.setAllowTestSettlement(false);
-				commonSettings.setForceSettlement(true);
-				commonSettings.setMaximizedClientWindow(true);
 				commonSettings.setReceiptNumberFormat("000000");
+				commonSettings.setTaxInclusive(true);
 			}
 			commonSettings.setReferenceCurrency(currency);
 
@@ -979,13 +983,14 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				Salespoint salespoint = Salespoint.newInstance(commonSettings);
 				salespoint.setId(Long.valueOf(1L));
 				salespoint.setCurrentParkedReceiptNumber(0L);
-				salespoint.setCurrentReceiptNumber(Long.valueOf(0L));
+				salespoint.setCurrentReceiptNumber(Long.valueOf(1L));
 				salespoint.setHost(host);
 				salespoint.setName(host);
 				salespoint.setProfile(this.getEntityManager().find(Profile.class, Long.valueOf(1l)));
 				salespoint.setPaymentType(this.getEntityManager().find(PaymentType.class, Long.valueOf(1l)));
 				salespoint.setProposalTax(this.getEntityManager().find(Tax.class, Long.valueOf(4l)));
 				salespoint.setProposalQuantity(1);
+				salespoint.setCurrentReceiptNumber(startReceiptNumber);
 				final Stock stock = Stock.newInstance(salespoint);
 				stock.setPaymentType(salespoint.getPaymentType());
 				salespoint.addStock(stock);

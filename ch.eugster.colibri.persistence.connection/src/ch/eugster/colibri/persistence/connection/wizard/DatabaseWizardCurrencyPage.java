@@ -55,10 +55,10 @@ public class DatabaseWizardCurrencyPage extends WizardPage implements Listener
 
 	public Long getStartReceiptNumber()
 	{
-		Long receiptNumber = null;
+		long receiptNumber = 1L;
 		try
 		{
-			receiptNumber = Long.valueOf(startReceiptNumber.getText());
+			receiptNumber = Long.valueOf(startReceiptNumber.getText()).longValue();
 		}
 		catch (NumberFormatException e)
 		{
