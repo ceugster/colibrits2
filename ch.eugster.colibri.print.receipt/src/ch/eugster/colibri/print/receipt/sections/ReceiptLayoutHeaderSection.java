@@ -206,7 +206,16 @@ public class ReceiptLayoutHeaderSection extends AbstractLayoutSection
 					}
 					case N:
 					{
-						String receiptNumber = String.format("%0" + receiptNumberFormat.length() + "d", receipt.getNumber().longValue());
+						String receiptNumber = null;
+						String format = receipt.getSettlement().getSalespoint().getCommonSettings().getReceiptNumberFormat();
+						if (format != null && !format.isEmpty())
+						{
+							receiptNumber = String.format("%0" + receiptNumberFormat.length() + "d", receipt.getNumber().longValue());
+						}
+						else
+						{
+							receiptNumber = receipt.getNumber().toString();
+						}
 						return layoutSection.replaceMarker(receiptNumber, marker, true);
 					}
 					case D:

@@ -29,7 +29,7 @@ public class Version extends AbstractEntity
 	 * Achtung, falls eine neue Tabelle eingeführt wird, muss diese in der
 	 * statischen Methode getTableNames aufgeführt werden.
 	 */
-	public static final int STRUCTURE = 23;
+	public static final int STRUCTURE = 24;
 
 	public static final int DATA = 0;
 

@@ -238,8 +238,8 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	protected Map<Long, SettlementEntry> createPositionSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		List<SettlementPosition> positions = query.selectPositions(this.getSelectedSalespoints(),
-				this.getSelectedDateRange());
+		List<SettlementPosition> positions = query.selectPositions(this.parentView.getSelectedSalespoints(),
+				this.parentView.getSelectedDateRange());
 		Map<Long, SettlementEntry> section = createPositionSection(new HashMap<Long, SettlementEntry>(), positions);
 		return section;
 	}
@@ -247,46 +247,46 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	protected Map<Long, SettlementEntry> createPaymentSection(ServerService service)
 	{
 		final PaymentQuery query = (PaymentQuery) service.getQuery(Payment.class);
-		Collection<SettlementPayment> payments = query.selectPayments(this.getSelectedSalespoints(), this.getSelectedDateRange());
-		return createPaymentSection(new HashMap<Long, SettlementEntry>(), payments, this.getSelectedSalespoints()[0]
+		Collection<SettlementPayment> payments = query.selectPayments(this.parentView.getSelectedSalespoints(), this.parentView.getSelectedDateRange());
+		return createPaymentSection(new HashMap<Long, SettlementEntry>(), payments, this.parentView.getSelectedSalespoints()[0]
 				.getCommonSettings().getReferenceCurrency());
 	}
 
 	protected Map<Long, SettlementEntry> createTaxSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementTax> taxes = query.selectTaxes(this.getSelectedSalespoints(), this.getSelectedDateRange());
+		Collection<SettlementTax> taxes = query.selectTaxes(this.parentView.getSelectedSalespoints(), this.parentView.getSelectedDateRange());
 		return createTaxSection(new HashMap<Long, SettlementEntry>(), taxes);
 	}
 
 	protected Map<Long, SettlementEntry> createInternalSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementInternal> internals = query.selectInternals(this.getSelectedSalespoints(),
-				this.getSelectedDateRange());
+		Collection<SettlementInternal> internals = query.selectInternals(this.parentView.getSelectedSalespoints(),
+				this.parentView.getSelectedDateRange());
 		return createInternalSection(new HashMap<Long, SettlementEntry>(), internals, printInternals.getSelection());
 	}
 
 	protected Map<Long, SettlementEntry> createRestitutedPositionSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementRestitutedPosition> internals = query.selectRestitutedPositions(this.getSelectedSalespoints(),
-				this.getSelectedDateRange());
+		Collection<SettlementRestitutedPosition> internals = query.selectRestitutedPositions(this.parentView.getSelectedSalespoints(),
+				this.parentView.getSelectedDateRange());
 		return createRestitutedPositionSection(new HashMap<Long, SettlementEntry>(), internals);
 	}
 
 	protected Map<Long, SettlementEntry> createPayedInvoiceSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementPayedInvoice> payedInvoices = query.selectPayedInvoices(this.getSelectedSalespoints(),
-				this.getSelectedDateRange());
+		Collection<SettlementPayedInvoice> payedInvoices = query.selectPayedInvoices(this.parentView.getSelectedSalespoints(),
+				this.parentView.getSelectedDateRange());
 		return createPayedInvoiceSection(new HashMap<Long, SettlementEntry>(), payedInvoices);
 	}
 
 	protected Map<Long, SettlementEntry> createReversedReceiptsSection(ServerService service)
 	{
 		final ReceiptQuery query = (ReceiptQuery) service.getQuery(Receipt.class);
-		Collection<SettlementReceipt> receipts = query.selectReversed(this.getSelectedSalespoints(), this.getSelectedDateRange());
+		Collection<SettlementReceipt> receipts = query.selectReversed(this.parentView.getSelectedSalespoints(), this.parentView.getSelectedDateRange());
 		return createReceiptSection(new HashMap<Long, SettlementEntry>(), receipts);
 	}
 
@@ -313,8 +313,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	@Override
 	public boolean validateSelection()
 	{
-		return (getSelectedSalespoints() != null && getSelectedSalespoints().length > 0) && getSelectedDateRange() != null
-				&& getSelectedDateRange().length == 2;
+		return true;
 	}
 
 	@Override
@@ -340,7 +339,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 		if (service != null)
 		{
 			ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
-			count = query.countBySalespointsAndDateRange(this.getSelectedSalespoints(), this.getSelectedDateRange());
+			count = query.countBySalespointsAndDateRange(this.parentView.getSelectedSalespoints(), this.parentView.getSelectedDateRange());
 		}
 		tracker.close();
 		return count;
@@ -358,7 +357,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 		parameters.put("salespoints", getSalespointList());
 		parameters.put("dateRange", getDateRangeList());
 		parameters.put("receiptCount", nf.format(countReceipts()));
-		parameters.put("taxInclusive", this.getSelectedSalespoints()[0].getCommonSettings().isTaxInclusive() ? "inkl. MwSt."
+		parameters.put("taxInclusive", this.parentView.getSelectedSalespoints()[0].getCommonSettings().isTaxInclusive() ? "inkl. MwSt."
 				: "exkl. Mwst.");
 		URL entry = Activator.getDefault().getBundle().getEntry("/reports/" + getReportName() + ".properties");
 		try
@@ -375,9 +374,9 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	private String getSalespointList()
 	{
 		StringBuilder salespoints = new StringBuilder();
-		if (getSelectedSalespoints() != null && getSelectedSalespoints().length > 0)
+		if (parentView.getSelectedSalespoints() != null && parentView.getSelectedSalespoints().length > 0)
 		{
-			for (Salespoint selectedSalespoint : getSelectedSalespoints())
+			for (Salespoint selectedSalespoint : this.parentView.getSelectedSalespoints())
 			{
 				if (salespoints.length() > 0)
 				{
@@ -391,23 +390,23 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 
 	private String getDateRangeList()
 	{
-		if (getSelectedDateRange() != null && getSelectedDateRange().length == 2)
+		if (parentView.getSelectedDateRange() != null && parentView.getSelectedDateRange().length == 2)
 		{
-			if (getSelectedDateRange()[0].get(Calendar.YEAR) == getSelectedDateRange()[1].get(Calendar.YEAR))
+			if (parentView.getSelectedDateRange()[0].get(Calendar.YEAR) == this.parentView.getSelectedDateRange()[1].get(Calendar.YEAR))
 			{
-				if (getSelectedDateRange()[0].get(Calendar.MONTH) == getSelectedDateRange()[1].get(Calendar.MONTH))
+				if (parentView.getSelectedDateRange()[0].get(Calendar.MONTH) == parentView.getSelectedDateRange()[1].get(Calendar.MONTH))
 				{
-					if (getSelectedDateRange()[0].get(Calendar.DATE) == getSelectedDateRange()[1].get(Calendar.DATE))
+					if (parentView.getSelectedDateRange()[0].get(Calendar.DATE) == parentView.getSelectedDateRange()[1].get(Calendar.DATE))
 					{
-						return SimpleDateFormat.getDateInstance().format(getSelectedDateRange()[0].getTime());
+						return SimpleDateFormat.getDateInstance().format(parentView.getSelectedDateRange()[0].getTime());
 					}
 				}
 			}
 
 			StringBuilder builder = new StringBuilder();
-			builder = builder.append(SimpleDateFormat.getDateInstance().format(getSelectedDateRange()[0].getTime()));
+			builder = builder.append(SimpleDateFormat.getDateInstance().format(parentView.getSelectedDateRange()[0].getTime()));
 			builder = builder.append(" bis ");
-			builder = builder.append(SimpleDateFormat.getDateInstance().format(getSelectedDateRange()[1].getTime()));
+			builder = builder.append(SimpleDateFormat.getDateInstance().format(parentView.getSelectedDateRange()[1].getTime()));
 			return builder.toString();
 		}
 		return "";

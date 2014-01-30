@@ -69,7 +69,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 	
 	public boolean isConnect()
 	{
-		return this.findArticleServer.isConnect();
+		return this.findArticleServer != null && this.findArticleServer.isConnect();
 	}
 
 	public String getProviderId()

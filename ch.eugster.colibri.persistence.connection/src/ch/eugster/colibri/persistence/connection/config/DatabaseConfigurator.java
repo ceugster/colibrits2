@@ -311,7 +311,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				commonSettings.setTransferDelay(60000);
 				commonSettings.setTransferRepeatDelay(15000);
 				commonSettings.setTransferReceiptCount(5);
-				commonSettings.setReceiptNumberFormat("000000");
+				commonSettings.setReceiptNumberFormat("");
 				commonSettings.setTaxInclusive(true);
 			}
 			commonSettings.setReferenceCurrency(currency);

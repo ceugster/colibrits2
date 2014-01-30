@@ -53,10 +53,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 import org.jdom.Attribute;
 import org.jdom.DocType;
 import org.jdom.Document;
@@ -115,10 +117,6 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	private Mode currentMode;
 
 	private Composite panelContainer;
-	
-	private Salespoint[] selectedSalespoints;
-	
-	private Calendar[] selectedDates;
 	
 	private Button[] importExportButtons;
 	
@@ -570,21 +568,50 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			{
 				if (currentMode != null)
 				{
-					start.setEnabled(false);
-					if (currentMode.equals(Mode.IMPORT))
+					try
 					{
-						importDirectory = new File(importPath.getText());
-						saveDirectory = new File(savePath.getText());
-						logDirectory = new File(logPath.getText());
-						deleteFile = deleteAfterImport.getSelection();
-						if (importDirectory.isDirectory())
+						start.setEnabled(false);
+						if (currentMode.equals(Mode.IMPORT))
 						{
+							importDirectory = new File(importPath.getText());
+							saveDirectory = new File(savePath.getText());
+							logDirectory = new File(logPath.getText());
+							deleteFile = deleteAfterImport.getSelection();
+							if (importDirectory.isDirectory())
+							{
+								final File[] files = importDirectory.listFiles(new FileFilter() 
+								{
+									@Override
+									public boolean accept(File file) 
+									{
+										return file.getName().endsWith(".xml");
+									}
+								});
+								if (files.length > 0)
+								{
+									doImport(files);
+								}
+								else
+								{
+									MessageDialog.openInformation(ImportExportView.this.getSite().getShell(), "Keine Dateien vorhanden", "Es sind keine Dateien zum Verarbeiten vorhanden.");
+								}
+							}
+							else
+							{
+								MessageDialog.openError(ImportExportView.this.getSite().getShell(), "Ungültiges Verzeichnis", "Das gewählte Verzeichnis ist ungültig.");
+							}
+						}
+						else if (currentMode.equals(Mode.EXPORT))
+						{
+							IStructuredSelection ssel = (IStructuredSelection) exportSettlementViewer.getSelection();
+							exportSettlement = (Settlement) ssel.getFirstElement();
+							exportDirectory = new File(exportPath.getText());
 							Job job = new Job(currentMode.action()) 
 							{
 								@Override
 								protected IStatus run(IProgressMonitor monitor) 
 								{
-									doImport(monitor);
+									doExport(monitor);
 									return Status.OK_STATUS;
 								}
 							};
@@ -593,7 +620,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 								@Override
 								public void done(IJobChangeEvent event) 
 								{
-									Display.getDefault().syncExec(new Runnable() 
+									Display.getDefault().syncExec(new Runnable()
 									{
 										@Override
 										public void run() 
@@ -602,48 +629,15 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 										}
 									});
 								}
-	
+
 							});
 							job.setUser(true);
 							job.schedule();
 						}
-						else
-						{
-							MessageDialog.openError(ImportExportView.this.getSite().getShell(), "Ungültiges Verzeichnis", "Das gewählte Verzeichnis ist ungültig.");
-						}
 					}
-					else if (currentMode.equals(Mode.EXPORT))
+					finally
 					{
-						IStructuredSelection ssel = (IStructuredSelection) exportSettlementViewer.getSelection();
-						exportSettlement = (Settlement) ssel.getFirstElement();
-						exportDirectory = new File(exportPath.getText());
-						Job job = new Job(currentMode.action()) 
-						{
-							@Override
-							protected IStatus run(IProgressMonitor monitor) 
-							{
-								doExport(monitor);
-								return Status.OK_STATUS;
-							}
-						};
-						job.addJobChangeListener(new JobChangeAdapter() 
-						{
-							@Override
-							public void done(IJobChangeEvent event) 
-							{
-								Display.getDefault().syncExec(new Runnable()
-								{
-									@Override
-									public void run() 
-									{
-										start.setEnabled(true);
-									}
-								});
-							}
-
-						});
-						job.setUser(true);
-						job.schedule();
+						start.setEnabled(true);
 					}
 				}
 			}
@@ -653,72 +647,84 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		panelContainer.layout();
 	}
 
-	private void doImport(final IProgressMonitor monitor)
+	private void doImport(final File[] files)
 	{
-		final File[] files = importDirectory.listFiles(new FileFilter() 
+		start.setEnabled(false);
+		final Result result = new Result();
+		UIJob job = new UIJob("Daten werden importiert...") 
 		{
 			@Override
-			public boolean accept(File file) 
+			public IStatus runInUIThread(IProgressMonitor monitor) 
 			{
-				return file.getName().endsWith(".xml");
+				try
+				{
+					monitor.beginTask("Importieren", files.length);
+					for (File file : files)
+					{
+						Document document = load(file);
+						if (document != null)
+						{
+							result.files += 1;
+							List<?> elements = document.getRootElement().getChildren("receipt");
+							if (!doImport(new SubProgressMonitor(monitor, elements.size()), elements, file, result))
+							{
+								monitor.setCanceled(true);
+							}
+						}
+					}
+				}
+				finally
+				{
+					monitor.done();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.addJobChangeListener(new JobChangeAdapter() 
+		{
+			@Override
+			public void done(IJobChangeEvent event) 
+			{
+				start.setEnabled(true);
+				StringBuilder message = new StringBuilder("Es wurden " + result.files + " Dateien eingelesen:\n");
+				message = message.append(result.read + " Datensätze wurden gelesen, " + result.write + " Datensätze wurden geschrieben, " + result.exist + " Datensätze waren bereits vorhanden, " + result.error + " Datensätze waren fehlerhaft.");
+				MessageDialog.openInformation(getSite().getShell(), "Zusammenfassung", message.toString());
 			}
 		});
-
-		if (files.length > 0)
-		{
-			final Result result = new Result();
-			monitor.beginTask("Belege werden importiert...", files.length);
-			try
-			{
-				for (File file : files)
-				{
-					Document document = load(file);
-					if (document != null)
-					{
-						if (!doImport(new SubProgressMonitor(monitor, 1), document, file, result))
-						{
-							monitor.setCanceled(true);
-						}
-					}
-					if (monitor.isCanceled())
-					{
-						return;
-					}
-				}
-			}
-			finally
-			{
-				monitor.done();
-				Display.getDefault().syncExec(new Runnable() 
-				{
-					@Override
-					public void run() 
-					{
-						if (monitor.isCanceled())
-						{
-							MessageDialog.openInformation(ImportExportView.this.getSite().getShell(), "Import abgebrochen", "Der Import wurde vom Benutzer abgebrochen.");
-						}
-						else
-						{
-							MessageDialog.openInformation(ImportExportView.this.getSite().getShell(), "Import abgeschlossen", "Der Import von " + DecimalFormat.getIntegerInstance().format(files.length) + " Dateien ist abgeschlossen.\n\nZusammenfassung:\n" + DecimalFormat.getInstance().format(result.read) + " Belege wurden gelesen,\n" + DecimalFormat.getInstance().format(result.write) + " Belege wurden geschrieben,\n" + DecimalFormat.getInstance().format(result.error) + " Fehler wurden festgestellt und\n" + DecimalFormat.getInstance().format(result.exist) + " Belege waren bereits vorhanden.\n\nAllfällige Fehler sind in Dateien mit gleichem Namen und der Endung \".log\" protokolliert.");
-						}
-					}
-				});
-			}
-		}
-		else
-		{
-			Display.getDefault().syncExec(new Runnable() 
-			{
-				@Override
-				public void run() 
-				{
-					MessageDialog.openInformation(getSite().getShell(), "Keine Dateien vorhanden", "Im ausgewählten Verzeichnis sind keine Dateien für den Import vorhanden.");
-				}
-			});
-		}
+		job.setUser(true);
+		job.schedule();
 	}
 
+	public Salespoint[] getSelectedSalespoints()
+	{
+		IViewReference[] references = this.getSite().getPage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			IViewPart part = reference.getView(true);
+			if (part instanceof SalespointView)
+			{
+				SalespointView view = (SalespointView) part;
+				return view.getSelectedSalespoints();
+			}
+		}
+		return null;
+	}
+	
+	public Calendar[] getSelectedDateRange()
+	{
+		IViewReference[] references = this.getSite().getPage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			IViewPart part = reference.getView(true);
+			if (part instanceof DateView)
+			{
+				DateView view = (DateView) part;
+				return view.getDates();
+			}
+		}
+		return null;
+	}
+	
 	private PrintWriter createLog(File file)
 	{
 		if (!logDirectory.exists())
@@ -760,7 +766,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			printer.close();
 		}
 	}
-	private boolean doImport(SubProgressMonitor monitor, Document document, File file, Result result)
+	private boolean doImport(SubProgressMonitor monitor, List<?> elements, File file, Result result)
 	{
 		if (!saveDirectory.exists())
 		{
@@ -770,72 +776,67 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		PrintWriter printer = createLog(file);
 		try
 		{
-			int count = Integer.valueOf(document.getRootElement().getAttributeValue("count")).intValue();
-			log(printer, "Import: " + file.getName()+ " (" + count + " Belege.");
+			log(printer, "Import: " + file.getName()+ " (" + elements.size() + " Belege.");
 
 			PersistenceService service = persistenceServiceTracker.getService();
 			if (service != null)
 			{
 				SalespointQuery salespointQuery = (SalespointQuery) service.getServerService().getQuery(Salespoint.class);
-				monitor.beginTask("Importiere " + file.getName(), count);
+				monitor.subTask("Importiere " + file.getName());
 				try
 				{
-					@SuppressWarnings("unchecked")
-					List<Element> receiptElements = document.getRootElement().getChildren("receipt");
-					for (Element receiptElement : receiptElements)
+					for (Object object : elements)
 					{
-						if (monitor.isCanceled())
+						if (object instanceof Element)
 						{
-							return false;
-						}
-						result.read++;
-						try
-						{
-							String mappingId = receiptElement.getAttributeValue("salespoint-id");
-							Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
-							if (salespoints.isEmpty())
+							Element element = (Element) object;
+							if (monitor.isCanceled())
 							{
-								
+								return false;
 							}
-							Salespoint salespoint = salespoints.iterator().next();
-							Settlement settlement = null;
-							Long settled = getSettlementTimeInMillis(receiptElement.getAttributeValue("settlement"));
-							Calendar calendar = GregorianCalendar.getInstance();
-							calendar.setTimeInMillis(settled.longValue());
-							System.out.println(salespoint.getMapping() + " " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
-							if (settled != null)
+							result.read++;
+							try
 							{
-								settlement = getSettlement(service, salespoint, settled.longValue());
-							}
-							System.out.println(receiptElement.getAttributeValue("number"));
-							if (receiptElement.getAttributeValue("number").equals("1000010000249246"))
-							{
-								System.out.println(receiptElement.getAttributeValue("number"));
-							}
-							Receipt receipt = this.convertToReceipt(receiptElement, settlement);
-							if (!receiptExists(service, receipt.getOtherId()))
-							{
-//								service.getServerService().getQuery(Receipt.class);
-								service.getServerService().persist(receipt, false);
-								result.write++;
-							}
-							else
-							{
-								result.exist++;
-								if (printer != null)
+								String mappingId = element.getAttributeValue("salespoint-id");
+								Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
+								if (!salespoints.isEmpty())
 								{
-									String id = receiptElement.getAttributeValue("id");
-									log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
+									Salespoint salespoint = salespoints.iterator().next();
+									Settlement settlement = null;
+									Long settled = getSettlementTimeInMillis(element.getAttributeValue("settlement"));
+									Calendar calendar = GregorianCalendar.getInstance();
+									calendar.setTimeInMillis(settled.longValue());
+									System.out.println(salespoint.getMapping() + " " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
+									if (settled != null)
+									{
+										settlement = getSettlement(service, salespoint, settled.longValue());
+									}
+									Receipt receipt = this.convertToReceipt(element, settlement);
+									if (!receiptExists(service, receipt.getOtherId()))
+									{
+		//								service.getServerService().getQuery(Receipt.class);
+										service.getServerService().persist(receipt, false);
+										result.write++;
+									}
+									else
+									{
+										result.exist++;
+										if (printer != null)
+										{
+											String id = element.getAttributeValue("id");
+											log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
+										}
+										Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + element.getAttributeValue("id") + ": Beleg existiert bereits.");
+									}
 								}
-								Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + receiptElement.getAttributeValue("id") + ": Beleg existiert bereits.");
 							}
-						}
-						catch (Exception e)
-						{
-							Activator.getDefault().log(LogService.LOG_ERROR, "Fehler beim verarbeiten von Beleg mit der Id " + receiptElement.getAttributeValue("id") + ": " + e.getMessage());
-							result.error++;
-							String id = receiptElement.getAttributeValue("id");
-							log(printer, "Fehler in Beleg " + id + ": " + e.getLocalizedMessage());
+							catch (Exception e)
+							{
+								Activator.getDefault().log(LogService.LOG_ERROR, "Fehler beim verarbeiten von Beleg mit der Id " + element.getAttributeValue("id") + ": " + e.getMessage());
+								result.error++;
+								String id = element.getAttributeValue("id");
+								log(printer, "Fehler in Beleg " + id + ": " + e.getLocalizedMessage());
+							}
 						}
 						monitor.worked(1);
 					}
@@ -851,7 +852,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 				log(printer, "Gelesen: " + DecimalFormat.getIntegerInstance().format(result.read));
 				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(result.write));
 				log(printer, "Vorhanden: " + DecimalFormat.getIntegerInstance().format(result.exist));
-				log(printer, "Eingefügt: " + DecimalFormat.getIntegerInstance().format(result.error));
+				log(printer, "Fehler: " + DecimalFormat.getIntegerInstance().format(result.error));
 			}
 			if (deleteFile)
 			{
@@ -865,39 +866,22 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 					save = save.append(File.separator);
 				}
 				save = save.append(file.getName());
-//				try 
-//				{
-					if (file.renameTo(new File(save.toString())))
+				if (file.renameTo(new File(save.toString())))
+				{
+					if (printer != null)
 					{
-						if (printer != null)
-						{
-							log(printer, "");
-							log(printer, "Datei gesichert in: " + save.toString());
-						}
+						log(printer, "");
+						log(printer, "Datei gesichert in: " + save.toString());
 					}
-					else
+				}
+				else
+				{
+					if (printer != null)
 					{
-						if (printer != null)
-						{
-							log(printer, "");
-							log(printer, "Sicherung der Datei konnte nicht durchgeführt werden.");
-						}
+						log(printer, "");
+						log(printer, "Sicherung der Datei konnte nicht durchgeführt werden.");
 					}
-//					Files.move(file.toPath(), new File(save.toString()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-//				} 
-//				catch (final IOException e) 
-//				{
-//					e.printStackTrace();
-//					Display.getDefault().syncExec(new Runnable()
-//					{
-//						@Override
-//						public void run() 
-//						{
-//							IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
-//							ErrorDialog.openError(ImportExportView.this.getSite().getShell(), "Fehler", "Die Quelldatei konnte nicht gesichert werden.", status);
-//						}
-//					});
-//				}
+				}
 			}
 		}
 		finally
@@ -1035,24 +1019,13 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection)
 	{
-		if (part instanceof SalespointView)
-		{
-			SalespointView view = (SalespointView) part;
-			this.selectedSalespoints = view.getSelectedSalespoints();
-			this.setSettlementViewerInput();
-		}
-		else if (part instanceof DateView)
-		{
-			DateView view = (DateView) part;
-			selectedDates = view.getDates();
-			this.setSettlementViewerInput();
-		}
+		this.setSettlementViewerInput();
 		updateStartButton();
 	}
 	
 	private void setSettlementViewerInput()
 	{
-		if (selectedSalespoints != null && selectedSalespoints.length > 0 && selectedDates != null && selectedDates.length == 2)
+		if (getSelectedSalespoints() != null && getSelectedSalespoints().length > 0 && getSelectedDateRange() != null && getSelectedDateRange().length == 2)
 		{
 			ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
 			try
@@ -1062,7 +1035,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 				if (service != null)
 				{
 					SettlementQuery query = (SettlementQuery) service.getServerService().getQuery(Settlement.class);
-					Collection<Settlement> settlements = query.selectBySalespointsAndSettled(selectedSalespoints, Long.valueOf(selectedDates[0].getTimeInMillis()), Long.valueOf(selectedDates[1].getTimeInMillis()));
+					Collection<Settlement> settlements = query.selectBySalespointsAndSettled(getSelectedSalespoints(), Long.valueOf(getSelectedDateRange()[0].getTimeInMillis()), Long.valueOf(getSelectedDateRange()[1].getTimeInMillis()));
 					this.exportSettlementViewer.setInput(settlements.toArray(new Settlement[0]));
 				}
 			}
@@ -1465,7 +1438,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		return timestamp.get(Calendar.HOUR_OF_DAY);
 	}
 
-	private void updatePositions(Element receiptElement, Receipt receipt)
+	private void updatePositions(Element receiptElement, Receipt receipt) throws IllegalArgumentException
 	{
 		@SuppressWarnings("unchecked")
 		List<Element> positionElements = receiptElement.getChildren("position");
@@ -1511,7 +1484,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		return Position.Option.ARTICLE;
 	}
 	
-	private Position convertToPosition(Element element, Receipt receipt)
+	private Position convertToPosition(Element element, Receipt receipt) throws IllegalArgumentException
 	{
 		Position position = Position.newInstance(receipt);
 		position.setBookProvider(Boolean.valueOf(element.getAttributeValue("galileo-book")));
@@ -1546,16 +1519,22 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		int quantity = Integer.valueOf(element.getAttributeValue("quantity")).intValue();
 		if (quantity < 0)
 		{
-			if (!position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.SALES))
+			if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
 			{
-				quantity = -Math.abs(quantity);
+				quantity = Math.abs(quantity);
+			}
+			else if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.EXPENSES))
+			{
+				quantity = Math.abs(quantity);
 			}
 		}
+		position.setQuantity(quantity);
 		double price = Math.abs(Double.valueOf(element.getAttributeValue("price")).doubleValue());
 		if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.EXPENSES) || position.getProductGroup().getProductGroupType().equals(ProductGroupType.WITHDRAWAL))
 		{
 			price = -price;
 		}
+		position.setPrice(price);
 		position.setSearchValue(element.getAttributeValue("product-number"));
 		String code = element.getAttributeValue("tax-id");
 		Tax tax = getTax(code);
@@ -1846,6 +1825,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	
 	private class Result
 	{
+		public int files = 0;
 		public int read = 0;
 		public int write = 0;
 		public int exist = 0;

@@ -31,6 +31,7 @@ import ch.eugster.colibri.client.ui.events.PositionChangeEvent;
 import ch.eugster.colibri.client.ui.events.PositionChangeListener;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
 import ch.eugster.colibri.client.ui.panels.user.pos.numeric.ValueDisplay;
+import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
@@ -316,7 +317,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			final String input = this.valueDisplay.readAndInitDisplay();
 			if ((input != null) && (input.length() > 0))
 			{
-				if (input.startsWith(Barcode.PREFIX_VOUCHER))
+				if (input.toUpperCase().startsWith(Barcode.PREFIX_VOUCHER))
 				{
 					log(LogService.LOG_INFO, "eGutschein gescant.");
 					log(LogService.LOG_INFO, "Prüfe eGutschein Service Verfügbarkeit...");
@@ -548,7 +549,15 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	{
 		if (this.position.getProductGroup() == null)
 		{
-			this.position.setProductGroup(this.position.getReceipt().getSettlement().getSalespoint().getCommonSettings().getDefaultProductGroup());
+			CommonSettings settings = this.position.getReceipt().getSettlement().getSalespoint().getCommonSettings();
+			if (this.position.isEbook())
+			{
+				this.position.setProductGroup(settings.getEBooks());
+			}
+			else
+			{
+				this.position.setProductGroup(settings.getDefaultProductGroup());
+			}
 		}
 	}
 

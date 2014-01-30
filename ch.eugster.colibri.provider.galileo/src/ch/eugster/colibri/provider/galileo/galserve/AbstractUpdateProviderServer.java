@@ -126,11 +126,6 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		return status;
 	}
 
-	protected BarcodeVerifier[] getBarcodeVerifiers()
-	{
-		return barcodeVerifierTracker.getServices(new BarcodeVerifier[0]);
-	}
-	
 	protected void setStatus(IStatus status)
 	{
 		this.status = status;

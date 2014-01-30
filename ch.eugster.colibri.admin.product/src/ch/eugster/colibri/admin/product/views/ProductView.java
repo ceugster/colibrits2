@@ -309,6 +309,11 @@ public class ProductView extends AbstractEntityView implements IDoubleClickListe
 						value = value.append(del + "eGutsch.");
 						del = ", ";
 					}
+					if (productGroup.isEBooks())
+					{
+						value = value.append(del + "eBooks.");
+						del = ", ";
+					}
 					cell.setText(value.toString());
 				}
 			}

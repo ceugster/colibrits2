@@ -172,6 +172,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					errors = errors.append(this.checkPayedInvoice(salespoint));
 					errors = errors.append(this.checkProviderTaxMapped());
 					errors = errors.append(this.checkExport(salespoint));
+					errors = errors.append(this.checkEBooks(salespoint));
 
 					final ServiceTracker<ProviderIdService, ProviderIdService> tracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle()
 							.getBundleContext(), ProviderIdService.class, null);
@@ -530,6 +531,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	{
 		ProviderQuery ProviderQuery = providerQueryTracker.getService();
 		return ProviderQuery.checkTaxCodes(persistenceServiceTracker.getService()).getMessage();
+	}
+
+	private String checkEBooks(Salespoint salespoint)
+	{
+		String msg = "Es wurde noch keine Warengruppe für EBooks definiert\n";
+		return salespoint.getCommonSettings().getEBooks() == null ? msg : "";
 	}
 
 	private String checkDefaultProductGroup(Salespoint salespoint)

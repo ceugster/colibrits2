@@ -29,7 +29,7 @@ public class VoucherLayoutHeaderSection extends AbstractLayoutSection
 		builder = builder.append("\n");
 		builder = builder.append("\n");
 		builder = builder.append("KKKKKKKKKKKKKKKKKKKKKKKKK\n");
-		builder = builder.append("NNNNNNN                   DDDDDDDDDD TTTTT\n");
+		builder = builder.append("NNNNNNNNNNNNNNNNNNNNNNNNN DDDDDDDDDD TTTTT\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -128,9 +128,17 @@ public class VoucherLayoutHeaderSection extends AbstractLayoutSection
 					}
 					case N:
 					{
-						simpleIntegerFormatter.setMinimumIntegerDigits(marker.length());
-						final String number = receipt.getNumber() == null ? "" : simpleIntegerFormatter.format(receipt.getNumber());
-						return layoutSection.replaceMarker(number, marker, false);
+						String receiptNumber = null;
+						String format = receipt.getSettlement().getSalespoint().getCommonSettings().getReceiptNumberFormat();
+						if (format != null && !format.isEmpty())
+						{
+							receiptNumber = String.format("%0" + receiptNumberFormat.length() + "d", receipt.getNumber().longValue());
+						}
+						else
+						{
+							receiptNumber = receipt.getNumber().toString();
+						}
+						return layoutSection.replaceMarker(receiptNumber, marker, true);
 					}
 					case D:
 					{

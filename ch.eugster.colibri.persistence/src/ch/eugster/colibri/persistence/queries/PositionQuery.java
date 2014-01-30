@@ -526,9 +526,8 @@ public class PositionQuery extends AbstractQuery<Position>
 
 		Currency currency = salespoints[0].getCommonSettings().getReferenceCurrency();
 
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
-				.equal(Receipt.State.SAVED);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
+		Expression expression = state.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		Expression allocation = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.ALLOCATION);
 		Expression withdrawal = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.WITHDRAWAL);
 		Expression internal = allocation.and(withdrawal);

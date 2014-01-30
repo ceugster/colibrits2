@@ -42,20 +42,18 @@ import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.galserve.AbstractUpdateProviderServer;
 import ch.eugster.colibri.provider.galileo.galserve.IUpdateProviderServer;
-import ch.eugster.colibri.provider.galileo.galserve.old.ClassFactory;
-import ch.eugster.colibri.provider.galileo.galserve.old.Igdserve;
 
 public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer implements IUpdateProviderServer
 {
-	private Igdserve galserve;
+	private Igdserve2g galserve;
 	
 	public UpdateProviderServerSqlCom4j(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
-		galserve = ClassFactory.creategdserve();
+		galserve = ClassFactory.creategdserve2g();
 	}
 	
-	protected Igdserve getGalserve()
+	protected Igdserve2g getGalserve()
 	{
 		return galserve;
 	}
@@ -79,7 +77,7 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		{
 			CommonSettingsQuery commonSettingsQuery = (CommonSettingsQuery) persistenceService.getCacheService().getQuery(CommonSettings.class);
 			CommonSettings commonSettings = commonSettingsQuery.findDefault();
-			ProductGroup productGroup = commonSettings.getDefaultProductGroup();
+			ProductGroup productGroup = commonSettings.getEBooks();
 			position.setProductGroup(productGroup);
 			Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(Activator.getDefault().getConfiguration().getProviderId());
 			if (!mappings.isEmpty())
@@ -973,9 +971,10 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 	@Override
 	public IStatus start()
 	{
+		this.status = super.start();
 		try
 		{
-			this.galserve = ch.eugster.colibri.provider.galileo.galserve.old.ClassFactory.creategdserve();
+			this.galserve = ClassFactory.creategdserve2g();
 		}
 		catch (Exception e)
 		{

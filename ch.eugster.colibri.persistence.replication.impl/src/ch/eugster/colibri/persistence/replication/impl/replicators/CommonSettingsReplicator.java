@@ -158,6 +158,12 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 			voucherProductGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class,
 					source.getDefaultVoucherProductGroup().getId());
 		}
+		ProductGroup eBooks = null;
+		if (source.getEBooks() != null)
+		{
+			eBooks = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class,
+					source.getEBooks().getId());
+		}
 		ProductGroup payedInvoice = null;
 		if (source.getPayedInvoice() != null)
 		{
@@ -177,6 +183,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 		target.setDefaultProductGroup(productGroup);
 		target.setDefaultVoucherPaymentType(voucherPaymentType);
 		target.setDefaultVoucherProductGroup(voucherProductGroup);
+		target.setEBooks(eBooks);
 		target.setExport(source.isExport());
 		target.setExportPath(source.getExportPath());
 		target.setForceSettlement(source.isForceSettlement());

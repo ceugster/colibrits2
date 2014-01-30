@@ -106,6 +106,16 @@
             id="ch.eugster.colibri.admin.product.setPayedInvoice"
             name="Bezahlte Rechnung">
       </command>
+      <command
+            categoryId="category.product"
+            defaultHandler="ch.eugster.colibri.admin.product.handlers.SetEBookHandler"
+            id="ch.eugster.colibri.admin.product.commands.setEBooks"
+            name="EBook setzen">
+         <state
+               class="org.eclipse.jface.commands.ToggleState"
+               id="ch.eugster.colibri.admin.product.state">
+         </state>
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -311,6 +321,30 @@
                label="Für bezahlte Rechnungen verwenden"
                style="toggle"
                tooltip="Für bezahlte Rechnungen verwenden">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="selection">
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false">
+                        <instanceof
+                              value="ch.eugster.colibri.persistence.model.ProductGroup">
+                        </instanceof>
+                     </iterate>
+                  </and>
+               </with>
+            </visibleWhen>
+         </command>
+         <command
+               commandId="ch.eugster.colibri.admin.product.commands.setEBooks"
+               id="STYLE"
+               label="Für EBooks verwenden"
+               style="toggle"
+               tooltip="Für EBooks verwenden">
             <visibleWhen
                   checkEnabled="false">
                <with

@@ -67,6 +67,10 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 	@JoinColumn(name = "cs_pg_payed_invoice_id", referencedColumnName = "pg_id")
 	private ProductGroup payedInvoice;
 
+	@OneToOne(optional = true)
+	@JoinColumn(name = "cs_pg_ebook_id", referencedColumnName = "pg_id")
+	private ProductGroup eBooks;
+
 	@Basic
 	@Column(name = "cs_provider")
 	private String provider;
@@ -617,6 +621,16 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 	public void setDefaultVoucherPaymentType(PaymentType defaultVoucherPaymentType) 
 	{
 		this.propertyChangeSupport.firePropertyChange("defaultVoucherPaymentType", this.defaultVoucherPaymentType, this.defaultVoucherPaymentType = defaultVoucherPaymentType);
+	}
+
+	public ProductGroup getEBooks() 
+	{
+		return eBooks;
+	}
+
+	public void setEBooks(ProductGroup eBooks) 
+	{
+		this.propertyChangeSupport.firePropertyChange("eBooks", this.eBooks, this.eBooks = eBooks);
 	}
 
 	public List<CommonSettingsProperty> getProperties()

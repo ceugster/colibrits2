@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.JRDataSource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -32,6 +33,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
@@ -54,18 +56,18 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 
 	private TabFolder tabFolder;
 
-	protected Salespoint[] selectedSalespoints;
-
-	protected Calendar[] selectedDateRange;
-	
-	protected ReportService.Destination selectedDestination;
-
-	private ReportService.Format selectedFormat;
-
 	private Button start;
 
 	private ISettlementCompositeChild selectedChild;
 
+	private Salespoint[] selectedSalespoints;
+	
+	private Calendar[] selectedDateRange;
+	
+	private ReportService.Destination selectedDestination;
+
+	private ReportService.Format selectedFormat;
+	
 	@Override
 	public void init(IViewSite site) throws PartInitException
 	{
@@ -98,6 +100,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		item.setText("Nach Datumsbereich");
 		SettlementDateRangeComposite dateRangeComposite = new SettlementDateRangeComposite(tabFolder, this, SWT.NONE);
 		item.setControl(dateRangeComposite);
+		tabFolder.setSelection(item);
 
 		item = new TabItem(tabFolder, SWT.NONE);
 		item.setText("Einzelner Abschluss");
@@ -180,27 +183,42 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 			{
 				if (selectedChild != null)
 				{
-					try
+					final JRDataSource dataSource = selectedChild.createDataSource();
+					if (dataSource == null)
 					{
-						final JRDataSource dataSource = selectedChild.createDataSource();
-						if (dataSource == null)
+						MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden (aus der Vorgängerversion übernommene Daten sind für diese Auswertung nicht abrufbar).");
+						return;
+					}
+					selectedSalespoints = getSelectedSalespoints();
+					selectedDateRange = getSelectedDateRange();
+					selectedDestination = getSelectedDestination();
+					selectedFormat = getSelectedFormat();
+					final Hashtable<String, Object> parameters = selectedChild.getParameters();
+					UIJob job = new UIJob("Auswertung wird aufbereitet...")
+					{
+						@Override
+						public IStatus runInUIThread(IProgressMonitor monitor)
 						{
-							MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden (aus der Vorgängerversion übernommene Daten sind für diese Auswertung nicht abrufbar).");
-							return;
+							try
+							{
+//								start.setEnabled(false);
+								monitor.beginTask("Auswertung wird aufbereitet. Bitte warten Sie...", IProgressMonitor.UNKNOWN);
+								final InputStream report = selectedChild.getReport();
+								printReport(new SubProgressMonitor(monitor, 1), report, dataSource, parameters);
+							}
+							catch (IOException e1)
+							{
+							}
+							finally
+							{
+								monitor.done();
+//								start.setEnabled(true);
+							}
+							return Status.OK_STATUS;
 						}
-						final Hashtable<String, Object> parameters = selectedChild.getParameters();
-						final InputStream report = selectedChild.getReport();
-						
-						start.setEnabled(false);
-						printReport(report, dataSource, parameters);
-					}
-					catch (IOException ex)
-					{
-					}
-					finally
-					{
-						start.setEnabled(true);
-					}
+					};
+//					job.setUser(true);
+					job.schedule();
 				}
 			}
 		});
@@ -208,6 +226,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(SalespointView.ID, this);
 		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DateView.ID, this);
 		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DestinationView.ID, this);
+		selectedChild.addSelectionChangedListener(SettlementView.this);
 
 		updateStartButton();
 	}
@@ -224,17 +243,62 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 	
 	public Salespoint[] getSelectedSalespoints()
 	{
-		return this.selectedSalespoints;
+		IViewReference[] references = this.getSite().getPage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			IViewPart part = reference.getView(true);
+			if (part instanceof SalespointView)
+			{
+				SalespointView view = (SalespointView) part;
+				return view.getSelectedSalespoints();
+			}
+		}
+		return null;
 	}
 	
 	public Calendar[] getSelectedDateRange()
 	{
-		return this.selectedDateRange;
+		IViewReference[] references = this.getSite().getPage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			IViewPart part = reference.getView(true);
+			if (part instanceof DateView)
+			{
+				DateView view = (DateView) part;
+				return view.getDates();
+			}
+		}
+		return null;
 	}
 	
 	public ReportService.Destination getSelectedDestination()
 	{
-		return this.selectedDestination;
+		IViewReference[] references = this.getSite().getPage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			IViewPart part = reference.getView(true);
+			if (part instanceof DestinationView)
+			{
+				DestinationView view = (DestinationView) part;
+				return view.getSelectedDestination();
+			}
+		}
+		return null;
+	}
+
+	public ReportService.Format getSelectedFormat()
+	{
+		IViewReference[] references = this.getSite().getPage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			IViewPart part = reference.getView(true);
+			if (part instanceof DestinationView)
+			{
+				DestinationView view = (DestinationView) part;
+				return view.getSelectedFormat();
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -246,25 +310,6 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 	@Override
 	public void selectionChanged(IWorkbenchPart part, ISelection selection)
 	{
-		if (part instanceof SalespointView)
-		{
-			SalespointView view = (SalespointView) part;
-			selectedSalespoints = view.getSelectedSalespoints();
-		}
-		else if (part instanceof DateView)
-		{
-			DateView view = (DateView) part;
-			selectedDateRange = view.getDates();
-		}
-		else if (part instanceof DestinationView)
-		{
-			DestinationView view = (DestinationView) part;
-			selectedDestination = view.getSelectedDestination();
-			if (selectedDestination.equals(ReportService.Destination.EXPORT))
-			{
-				selectedFormat = view.getSelectedFormat();
-			}
-		}
 		updateChildren();
 		updateStartButton();
 	}
@@ -281,21 +326,11 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 			}
 		}
 	}
-
-	public boolean validateSelection()
+	
+	private boolean validateSelection()
 	{
-		if (this.selectedDestination == null)
-		{
-			return false;
-		}
-		if (this.selectedDestination.equals(ReportService.Destination.EXPORT))
-		{
-			return this.selectedFormat != null;
-		}
-		else
-		{
-			return true;
-		}
+		return (getSelectedSalespoints() != null && getSelectedSalespoints().length > 0) && getSelectedDateRange() != null
+				&& getSelectedDateRange().length == 2;	
 	}
 
 	private void updateStartButton()
@@ -317,14 +352,14 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		this.updateStartButton();
 	}
 
-	protected IStatus printReport(final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)
+	protected IStatus printReport(IProgressMonitor monitor, final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)
 	{
 		if (this.selectedDestination == null)
 		{
 			return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Sie haben kein Ausgabeziel ausgewählt.");
 		}
 		File exportFile = null;
-		if (selectedDestination.equals(ReportService.Destination.EXPORT))
+		if (this.selectedDestination.equals(ReportService.Destination.EXPORT))
 		{
 			if (this.selectedFormat == null)
 			{
@@ -354,7 +389,8 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 			final ReportService service = tracker.getService();
 			if (service != null)
 			{
-				switch (selectedDestination)
+				monitor.beginTask("Vorschau", 1);
+				switch (this.selectedDestination)
 				{
 					case EXPORT:
 					{
@@ -371,17 +407,9 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 					}
 					case PREVIEW:
 					{
-						UIJob job = new UIJob("preview")
-						{
-							@Override
-							public IStatus runInUIThread(IProgressMonitor monitor) 
-							{
-								service.view(report, dataSource, parameters);
-								return Status.OK_STATUS;
-							}
-						};
-						job.setSystem(true);
-						job.schedule();
+						service.view(monitor, report, dataSource, parameters);
+						monitor.worked(1);
+						monitor.done();
 						break;
 					}
 					default:
@@ -390,6 +418,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 								"Das ausgewählte Ausgabeziel ist nicht verfügbar.");
 					}
 				}
+				monitor.beginTask("Vorschau", 1);
 			}
 		}
 		catch (Exception e)
@@ -399,6 +428,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		finally
 		{
 			tracker.close();
+			monitor.done();
 		}
 		return Status.OK_STATUS;
 	}

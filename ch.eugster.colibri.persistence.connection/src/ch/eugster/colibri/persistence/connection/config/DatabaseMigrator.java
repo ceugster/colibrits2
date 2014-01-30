@@ -591,22 +591,13 @@ public class DatabaseMigrator extends AbstractConfigurator
 		}
 		catch (final NumberFormatException e)
 		{
-			numberlength = 6;
 		}
-		String numberFormat = null;
-		if (numberlength > 0)
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < numberlength; i++)
 		{
-			StringBuilder builder = new StringBuilder();
-			for (int i = 0; i < numberlength; i++)
-			{
-				builder = builder.append("0");
-			}
-			numberFormat = builder.toString();
+			builder = builder.append("0");
 		}
-		else
-		{
-			numberFormat = "000000";
-		}
+		String numberFormat = builder.toString();
 		boolean forceSettlement = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-settlement")).booleanValue();
 		boolean forceStockCount = Boolean.valueOf(this.oldDocument.getRootElement().getChild("salespoint").getAttributeValue("force-stock-count")).booleanValue();
 
@@ -677,7 +668,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 					ProviderProperty prop = ProviderProperty.newInstance();
 					prop.setKey("galileo.connect");
 					prop.setProvider("ch.eugster.colibri.provider.galileo");
-					prop.setValue(Boolean.toString(setting.use), Boolean.toString(setting.use));
+					prop.setValue(setting.use ? "1" : "0");
 					this.getEntityManager().getTransaction().begin();
 					this.getEntityManager().merge(prop);
 					this.getEntityManager().getTransaction().commit();

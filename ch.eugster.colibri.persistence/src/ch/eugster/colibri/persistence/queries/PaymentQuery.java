@@ -55,7 +55,8 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		expression = expression.get("receipt").get("settlement").equal(settlement);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
-
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("internal").equal(false));
+		
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("paymentType", new ExpressionBuilder().get("paymentType").get("id"));
 

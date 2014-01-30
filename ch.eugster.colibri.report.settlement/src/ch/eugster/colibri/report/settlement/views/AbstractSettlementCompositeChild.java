@@ -4,10 +4,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +15,6 @@ import org.eclipse.swt.widgets.Composite;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
-import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.SettlementDetail;
 import ch.eugster.colibri.persistence.model.SettlementInternal;
 import ch.eugster.colibri.persistence.model.SettlementMoney;
@@ -31,7 +27,6 @@ import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
-import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.settlement.model.Section;
 import ch.eugster.colibri.report.settlement.model.SettlementEntry;
 
@@ -64,21 +59,6 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 		this.listeners.remove(listener);
 	}
 
-	protected Salespoint[] getSelectedSalespoints()
-	{
-		return this.parentView.getSelectedSalespoints();
-	}
-	
-	protected Calendar[] getSelectedDateRange()
-	{
-		return this.parentView.getSelectedDateRange();
-	}
-	
-	protected ReportService.Destination getSelectedDestination()
-	{
-		return this.parentView.getSelectedDestination();
-	}
-	
 	protected abstract void init();
 
 	protected Map<Long, SettlementEntry> createPositionSection(Map<Long, SettlementEntry> section,
@@ -285,7 +265,7 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 			else if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.WITHDRAWAL))
 			{
 				double amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
-				amount += Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
+				amount -= Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
 						Position.AmountType.NETTO));
 				entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
 			}

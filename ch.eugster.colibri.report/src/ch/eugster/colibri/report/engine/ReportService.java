@@ -5,7 +5,8 @@ import java.io.InputStream;
 import java.util.Map;
 
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JasperReport;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface ReportService
 {
@@ -21,10 +22,10 @@ public interface ReportService
 	void print(InputStream report, Comparable[] beanArray, Map<String, Object> parameters, boolean doNotShowPrintDialog)
 			throws IllegalArgumentException;
 
-	void view(final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)
+	void view(IProgressMonitor monitor, final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)
 			throws IllegalArgumentException;
 
-	void view(final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters)
+	void view(IProgressMonitor monitor, final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters)
 			throws IllegalArgumentException;
 
 	public enum Destination

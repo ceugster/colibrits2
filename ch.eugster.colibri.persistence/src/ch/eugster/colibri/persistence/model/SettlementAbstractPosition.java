@@ -139,22 +139,26 @@ public abstract class SettlementAbstractPosition extends AbstractEntity implemen
 
 	public void setProductGroup(final ProductGroup productGroup)
 	{
-		this.productGroup = productGroup;
-		this.setProductGroupType(productGroup == null ? null : productGroup.getProductGroupType());
-		String code = null;
-		if (productGroup.getProductGroupMappings().isEmpty())
+		if (productGroup != null)
 		{
-			if (productGroup.getCode() != null && !productGroup.getCode().equals(productGroup.getName()))
+			this.productGroup = productGroup;
+			this.setProductGroupType(productGroup.getProductGroupType());
+			String code = null;
+			if (productGroup.getProductGroupMappings() == null || productGroup.getProductGroupMappings().isEmpty())
 			{
-				code = productGroup.getCode();
+				
+				if (productGroup.getCode() != null && !productGroup.getCode().equals(productGroup.getName()))
+				{
+					code = productGroup.getCode();
+				}
 			}
+			else
+			{
+				code = productGroup.getProductGroupMappings().iterator().next().getExternalProductGroup().getCode();
+			}
+			this.setCode(code == null ? null : code);
+			this.setName(productGroup == null ? null : productGroup.getName());
 		}
-		else
-		{
-			code = productGroup.getProductGroupMappings().iterator().next().getExternalProductGroup().getCode();
-		}
-		this.setCode(code == null ? null : code);
-		this.setName(productGroup == null ? null : productGroup.getName());
 	}
 
 	public void setSettlement(final Settlement settlement)

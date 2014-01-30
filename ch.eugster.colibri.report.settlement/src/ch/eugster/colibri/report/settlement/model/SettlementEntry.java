@@ -31,11 +31,19 @@ public class SettlementEntry extends HashMap<String, Object> implements Comparab
 					if (getCode().isEmpty() || other.getCode().isEmpty())
 					{
 						comparison = -getCode().compareTo(other.getCode());
+						if (comparison == 0)
+						{
+							comparison = this.getText().compareTo(other.getText());
+						}
 					}
 					else
 					{
-					comparison = getCode().compareTo(other.getCode());
+						comparison = getCode().compareTo(other.getCode());
 					}
+				}
+				else
+				{
+					
 				}
 			}
 		}

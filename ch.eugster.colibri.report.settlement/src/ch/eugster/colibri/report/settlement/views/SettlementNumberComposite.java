@@ -280,13 +280,13 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 	{
 		if (settlementViewer.getContentProvider() != null)
 		{
-			if (getSelectedSalespoints() == null || getSelectedSalespoints().length == 0)
+			if (parentView.getSelectedSalespoints() == null || parentView.getSelectedSalespoints().length == 0)
 			{
 				settlementViewer.setInput(new Object[0]);
 				settlementViewer.setSelection(new StructuredSelection());
 				return;
 			}
-			if (getSelectedDateRange() == null || getSelectedDateRange().length != 2)
+			if (parentView.getSelectedDateRange() == null || parentView.getSelectedDateRange().length != 2)
 			{
 				settlementViewer.setInput(new Object[0]);
 				settlementViewer.setSelection(new StructuredSelection());
@@ -304,8 +304,8 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 			else
 			{
 				SettlementQuery query = (SettlementQuery) service.getServerService().getQuery(Settlement.class);
-				Collection<Settlement> s = query.selectBySalespointsAndSettled(getSelectedSalespoints(),
-						getSelectedDateRange()[0].getTimeInMillis(), getSelectedDateRange()[1].getTimeInMillis());
+				Collection<Settlement> s = query.selectBySalespointsAndSettled(parentView.getSelectedSalespoints(),
+						parentView.getSelectedDateRange()[0].getTimeInMillis(), parentView.getSelectedDateRange()[1].getTimeInMillis());
 				Settlement[] settlements = s.toArray(new Settlement[0]);
 				settlementViewer.setInput(settlements);
 				if (settlements.length > 0)

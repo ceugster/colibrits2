@@ -16,9 +16,7 @@ import net.sf.jasperreports.engine.data.JRBeanArrayDataSource;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.progress.UIJob;
+import org.eclipse.core.runtime.jobs.Job;
 
 import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.internal.viewer.ViewerApp;
@@ -45,29 +43,36 @@ public class ReportServiceComponent implements ReportService
 	}
 
 	@Override
-	public void view(final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters)
+	public void view(IProgressMonitor monitor, final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters)
 			throws IllegalArgumentException
 	{
 		Arrays.sort(beanArray);
 		JRDataSource dataSource = new JRBeanArrayDataSource(beanArray);
-		view(report, dataSource, parameters);
+		view(monitor, report, dataSource, parameters);
 	}
 
 	@Override
-	public void view(final InputStream report, final JRDataSource dataSource,
-			final Map<String, Object> parameters) throws IllegalArgumentException {
+	public void view(IProgressMonitor monitor, final InputStream report, final JRDataSource dataSource,
+			final Map<String, Object> parameters) throws IllegalArgumentException 
+	{
 		try
 		{
+			monitor.beginTask("", 1);
 			JasperReport jasperReport = JasperCompileManager.compileReport(report);
 			final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
 			ViewerApp app = new ViewerApp();
 			app.getReportViewer().setDocument(jasperPrint);
 			app.open();
+			monitor.worked(1);
 		}
 		catch (Exception e)
 		{
 			throw new IllegalArgumentException(e);
+		}
+		finally
+		{
+			monitor.done();
 		}
 	}
 

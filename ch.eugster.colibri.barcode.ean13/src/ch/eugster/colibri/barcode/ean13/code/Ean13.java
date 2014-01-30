@@ -24,7 +24,7 @@ public class Ean13 extends AbstractBarcode
 
 	public boolean isEbook()
 	{
-		return ebookPrefix != null && ebookPrefix.equals(PREFIX_EBOOK);
+		return ebookPrefix != null && ebookPrefix.toUpperCase().equals(PREFIX_EBOOK);
 	}
 	
 	private String ebookPrefix = null;
@@ -179,14 +179,14 @@ public class Ean13 extends AbstractBarcode
 
 		String prefix = null;
 		String articleCode = null;
-		if (code.startsWith(Ean13.PREFIX_EBOOK))
+		if (code.toUpperCase().startsWith(Ean13.PREFIX_EBOOK))
 		{
 			if ((code.length() < Ean13.EAN13_EBOOK_LENGTH - 1) || code.length() > Ean13.EAN13_EBOOK_LENGTH)
 			{
 				return null;
 			}
-			prefix = code.substring(0, 1);
-			articleCode = code.replaceFirst(Ean13.PREFIX_EBOOK, "");
+			prefix = code.substring(0, 1).toUpperCase();
+			articleCode = code.toUpperCase().replaceFirst(Ean13.PREFIX_EBOOK, "");
 			if (articleCode.length() == Ean13.EAN13_EBOOK_LENGTH - 1)
 			{
 				articleCode = articleCode + Integer.valueOf(Ean13.computeChecksum(articleCode));

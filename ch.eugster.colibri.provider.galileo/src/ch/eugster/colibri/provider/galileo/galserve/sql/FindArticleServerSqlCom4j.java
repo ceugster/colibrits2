@@ -39,17 +39,15 @@ import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.galserve.AbstractFindArticleServer;
 import ch.eugster.colibri.provider.galileo.galserve.IFindArticleServer;
-import ch.eugster.colibri.provider.galileo.galserve.old.ClassFactory;
-import ch.eugster.colibri.provider.galileo.galserve.old.Igdserve;
 
 public class FindArticleServerSqlCom4j extends AbstractFindArticleServer implements IFindArticleServer
 {
-	private Igdserve galserve;
+	private Igdserve2g galserve;
 	
 	public FindArticleServerSqlCom4j(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
-		galserve = ClassFactory.creategdserve();
+		galserve = ClassFactory.creategdserve2g();
 	}
 	
 	@Override
@@ -363,7 +361,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 	{
 		try
 		{
-			this.galserve = ch.eugster.colibri.provider.galileo.galserve.old.ClassFactory.creategdserve();
+			this.galserve = ClassFactory.creategdserve2g();
 		}
 		catch (Exception e)
 		{
