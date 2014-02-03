@@ -89,35 +89,57 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 		{
 			for (final CommonSettings source : sources)
 			{
+				CommonSettings target = (CommonSettings) this.persistenceService.getCacheService().find(
+						CommonSettings.class, source.getId());
+				
+				ProductGroup productGroup = null;
 				if (source.getDefaultProductGroup() != null)
 				{
-					final ProductGroup productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getDefaultProductGroup().getId());
-					final CommonSettings target = (CommonSettings) this.persistenceService.getCacheService().find(
-							CommonSettings.class, source.getId());
-					if ((target.getDefaultProductGroup() == null)
-							|| (target.getDefaultProductGroup().getId() != productGroup.getId()))
-					{
-						target.setDefaultProductGroup(productGroup);
-						merge(target);
-					}
+					productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getDefaultProductGroup().getId());
 				}
-				if (monitor != null)
+				else
 				{
-					i++;
-					monitor.worked(i);
+					productGroup = null;
 				}
+				target.setDefaultProductGroup(productGroup);
 				if (source.getPayedInvoice() != null)
 				{
-					final ProductGroup productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getPayedInvoice().getId());
-					final CommonSettings target = (CommonSettings) this.persistenceService.getCacheService().find(
-							CommonSettings.class, source.getId());
-					if ((target.getPayedInvoice() == null)
-							|| (target.getPayedInvoice().getId() != productGroup.getId()))
-					{
-						target.setPayedInvoice(productGroup);
-						merge(target);
-					}
+					productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getPayedInvoice().getId());
 				}
+				else
+				{
+					productGroup = null;
+				}
+				target.setPayedInvoice(productGroup);
+				if (source.getDefaultVoucherProductGroup() != null)
+				{
+					productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getDefaultVoucherProductGroup().getId());
+				}
+				else
+				{
+					productGroup = null;
+				}
+				target.setDefaultVoucherProductGroup(productGroup);
+				if (source.getEBooks() != null)
+				{
+					productGroup = (ProductGroup) this.persistenceService.getCacheService().find(ProductGroup.class, source.getEBooks().getId());
+					target.setEBooks(productGroup);
+				}
+				else
+				{
+					productGroup = null;
+				}
+				target.setDefaultVoucherProductGroup(productGroup);
+				PaymentType paymentType = null;
+				if (source.getDefaultVoucherPaymentType() != null)
+				{
+					paymentType = (PaymentType) this.persistenceService.getCacheService().find(PaymentType.class, source.getDefaultVoucherPaymentType().getId());
+				}
+				else
+				{
+					paymentType = null;
+				}
+				target.setDefaultVoucherPaymentType(paymentType);
 				if (monitor != null)
 				{
 					i++;
