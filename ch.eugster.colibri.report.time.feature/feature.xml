@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ch.eugster.colibri.report.time.feature"
+      label="Tagesumsatzstatistik Feature"
+      version="1.0.0.qualifier"
+      provider-name="Christian Eugster">
+
+   <description>
+      Tagesumsatzstatistik im Programm Auswertungen.
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="ch.eugster.colibri.report.daterange"/>
+      <import plugin="ch.eugster.colibri.report.destination"/>
+      <import plugin="ch.eugster.colibri.report"/>
+      <import plugin="ch.eugster.colibri.report.salespoint"/>
+      <import plugin="ch.eugster.colibri.ui"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="ch.eugster.colibri.report.time"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

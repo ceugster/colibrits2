@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="ch.eugster.colibri.report.time.ReportTimeRangePerspective"
+            id="ch.eugster.colibri.report.timerange.perspective"
+            name="Tagesumsatzstatistik">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="ch.eugster.colibri.report.timerange.category"
+            class="ch.eugster.colibri.report.time.views.TimeRangeView"
+            id="ch.eugster.colibri.report.timerange.view"
+            name="Tagesumsatzstatistik"
+            restorable="true">
+      </view>
+      <category
+            id="ch.eugster.colibri.report.timerange.category"
+            name="Berichte">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu?ch.eugster.colibri.report.menu.views?after=additions">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               label="Tagesumsatzstatistik"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.report.timerange.view">
+            </parameter>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:ch.eugster.colibri.report.perspective.toolbar?after=additions">
+         <command
+               commandId="org.eclipse.ui.perspectives.showPerspective"
+               label="Tagesumsatzstatistik"
+               mode="FORCE_TEXT"
+               style="radio"
+               tooltip="Zur Perspektive Tagesumsatzstatistik wechseln">
+            <parameter
+                  name="org.eclipse.ui.perspectives.showPerspective.perspectiveId"
+                  value="ch.eugster.colibri.report.timerange.perspective">
+            </parameter>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>
