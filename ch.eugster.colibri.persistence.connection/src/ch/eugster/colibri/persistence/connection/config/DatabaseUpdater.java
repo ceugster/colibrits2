@@ -873,6 +873,69 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 										: structureVersion;
 							}
 
+							else if (structureVersion == 24)
+							{
+								this.log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_receipt_printer_settings";
+								String columnName = "rp_print_logo";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								columnName = "rp_logo";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "INTEGER", "0", false);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								columnName = "rp_print_logo_mode";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								tableName = "colibri_salespoint_receipt_printer_settings";
+								columnName = "srp_print_logo";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", null, true);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								columnName = "srp_logo";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "INTEGER", null, true);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								columnName = "srp_print_logo_mode";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", null, true);
+									this.log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+
 							this.log(LogService.LOG_INFO, "Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");
 							sql = "UPDATE colibri_version SET v_structure = " + structureVersion;

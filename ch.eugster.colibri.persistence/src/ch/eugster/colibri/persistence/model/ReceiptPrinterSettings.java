@@ -10,6 +10,8 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -18,6 +20,8 @@ import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+
+import org.eclipse.persistence.annotations.Convert;
 
 @Entity
 @Table(name = "colibri_receipt_printer_settings")
@@ -58,6 +62,20 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 	@Column(name = "rp_component_name")
 	private String componentName;
 
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "rp_print_logo")
+	private boolean printLogo;
+	
+	@Basic
+	@Column(name = "rp_logo")
+	private int logo;
+	
+	@Basic
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "rp_print_logo_mode")
+	private PrintMode printLogoMode;
+	
 	@OneToMany
 	@MapKey(name = "printoutType")
 	private Map<String, Printout> printouts = new HashMap<String, Printout>();
@@ -173,6 +191,36 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 	public void setPort(final String port)
 	{
 		this.propertyChangeSupport.firePropertyChange("port", port, this.port = port);
+	}
+
+	public boolean isPrintLogo() 
+	{
+		return printLogo;
+	}
+
+	public void setPrintLogo(boolean printLogo) 
+	{
+		this.propertyChangeSupport.firePropertyChange("printLogo", printLogo, this.printLogo = printLogo);
+	}
+
+	public int getLogo() 
+	{
+		return logo;
+	}
+
+	public void setLogo(int logo) 
+	{
+		this.propertyChangeSupport.firePropertyChange("logo", logo, this.logo = logo);
+	}
+
+	public PrintMode getPrintLogoMode() 
+	{
+		return printLogoMode;
+	}
+
+	public void setPrintLogoMode(PrintMode printLogoMode) 
+	{
+		this.propertyChangeSupport.firePropertyChange("printLogoMode", printLogoMode, this.printLogoMode = printLogoMode);
 	}
 
 	public static ReceiptPrinterSettings newInstance()

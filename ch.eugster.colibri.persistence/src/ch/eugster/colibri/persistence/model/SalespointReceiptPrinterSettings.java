@@ -5,6 +5,8 @@ import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +15,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+
+import org.eclipse.persistence.annotations.Convert;
 
 @Entity
 @Table(name = "colibri_salespoint_receipt_printer_settings")
@@ -52,7 +56,21 @@ public class SalespointReceiptPrinterSettings extends AbstractEntity implements 
 	@Basic
 	@Column(name = "srp_cols")
 	private Integer cols;
-
+	
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "srp_print_logo")
+	private Boolean printLogo;
+	
+	@Basic
+	@Column(name = "srp_logo")
+	private Integer logo;
+	
+	@Basic
+	@Enumerated(EnumType.ORDINAL)
+	@Column(name = "srp_print_logo_mode")
+	private PrintMode printLogoMode;
+	
 	protected SalespointReceiptPrinterSettings()
 	{
 		super();
@@ -167,6 +185,58 @@ public class SalespointReceiptPrinterSettings extends AbstractEntity implements 
 	public void setSalespoint(final Salespoint salespoint)
 	{
 		this.propertyChangeSupport.firePropertyChange("salespoint", this.salespoint, this.salespoint = salespoint);
+	}
+
+	public boolean isPrintLogo() 
+	{
+		if (this.printLogo == null)
+		{
+			return this.getReceiptPrinterSettings().isPrintLogo();
+		}
+		return this.printLogo.booleanValue();
+	}
+
+	public void setPrintLogo(boolean printLogo) 
+	{
+		Boolean _printLogo = Boolean.valueOf(printLogo);
+		if (printLogo = this.getReceiptPrinterSettings().isPrintLogo())
+		{
+			_printLogo = null;
+		}
+		this.propertyChangeSupport.firePropertyChange("printLogo", this.printLogo, this.printLogo = _printLogo);
+	}
+
+	public int getLogo() 
+	{
+		if (this.logo == null)
+		{
+			return this.getReceiptPrinterSettings().getLogo();
+		}
+		return this.logo.intValue();
+	}
+
+	public void setLogo(int logo) 
+	{
+		Integer _logo = Integer.valueOf(logo);
+		if (logo == this.getReceiptPrinterSettings().getLogo())
+		{
+			_logo = null;
+		}
+		this.propertyChangeSupport.firePropertyChange("logo", this.logo, this.logo = _logo);
+	}
+
+	public PrintMode getPrintLogoMode() 
+	{
+		return this.printLogoMode == null ? this.getReceiptPrinterSettings().getPrintLogoMode() : this.printLogoMode;
+	}
+
+	public void setPrintLogoMode(PrintMode printLogoMode) 
+	{
+		if (printLogoMode.equals(this.getReceiptPrinterSettings().getPrintLogoMode()))
+		{
+			printLogoMode = null;
+		}
+		this.propertyChangeSupport.firePropertyChange("printLogoMode", this.printLogoMode, this.printLogoMode = printLogoMode);
 	}
 
 	public static SalespointReceiptPrinterSettings newInstance()

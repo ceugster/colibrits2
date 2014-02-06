@@ -201,7 +201,7 @@ public class GalileoConfiguration implements ProviderConfiguration
 				/*
 				 * Für jeden Wert in validValues 1 labeltext, getrennt durch |
 				 */
-				return "Keine|Galileo VFP (galserve, wgserve, kundenserver)|Galileo2G (galserve2g, wgserve2g, kundenserver2g)";
+				return "Keine|Galileo VFP (galserve, wgserve, kundenserver)|Galileo SQL (galserve2g, wgserve2g, kundenserver2g)";
 			}
 			default:
 			{

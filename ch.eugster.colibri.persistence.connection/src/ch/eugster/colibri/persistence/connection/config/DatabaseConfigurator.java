@@ -297,6 +297,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			{
 				commonSettings = CommonSettings.newInstance();
 				commonSettings.setAllowTestSettlement(false);
+				commonSettings.setExport(false);
+				commonSettings.setExportPath(null);
 				commonSettings.setForceCashCheck(true);
 				commonSettings.setForceSettlement(true);
 				commonSettings.setHostnameResolver(HostnameResolver.HOSTNAME);
@@ -822,8 +824,8 @@ public class DatabaseConfigurator extends AbstractConfigurator
 					paymentType.setId(Long.valueOf(counter));
 					paymentType.setChange(true);
 					paymentType.setCurrency(currency);
-					paymentType.setCode("BAR " + currency.getCode());
-					paymentType.setName("Bargeld" + currency.getCode());
+					paymentType.setCode("Bargeld " + currency.getCode());
+					paymentType.setName("Bargeld " + currency.getCode());
 					paymentType.setOpenCashdrawer(true);
 					paymentType.setUndeletable(true);
 

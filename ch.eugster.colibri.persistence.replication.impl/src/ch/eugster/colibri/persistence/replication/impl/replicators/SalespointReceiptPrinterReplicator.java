@@ -97,7 +97,10 @@ public class SalespointReceiptPrinterReplicator extends AbstractEntityReplicator
 		target = super.replicate(source, target);
 		target.setCols(source.getCols());
 		target.setConverter(source.getConverter());
+		target.setLogo(source.getLogo());
 		target.setPort(source.getPort());
+		target.setPrintLogo(source.isPrintLogo());
+		target.setPrintLogoMode(source.getPrintLogoMode());
 		target.setLinesBeforeCut(source.getLinesBeforeCut());
 		return target;
 	}

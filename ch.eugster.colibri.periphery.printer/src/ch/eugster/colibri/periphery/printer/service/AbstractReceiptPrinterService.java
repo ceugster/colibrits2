@@ -13,6 +13,7 @@ import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.printer.Activator;
+import ch.eugster.colibri.persistence.model.PrintMode;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.ReceiptPrinterSettingsQuery;
@@ -43,6 +44,33 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 			return receiptPrinterSettings.getPort();
 		}
 		return salespoint.getReceiptPrinterSettings().getPort();
+	}
+
+	protected boolean isPrintLogo()
+	{
+		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		{
+			return receiptPrinterSettings.isPrintLogo();
+		}
+		return salespoint.getReceiptPrinterSettings().isPrintLogo();
+	}
+
+	protected int getLogo()
+	{
+		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		{
+			return receiptPrinterSettings.getLogo();
+		}
+		return salespoint.getReceiptPrinterSettings().getLogo();
+	}
+
+	protected PrintMode getPrintLogoMode()
+	{
+		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		{
+			return receiptPrinterSettings.getPrintLogoMode();
+		}
+		return salespoint.getReceiptPrinterSettings().getPrintLogoMode();
 	}
 
 	protected int getLinesBeforeCut()

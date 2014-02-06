@@ -1339,6 +1339,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Money.ja
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Payment.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/PaymentType.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Position.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/PrintMode.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Printout.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/PrintoutArea.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Product.java -text

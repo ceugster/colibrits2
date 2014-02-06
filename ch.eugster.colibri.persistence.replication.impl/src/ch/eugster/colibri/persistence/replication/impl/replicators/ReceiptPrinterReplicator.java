@@ -80,8 +80,11 @@ public class ReceiptPrinterReplicator extends AbstractEntityReplicator<ReceiptPr
 		target.setCols(source.getCols());
 		target.setComponentName(source.getComponentName());
 		target.setConverter(source.getConverter());
+		target.setLogo(source.getLogo());
 		target.setName(source.getName());
 		target.setPort(source.getPort());
+		target.setPrintLogo(source.isPrintLogo());
+		target.setPrintLogoMode(source.getPrintLogoMode());
 		target.setLinesBeforeCut(source.getLinesBeforeCut());
 		return target;
 	}

@@ -129,7 +129,7 @@ public class CommonSettingsReplicator extends AbstractEntityReplicator<CommonSet
 				{
 					productGroup = null;
 				}
-				target.setDefaultVoucherProductGroup(productGroup);
+				target.setEBooks(productGroup);
 				PaymentType paymentType = null;
 				if (source.getDefaultVoucherPaymentType() != null)
 				{

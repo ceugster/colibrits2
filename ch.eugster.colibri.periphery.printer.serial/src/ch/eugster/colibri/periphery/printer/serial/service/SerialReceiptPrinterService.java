@@ -69,6 +69,10 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		}
 		if (printer != null)
 		{
+			if (this.isPrintLogo())
+			{
+				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
+			}
 			final String printable = this.getConverter().convert(text);
 			System.out.println(printable);
 			printer.print(printable + "\n");
@@ -77,6 +81,15 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		}
 	}
 
+	private void printNVBitImage(int n, int m)
+	{
+		this.printer.write(AsciiConstants.FS);
+		this.printer.write(AsciiConstants.p);
+		this.printer.write(n);
+		this.printer.write(m);
+		this.printer.flush();
+	}
+	
 	@Override
 	public void print(String text, Salespoint salespoint) 
 	{
@@ -87,6 +100,10 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		}
 		if (printer != null)
 		{
+			if (this.isPrintLogo())
+			{
+				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
+			}
 			Converter converter = new Converter(settings == null ? this.getReceiptPrinterSettings().getConverter() : settings.getConverter());
 			final String printable = converter.convert(text);
 			System.out.println(printable);
@@ -105,6 +122,10 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		}
 		if (printer != null)
 		{
+			if (this.isPrintLogo())
+			{
+				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
+			}
 			for (String line : text)
 			{
 				final String printable = this.getConverter().convert(line);

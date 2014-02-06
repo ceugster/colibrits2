@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -30,6 +31,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -651,48 +654,93 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	{
 		start.setEnabled(false);
 		final Result result = new Result();
-		UIJob job = new UIJob("Daten werden importiert...") 
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(this.getSite().getShell());
+		try 
 		{
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) 
+			dialog.run(true, true, new IRunnableWithProgress() 
 			{
-				try
+				@Override
+				public void run(IProgressMonitor monitor)
+						throws InvocationTargetException, InterruptedException 
 				{
-					monitor.beginTask("Importieren", files.length);
-					for (File file : files)
+					try
 					{
-						Document document = load(file);
-						if (document != null)
+						monitor.beginTask("Importiere...", files.length);
+						for (File file : files)
 						{
-							result.files += 1;
-							List<?> elements = document.getRootElement().getChildren("receipt");
-							if (!doImport(new SubProgressMonitor(monitor, elements.size()), elements, file, result))
-							{
-								monitor.setCanceled(true);
-							}
+							Document document = load(file);
+							@SuppressWarnings("unchecked")
+							List<Element> elements = document.getRootElement().getChildren("receipt");
+							doImport(new SubProgressMonitor(monitor, elements.size()), elements, file, result);
 						}
 					}
+					finally
+					{
+						monitor.done();
+					}
+					
 				}
-				finally
-				{
-					monitor.done();
-				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.addJobChangeListener(new JobChangeAdapter() 
+			});
+		} 
+		catch (InvocationTargetException e) 
 		{
-			@Override
-			public void done(IJobChangeEvent event) 
-			{
-				start.setEnabled(true);
-				StringBuilder message = new StringBuilder("Es wurden " + result.files + " Dateien eingelesen:\n");
-				message = message.append(result.read + " Datensätze wurden gelesen, " + result.write + " Datensätze wurden geschrieben, " + result.exist + " Datensätze waren bereits vorhanden, " + result.error + " Datensätze waren fehlerhaft.");
-				MessageDialog.openInformation(getSite().getShell(), "Zusammenfassung", message.toString());
-			}
-		});
-		job.setUser(true);
-		job.schedule();
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		catch (InterruptedException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{
+			StringBuilder message = new StringBuilder("Es wurden " + result.files + " Dateien eingelesen:\n");
+			message = message.append(result.read + " Datensätze wurden gelesen, " + result.write + " Datensätze wurden geschrieben, " + result.exist + " Datensätze waren bereits vorhanden, " + result.error + " Datensätze waren fehlerhaft.");
+			MessageDialog.openInformation(getSite().getShell(), "Zusammenfassung", message.toString());
+			start.setEnabled(true);
+		}
+//		UIJob job = new UIJob("Daten werden importiert...") 
+//		{
+//			@Override
+//			public IStatus runInUIThread(IProgressMonitor monitor) 
+//			{
+//				try
+//				{
+//					monitor.beginTask("Importieren", files.length);
+//					for (File file : files)
+//					{
+//						Document document = load(file);
+//						if (document != null)
+//						{
+//							result.files += 1;
+//							List<?> elements = document.getRootElement().getChildren("receipt");
+//							if (!doImport(new SubProgressMonitor(monitor, elements.size()), elements, file, result))
+//							{
+//								monitor.setCanceled(true);
+//							}
+//						}
+//					}
+//				}
+//				finally
+//				{
+//					monitor.done();
+//				}
+//				return Status.OK_STATUS;
+//			}
+//		};
+//		job.addJobChangeListener(new JobChangeAdapter() 
+//		{
+//			@Override
+//			public void done(IJobChangeEvent event) 
+//			{
+//				start.setEnabled(true);
+//				StringBuilder message = new StringBuilder("Es wurden " + result.files + " Dateien eingelesen:\n");
+//				message = message.append(result.read + " Datensätze wurden gelesen, " + result.write + " Datensätze wurden geschrieben, " + result.exist + " Datensätze waren bereits vorhanden, " + result.error + " Datensätze waren fehlerhaft.");
+//				MessageDialog.openInformation(getSite().getShell(), "Zusammenfassung", message.toString());
+//			}
+//		});
+//		job.setUser(true);
+//		job.schedule();
 	}
 
 	public Salespoint[] getSelectedSalespoints()
@@ -766,7 +814,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			printer.close();
 		}
 	}
-	private boolean doImport(SubProgressMonitor monitor, List<?> elements, File file, Result result)
+	private boolean doImport(IProgressMonitor monitor, List<Element> elements, File file, Result result)
 	{
 		if (!saveDirectory.exists())
 		{
@@ -782,7 +830,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			if (service != null)
 			{
 				SalespointQuery salespointQuery = (SalespointQuery) service.getServerService().getQuery(Salespoint.class);
-				monitor.subTask("Importiere " + file.getName());
+				monitor.subTask(file.getName() + " wird importiert...");
 				try
 				{
 					for (Object object : elements)

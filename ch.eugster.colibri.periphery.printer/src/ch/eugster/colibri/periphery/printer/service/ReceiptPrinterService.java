@@ -26,7 +26,7 @@ public interface ReceiptPrinterService
 	void print(String text);
 
 	void print(String[] text);
-
+	
 	void testPrint(String deviceName, String conversions, String text, int feed);
 
 	public enum Drawer
