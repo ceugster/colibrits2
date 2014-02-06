@@ -146,7 +146,7 @@ $F{section}.equals(new Integer(8)) ? "Total Stornierungen" : null]]></textFieldE
 )))))) :
 $F{section}.equals(new Integer(2)) ?
  ($F{group}.equals(new Integer(0)) ? "Zahlungsarten" :
- ($F{group}.equals(new Integer(1)) ? "Währungen" : ""
+ ($F{group}.equals(new Integer(1)) ? "Fremdwährungen" : ""
 )) :
 $F{section}.equals(new Integer(4)) ? "Mehrwertsteuern"
  :
@@ -249,7 +249,7 @@ null]]></textFieldExpression>
 )))))) :
 $F{section}.equals(new Integer(2)) ?
  ($F{group}.equals(new Integer(0)) ? "Total Zahlungsarten" :
- ($F{group}.equals(new Integer(1)) ? "Total Währungen" : ""
+ ($F{group}.equals(new Integer(1)) ? "Total Fremdwährungen" : ""
 )) :
 $F{section}.equals(new Integer(4)) ? "Total Mehrwertsteuer" :
 $F{section}.equals(new Integer(5)) ?

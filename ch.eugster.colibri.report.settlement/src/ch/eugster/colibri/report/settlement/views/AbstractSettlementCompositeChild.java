@@ -133,8 +133,16 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 				entry = new SettlementEntry(Section.PAYMENT);
 				section.put(id, entry);
 				entry.setGroup(payment.getPaymentType().getCurrency().getId().equals(referenceCurrency.getId()) ? 0 : 1);
-				entry.setCode(payment.getPaymentType().getCode());
-				entry.setText((id < 0L ? "Rückgeld " : "") + payment.getPaymentType().getName());
+//				entry.setCode(payment.getPaymentType().getCode());
+				entry.setCode(null);
+				if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+				{
+					entry.setText((id < 0L ? "Rückgutscheine" : payment.getPaymentType().getName()));
+				}
+				else
+				{
+					entry.setText((id < 0L ? "Rückgeld " : "") + payment.getPaymentType().getName());
+				}
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + payment.getQuantity();
 			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
@@ -284,7 +292,8 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 				entry = new SettlementEntry(Section.TAX);
 				section.put(tax.getCurrentTax().getId(), entry);
 				entry.setGroup(0);
-				entry.setCode(tax.getCurrentTax().getTax().format());
+//				entry.setCode(tax.getCurrentTax().getTax().format());
+				entry.setCode(null);
 				entry.setText(tax.getCurrentTax().getTax().format());
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + tax.getQuantity();
