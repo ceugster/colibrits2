@@ -53,6 +53,11 @@ public class SalespointSalesAction extends ConfigurableAction
 		this.handlerRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);
 	}
+	
+	private boolean isConnected(PersistenceService service)
+	{
+		return service != null && (service.getServerService().isLocal() || service.getServerService().isConnected());
+	}
 
 	@Override
 	public void actionPerformed(final ActionEvent event)
@@ -63,7 +68,7 @@ public class SalespointSalesAction extends ConfigurableAction
 		try
 		{
 			final PersistenceService service = (PersistenceService) serviceTracker.getService();
-			if (service != null && service.getServerService().isConnected())
+			if (isConnected(service))
 			{
 				final PositionQuery positionQuery = (PositionQuery) service.getServerService().getQuery(Position.class);
 				final double sales = positionQuery.sumCurrent(ProductGroupType.SALES_RELATED, this.userPanel.getSalespoint());
@@ -71,7 +76,7 @@ public class SalespointSalesAction extends ConfigurableAction
 				final Frame frame = Activator.getDefault().getFrame();
 				final Profile profile = this.userPanel.getSalespoint().getProfile();
 				MessageDialog dialog = null;
-				if (service.getServerService().isConnected())
+				if (isConnected(service))
 				{
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
 					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
@@ -106,7 +111,7 @@ public class SalespointSalesAction extends ConfigurableAction
 			try
 			{
 				final PersistenceService service = (PersistenceService) serviceTracker.getService();
-				enabled = service != null && service.getServerService().isConnected();
+				enabled = isConnected(service);
 			}
 			finally
 			{

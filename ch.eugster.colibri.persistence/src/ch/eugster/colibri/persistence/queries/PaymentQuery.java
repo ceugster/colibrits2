@@ -126,7 +126,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		/*
 		 * 
 		 */
-		reportQuery.addCount();
+		reportQuery.addCount("id", Long.class);
 		reportQuery.addSum("defaultCurrencyAmount", roundedDcAmount, Double.class);
 		reportQuery.addSum("foreignCurrencyAmount", roundedFcAmount, Double.class);
 

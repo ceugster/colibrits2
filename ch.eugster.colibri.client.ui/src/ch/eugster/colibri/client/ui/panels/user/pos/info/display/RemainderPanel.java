@@ -7,6 +7,7 @@
 package ch.eugster.colibri.client.ui.panels.user.pos.info.display;
 
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
@@ -15,7 +16,7 @@ public class RemainderPanel extends DisplayPanel
 {
 	public static final long serialVersionUID = 0l;
 
-	private static final String BACK = "Zurück";
+	private static final String BACK = "Rückgeld";
 
 	private static final String REMAINDER = "Offen";
 
@@ -29,46 +30,48 @@ public class RemainderPanel extends DisplayPanel
 	@Override
 	public void setData(final Receipt receipt)
 	{
-		positionDefaultCurrencyAmount = receipt.getPositionDefaultCurrencyAmount(AmountType.NETTO);
-		double backAmount = receipt.getPaymentDefaultCurrencyBackAmount();
-
-		if (backAmount == positionDefaultCurrencyAmount)
+		if (receipt.getPositionAmount(Receipt.QuotationType.REFERENCE_CURRENCY, Position.AmountType.NETTO) != 0D)
 		{
-			defaultCurrencyAmount = 0d;
-		}
-		else if (backAmount == 0d)
-		{
-			defaultCurrencyAmount = positionDefaultCurrencyAmount - receipt.getPaymentDefaultCurrencyAmount();
-		}
-		else
-		{
-			defaultCurrencyAmount = backAmount;
-		}
-
-		final double positionForeignCurrencyAmount = receipt.getPositionDefaultForeignCurrencyAmount(AmountType.NETTO);
-		backAmount = receipt.getPaymentDefaultForeignCurrencyBackAmount();
-
-		if (backAmount == positionForeignCurrencyAmount)
-		{
-			foreignCurrencyAmount = 0d;
-		}
-		else if (backAmount == 0d)
-		{
-			foreignCurrencyAmount = positionForeignCurrencyAmount - receipt.getPaymentDefaultForeignCurrencyAmount();
-		}
-		else
-		{
-			foreignCurrencyAmount = backAmount;
-		}
-
-		textLabel.setText(getText());
-
-		if (positionDefaultCurrencyAmount >= 0)
-		{
-			defaultCurrencyAmount = Math.abs(defaultCurrencyAmount);
-			foreignCurrencyAmount = Math.abs(foreignCurrencyAmount);
-		}
-
+			positionDefaultCurrencyAmount = receipt.getPositionDefaultCurrencyAmount(AmountType.NETTO);
+			double backAmount = receipt.getPaymentDefaultCurrencyBackAmount();
+	
+			if (backAmount == positionDefaultCurrencyAmount)
+			{
+				defaultCurrencyAmount = 0d;
+			}
+			else if (backAmount == 0d)
+			{
+				defaultCurrencyAmount = positionDefaultCurrencyAmount - receipt.getPaymentDefaultCurrencyAmount();
+			}
+			else
+			{
+				defaultCurrencyAmount = backAmount;
+			}
+	
+			final double positionForeignCurrencyAmount = receipt.getPositionDefaultForeignCurrencyAmount(AmountType.NETTO);
+			backAmount = receipt.getPaymentDefaultForeignCurrencyBackAmount();
+	
+			if (backAmount == positionForeignCurrencyAmount)
+			{
+				foreignCurrencyAmount = 0d;
+			}
+			else if (backAmount == 0d)
+			{
+				foreignCurrencyAmount = positionForeignCurrencyAmount - receipt.getPaymentDefaultForeignCurrencyAmount();
+			}
+			else
+			{
+				foreignCurrencyAmount = backAmount;
+			}
+	
+			textLabel.setText(getText());
+	
+			if (positionDefaultCurrencyAmount >= 0)
+			{
+				defaultCurrencyAmount = Math.abs(defaultCurrencyAmount);
+				foreignCurrencyAmount = Math.abs(foreignCurrencyAmount);
+			}
+		}	
 	}
 
 	@Override

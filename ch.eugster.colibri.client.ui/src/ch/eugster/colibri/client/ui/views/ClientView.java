@@ -529,8 +529,15 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private String checkProviderTaxMapped()
 	{
-		ProviderQuery ProviderQuery = providerQueryTracker.getService();
-		return ProviderQuery.checkTaxCodes(persistenceServiceTracker.getService()).getMessage();
+		ProviderQuery providerQuery = providerQueryTracker.getService();
+		if (providerQuery == null)
+		{
+			return "";
+		}
+		else
+		{
+			return providerQuery.checkTaxCodes(persistenceServiceTracker.getService()).getMessage();
+		}
 	}
 
 	private String checkEBooks(Salespoint salespoint)
@@ -576,15 +583,13 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		String count = "?";
 		Image image = null;
 
-		this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
-		this.transferInformation.setErrorText("");
-		// this.transferInformation = new
-		// StatusLineContributionItem("transfer.information", 36);
 		PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			if (!persistenceService.getServerService().isLocal())
 			{
+				this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
+				this.transferInformation.setErrorText("");
 				ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
 				long counted = receiptQuery.countRemainingToTransfer();
 				final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
@@ -593,12 +598,11 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
 				this.transferInformation.setText("Zu übertragen: " + count);
 				this.transferInformation.setImage(image);
+				this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.transferInformation);
+
 			}
 		}
-		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.transferInformation);
 
-		// this.providerInformation = new
-		// StatusLineContributionItem("provider.information", 32);
 		this.providerInformation = new StatusLineContributionItem("provider.information", true, 32);
 		this.providerInformation.setErrorText("");
 		persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker

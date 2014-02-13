@@ -21,6 +21,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.formattedtext.FormattedText;
@@ -74,6 +75,7 @@ import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.CommonSettings.HostnameResolver;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.PrintMode;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
@@ -132,6 +134,12 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 	private ComboViewer taxes;
 
 	private ComboViewer receiptPrinterViewer;
+	
+	private Button printLogo;
+	
+	private ComboViewer logo;
+	
+	private ComboViewer printLogoMode;
 
 	private Text receiptPrinterPort;
 
@@ -504,6 +512,14 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 				this.receiptPrinterConverter.setText(receiptPrinter.getConverter() == null ? "" : receiptPrinter.getConverter());
 				this.receiptPrinterLinesBeforeCut.setSelection(receiptPrinter.getLinesBeforeCut());
 				this.receiptPrinterPort.setText(receiptPrinter.getPort() == null ? "" : receiptPrinter.getPort());
+				this.printLogo.setSelection(receiptPrinter.isPrintLogo());
+				this.logo.setSelection(new StructuredSelection(new Integer[] { receiptPrinter.getLogo() }));
+				PrintMode mode = receiptPrinter.getPrintLogoMode();
+				if (mode == null)
+				{
+					mode = PrintMode.NORMAL;
+				}
+				this.printLogoMode.setSelection(new StructuredSelection(new PrintMode[] { mode }));
 			}
 		}
 
@@ -586,7 +602,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 			}
 		}
 		
-		StructuredSelection ssel = (StructuredSelection) this.profiles.getSelection();
+		IStructuredSelection ssel = (IStructuredSelection) this.profiles.getSelection();
 		final Profile newProfile = (Profile) ssel.getFirstElement();
 		final Profile oldProfile = salespoint.getProfile();
 		if (oldProfile != null)
@@ -665,6 +681,21 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 					currentPrinterSettings.setLinesBeforeCut(this.receiptPrinterLinesBeforeCut.getSelection());
 					currentPrinterSettings.setPort(this.receiptPrinterPort.getText().isEmpty() ? null : receiptPrinterPort.getText());
 					salespoint.setReceiptPrinterSettings(currentPrinterSettings);
+					currentPrinterSettings.setPrintLogo(this.printLogo.getSelection());
+					ssel = (IStructuredSelection) this.logo.getSelection();
+					int logo = 0;
+					if (!ssel.isEmpty())
+					{
+						logo = ((Integer) ssel.getFirstElement()).intValue();
+					}
+					currentPrinterSettings.setLogo(logo);
+					PrintMode mode = PrintMode.NORMAL;
+					ssel = (IStructuredSelection) this.printLogoMode.getSelection();
+					if (!ssel.isEmpty())
+					{
+						mode = (PrintMode) ssel.getFirstElement();
+					}
+					currentPrinterSettings.setPrintLogoMode(mode);
 				}
 			}
 		}
@@ -1751,7 +1782,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 				GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 				gridData.horizontalSpan = 2;
 				
-				final CCombo combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
+				CCombo combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
 				combo.setLayoutData(gridData);
 				combo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
 				this.formToolkit.adapt(combo);
@@ -1792,6 +1823,94 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 					}
 				});
 				this.receiptPrinterViewer.setInput(peripheries.toArray(new ReceiptPrinterSettings[0]));
+
+				label = this.formToolkit.createLabel(composite, "Logo drucken");
+				label.setLayoutData(new GridData());
+
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				
+				this.printLogo = this.formToolkit.createButton(composite, "", SWT.CHECK);
+				this.printLogo.setLayoutData(gridData);
+				this.printLogo.addSelectionListener(new SelectionListener() 
+				{
+					@Override
+					public void widgetSelected(SelectionEvent e) 
+					{
+						SalespointEditor.this.setDirty(true);
+					}
+
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e) 
+					{
+						widgetSelected(e);
+					}
+				});
+				
+				label = this.formToolkit.createLabel(composite, "Auswahl Logo");
+				label.setLayoutData(new GridData());
+
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				
+				combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
+				combo.setLayoutData(gridData);
+				combo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+				combo.addSelectionListener(new SelectionListener()
+				{
+					@Override
+					public void widgetDefaultSelected(final SelectionEvent e)
+					{
+						this.widgetSelected(e);
+					}
+
+					@Override
+					public void widgetSelected(final SelectionEvent e)
+					{
+						SalespointEditor.this.setDirty(true);
+					}
+				});
+				this.formToolkit.adapt(combo);
+
+				this.logo = new ComboViewer(combo);
+				this.logo.setContentProvider(new LogoContentProvider());
+				this.logo.setLabelProvider(new LogoLabelProvider());
+				final Integer[] logos = new Integer[5];
+				for (int i = 0; i < 5; i++)
+				{
+					logos[i] = Integer.valueOf(i + 1);
+				}
+				this.logo.setInput(logos);
+				
+				label = this.formToolkit.createLabel(composite, "Druckmodus Logo");
+				label.setLayoutData(new GridData());
+
+				gridData = new GridData(GridData.FILL_HORIZONTAL);
+				gridData.horizontalSpan = 2;
+				
+				combo = new CCombo(composite, SWT.READ_ONLY | SWT.DROP_DOWN | SWT.FLAT);
+				combo.setLayoutData(gridData);
+				combo.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TEXT_BORDER);
+				combo.addSelectionListener(new SelectionListener()
+				{
+					@Override
+					public void widgetDefaultSelected(final SelectionEvent e)
+					{
+						this.widgetSelected(e);
+					}
+
+					@Override
+					public void widgetSelected(final SelectionEvent e)
+					{
+						SalespointEditor.this.setDirty(true);
+					}
+				});
+				this.formToolkit.adapt(combo);
+
+				this.printLogoMode = new ComboViewer(combo);
+				this.printLogoMode.setContentProvider(new LogoModeContentProvider());
+				this.printLogoMode.setLabelProvider(new LogoModeLabelProvider());
+				this.printLogoMode.setInput(PrintMode.values());
 
 				label = this.formToolkit.createLabel(composite, "Anschluss");
 				label.setLayoutData(new GridData());
@@ -2460,4 +2579,5 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 			return property.toString();
 		}
 	}
+
 }

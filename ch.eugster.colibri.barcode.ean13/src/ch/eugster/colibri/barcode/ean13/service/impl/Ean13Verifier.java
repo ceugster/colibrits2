@@ -7,6 +7,7 @@ import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.ean13.Activator;
 import ch.eugster.colibri.barcode.ean13.code.Ean13;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
+import ch.eugster.colibri.persistence.model.Position;
 
 public class Ean13Verifier implements BarcodeVerifier
 {

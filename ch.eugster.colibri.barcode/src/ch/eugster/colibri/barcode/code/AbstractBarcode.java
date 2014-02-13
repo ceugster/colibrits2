@@ -70,7 +70,7 @@ public abstract class AbstractBarcode implements Barcode
 	@Override
 	public void updatePosition(final Position position)
 	{
-		position.setSearchValue(this.getCode());
+		position.setSearchValue((this.isEbook() ? PREFIX_EBOOK : "") + this.getCode());
 		position.setEbook(this.isEbook());
 	}
 }

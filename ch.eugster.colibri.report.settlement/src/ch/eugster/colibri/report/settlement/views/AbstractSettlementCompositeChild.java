@@ -256,7 +256,8 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 				entry = new SettlementEntry(Section.INTERNAL);
 				section.put(id, entry);
 				entry.setGroup(groupId);
-				entry.setCode(internal.getPosition().getProductGroup().getCode());
+//				entry.setCode(internal.getPosition().getProductGroup().getCode());
+				entry.setCode(null);
 				entry.setText(internal.getPosition().getProductGroup().getName());
 			}
 			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue())

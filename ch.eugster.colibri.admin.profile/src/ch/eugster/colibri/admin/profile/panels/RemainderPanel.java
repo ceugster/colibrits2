@@ -12,7 +12,7 @@ public class RemainderPanel extends DisplayPanel
 {
 	public static final long serialVersionUID = 0l;
 
-	private static final String BACK = "Zurück";
+	private static final String BACK = "Rückgeld";
 
 	private static final String REMAINDER = "Offen";
 
@@ -26,7 +26,7 @@ public class RemainderPanel extends DisplayPanel
 	@Override
 	public void setTestData()
 	{
-		textLabel.setText("Zurück");
+		textLabel.setText(BACK);
 		foreignCurrencyLabel.setText("EUR");
 		foreignCurrencyAmountLabel.setText("16.00");
 		defaultCurrencyLabel.setText("CHF");

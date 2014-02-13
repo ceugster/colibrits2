@@ -162,11 +162,11 @@ public class PaymentLabelProvider extends LabelProvider implements ILabelProvide
 			}
 			if (paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.CASH))
 			{
-				String currency = paymentType.getCurrency().format();
-				if (!sb.toString().contains(currency))
-				{
-					sb = sb.append(" " + currency);
-				}
+//				String currency = paymentType.getCurrency().format();
+//				if (!sb.toString().contains(currency))
+//				{
+//					sb = sb.append(" " + currency);
+//				}
 			}
 			CommonSettings settings = getCommonSettings();
 			

@@ -75,6 +75,12 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 
 	private Spinner linesBeforeCut;
 
+//	private Button printLogo;
+//	
+//	private ComboViewer logo;
+//	
+//	private ComboViewer printLogoMode;
+	
 	private IDialogSettings settings;
 
 	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;

@@ -17,8 +17,8 @@ public class ReportReceiptPerspective implements IPerspectiveFactory
 	{
 		layout.setEditorAreaVisible(true);
 		layout.addView(ReceiptListView.ID, IPageLayout.LEFT, .7F, "org.eclipse.ui.editorss");
-		layout.addView(PositionListView.ID, IPageLayout.BOTTOM, .4F, ReceiptListView.ID);
-		layout.addView(PaymentListView.ID, IPageLayout.BOTTOM, .4F, ReceiptListView.ID);
+		layout.addView(PositionListView.ID, IPageLayout.BOTTOM, .5F, ReceiptListView.ID);
+		layout.addView(PaymentListView.ID, IPageLayout.BOTTOM, .5F, PositionListView.ID);
 		layout.addView(ReceiptFilterView.ID, IPageLayout.RIGHT, .3F, "org.eclipse.ui.editorss");
 		layout.setEditorAreaVisible(false);
 	}

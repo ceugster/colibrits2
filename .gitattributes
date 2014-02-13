@@ -459,6 +459,10 @@ ch.eugster.colibri.admin.salespoint/plugin.properties -text
 ch.eugster.colibri.admin.salespoint/plugin.xml -text
 ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/Activator.java -text
 ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/AdminSalespointPerspective.java -text
+ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/LogoContentProvider.java -text
+ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/LogoLabelProvider.java -text
+ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/LogoModeContentProvider.java -text
+ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/LogoModeLabelProvider.java -text
 ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/OptionContentProvider.java -text
 ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/OptionLabelProvider.java -text
 ch.eugster.colibri.admin.salespoint/src/ch/eugster/colibri/admin/salespoint/editors/OptionSorter.java -text

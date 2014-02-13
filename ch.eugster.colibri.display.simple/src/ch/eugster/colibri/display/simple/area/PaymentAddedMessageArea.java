@@ -96,11 +96,11 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 				}
 				case O:
 				{
-					return "Offen/Zurück Betrag LW";
+					return "Offen/Rückgeld Betrag LW";
 				}
 				case P:
 				{
-					return "Offen/Zurück Betrag FW";
+					return "Offen/Rückgeld Betrag FW";
 				}
 				case R:
 				{
@@ -112,7 +112,7 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 				}
 				case X:
 				{
-					return "Text Offen/Zurück";
+					return "Text Offen/Rückgeld";
 				}
 				case Y:
 				{
@@ -218,7 +218,7 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 						double positions = payment.getReceipt().getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
 						double payments = payment.getReceipt().getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
 						double difference = positions - payments;
-						String text = difference > 0D ? "Offen" : "Zurück";
+						String text = difference > 0D ? "Offen" : "Rückgeld";
 						return layoutArea.replaceMarker(text, marker, true);
 					}
 					case Y:
@@ -255,7 +255,7 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 						String amountText = amountFormatter.format(Math.abs(difference));
 						amountText = currency.getCode() + " " + amountText;
 						int articleTextLen = marker.length() - amountText.length();
-						String text = difference > 0D ? pad("Offen", articleTextLen) : pad("Zurück", articleTextLen);
+						String text = difference > 0D ? pad("Offen", articleTextLen) : pad("Rückgeld", articleTextLen);
 						text = layoutArea.replaceMarker(text + amountText, marker, false);
 						return text;
 					}

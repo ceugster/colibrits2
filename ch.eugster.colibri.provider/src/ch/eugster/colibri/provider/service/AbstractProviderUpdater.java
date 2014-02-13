@@ -56,11 +56,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 					{
 						if (!position.isServerUpdated())
 						{
-							if (position.getOtherId() == null)
-							{
-								position.setServerUpdated(true);
-							}
-							else
+							if (position.getOtherId() != null)
 							{
 								try
 								{
@@ -82,6 +78,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 						{
 							try
 							{
+								position.setServerUpdated(true);
 								position = (Position) persistenceService.getCacheService().merge(position);
 							}
 							catch(Exception e)
@@ -132,11 +129,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 					{
 						if (!payment.isServerUpdated())
 						{
-							if (payment.getOtherId() == null)
-							{
-								payment.setServerUpdated(true);
-							}
-							else
+							if (payment.getOtherId() != null)
 							{
 								try
 								{
@@ -158,6 +151,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 						{
 							try
 							{
+								payment.setServerUpdated(true);
 								payment = (Payment) persistenceService.getCacheService().merge(payment);
 							}
 							catch(Exception e)

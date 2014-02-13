@@ -1579,7 +1579,7 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		layoutData.align = TableWrapData.FILL;
 		layoutData.grabHorizontal = false;
 
-		this.showReceivedBackAlways = this.formToolkit.createButton(composite, "'Gegeben' und 'Zurück' immer sichtbar", SWT.CHECK);
+		this.showReceivedBackAlways = this.formToolkit.createButton(composite, "'Gegeben' und 'Rückgeld' immer sichtbar", SWT.CHECK);
 		this.showReceivedBackAlways.setLayoutData(layoutData);
 		this.showReceivedBackAlways.addSelectionListener(new SelectionListener()
 		{
