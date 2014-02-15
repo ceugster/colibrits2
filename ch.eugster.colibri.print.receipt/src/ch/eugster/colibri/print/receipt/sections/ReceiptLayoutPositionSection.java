@@ -481,7 +481,14 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 					}
 					case U:
 					{
-						return getArticle(position, layoutSection, marker);
+						if (position.isEbook())
+						{
+							return getProductGroup(position, layoutSection, marker);
+						}
+						else
+						{
+							return getArticle(position, layoutSection, marker);
+						}
 					}
 					default:
 					{
@@ -518,6 +525,15 @@ public class ReceiptLayoutPositionSection extends AbstractLayoutSection
 			{
 				return section.replaceMarker(position.getProduct().getTitleAndAuthorShortFormNoCode(), marker, true);
 			}
+		}
+		
+		private String getProductGroup(Position position, ILayoutSection section, String marker)
+		{
+			String code = position.getProductGroup().getCode();
+			String name = position.getProductGroup().getName();
+			code = code.equals(name) ? "" : code;
+			String pg = (code.isEmpty() ? "" : code + " ") + name;
+			return section.replaceMarker(pg, marker, true);
 		}
 		
 		public String getExternalTaxCode(Position position)
