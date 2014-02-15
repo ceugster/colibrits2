@@ -216,6 +216,14 @@ litigation.
       <update label="ColibriTS Update Site" url="http://eugster-informatik.dyndns.info/ColibriTS/updates"/>
    </url>
 
+   <requires>
+      <import plugin="org.eclipse.osgi" version="3.7.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="ch.eugster.colibri.periphery.display"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="org.eclipse.equinox.ds" version="1.3.1" match="greaterOrEqual"/>
+   </requires>
+
    <plugin
          id="ch.eugster.colibri.display"
          download-size="0"
