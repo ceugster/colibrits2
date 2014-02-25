@@ -99,16 +99,12 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		text = text.replaceAll(HTMLButton.COLOR_REGEX, "");
 		text = text.replaceAll(HTMLButton.FONT_REGEX, "");
 		text = text.replaceAll(HTMLButton.HTML_PATTERN, "");
-		System.out.println(labelText + "         " + text);
 		return text;
 	}
 
 	public int extractColor(final String labelText)
 	{
 		int rgb = this.getForeground().getRGB();
-		String color = " color=\"#" + Integer.toHexString(rgb).substring(2) + "\"";
-		String text = labelText.replaceAll(COLOR_REGEX, color);
-		System.out.println(text);
 		return rgb;
 	}
 

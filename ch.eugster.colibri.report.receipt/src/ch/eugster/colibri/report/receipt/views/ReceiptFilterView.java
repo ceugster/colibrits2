@@ -1,13 +1,32 @@
 package ch.eugster.colibri.report.receipt.views;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.PropertyResourceBundle;
 
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.data.JRMapArrayDataSource;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -35,16 +54,21 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DateTime;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -56,6 +80,8 @@ import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.SettlementQuery;
 import ch.eugster.colibri.persistence.queries.UserQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.report.destination.views.DestinationView;
+import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.receipt.Activator;
 import ch.eugster.colibri.ui.filters.DeletedEntityViewerFilter;
 
@@ -83,6 +109,10 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 	
 	private FormattedText amount;
 
+	private Button printReceiptList;
+
+	private int receiptCount = 0;
+	
 	private final ListenerList listeners = new ListenerList();
 
 	@Override
@@ -347,6 +377,43 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 			}
 		});
 
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		
+		Composite filler = new Composite(composite, SWT.None);
+		filler.setLayoutData(new GridData(GridData.FILL_BOTH));
+		filler.setLayout(gridLayout);
+		
+		gridLayout = new GridLayout(2, false);
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		
+		filler = new Composite(composite, SWT.None);
+		filler.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		filler.setLayout(gridLayout);
+		
+		Composite filler2 = new Composite(filler, SWT.None);
+		filler2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		printReceiptList = new Button(filler, SWT.PUSH);
+		printReceiptList.setLayoutData(new GridData());
+		printReceiptList.setText("Belegliste drucken");
+		printReceiptList.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event)
+			{
+				widgetSelected(event);
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event)
+			{
+				printReceiptList();
+			}
+		});
+
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null)
 		{
@@ -369,6 +436,332 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		this.getSite().setSelectionProvider(this);
 
 		this.setFocus();
+	}
+	
+	private void printReceiptList()
+	{
+		final DestinationObject destination = getDestination();
+		if (destination == null)
+		{
+			MessageDialog.openInformation(null, "Keine Destination ausgewählt", "Sie haben keine Destination selektiert.");
+			return;
+		}
+		if (destination.destination.equals(ReportService.Destination.EXPORT) && destination.format == null)
+		{
+			MessageDialog.openInformation(null, "Kein Ausgabeformat ausgewählt", "Sie haben kein Ausgabeformat selektiert.");
+			return;
+		}
+
+		final JRDataSource dataSource = createDataSource();
+		if (dataSource == null)
+		{
+			MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden (aus der Vorgängerversion übernommene Daten sind für diese Auswertung nicht abrufbar).");
+			return;
+		}
+
+		UIJob job = new UIJob("Auswertung wird aufbereitet...")
+		{
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor)
+			{
+				try
+				{
+//					start.setEnabled(false);
+					monitor.beginTask("Auswertung wird aufbereitet. Bitte warten Sie...", IProgressMonitor.UNKNOWN);
+					final InputStream report = getReport();
+					printReport(new SubProgressMonitor(monitor, 1), report, dataSource, getParameters(), destination.destination, destination.format);
+				}
+				catch (IOException e1)
+				{
+				}
+				finally
+				{
+					monitor.done();
+//					start.setEnabled(true);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+	}
+
+	private DestinationObject getDestination()
+	{
+		DestinationObject destination = new DestinationObject();
+		IViewReference[] references = this.getSite().getWorkbenchWindow().getActivePage().getViewReferences();
+		for (IViewReference reference : references)
+		{
+			if (reference.getId().equals(DestinationView.ID))
+			{
+				DestinationView view = (DestinationView) reference.getView(true);
+				if (view == null)
+				{
+					MessageDialog.openInformation(null, "Keine Destination ausgewählt", "Sie haben keine Destination selektiert.");
+					return null;
+				}
+				else
+				{
+					if (view.getSelectedDestination() != null)
+					{
+						destination.destination = view.getSelectedDestination();
+					}
+					if (view.getSelectedFormat() != null)
+					{
+						destination.format = view.getSelectedFormat();
+					}
+				}
+			}
+		}
+		return destination;
+	}
+	
+	private JRDataSource createDataSource()
+	{
+		JRDataSource dataSource = null;
+		Long receiptNumber = null;
+		if (number.getText().length() > 0)
+		{
+			try
+			{
+				receiptNumber = Long.valueOf(number.getText());
+			}
+			catch (NumberFormatException e)
+			{
+			}
+		}
+		if (receiptNumber == null)
+		{
+			IStructuredSelection ssel = (IStructuredSelection) salespointViewer.getSelection();
+			if (ssel.isEmpty())
+			{
+				MessageDialog.openInformation(null, "Keine Kasse ausgewählt", "Sie haben keine Kasse selektiert.");
+				return null;
+			}
+			else
+			{
+				Salespoint salespoint = (Salespoint) ssel.getFirstElement();
+				Calendar[] dateRange = new Calendar[2];
+				dateRange[0] = getStartDate(date);
+				dateRange[1] = getEndDate(dateRange[0]);
+				dataSource = createDataSource(salespoint, dateRange);
+			}
+		}
+		else
+		{
+			dataSource = createDataSource(receiptNumber);
+		}
+		return dataSource;
+	}
+	
+	private Map<String, Object> getParameters()
+	{
+		NumberFormat nf = DecimalFormat.getIntegerInstance();
+		Hashtable<String, Object> parameters = new Hashtable<String, Object>();
+		final String header = "Header";
+		parameters.put("header", header);
+		parameters.put("printTime",
+				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+		parameters.put("salespoint", getSalespoint().getName());
+		parameters.put("date", SimpleDateFormat.getDateInstance().format(getStartDate(date).getTime()));
+		parameters.put("receiptCount", nf.format(receiptCount));
+		URL entry = Activator.getDefault().getBundle().getEntry("/reports/" + "ReceiptList" + ".properties");
+		try
+		{
+			InputStream stream = entry.openStream();
+			parameters.put(JRParameter.REPORT_RESOURCE_BUNDLE, new PropertyResourceBundle(stream));
+		}
+		catch (Exception e)
+		{
+		}
+		return parameters;
+	}
+	
+	private JRDataSource createDataSource(Long receiptNumber)
+	{
+		receiptCount = 0;
+		JRDataSource dataSource = null;
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+				PersistenceService.class, null);
+		tracker.open();
+		try
+		{
+			PersistenceService service = (PersistenceService) tracker.getService();
+			if (service != null)
+			{
+				Collection<Entry> entries = new ArrayList<Entry>();
+				ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
+				Collection<Receipt> receipts = query.selectByNumber(receiptNumber);
+				if (receipts.size() > 0)
+				{
+					for (Receipt receipt : receipts)
+					{
+						receiptCount++;
+						Collection<Position> positions = receipt.getPositions();
+						{
+							for (Position position : positions)
+							{
+								entries.add(new Entry(position));
+							}
+						}
+						Collection<Payment> payments = receipt.getPayments();
+						{
+							for (Payment payment : payments)
+							{
+								entries.add(new Entry(payment));
+							}
+						}
+					}
+				}
+				if (!entries.isEmpty())
+				{
+					dataSource = new JRMapArrayDataSource(entries.toArray(new Entry[0]));
+				}
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+		return dataSource;
+	}
+
+	private JRDataSource createDataSource(Salespoint salespoint, Calendar[] dateRange)
+	{
+		receiptCount = 0;
+		JRDataSource dataSource = null;
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+				PersistenceService.class, null);
+		tracker.open();
+		try
+		{
+			PersistenceService service = (PersistenceService) tracker.getService();
+			if (service != null)
+			{
+				IStructuredSelection ssel = (IStructuredSelection) this.settlementViewer.getSelection();
+				Settlement settlement = (Settlement) ssel.getFirstElement();
+				ssel = (IStructuredSelection) this.stateViewer.getSelection();
+				ReceiptStateSelector state = (ReceiptStateSelector) ssel.getFirstElement();
+				ssel = (IStructuredSelection) this.userViewer.getSelection();
+				User user = (User) ssel.getFirstElement();
+				Collection<Entry> entries = new ArrayList<Entry>();
+				ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
+				Collection<Receipt> receipts = query.selectBySalespointAndDate(salespoint, dateRange[0], dateRange[1]);
+				if (receipts.size() > 0)
+				{
+					for (Receipt receipt : receipts)
+					{
+						if (settlement.getId() == null || receipt.getSettlement().getId().equals(settlement.getId()))
+						{
+							if (state.matches(receipt.getState()))
+							{
+								if (user.getId() == null || (receipt.getUser() != null && receipt.getUser().getId().equals(user.getId())))
+								{
+									receiptCount++;
+									Collection<Position> positions = receipt.getPositions();
+									{
+										for (Position position : positions)
+										{
+											entries.add(new Entry(position));
+										}
+									}
+									Collection<Payment> payments = receipt.getPayments();
+									{
+										for (Payment payment : payments)
+										{
+											entries.add(new Entry(payment));
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				if (!entries.isEmpty())
+				{
+					dataSource = new JRMapArrayDataSource(entries.toArray(new Entry[0]));
+				}
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+		return dataSource;
+	}
+
+	private InputStream getReport() throws IOException
+	{
+		URL url = Activator.getDefault().getBundle().getEntry("reports/" + "ReceiptList" + ".jrxml");
+		return url.openStream();
+	}
+	
+	private void printReport(IProgressMonitor monitor, InputStream report, JRDataSource dataSource, Map<String, Object> parameters, ReportService.Destination destination, ReportService.Format format)
+	{
+		File exportFile = null;
+		if (destination.equals(ReportService.Destination.EXPORT))
+		{
+			FileDialog dialog = new FileDialog(this.getSite().getShell());
+			dialog.setFileName("*" + format.extension());
+			dialog.setFilterExtensions(new String[] { "*" + format.extension() });
+			dialog.setFilterIndex(0);
+			dialog.setFilterNames(new String[] { format.label() });
+			dialog.setText("Datei");
+			String path = dialog.open();
+			if (path == null)
+			{
+				return;
+			}
+			exportFile = new File(path);
+		}
+
+		ServiceTracker<ReportService, ReportService> tracker = new ServiceTracker<ReportService, ReportService>(Activator.getDefault().getBundle().getBundleContext(), ReportService.class, null);
+		try
+		{
+			tracker.open();
+			final ReportService service = tracker.getService();
+			if (service != null)
+			{
+				monitor.beginTask("Vorschau", 1);
+				switch (destination)
+				{
+					case EXPORT:
+					{
+						service.export(report, dataSource, parameters, format, exportFile);
+						break;
+					}
+					case PRINTER:
+					{
+						service.print(report, dataSource, parameters, false);
+						break;
+					}
+					case RECEIPT_PRINTER:
+					{
+					}
+					case PREVIEW:
+					{
+						service.view(monitor, report, dataSource, parameters);
+						monitor.worked(1);
+						monitor.done();
+						break;
+					}
+					default:
+					{
+						MessageDialog.openInformation(null, "Destination nicht verfügbar", "Das ausgewählte Ausgabeziel ist nicht verfügbar.");
+						return;
+					}
+				}
+				monitor.beginTask("Vorschau", 1);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			tracker.close();
+			monitor.done();
+		}
 	}
 
 	@Override
@@ -814,6 +1207,29 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 	{
 		ALL, REVERSED, SAVED;
 
+		public boolean matches(Receipt.State state)
+		{
+			switch (this)
+			{
+			case ALL:
+			{
+				return true;
+			}
+			case REVERSED:
+			{
+				return state.equals(Receipt.State.REVERSED);
+			}
+			case SAVED:
+			{
+				return state.equals(Receipt.State.SAVED);
+			}
+			default:
+			{
+				return false;
+			}
+			}
+		}
+		
 		public Receipt.State getState()
 		{
 			switch (this)
@@ -982,5 +1398,11 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				fireSelectionChanged(event);
 			}
 		}
+	}
+
+	private class DestinationObject
+	{
+		public ReportService.Destination destination = ReportService.Destination.PREVIEW;
+		public ReportService.Format format = ReportService.Format.PDF;
 	}
 }

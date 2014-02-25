@@ -260,12 +260,6 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 
 		SettlementEntry[] allEntries = entries.toArray(new SettlementEntry[0]);
 		Arrays.sort(allEntries);
-		for (SettlementEntry entry : allEntries)
-		{
-			System.out.println(entry.get("section") + ", " + entry.get("group") + ", " + entry.get("code") + ", "
-					+ entry.get("text") + ", " + entry.get("quantity") + ", " + entry.get("amount1") + ", "
-					+ entry.get("amount2"));
-		}
 
 		return allEntries.length == 0 ? null : new JRMapArrayDataSource(allEntries);
 	}

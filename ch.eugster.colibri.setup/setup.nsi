@@ -5,7 +5,7 @@ Name ColibriTS
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 3.7.2-1.0.0.201402071700
+!define VERSION 3.7.2-1.0.0.201402231900
 !define COMPANY "Christian Eugster"
 !define URL http://eugster-informatik.ch/
 !define PRODUCT_PATH C:\Programme\ColibriTSII\release-${VERSION}
@@ -48,7 +48,7 @@ Var StartMenuGroup
 !insertmacro MUI_LANGUAGE English
 
 # Installer attributes
-OutFile "C:\Dokumente und Einstellungen\ceugster\Projekte\Colibrits2\Setup\colibri_setup_win32.x86_${VERSION}.exe"
+OutFile "C:\Projekte\Colibrits2\Setup\colibri_setup_win32.x86_${VERSION}.exe"
 installDir C:\ColibriTSII
 CRCCheck on
 XPStyle on

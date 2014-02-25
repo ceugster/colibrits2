@@ -1745,6 +1745,7 @@ ch.eugster.colibri.report.receipt.feature/build.properties -text
 ch.eugster.colibri.report.receipt.feature/feature.xml -text
 ch.eugster.colibri.report.receipt/.classpath -text
 ch.eugster.colibri.report.receipt/.project -text
+ch.eugster.colibri.report.receipt/.settings/org.eclipse.core.resources.prefs -text
 ch.eugster.colibri.report.receipt/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.receipt/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.receipt/META-INF/MANIFEST.MF -text
@@ -1757,6 +1758,7 @@ ch.eugster.colibri.report.receipt/icons/receipt-reversed.png -text
 ch.eugster.colibri.report.receipt/icons/receipt.png -text
 ch.eugster.colibri.report.receipt/icons/reversed-receipt.png -text
 ch.eugster.colibri.report.receipt/plugin.xml -text
+ch.eugster.colibri.report.receipt/reports/ReceiptList.jrxml -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/Activator.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/ReportReceiptPerspective.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/handlers/PrintReceiptHandler.java -text
