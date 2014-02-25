@@ -301,7 +301,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 				this.controls.put(property.key(), control);
 			}
 		}
-
+		
 		if (input.canCheckConnection())
 		{
 			GridData gridData = new GridData();

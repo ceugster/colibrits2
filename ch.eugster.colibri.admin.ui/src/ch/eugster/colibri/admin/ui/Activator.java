@@ -124,11 +124,10 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(context, PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
 
-		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		final String[] topics = new String[] { Topic.SCHEDULED_TRANSFER.topic() };
 		properties.put(EventConstants.EVENT_TOPIC, topics);
-		this.eventHandlerServiceRegistration = context.registerService(EventHandler.class, eventHandler,
+		this.eventHandlerServiceRegistration = context.registerService(EventHandler.class, this,
 				properties);
 
 		final LogService log = (LogService) this.logServiceTracker.getService();

@@ -38,7 +38,9 @@ import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.actions.DiscountAction;
 import ch.eugster.colibri.client.ui.actions.PaymentTypeAction;
 import ch.eugster.colibri.client.ui.buttons.ConfigurableButton;
+import ch.eugster.colibri.client.ui.events.PositionChangeMediator;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
+import ch.eugster.colibri.client.ui.panels.user.PositionWrapper;
 import ch.eugster.colibri.client.ui.panels.user.ReceiptWrapper;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.events.Topic;
@@ -66,13 +68,18 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 
 	private final ReceiptChangeMediator receiptChangeMediator;
 
+	private final PositionChangeMediator positionChangeMediator;
+
 	private final String[] receiptProperties = new String[] { ReceiptWrapper.KEY_PROPERTY_POSITIONS };
+
+	private final String[] positionProperties = new String[] { PositionWrapper.KEY_PROPERTY_DISCOUNT};
 
 	public PositionListModel(final UserPanel userPanel)
 	{
 		this.userPanel = userPanel;
 		this.createTableColumns();
 		this.receiptChangeMediator = new ReceiptChangeMediator(userPanel, this, this.receiptProperties);
+		this.positionChangeMediator = new PositionChangeMediator(userPanel, this, this.positionProperties);
 		userPanel.getPositionWrapper().setKeyListener(new KeyAdapter()
 		{
 			@Override
@@ -325,7 +332,23 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		{
 			if (event.getNewValue() instanceof Receipt)
 			{
-				this.fireTableDataChanged();
+				if (this.selectionListModel.getMinSelectionIndex() == -1)
+				{
+					Receipt receipt = (Receipt) event.getNewValue();
+					this.fireTableDataChanged();
+					Position[] positions = receipt.getPositions().toArray(new Position[0]);
+					this.sendEvent(positions[positions.length - 1]);
+				}
+				else
+				{
+					this.testForTableUpdate();
+				}
+//				Receipt receipt = (Receipt) event.getNewValue();
+//				Position[] positions = receipt.getPositions().toArray(new Position[0]);
+//				if (positions.length > 0)
+//				{
+//					this.replacePosition(positions[positions.length - 1]);
+//				}
 			}
 		}
 		else if (event.getSource() instanceof Receipt)
@@ -333,6 +356,15 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 			if (event.getPropertyName().equals(ReceiptWrapper.KEY_PROPERTY_POSITIONS))
 			{
 
+			}
+		}
+		else if (event.getSource() instanceof Position)
+		{
+			if (event.getPropertyName().equals(PositionWrapper.KEY_PROPERTY_DISCOUNT))
+			{
+//				Position position = (Position) event.getSource();
+				this.testForTableUpdate();
+//				this.sendEvent(position);
 			}
 		}
 	}

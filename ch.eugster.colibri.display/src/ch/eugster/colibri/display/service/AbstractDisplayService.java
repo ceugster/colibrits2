@@ -196,11 +196,10 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 		t.add(Topic.POSITION_ADDED.topic());
 		t.add(Topic.PAYMENT_ADDED.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
-		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundleContext()
-				.registerService(EventHandler.class, eventHandler, properties);
+				.registerService(EventHandler.class, this, properties);
 		
 		if (this.logService != null)
 		{
@@ -220,7 +219,7 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 			CustomerDisplayService service = this.getCustomerDisplayService(name);
 			if (service != null)
 			{
-				service.clearText();
+				service.clearDisplay();
 			}
 		}
 

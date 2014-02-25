@@ -74,11 +74,10 @@ public class AdminApplicationActionBarAdvisor extends ActionBarAdvisor implement
 		t.add("ch/eugster/colibri/transfer");
 		final String[] topics = t.toArray(new String[t.size()]);
 
-		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
-				.registerService(EventHandler.class, eventHandler, properties);
+				.registerService(EventHandler.class, this, properties);
 	}
 
 	@Override

@@ -53,6 +53,7 @@ import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListPanel
 import ch.eugster.colibri.client.ui.panels.user.settlement.CoinCounterPanel;
 import ch.eugster.colibri.client.ui.views.ClientView;
 import ch.eugster.colibri.persistence.model.Configurable;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Profile.PanelType;
 import ch.eugster.colibri.persistence.model.Receipt;
@@ -187,6 +188,11 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 							messageType) == MessageDialog.BUTTON_YES)
 					{
 						this.getReceiptWrapper().setDiscount(discount);
+						Position[] positions = this.getReceiptWrapper().getReceipt().getPositions().toArray(new Position[0]);
+						if (positions.length > 0)
+						{
+							positions[positions.length - 1].setDiscount(discount);
+						}
 						return;
 					}
 				}

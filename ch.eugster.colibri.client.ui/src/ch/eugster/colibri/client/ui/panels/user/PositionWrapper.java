@@ -283,7 +283,6 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private void log(int level, String message)
 	{
-		System.out.println(message);
 		LogService service = logServiceTracker.getService();
 		if (service != null)
 		{

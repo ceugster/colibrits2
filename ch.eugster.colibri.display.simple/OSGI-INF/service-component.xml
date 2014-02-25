@@ -6,11 +6,6 @@
    <reference bind="addCustomerDisplayService" cardinality="1..n" interface="ch.eugster.colibri.periphery.display.service.CustomerDisplayService" name="customerDisplayService" policy="static" unbind="removeCustomerDisplayService"/>
    <service>
       <provide interface="ch.eugster.colibri.display.service.DisplayService"/>
-      <provide interface="org.osgi.service.event.EventHandler"/>
    </service>
    <property name="custom.label" type="String" value="Layout Kundendisplay"/>
-   <property name="event.topics" type="String">ch/eugster/colibri/add/position
-ch/eugster/colibri/add/payment
-ch/eugster/colibri/store/receipt
-   </property>
 </scr:component>
