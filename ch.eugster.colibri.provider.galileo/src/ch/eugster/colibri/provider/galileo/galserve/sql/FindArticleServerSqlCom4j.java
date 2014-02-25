@@ -359,6 +359,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 	@Override
 	public IStatus start()
 	{
+		super.start();
 		try
 		{
 			this.galserve = ClassFactory.creategdserve2g();
@@ -378,14 +379,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		{
 			this.galserve = null;
 		}
-		if (this.barcodeVerifierTracker != null)
-		{
-			this.barcodeVerifierTracker.close();
-		}
-		if (this.logServiceTracker != null)
-		{
-			this.logServiceTracker.close();
-		}
+		super.stop();
 		this.status = Status.CANCEL_STATUS;
 	}
 

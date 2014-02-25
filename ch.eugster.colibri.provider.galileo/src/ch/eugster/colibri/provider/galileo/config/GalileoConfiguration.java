@@ -139,6 +139,21 @@ public class GalileoConfiguration implements ProviderConfiguration
 			}
 		}
 
+//		public boolean enabled()
+//		{
+//			switch(this)
+//			{
+//			case DATABASE_PATH:
+//			{
+//				
+//			}
+//			default:
+//			{
+//				return true;
+//			}
+//			}
+//		}
+
 		@Override
 		public String key()
 		{

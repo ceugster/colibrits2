@@ -569,7 +569,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			}
 			return map;
 		}
-
+		
 		private ProviderProperty persistedProperty;
 		
 		public void setPersistedProperty(ProviderProperty persistedProperty)
@@ -615,7 +615,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			}
 			}
 		}
-		
+
 		public Class<?> valueType()
 		{
 			return String.class;

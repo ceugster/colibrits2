@@ -180,7 +180,6 @@ public class DateView extends ViewPart implements ISelectionProvider
 		this.start.setHours(0);
 		this.start.setMinutes(0);
 		this.start.setSeconds(0);
-		System.out.println(SimpleDateFormat.getInstance().format(calendar.getTime()));
 	}
 
 	private void setEndDate(Calendar calendar)

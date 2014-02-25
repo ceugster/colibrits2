@@ -991,14 +991,7 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		{
 			this.galserve = null;
 		}
-		if (this.barcodeVerifierTracker != null)
-		{
-			this.barcodeVerifierTracker.close();
-		}
-		if (this.logServiceTracker != null)
-		{
-			this.logServiceTracker.close();
-		}
+		super.stop();
 		this.status = Status.CANCEL_STATUS;
 	}
 

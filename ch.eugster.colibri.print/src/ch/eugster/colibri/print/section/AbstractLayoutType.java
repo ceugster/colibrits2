@@ -60,7 +60,6 @@ public abstract class AbstractLayoutType implements ILayoutType
 					line = AbstractLayoutType.padRight(line, this.receiptPrinterService.getReceiptPrinterSettings()
 							.getCols());
 				}
-				System.out.println(line);
 				result.append(line);
 			}
 		}

@@ -854,7 +854,6 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 									Long settled = getSettlementTimeInMillis(element.getAttributeValue("settlement"));
 									Calendar calendar = GregorianCalendar.getInstance();
 									calendar.setTimeInMillis(settled.longValue());
-									System.out.println(salespoint.getMapping() + " " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
 									if (settled != null)
 									{
 										settlement = getSettlement(service, salespoint, settled.longValue());
