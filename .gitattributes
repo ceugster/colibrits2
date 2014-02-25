@@ -1761,6 +1761,7 @@ ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/Activato
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/ReportReceiptPerspective.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/handlers/PrintReceiptHandler.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/AmountViewerFilter.java -text
+ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/Entry.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/PaymentContentProvider.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/PaymentListView.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/PaymentTypeContentProvider.java -text
