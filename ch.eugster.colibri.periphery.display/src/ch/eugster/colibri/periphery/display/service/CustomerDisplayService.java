@@ -8,7 +8,7 @@ public interface CustomerDisplayService
 {
 	public static final String EVENT_ADMIN_TOPIC_ERROR = Topic.DISPLAY_ERROR.topic();
 
-	void clearText();
+	void clearDisplay();
 
 	void displayText(int timerDelay, String text);
 
@@ -20,7 +20,7 @@ public interface CustomerDisplayService
 
 	CustomerDisplaySettings createCustomerDisplaySettings();
 	
-	SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings();
+//	SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings();
 	
 	String convertToString(Object object);
 }

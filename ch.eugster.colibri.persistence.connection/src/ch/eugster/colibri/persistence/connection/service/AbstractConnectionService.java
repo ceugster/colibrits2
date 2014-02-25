@@ -1,9 +1,7 @@
 package ch.eugster.colibri.persistence.connection.service;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Dictionary;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
@@ -384,9 +382,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		try
 		{
 			Activator.getDefault().log(LogService.LOG_INFO, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
-			System.out.println("Start creating entityManager: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			this.entityManager = getEntityManagerFactory().createEntityManager(getEntityManagerFactory().getProperties());
-			System.out.println("End creating entityManager: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			Activator.getDefault().log(LogService.LOG_INFO, "EntityManager kreiert.");
 			this.entityManager.setFlushMode(FlushModeType.COMMIT);
 			CommonSettingsQuery query = (CommonSettingsQuery) this.getQuery(CommonSettings.class);
@@ -394,9 +390,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		}
 		catch (Exception e)
 		{
-			System.out.println("Creating entityManager failed: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			Activator.getDefault().log(LogService.LOG_INFO, "EntityManager konnte nicht kreiert werden.");
-//			IProduct product = Platform.getProduct();
 			String[] args = Platform.getCommandLineArgs();
 			String app = "ch.eugster.colibri.admin.application";
 			for (int i = 0; i < args.length; i++)

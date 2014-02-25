@@ -82,14 +82,14 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		return salespoint.getReceiptPrinterSettings().getLinesBeforeCut();
 	}
 	
-	@Override
-	public void cutPaper()
+//	@Override
+	protected void cutPaper()
 	{
 		this.doCutPaper(this.getLinesBeforeCut());
 	}
 
-	@Override
-	public void cutPaper(int feed)
+//	@Override
+	protected void cutPaper(int feed)
 	{
 		this.doCutPaper(feed);
 	}

@@ -14,8 +14,10 @@ import org.osgi.service.log.LogService;
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.display.Activator;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
+import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.SalespointCustomerDisplaySettings;
 import ch.eugster.colibri.persistence.queries.CustomerDisplaySettingsQuery;
+import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
@@ -44,14 +46,31 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		}
 		return this.customerDisplaySettings;
 	}
+	
+	protected String getPort()
+	{
+		String port = null;
+		if (this.salespointCustomerDisplaySettings == null)
+		{
+			this.salespointCustomerDisplaySettings = this.getSalespointCustomerDisplaySettings(persistenceService.getCacheService());
+		}
+		if (this.salespointCustomerDisplaySettings == null)
+		{
+			port = this.customerDisplaySettings.getPort();
+		}
+		else
+		{
+			port = this.salespointCustomerDisplaySettings.getPort();
+		}
+		return port;
+	}
 
-	@Override
-	public SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings()
+	protected SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings()
 	{
 		return this.salespointCustomerDisplaySettings;
 	}
 
-	public void setCustomerDisplaySettings()
+	protected void setCustomerDisplaySettings()
 	{
 		this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getCacheService());
 //		if (this.customerDisplaySettings == null)
@@ -64,6 +83,15 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		if (this.customerDisplaySettings == null)
 		{
 			this.customerDisplaySettings = this.createCustomerDisplaySettings();
+		}
+	}
+
+	protected void setSalespointCustomerDisplaySettings()
+	{
+		this.salespointCustomerDisplaySettings = this.getSalespointCustomerDisplaySettings(this.persistenceService.getCacheService());
+		if (this.salespointCustomerDisplaySettings == null)
+		{
+			this.salespointCustomerDisplaySettings = this.createSalespointCustomerDisplaySettings();
 		}
 	}
 
@@ -98,7 +126,6 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 			}
 			text = builder.toString();
 		}
-		System.out.println(text);
 		return text;
 	}
 
@@ -193,6 +220,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		this.persistenceService = null;
 	}
 
+	@Override
 	public CustomerDisplaySettings createCustomerDisplaySettings()
 	{
 		final CustomerDisplaySettings settings = CustomerDisplaySettings.newInstance();
@@ -205,6 +233,16 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		return settings;
 	}
 
+	protected SalespointCustomerDisplaySettings createSalespointCustomerDisplaySettings()
+	{
+		final SalespointCustomerDisplaySettings settings = SalespointCustomerDisplaySettings.newInstance();
+		settings.setRows(this.getDefaultRowCount());
+		settings.setCols(this.getDefaultColumnCount());
+		settings.setConverter(this.getDefaultConverter());
+		settings.setPort(this.getDefaultPort());
+		return settings;
+	}
+
 	private CustomerDisplaySettings getCustomerDisplaySettings(final ConnectionService service)
 	{
 		final String componentName = (String) this.context.getProperties().get("component.name");
@@ -213,12 +251,20 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		return query.findByComponentName(componentName);
 	}
 
+	private SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings(final ConnectionService service)
+	{
+		final SalespointQuery query = (SalespointQuery) service.getQuery(Salespoint.class);
+		Salespoint salespoint = query.getCurrentSalespoint();
+		return salespoint.getCustomerDisplaySettings();
+	}
+
 	private int getDefaultColumnCount()
 	{
 		final Integer cols = (Integer) this.context.getProperties().get("custom.cols");
 		return cols == null ? 1 : cols.intValue();
 	}
 	
+	@Override
 	public String convertToString(Object object)
 	{
 		if (object instanceof String)

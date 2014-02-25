@@ -262,7 +262,6 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 				Calendar calendar = GregorianCalendar.getInstance();
 				String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
 				result = query.getResultList();
-				System.out.println(time + " " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			}
 		}
 		catch (Exception e)

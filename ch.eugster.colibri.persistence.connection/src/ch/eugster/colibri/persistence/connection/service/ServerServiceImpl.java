@@ -1,8 +1,6 @@
 package ch.eugster.colibri.persistence.connection.service;
 
-import java.text.SimpleDateFormat;
 import java.util.Enumeration;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -179,10 +177,8 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		else
 		{
 			Map<String, Object> map = getEntityManagerProperties(status, properties);
-			System.out.println("Start creating EntityManagerFactory: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 			factory = this.getPersistenceService().getPersistenceProvider()
 					.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_SERVER, map);
-			System.out.println("End creating EntityManagerFactory: " + SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
 		}
 		return factory;
 	}

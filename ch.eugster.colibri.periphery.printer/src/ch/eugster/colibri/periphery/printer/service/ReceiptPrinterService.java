@@ -9,9 +9,9 @@ public interface ReceiptPrinterService
 {
 	public static final String EVENT_ADMIN_TOPIC_ERROR = Topic.PRINT_ERROR.topic();
 
-	void cutPaper();
+//	void cutPaper();
 
-	void cutPaper(int linesBeforeCut);
+//	void cutPaper(int linesBeforeCut);
 
 	void openDrawer(Currency currency);
 	

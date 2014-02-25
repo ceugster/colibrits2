@@ -68,11 +68,10 @@ public class LoginDialog extends TitleAreaDialog implements EventHandler
 				EventAdmin.class, null);
 		this.eventAdminTracker.open();
 
-		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerRegistration = Activator.getDefault().getBundle().getBundleContext()
-				.registerService(EventHandler.class, eventHandler, properties);
+				.registerService(EventHandler.class, this, properties);
 	}
 
 	@Override

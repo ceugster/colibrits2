@@ -1,6 +1,5 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -86,12 +85,8 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 			{
 				Calendar calendar = GregorianCalendar.getInstance();
 				calendar.setTimeInMillis(settledFrom.longValue());
-				System.out.println(settledFrom.longValue() + ", "
-						+ SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
 				calendar = GregorianCalendar.getInstance();
 				calendar.setTimeInMillis(settledTo.longValue());
-				System.out.println(settledTo.longValue() + ", "
-						+ SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
 				settled = new ExpressionBuilder().get("settled")
 						.between(settledFrom.longValue(), settledTo.longValue());
 			}

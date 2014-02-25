@@ -24,7 +24,6 @@ public class DayTimeRow extends HashMap<Object, Object>
 	
 	public void add(Integer hour, Double amount)
 	{
-		System.out.println("h" + hour.toString());
 		Double oldAmount = (Double) this.get("h" + hour.toString());
 		Double newAmount = 0D;
 		newAmount = oldAmount == null ? amount : new Double(oldAmount.doubleValue() + amount.doubleValue());

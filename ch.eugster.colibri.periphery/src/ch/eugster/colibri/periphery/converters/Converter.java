@@ -15,7 +15,7 @@ public class Converter
 		for (int i = 0; i < text.length(); i++)
 		{
 			final int c = text.charAt(i);
-			if (this.conversionTable.length < c)
+			if (this.conversionTable.length - 1 < c)
 			{
 				target[i] = text.charAt(i);
 			}
@@ -50,8 +50,8 @@ public class Converter
 				builder.append(c);
 			}
 		}
-		return builder.toString();
-//		return new String(target);
+		String print = builder.toString();
+		return print;
 	}
 
 	public void setConverter(final String converter)
