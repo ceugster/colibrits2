@@ -1,5 +1,7 @@
 package ch.eugster.colibri.persistence.queries;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -21,10 +23,12 @@ import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.DayTimeRow;
+import ch.eugster.colibri.persistence.model.DiscountEntry;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.ProductGroupEntry;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -34,6 +38,7 @@ import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.User;
+import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
 public class PositionQuery extends AbstractQuery<Position>
@@ -54,12 +59,9 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.select(deleted.and(parked.and(value)));
 	}
 
-	public long countProviderUpdates(Salespoint salespoint, String providerId)
+	public long countProviderUpdates(Salespoint salespoint, String providerId, boolean updateServer)
 	{
-//		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-//		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
-
-		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
@@ -67,13 +69,16 @@ public class PositionQuery extends AbstractQuery<Position>
 		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
 		
 		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
-		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
+		if (updateServer)
+		{
+			saved = saved.and(new ExpressionBuilder().get("providerBooked").equal(false));
+		}
 
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
-		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
-
-		final Expression states = deleted.and(saved.or(reversed));
-		final long value = this.count(states);
+		reversed = reversed.and(new ExpressionBuilder().get("providerBooked").equal(true));
+		
+		final Expression select = deleted.and(provider).and(saved.or(reversed));
+		final long value = this.count(select);
 		return value;
 	}
 
@@ -82,6 +87,13 @@ public class PositionQuery extends AbstractQuery<Position>
 		List<ReportQueryResult> results = this.selectPositionsBySalespointsAndDateRange(salespoints, dateRange);
 		List<SettlementPosition> positions = this.getPositionsDetails(results, null);
 		return positions;
+	}
+
+	public List<DiscountEntry> selectDiscounts(final Salespoint[] salespoints, Calendar[] dateRange, boolean onlyWithDiscount)
+	{
+		List<ReportQueryResult> results = this.selectPositionsBySalespointsAndDateRangeAndDiscount(salespoints, dateRange, onlyWithDiscount);
+		List<DiscountEntry> entries = this.getDiscountEntries(results);
+		return entries;
 	}
 
 	public List<SettlementPosition> selectPositions(final Settlement settlement)
@@ -124,12 +136,9 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.getInternalDetails(this.selectInternalsBySalespointsAndDateRange(salespoints, dateRange), null);
 	}
 
-	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows)
+	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, boolean updateServer, final int maxRows)
 	{
-//		Expression expression = new ExpressionBuilder(Position.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
-//		expression = expression.and(new ExpressionBuilder().get("receipt").get("otherId").isNull());
-
-		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
@@ -137,13 +146,17 @@ public class PositionQuery extends AbstractQuery<Position>
 		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
 		
 		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
-		saved = saved.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(false)));
+		if (updateServer)
+		{
+			saved = saved.and(new ExpressionBuilder().get("providerBooked").equal(false));
+		}
 
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
-		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
+		reversed = reversed.and(new ExpressionBuilder().get("providerBooked").equal(true));
+		
+		final Expression select = deleted.and(provider).and(saved.or(reversed));
+		final Collection<Position> positions = this.select(select, maxRows);
 
-		final Expression states = deleted.and(saved.or(reversed));
-		final Collection<Position> positions = this.select(states, maxRows);
 		return positions;
 	}
 
@@ -328,6 +341,51 @@ public class PositionQuery extends AbstractQuery<Position>
 		return details;
 	}
 
+	private List<DiscountEntry> getDiscountEntries(final Collection<ReportQueryResult> results)
+	{
+		DateFormat format = new SimpleDateFormat("yyyyMMdd");
+		final Map<Long, Map<String, DiscountEntry>> entries = new HashMap<Long, Map<String, DiscountEntry>>();
+		for (final ReportQueryResult result : results)
+		{
+			Long id = (Long)result.get("salespointId");
+			Map<String, DiscountEntry> salespoint = entries.get(id);
+			if (salespoint == null)
+			{
+				salespoint = new HashMap<String, DiscountEntry>();
+				entries.put(id, salespoint);
+			}
+			Calendar date = (Calendar)result.get("date");
+			String key = format.format(date.getTime());
+			DiscountEntry entry = salespoint.get(key);
+			if (entry == null)
+			{
+				entry = new DiscountEntry();
+				salespoint.put(key, entry);
+			}
+			Double brutAmount = (Double)result.get("brutAmount");
+			Double existingBrutAmount = entry.getFullAmount();
+			double newBrutAmount = (brutAmount == null ? 0D : brutAmount.doubleValue()) + (existingBrutAmount == null ? 0D : existingBrutAmount.doubleValue());
+			Double netAmount = (Double)result.get("netAmount");
+			Double existingNetAmount = entry.getAmount();
+			double newNetAmount = (netAmount == null ? 0D : netAmount.doubleValue()) + (existingNetAmount == null ? 0D : existingNetAmount.doubleValue());
+			entry.setAmount(Double.valueOf(newNetAmount));
+			entry.setFullAmount(Double.valueOf(newBrutAmount));
+			entry.setDiscount(newBrutAmount - newNetAmount);
+			entry.setPercent(1 - newNetAmount/newBrutAmount);
+			entry.setDay(date.get(Calendar.DAY_OF_MONTH));
+			entry.setMonth(date.get(Calendar.MONTH));
+			entry.setYear(date.get(Calendar.YEAR));
+			entry.setSalespoint((String)result.get("salespointName"));
+		}
+		List<DiscountEntry> allEntries = new ArrayList<DiscountEntry>();
+		Collection<Map<String, DiscountEntry>> salespoints = entries.values();
+		for (Map<String, DiscountEntry> s : salespoints)
+		{
+			allEntries.addAll(s.values());
+		}
+		return allEntries;
+	}
+
 	private List<SettlementPayedInvoice> getPayedInvoicesDetails(final Collection<Position> positions,
 			final Settlement settlement)
 	{
@@ -364,30 +422,242 @@ public class PositionQuery extends AbstractQuery<Position>
 		return details;
 	}
 
-	// private Collection<SettlementPosition> getPositionDetails(final
-	// Collection<Position> positions,
-	// final Settlement settlement)
-	// {
-	// final Collection<SettlementPosition> details = new
-	// ArrayList<SettlementPosition>();
-	// for (final Position position : positions)
-	// {
-	// final SettlementPosition detail =
-	// SettlementPosition.newInstance(settlement, position.getProductGroup(),
-	// position.getReceipt().getDefaultCurrency(),
-	// position.getForeignCurrency());
-	// detail.setQuantity(position.getQuantity());
-	// double amount =
-	// position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-	// Position.AmountType.NETTO);
-	// detail.setDefaultCurrencyAmount(amount);
-	// detail.setForeignCurrencyAmount(amount);
-	// detail.setTaxAmount(position.getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
-	// details.add(detail);
-	// }
-	// return details;
-	// }
+	public Map<String, Map<Long, ProductGroupEntry>> selectProductGroupStatistics(Salespoint[] salespoints, Calendar[] dateRange,
+			String provider, boolean withExpenses, boolean withOtherSales, boolean previousYear)
+	{
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED).and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		if (provider != null && !provider.isEmpty())
+		{
+			Expression productGroup = new ExpressionBuilder().get("productGroup").anyOfAllowingNone("productGroupMappings").get("provider").equal(provider);
+			state.and(productGroup);
+		}
+		Expression sales = new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED);
+		if (withOtherSales)
+		{
+			sales = sales.or(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.NON_SALES_RELATED));
+		}
+		if (withExpenses)
+		{
+			sales = sales.or(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.EXPENSES_INVESTMENT));
+			sales = sales.or(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.EXPENSES_MATERIAL));
+		}
 
+		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").equal(salespoints[0]);
+		for (int i = 1; i < salespoints.length; i++)
+		{
+			sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+					.equal(salespoints[i]));
+		}
+		Expression dates = null;
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			dates = new ExpressionBuilder().get("receipt").get("timestamp").between(dateRange[0], dateRange[1]);
+		}
+		else if (dateRange[0] != null)
+		{
+			dates = new ExpressionBuilder().get("receipt").get("timestamp").greaterThanEqual(dateRange[0]);
+		}
+		else if (dateRange[1] != null)
+		{
+			dates = new ExpressionBuilder().get("receipt").get("timestamp").lessThanEqual(dateRange[1]);
+		}
+		Expression expression = state.and(sales).and(dates).and(sps);
+
+		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+//		reportQuery.addAttribute("salespointId", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+//		reportQuery.addAttribute("salespointName", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addAttribute("provider", new ExpressionBuilder().get("provider"));
+		reportQuery.addAttribute("productGroupId", new ExpressionBuilder().get("productGroup").get("id"));
+		reportQuery.addAttribute("productGroupName", new ExpressionBuilder().get("productGroup").get("name"));
+		reportQuery.addAttribute("ordered", new ExpressionBuilder().get("ordered"));
+
+		reportQuery.addSum("quantity", Integer.class);
+		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.NETTO), Double.class);
+
+//		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+//		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("provider"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("productGroup").get("id"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("productGroup").get("name"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("ordered"));
+
+//		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+//		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("provider"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("productGroup").get("id"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("productGroup").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("ordered"));
+
+		List<ReportQueryResult> results = this.selectReportQueryResults(reportQuery);
+		Map<String, Map<Long, ProductGroupEntry>> entries = new HashMap<String, Map<Long, ProductGroupEntry>>();
+		for (ReportQueryResult result : results)
+		{
+			String providerId = (String) result.get("provider");
+			Map<Long, ProductGroupEntry> productGroups = entries.get(providerId);
+			if (productGroups == null)
+			{
+				productGroups = new HashMap<Long, ProductGroupEntry>();
+				entries.put(providerId, productGroups);
+			}
+			Long productGroupId = (Long) result.get("productGroupId");
+			ProductGroupEntry entry = productGroups.get(productGroupId);
+			if (entry == null)
+			{
+				entry = new ProductGroupEntry();
+				productGroups.put(productGroupId, entry);
+			}
+			Boolean ordered = (Boolean)result.get("ordered");
+			entry.setProductGroupId(productGroupId);
+			entry.setProductGroupName(result.get("productGroupName").toString());
+			entry.setProviderId(providerId);
+			double amount = ((Double) result.get("amount")).doubleValue();
+			int quantity = ((Integer) result.get("quantity")).intValue();
+			if (ordered)
+			{
+				double existingAmount = entry.getOrderAmount();
+				entry.setOrderAmount(Double.valueOf(existingAmount + amount));
+				int existingQuantity = entry.getOrderQuantity();
+				entry.setOrderQuantity(Integer.valueOf(existingQuantity + quantity));
+			}
+			else
+			{
+				double existingAmount = entry.getStockAmount();
+				entry.setStockAmount(Double.valueOf(existingAmount + amount));
+				int existingQuantity = entry.getStockQuantity();
+				entry.setStockQuantity(Integer.valueOf(existingQuantity + quantity));
+			}
+			double existingAmount = entry.getTotalAmount();
+			entry.setTotalAmount(Double.valueOf(existingAmount + amount));
+			int existingQuantity = entry.getTotalQuantity();
+			entry.setTotalQuantity(Integer.valueOf(existingQuantity + quantity));
+		}
+		
+		return entries;
+	}
+	
+	public Map<Long, Map<String, Map<Long, ProductGroupEntry>>> selectProductGroupStatisticsBySalespoint(Salespoint[] salespoints, Calendar[] dateRange,
+			String provider, boolean withExpenses, boolean withOtherSales, boolean previousYear)
+	{
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED).and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		if (provider != null && !provider.isEmpty())
+		{
+			Expression productGroup = new ExpressionBuilder().get("productGroup").anyOfAllowingNone("productGroupMappings").get("provider").equal(provider);
+			state.and(productGroup);
+		}
+		Expression sales = new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED);
+		if (withOtherSales)
+		{
+			sales = sales.or(new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.NON_SALES_RELATED));
+		}
+		if (withExpenses)
+		{
+			sales = sales.or(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.EXPENSES_INVESTMENT));
+			sales = sales.or(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.EXPENSES_MATERIAL));
+		}
+
+		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").equal(salespoints[0]);
+		for (int i = 1; i < salespoints.length; i++)
+		{
+			sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+					.equal(salespoints[i]));
+		}
+		Expression dates = null;
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			dates = new ExpressionBuilder().get("receipt").get("timestamp").between(dateRange[0], dateRange[1]);
+		}
+		else if (dateRange[0] != null)
+		{
+			dates = new ExpressionBuilder().get("receipt").get("timestamp").greaterThanEqual(dateRange[0]);
+		}
+		else if (dateRange[1] != null)
+		{
+			dates = new ExpressionBuilder().get("receipt").get("timestamp").lessThanEqual(dateRange[1]);
+		}
+		Expression expression = state.and(sales).and(dates).and(sps);
+
+		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+		reportQuery.addAttribute("salespointId", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+		reportQuery.addAttribute("salespointName", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addAttribute("provider", new ExpressionBuilder().get("provider"));
+		reportQuery.addAttribute("provider", new ExpressionBuilder().get("provider"));
+		reportQuery.addAttribute("productGroupId", new ExpressionBuilder().get("productGroup").get("id"));
+		reportQuery.addAttribute("productGroupName", new ExpressionBuilder().get("productGroup").get("name"));
+		reportQuery.addAttribute("ordered", new ExpressionBuilder().get("ordered"));
+
+		reportQuery.addSum("quantity", Integer.class);
+		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.NETTO), Double.class);
+
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("provider"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("productGroup").get("id"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("productGroup").get("name"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("ordered"));
+
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("provider"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("productGroup").get("id"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("productGroup").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("ordered"));
+
+		List<ReportQueryResult> results = this.selectReportQueryResults(reportQuery);
+		Map<Long, Map<String, Map<Long, ProductGroupEntry>>> entries = new HashMap<Long, Map<String, Map<Long, ProductGroupEntry>>>();
+		for (ReportQueryResult result : results)
+		{
+			Long salespointId = (Long) result.get("salespointId");
+			Map<String, Map<Long, ProductGroupEntry>> salespointMap = entries.get(salespointId);
+			if (salespointMap == null)
+			{
+				salespointMap = new HashMap<String, Map<Long, ProductGroupEntry>>();
+				entries.put(salespointId, salespointMap);
+			}
+			String providerId = (String) result.get("provider");
+			Map<Long, ProductGroupEntry> productGroups = salespointMap.get(providerId);
+			if (productGroups == null)
+			{
+				productGroups = new HashMap<Long, ProductGroupEntry>();
+				salespointMap.put(providerId, productGroups);
+			}
+			Long productGroupId = (Long) result.get("productGroupId");
+			ProductGroupEntry entry = productGroups.get(productGroupId);
+			if (entry == null)
+			{
+				entry = new ProductGroupEntry();
+				productGroups.put(productGroupId, entry);
+			}
+			Boolean ordered = (Boolean)result.get("ordered");
+			entry.setSalespointId(salespointId);
+			entry.setSalespointName(result.get("salespointName").toString());
+			entry.setProductGroupId(productGroupId);
+			entry.setProductGroupName(result.get("productGroupName").toString());
+			entry.setProviderId(providerId);
+			double amount = ((Double) result.get("amount")).doubleValue();
+			int quantity = ((Integer) result.get("quantity")).intValue();
+			if (ordered)
+			{
+				double existingAmount = entry.getOrderAmount();
+				entry.setOrderAmount(Double.valueOf(existingAmount + amount));
+				int existingQuantity = entry.getOrderQuantity();
+				entry.setOrderQuantity(Integer.valueOf(existingQuantity + quantity));
+			}
+			else
+			{
+				double existingAmount = entry.getStockAmount();
+				entry.setStockAmount(Double.valueOf(existingAmount + amount));
+				int existingQuantity = entry.getStockQuantity();
+				entry.setStockQuantity(Integer.valueOf(existingQuantity + quantity));
+			}
+			double existingAmount = entry.getTotalAmount();
+			entry.setTotalAmount(Double.valueOf(existingAmount + amount));
+			int existingQuantity = entry.getTotalQuantity();
+			entry.setTotalQuantity(Integer.valueOf(existingQuantity + quantity));
+		}
+		
+		return entries;
+	}
+	
 	private Expression getTaxAmount(final Currency currency, final Receipt.QuotationType quotationType)
 	{
 		final Expression base = this.getAmount(quotationType, AmountType.NETTO);
@@ -580,6 +850,108 @@ public class PositionQuery extends AbstractQuery<Position>
 		reportQuery.addGrouping(new ExpressionBuilder().get("foreignCurrency").get("id"));
 
 		return this.selectReportQueryResults(reportQuery);
+	}
+
+
+	public List<ReportQueryResult> selectPositionsBySalespointsAndDateRangeAndDiscount(Salespoint[] salespoints,
+			Calendar[] dateRange, boolean onlyWithDiscount)
+	{
+		if (salespoints == null || salespoints.length == 0)
+		{
+			return new ArrayList<ReportQueryResult>();
+		}
+
+		Currency currency = salespoints[0].getCommonSettings().getReferenceCurrency();
+
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
+		Expression expression = state.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		if (onlyWithDiscount)
+		{
+			Expression discount = new ExpressionBuilder().get("discount").notEqual(0D);
+			expression = expression.and(discount);
+		}
+		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+				.equal(salespoints[0]);
+		for (int i = 1; i < salespoints.length; i++)
+		{
+			sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+					.equal(salespoints[i]));
+		}
+		expression = expression.and(sps);
+
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.between(dateRange[0], dateRange[1]));
+		}
+		else if (dateRange[0] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.greaterThanEqual(dateRange[0]));
+		}
+		else if (dateRange[1] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.lessThanEqual(dateRange[1]));
+		}
+
+		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+		reportQuery.addAttribute("salespointId", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+		reportQuery.addAttribute("salespointName", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addAttribute("date", new ExpressionBuilder().get("receipt").get("timestamp"));
+//		reportQuery.addAttribute("foreignCurrency", new ExpressionBuilder().get("foreignCurrency").get("id"));
+
+		reportQuery.addSum("brutAmount",
+				this.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.BRUTTO), Double.class);
+		reportQuery.addSum("netAmount",
+				this.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.NETTO), Double.class);
+
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("timestamp"));
+
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("timestamp"));
+
+		return this.selectReportQueryResults(reportQuery);
+	}
+
+	public List<Position> selectBySalespointsAndDateRange(Salespoint[] salespoints, Calendar[] dateRange)
+	{
+		if (salespoints == null || salespoints.length == 0)
+		{
+			return new ArrayList<Position>();
+		}
+
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
+		Expression expression = state.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+				.equal(salespoints[0]);
+		for (int i = 1; i < salespoints.length; i++)
+		{
+			sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
+					.equal(salespoints[i]));
+		}
+		expression = expression.and(sps);
+
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.between(dateRange[0], dateRange[1]));
+		}
+		else if (dateRange[0] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.greaterThanEqual(dateRange[0]));
+		}
+		else if (dateRange[1] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.lessThanEqual(dateRange[1]));
+		}
+
+		return this.select(expression);
 	}
 
 	private Collection<Position> selectPayedInvoicesBySalespointsAndDateRange(Salespoint[] salespoints,

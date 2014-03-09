@@ -1333,6 +1333,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CurrentT
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/CustomerDisplaySettings.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DayTimeRow.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DeletedFilter.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DiscountEntry.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Display.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/DisplayArea.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Entity.java -text
@@ -1349,6 +1350,7 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Printout
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/PrintoutArea.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Product.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductGroup.java -text
+ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductGroupEntry.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductGroupMapping.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Profile.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProviderProperty.java -text

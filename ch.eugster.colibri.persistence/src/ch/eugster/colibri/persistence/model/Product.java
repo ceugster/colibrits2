@@ -23,6 +23,8 @@ import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.eclipse.persistence.annotations.Index;
+
 @Entity
 @AttributeOverrides({ @AttributeOverride(name = "timestamp", column = @Column(name = "pd_timestamp")),
 		@AttributeOverride(name = "version", column = @Column(name = "pd_version")),
@@ -55,6 +57,7 @@ public class Product extends AbstractEntity
 	private Calendar invoiceDate;
 
 	@Basic
+	@Index
 	@Column(name = "pd_invoice_number")
 	private String invoiceNumber;
 

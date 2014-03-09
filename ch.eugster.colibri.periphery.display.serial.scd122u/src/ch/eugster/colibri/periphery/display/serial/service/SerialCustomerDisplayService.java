@@ -57,6 +57,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (this.display != null)
 		{
 			String print = this.correctText(text);
+			System.out.println(print);
 			for (int i = 0; i < print.length(); i++)
 			{
 				this.display.write(print.charAt(i));
@@ -73,6 +74,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (this.display != null)
 		{
 			String print = this.correctText(new Converter(converter), text);
+			System.out.println(print);
 			for (int i = 0; i < print.length(); i++)
 			{
 				this.display.write(print.charAt(i));

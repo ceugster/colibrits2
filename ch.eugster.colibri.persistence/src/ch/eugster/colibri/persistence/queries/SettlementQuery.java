@@ -33,7 +33,7 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		return settlement;
 	}
 
-	public Collection<Settlement> selectBySalespointAndDateRange(final Salespoint[] salespoints, Calendar[] dateRange)
+	public List<Settlement> selectBySalespointAndDateRange(final Salespoint[] salespoints, Calendar[] dateRange)
 	{
 		if (salespoints == null || salespoints.length == 0)
 		{
@@ -45,7 +45,7 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 			salespointCriteria.or(new ExpressionBuilder().get("salespoint").equal(salespoints[i]));
 		}
 		final Expression settledCriteria = new ExpressionBuilder().get("settled").between(dateRange[0], dateRange[1]);
-		Collection<Settlement> settlements = this.select(salespointCriteria.and(settledCriteria));
+		List<Settlement> settlements = this.select(salespointCriteria.and(settledCriteria));
 		return settlements;
 	}
 
