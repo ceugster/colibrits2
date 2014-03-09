@@ -52,6 +52,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -508,7 +509,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		if (persistenceService != null)
 		{
 			PositionQuery positionQuery = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
-			count = positionQuery.countProviderUpdates(salespoint, providerId);
+			count = positionQuery.countProviderUpdates(salespoint, providerId, !persistenceService.getServerService().isLocal());
 			PaymentQuery paymentQuery = (PaymentQuery) persistenceService.getCacheService().getQuery(Payment.class);
 			count += paymentQuery.countProviderUpdates(salespoint, providerId);
 		}
@@ -548,8 +549,29 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private String checkDefaultProductGroup(Salespoint salespoint)
 	{
-		String msg = "Es wurde noch keine Default-Warengruppe definiert\n";
-		return salespoint.getCommonSettings().getDefaultProductGroup() == null ? msg : "";
+		CommonSettings settings = salespoint.getCommonSettings();
+		if (settings.getDefaultProductGroup() == null)
+		{
+			return "Es wurde noch keine Default-Warengruppe definiert\n";
+		}
+		else if (settings.getDefaultProductGroup().getProductGroupMappings().size() == 0)
+		{
+			ServiceReference<ProviderQuery>[] references = providerQueryTracker.getServiceReferences();
+			if (references != null && references.length > 0)
+			{
+				StringBuilder builder = new StringBuilder();
+				for (int i = 0; i < references.length; i++)
+				{
+					ProviderQuery query = providerQueryTracker.getService(references[i]);
+					if (query != null)
+					{
+						builder = builder.append((builder.length() == 0 ? "" : (references.length > 1 && i == references.length - 1 ? " oder " : ", ")) + query.getConfiguration().getName());
+					}
+				}
+				return "Die Default-Warengruppe muss mit einer Warengruppe von " + builder.toString() + " verbunden sein.";
+			}
+		}
+		return "";
 	}
 
 	private void createControl(final Composite parent)
@@ -620,7 +642,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				final long counted = countProviderUpdates(salespoint, provider.getProviderId());
 				count = Long.valueOf(counted).toString();
 				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
-				this.providerInformation.setText(provider.getName() + ": " + count);
+				this.providerInformation.setText("Verbuchen: " + count);
 				this.providerInformation.setImage(image);
 			}
 		}

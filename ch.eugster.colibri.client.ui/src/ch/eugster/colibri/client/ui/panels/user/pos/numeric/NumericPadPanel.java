@@ -88,7 +88,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 
 	public static final String TEXT_DOT = ".";
 
-	private PositionChangeMediator positionChangeMediator;
+//	private PositionChangeMediator positionChangeMediator;
 
 	public NumericPadPanel(final UserPanel userPanel, final ValueDisplay display, final Profile profile)
 	{
@@ -247,7 +247,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 		this.add(cifferArea, BorderLayout.CENTER);
 		
 		this.userPanel.getPositionWrapper().addPropertyChangeListener(this);
-		this.positionChangeMediator = new PositionChangeMediator(userPanel, this, NumericPadPanel.positionProperties);
+		new PositionChangeMediator(userPanel, this, NumericPadPanel.positionProperties);
 	}
 
 	@Override
@@ -257,7 +257,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 		{
 			StringBuilder label = new StringBuilder();
 			Position position = (Position) event.getSource();
-			if (position.getProductGroup() == null)
+			if (position.getProductGroup() == null || (position.getProduct() != null && position.getProduct().getExternalProductGroup() == null))
 			{
 				label = label.append("WG");
 			}
@@ -276,6 +276,10 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 			else if (position.getCurrentTax() == null)
 			{
 				label = label.append(label.length() > 0 ? " / MWST" : "MWST");
+			}
+			else
+			{
+				
 			}
 			this.displayLabel.setText(label.toString());
 			this.displayLabel.setForeground(Color.red);

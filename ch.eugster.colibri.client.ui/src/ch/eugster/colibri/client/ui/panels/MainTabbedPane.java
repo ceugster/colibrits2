@@ -162,7 +162,8 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			{
 				if (!MainTabbedPane.this.state.equals(MainTabbedPane.State.SHUTDOWN))
 				{
-					MainTabbedPane.this.showProviderInterfaceMessage(true);
+					String name = service.getName();
+					MainTabbedPane.this.showProviderInterfaceMessage(true, name);
 				}
 				super.removedService(reference, service);
 			}
@@ -524,14 +525,13 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		}
 	}
 
-	private void showProviderInterfaceMessage(final boolean failOver)
+	private void showProviderInterfaceMessage(final boolean failOver, String providerName)
 	{
-		final String title = "Warenbewirtschaftung";
-		final String msg = failOver ? "Die Verbindung zur Warenbewirtschaftung wurde unterbrochen.\nSie können weiterarbeiten, müssen aber gegebenenfalls vermehrt Eingaben von Hand machen."
-				: "Die Verbindung zur Warenbewirtschaftung konnte wiederhergestellt werden.";
+		final String msg = failOver ? "Die Verbindung zu " + providerName + " wurde unterbrochen.\nSie können weiterarbeiten, müssen aber gegebenenfalls vermehrt Eingaben von Hand machen."
+				: "Die Verbindung zu " + providerName + " konnte wiederhergestellt werden.";
 		final Frame frame = Activator.getDefault().getFrame();
 		final Profile profile = this.getCurrentPanel().getProfile();
-		MessageDialog.showInformation(frame, profile, title, msg, MessageDialog.TYPE_WARN);
+		MessageDialog.showInformation(frame, profile, providerName, msg, MessageDialog.TYPE_WARN);
 	}
 
 //	private void sendEvent(String topics)

@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
+import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.events.DisposeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
@@ -42,6 +43,10 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 		if (persistenceService != null)
 		{
 			productGroup = (ProductGroup) persistenceService.getCacheService().find(ProductGroup.class, this.key.getParentId());
+			if (!productGroup.isPayedInvoice())
+			{
+				productGroup = productGroup.getCommonSettings().getPayedInvoice();
+			}
 		}
 		return productGroup;
 	}
@@ -68,11 +73,11 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 						{
 							userPanel.getPositionListPanel().getModel().actionPerformed(event);
 						}
-//						else if (status.getSeverity() != IStatus.CANCEL)
-//						{
-//							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), "Lesen der Kundendaten",
-//									status.getMessage(), MessageDialog.BUTTON_OK);
-//						}
+						else if (status.getSeverity() == IStatus.INFO)
+						{
+							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), "Lesen der Kundendaten",
+									status.getMessage(), MessageDialog.BUTTON_OK);
+						}
 					}
 				}
 				finally
