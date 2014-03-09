@@ -62,7 +62,7 @@ public class SetDefaultProductGroupHandler extends AbstractPersistenceClientHand
 				}
 			}
 		}
-		return null;
+		return Status.OK_STATUS;
 	}
 
 	@Override
