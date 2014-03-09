@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="1.0.0.201402231900" useFeatures="true" includeLaunchers="true">
+<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="1.0.0.201403081000" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/ch.eugster.colibri.product/icons/kasse_128x128.png"/>
@@ -194,6 +194,8 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.provider.voucher.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.drivers.sqlserver.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.scheduler.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.report.productgroup.feature" version="1.0.0.qualifier"/>
+      <feature id="ch.eugster.colibri.report.tax.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>

@@ -88,7 +88,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			{
 				log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
 				status = this.findArticleServer.findAndRead(barcode, position);
-				if ((status.getSeverity() == IStatus.OK) || (status.getSeverity() == IStatus.ERROR))
+				if ((status.isOK()) || (status.getSeverity() == IStatus.ERROR))
 				{
 					log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
 					this.sendEvent(this.getEvent(status, true));
@@ -132,7 +132,10 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			finally
 			{
 				log(LogService.LOG_INFO, position.getReceipt().getCustomer() == null ? "Kundensuche abgebrochen." : "Kunden ausgewählt: " + position.getReceipt().getCustomerCode() + " - " + position.getReceipt().getCustomer().getFullname() + ".");
-				this.sendEvent(this.getEvent(status, true));
+				if (status.isOK())
+				{
+					this.sendEvent(this.getEvent(status, true));
+				}
 			}
 		}
 		return status;

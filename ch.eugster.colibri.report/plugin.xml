@@ -21,7 +21,7 @@
             allPopups="false"
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
-               id="ch.eugster.colibri.report.perspective.toolbar">
+               id="ch.eugster.colibri.report.toolbar.perspectives">
          </toolbar>
       </menuContribution>
    </extension>

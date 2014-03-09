@@ -97,6 +97,7 @@ public class GalileoConfiguratorComponent extends AbstractProviderService implem
 	
 	public boolean isConnect()
 	{
+		this.loadProperties(persistenceService.getServerService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
 		IProperty property = properties.get(GalileoProperty.CONNECT.key());
 		return Integer.valueOf(property.value()).intValue() > 0;
 	}

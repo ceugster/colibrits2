@@ -8,6 +8,7 @@ import java.util.Collection;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
@@ -187,12 +188,26 @@ public class ReceiptLayoutPaymentSection extends AbstractLayoutSection
 					{
 						if (payment.isBack())
 						{
-							return layoutSection.replaceMarker("Rückgeld " + payment.getPaymentType().getCode(),
-									marker, true);
+							if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CASH))
+							{
+								return layoutSection.replaceMarker("Rückgeld Bar", marker, true);
+							}
+							else
+							{
+								return layoutSection.replaceMarker("Rückgeld " + payment.getPaymentType().getCode(),
+										marker, true);
+							}
 						}
 						else
 						{
-							return layoutSection.replaceMarker(payment.getPaymentType().getCode(), marker, true);
+							if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CASH))
+							{
+								return layoutSection.replaceMarker("Bargeld", marker, true);
+							}
+							else
+							{
+								return layoutSection.replaceMarker(payment.getPaymentType().getCode(), marker, true);
+							}
 						}
 					}
 					case W:

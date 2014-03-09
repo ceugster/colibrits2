@@ -86,10 +86,14 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 			 * Position.searchValue() is a barcode Position.Product must exist
 			 */
 			status = this.checkPosition(position);
-			if (status.getSeverity() == IStatus.OK)
-			{
+			/*
+			 * Diese folgende Abfrage wurde auskommentiert, weil sie im Fall, dass eine Posiiton nicht gefunden werden kann,
+			 * die Verbuchung abbricht und so die gleiche Position immer wieder versucht wird zu aktualisieren.
+			 */
+//			if (status.isOK())
+//			{
 				status = this.updateProviderServer.updateProvider(position);
-			}
+//			}
 			log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
 		}
 		return status;
@@ -200,6 +204,10 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 							log(LogService.LOG_INFO, "Prüfe Position " + position.getSearchValue() + "...");
 						}
 						status = providerQuery.findAndRead(barcode, position);
+						if (status.getSeverity() == IStatus.CANCEL)
+						{
+							
+						}
 						if (this.logService != null)
 						{
 							log(LogService.LOG_INFO, "Position " + (status.getSeverity() == IStatus.OK ? "OK." :  "FEHLER."));

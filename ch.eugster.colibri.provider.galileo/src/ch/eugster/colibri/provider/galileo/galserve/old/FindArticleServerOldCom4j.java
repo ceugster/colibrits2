@@ -47,7 +47,6 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 	public FindArticleServerOldCom4j(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
-		galserve = ClassFactory.creategdserve();
 	}
 	
 	@Override

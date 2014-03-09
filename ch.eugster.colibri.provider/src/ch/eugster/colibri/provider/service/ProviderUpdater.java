@@ -38,7 +38,7 @@ public interface ProviderUpdater extends Comparable<ProviderUpdater>
 	
 	Integer getRanking();
 
-	Collection<Position> getPositions(ConnectionService service, int max);
+	Collection<Position> getPositions(PersistenceService service, int max);
 
 	IStatus updatePositions(PersistenceService persistenceService, Collection<Position> positions);
 

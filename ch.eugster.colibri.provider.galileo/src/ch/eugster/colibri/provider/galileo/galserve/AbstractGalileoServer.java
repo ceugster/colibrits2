@@ -22,10 +22,13 @@ import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 
 public abstract class AbstractGalileoServer implements IServer
 {
+	protected GalileoConfiguration configuration = new GalileoConfiguration();
+	
 	protected Map<String, IProperty> properties;
 
 	protected boolean open = false;

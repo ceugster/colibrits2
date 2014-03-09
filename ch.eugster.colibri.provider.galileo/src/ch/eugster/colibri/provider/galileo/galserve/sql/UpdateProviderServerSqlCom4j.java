@@ -19,6 +19,7 @@ import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.CurrentTaxCodeMapping;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
@@ -50,7 +51,6 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 	public UpdateProviderServerSqlCom4j(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
-		galserve = ClassFactory.creategdserve2g();
 	}
 	
 	protected Igdserve2g getGalserve()
@@ -616,8 +616,6 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 			{
 				if (this.getGalserve().do_wgstorno())
 				{
-					position.setProviderBooked(true);
-					this.updateCustomerAccount(position);
 					log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
 								+ " aufgerufen... Ok!");
 				}
@@ -637,11 +635,8 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		{
 			try
 			{
-				boolean sold = this.getGalserve().do_wgverkauf();
-				if (sold)
+				if (this.getGalserve().do_wgverkauf())
 				{
-					position.setProviderBooked(true);
-					this.updateCustomerAccount(position);
 					log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
 								+ " aufgerufen... Ok!");
 				}
@@ -658,7 +653,13 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 			}
 		}
 
-		return this.galileoTransactionWritten();
+		IStatus status = this.galileoTransactionWritten();
+		if (status.isOK())
+		{
+			position.setProviderBooked(true);
+			this.updateCustomerAccount(position);
+		}
+		return status;
 	}
 
 	private Integer getGalileoCustomerCode(final Receipt receipt)
@@ -683,6 +684,28 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		return value == null ? Integer.valueOf(0) : value;
 	}
 
+	private String getTaxCode(Position position)
+	{
+		String tax = "0";
+		if (this.configuration.canMap(position.getCurrentTax()))
+		{
+			CurrentTaxCodeMapping mapping = position.getCurrentTax().getCurrentTaxCodeMapping(position.getProvider());
+			if (mapping != null)
+			{
+				tax = mapping.getCode();
+			}
+		}
+		else if (this.configuration.canMap(position.getCurrentTax().getTax()))
+		{
+			TaxCodeMapping mapping = position.getCurrentTax().getTax().getTaxCodeMapping(position.getProvider());
+			if (mapping != null)
+			{
+				tax = mapping.getCode();
+			}
+		}
+		return tax;
+	}
+	
 	private IStatus setProviderValues(final Position position)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
@@ -695,39 +718,27 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 			this.getGalserve().vmenge(Math.abs(position.getQuantity()));
 			this.getGalserve().vpreis(Math.abs(position.getPrice()));
 			this.getGalserve().vebook(Boolean.valueOf(position.isEbook()));
+			this.getGalserve().vmwst(getTaxCode(position));
 			this.getGalserve().vrabatt(-Math.abs(position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
 					Position.AmountType.DISCOUNT)));
 
 			if (position.getProduct() == null)
 			{
-				this.getGalserve().vwgname(position.getProductGroup().getName());
-				this.getGalserve().vwgruppe(position.getProductGroup().getCode());
+				this.getGalserve().vwgname(cut(position.getProductGroup().getName(), 30));
+				this.getGalserve().vwgruppe(cut(position.getProductGroup().getCode(), 2));
 			}
 			else
 			{
 				this.getGalserve().vnummer(position.getProduct().getCode());
 				if (position.getOption().equals(Position.Option.PAYED_INVOICE))
 				{
-					this.getGalserve().vwgname(position.getProductGroup().getName());
-					this.getGalserve().vwgruppe(position.getProductGroup().getCode());
+					this.getGalserve().vwgname(cut(position.getProductGroup().getName(), 30));
+					this.getGalserve().vwgruppe(cut(position.getProductGroup().getCode(), 2));
 				}
 				else
 				{
-					this.getGalserve().vwgname(position.getProduct().getExternalProductGroup().getText());
-					this.getGalserve().vwgruppe(position.getProduct().getExternalProductGroup().getCode());
-					try
-					{
-						TaxCodeMapping taxCodeMapping = position.getCurrentTax().getTax().getTaxCodeMapping(Activator.getDefault().getConfiguration().getProviderId());
-						if (taxCodeMapping.isDeleted())
-						{
-							throw new NullPointerException();
-						}
-						this.getGalserve().vmwst(taxCodeMapping.getCode());
-					}
-					catch (NullPointerException e)
-					{
-//						String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler Mwst-Mapping ungültig).";
-					}
+					this.getGalserve().vwgname(cut(position.getProduct().getExternalProductGroup().getText(), 30));
+					this.getGalserve().vwgruppe(cut(position.getProduct().getExternalProductGroup().getCode(), 3));
 				}
 			}
 		}
@@ -738,6 +749,15 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		return status;
 	}
 
+	private String cut(String value, int maxlength)
+	{
+		if (value == null)
+		{
+			return "";
+		}
+		return value.length() > maxlength ? value.substring(0, maxlength) : value;
+	}
+	
 	private IStatus doVerkauf(Position position, IStatus status)
 	{
 		if (status.getSeverity() == IStatus.OK)
@@ -1029,7 +1049,7 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 	{
 		IProperty property = properties.get(GalileoProperty.KEEP_CONNECTION.key());
 		int keepConnection = Integer.valueOf(property.value()).intValue();
-		if (force || (!this.wasOpen && this.open && keepConnection == 0))
+		if (this.open && (force || (!this.wasOpen && keepConnection == 0)))
 		{
 			this.galserve.do_NClose();
 			this.open = false;

@@ -8,10 +8,12 @@ package ch.eugster.colibri.provider.galileo.kundenserver.sql;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
@@ -19,11 +21,12 @@ import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.Product;
 import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.product.Customer;
+import ch.eugster.colibri.persistence.queries.ProductQuery;
+import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
-import ch.eugster.colibri.provider.galileo.kundenserver.sql.ClassFactory;
 
 public class CustomerServerSql extends CustomerServer
 {
@@ -80,19 +83,21 @@ public class CustomerServerSql extends CustomerServer
 				Object object = CustomerServerSql.this.kserver.lrggewaehlt();
 				if (object instanceof Boolean && ((Boolean) object).booleanValue())
 				{
-					final Product product = Product.newInstance(position);
 					Integer value = (Integer) CustomerServerSql.this.kserver.nrgnummer();
-					product.setInvoiceNumber(value.toString());
-					position.setProduct(product);
-					position.setQuantity(1);
-					position.setPrice((Double) CustomerServerSql.this.kserver.nrgbetrag());
-					position.setDiscount(discount);
-					position.setSearchValue(product.getInvoiceNumber());
-					position.setProductGroup(productGroup);
-					position.setOption(Option.PAYED_INVOICE);
+					this.status = checkInvoice(value.toString());
+					if (status.isOK())
+					{
+						final Product product = Product.newInstance(position);
+						product.setInvoiceNumber(value.toString());
+						position.setProduct(product);
+						position.setQuantity(1);
+						position.setPrice((Double) CustomerServerSql.this.kserver.nrgbetrag());
+						position.setDiscount(discount);
+						position.setSearchValue(product.getInvoiceNumber());
+						position.setProductGroup(productGroup);
+						position.setOption(Option.PAYED_INVOICE);
+					}
 				}
-				this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
-						Topic.CUSTOMER_UPDATE.topic());
 			}
 			else
 			{
@@ -116,6 +121,50 @@ public class CustomerServerSql extends CustomerServer
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic(), new Exception("Keine Verbindung"));
 		}
 		return this.status;
+	}
+
+	private IStatus checkInvoice(String invoiceNumber)
+	{
+		IStatus status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), "Es kann nicht überprüft werden, ob die Rechnung bereits einmal an der Kasse bezahlt worden ist.");
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
+		tracker.open();
+		try
+		{
+			PersistenceService service = tracker.getService();
+			if (service != null)
+			{
+				ProductQuery query = (ProductQuery) service.getCacheService().getQuery(Product.class);
+				if (query.selectInvoice(invoiceNumber).size() == 0)
+				{
+					if (service.getServerService().isConnected())
+					{
+						query = (ProductQuery) service.getServerService().getQuery(Product.class);
+						List<Product> invoices = query.selectInvoice(invoiceNumber);
+						if (invoices.size() == 0)
+						{
+							status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic());
+						}
+						else
+						{
+							status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), "Die Rechnung wurde an der Kasse " + invoices.iterator().next().getPosition().getReceipt().getSettlement().getSalespoint().getName() + " bezahlt.");
+						}
+					}
+					else
+					{
+						status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), "Rechnung wurde an dieser Kasse nicht bezahlt, ob sie an einer anderen Kasse bezahlt worden ist, kann zur Zeit nicht überprüft werden, da die Verbindung zum Server nicht hergestellt ist.");
+					}
+				}
+				else
+				{
+					status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic());
+				}
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+		return status;
 	}
 	
 	public IStatus start()

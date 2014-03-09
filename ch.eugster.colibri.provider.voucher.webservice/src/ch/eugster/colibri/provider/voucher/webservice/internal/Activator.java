@@ -16,7 +16,6 @@ public class Activator implements BundleActivator
 	private static Activator plugin;
 
 	private BundleContext context;
-	
 	/**
 	 * The constructor
 	 */
@@ -34,9 +33,8 @@ public class Activator implements BundleActivator
 	@Override
 	public void start(final BundleContext context) throws Exception
 	{
-		this.context = context;
 		Activator.plugin = this;
-
+		this.context = context;
 		logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		logServiceTracker.open();
 
@@ -63,6 +61,7 @@ public class Activator implements BundleActivator
 			logService.log(LogService.LOG_INFO, "Plugin " + context.getBundle().getSymbolicName() + " gestoppt.");
 		}
 		logServiceTracker.close();
+		this.context = null;
 		Activator.plugin = null;
 	}
 
@@ -75,8 +74,8 @@ public class Activator implements BundleActivator
 	{
 		return Activator.plugin;
 	}
-
-	public BundleContext getContext()
+	
+	public BundleContext getBundleContext()
 	{
 		return context;
 	}

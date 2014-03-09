@@ -50,7 +50,6 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 	public UpdateProviderServerOldCom4j(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
-		galserve = ClassFactory.creategdserve();
 	}
 	
 	protected Igdserve getGalserve()
@@ -177,6 +176,7 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 							{
 								try
 								{
+									
 									if (this.getGalserve().do_getkunde(customerId))
 									{
 										this.updatePosition(barcode, position);
@@ -689,6 +689,20 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 		return value == null ? Integer.valueOf(0) : value;
 	}
 
+	private String getTaxCode(Position position)
+	{
+		String tax = null;
+		if (this.configuration.canMap(position.getCurrentTax()))
+		{
+			tax = position.getCurrentTax().getCurrentTaxCodeMapping(position.getProvider()).getCode();
+		}
+		else if (this.configuration.canMap(position.getCurrentTax().getTax()))
+		{
+			tax = position.getCurrentTax().getTax().getTaxCodeMapping(position.getProvider()).getCode();
+		}
+		return tax;
+	}
+	
 	private IStatus setProviderValues(final Position position)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
@@ -701,6 +715,7 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 			this.getGalserve().vmenge(Math.abs(position.getQuantity()));
 			this.getGalserve().vpreis(Math.abs(position.getPrice()));
 			this.getGalserve().vebook(Boolean.valueOf(position.isEbook()));
+			this.getGalserve().vmwst(getTaxCode(position));
 			this.getGalserve().vrabatt(-Math.abs(position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
 					Position.AmountType.DISCOUNT)));
 

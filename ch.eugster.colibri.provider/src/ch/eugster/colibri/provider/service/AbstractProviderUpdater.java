@@ -17,17 +17,17 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 public abstract class AbstractProviderUpdater extends AbstractProviderService implements ProviderUpdater 
 {
 	@Override
-	public Collection<Position> getPositions(ConnectionService service,
+	public Collection<Position> getPositions(PersistenceService service,
 			int max) 
 	{
-		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
+		SalespointQuery salespointQuery = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
 		if (salespoint == null)
 		{
 			return new ArrayList<Position>();
 		}
-		PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		return query.selectProviderUpdates(salespoint, getProviderId(), max);
+		PositionQuery query = (PositionQuery) service.getCacheService().getQuery(Position.class);
+		return query.selectProviderUpdates(salespoint, getProviderId(), !service.getServerService().isLocal(), max);
 	}
 	
 	protected abstract IStatus checkConnection();
@@ -41,16 +41,12 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 		{
 			status = this.checkConnection();
 		}
-		if (status.getSeverity() == IStatus.OK)
+		if (status.isOK())
 		{
 			for (Position position : positions)
 			{
 				status = updateProvider(position);
-				if (status.getSeverity() == IStatus.ERROR)
-				{
-					break;
-				}
-				if (status.getSeverity() == IStatus.OK)
+				if (status.isOK())
 				{
 					try
 					{

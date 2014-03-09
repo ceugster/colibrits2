@@ -287,11 +287,11 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			{
 				if (position.getQuantity() > 0)
 				{
-					result = creditAccount(position.getProvider(), position.getAmount(QuotationType.DEFAULT_CURRENCY, AmountType.NETTO));
+					result = creditAccount(position.getSearchValue().toUpperCase(), position.getAmount(QuotationType.DEFAULT_CURRENCY, AmountType.NETTO));
 				}
 				else if (position.getQuantity() < 0)
 				{
-					result = chargeAccount(position.getProvider(), position.getAmount(QuotationType.DEFAULT_CURRENCY, AmountType.NETTO));
+					result = chargeAccount(position.getSearchValue().toUpperCase(), position.getAmount(QuotationType.DEFAULT_CURRENCY, AmountType.NETTO));
 				}
 			}
 			if (result.isOK())
@@ -327,7 +327,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			}
 			catch (Exception e)
 			{
-				return new Status(IStatus.ERROR, Activator.getDefault().getContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+				return new Status(IStatus.ERROR, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
 			}
 		}
 		return result.getStatus();
@@ -379,7 +379,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 				}
 				catch (Exception e)
 				{
-					return new Status(IStatus.ERROR, Activator.getDefault().getContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+					return new Status(IStatus.ERROR, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
 				}
 			}
 		}
@@ -486,17 +486,17 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	}
 
 	@Override
-	public Collection<Position> getPositions(ConnectionService service,
+	public Collection<Position> getPositions(PersistenceService service,
 			int max)
 	{
-		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
+		SalespointQuery salespointQuery = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
 		if (salespoint == null)
 		{
 			return new ArrayList<Position>();
 		}
-		PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		return query.selectProviderUpdates(salespoint, this.getProviderId(), max);
+		PositionQuery query = (PositionQuery) service.getCacheService().getQuery(Position.class);
+		return query.selectProviderUpdates(salespoint, this.getProviderId(), !service.getServerService().isLocal(), max);
 	}
 
 	@Override
@@ -779,7 +779,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		@Override
 		public String providerId() 
 		{
-			return Activator.getDefault().getContext().getBundle().getSymbolicName();
+			return Activator.getDefault().getBundleContext().getBundle().getSymbolicName();
 		}
 
 		@Override
