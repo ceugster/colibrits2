@@ -91,7 +91,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:ch.eugster.colibri.report.perspective.toolbar?after=additions">
+            locationURI="toolbar:ch.eugster.colibri.report.toolbar.perspectives?after=additions">
          <command
                commandId="org.eclipse.ui.perspectives.showPerspective"
                hoverIcon="icons/receipt.png"
@@ -105,6 +105,49 @@
                   value="ch.eugster.colibri.report.receipt.perspective">
             </parameter>
          </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:ch.eugster.colibri.report.menu.views?after=additions">
+         <menu
+               label="Belegliste">
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  label="Belegliste"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ui.views.showView.viewId"
+                     value="ch.eugster.colibri.report.receipt.receiptview">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  label="Positionen"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ui.views.showView.viewId"
+                     value="ch.eugster.colibri.report.receipt.positionview">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  label="Zahlungen"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ui.views.showView.viewId"
+                     value="ch.eugster.colibri.report.receipt.paymentview">
+               </parameter>
+            </command>
+            <command
+                  commandId="org.eclipse.ui.views.showView"
+                  label="Filter"
+                  style="push">
+               <parameter
+                     name="org.eclipse.ui.views.showView.viewId"
+                     value="ch.eugster.colibri.report.receipt.filterview">
+               </parameter>
+            </command>
+         </menu>
       </menuContribution>
    </extension>
 

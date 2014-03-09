@@ -6,6 +6,6 @@
    </service>
    <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="persistenceService" policy="static" unbind="unsetPersistenceService"/>
    <reference bind="setEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="eventAdmin" policy="static" unbind="unsetEventAdmin"/>
-   <reference bind="addProviderUpdater" cardinality="1..n" interface="ch.eugster.colibri.provider.service.ProviderUpdater" name="ProviderUpdater" policy="static" unbind="removeProviderUpdater"/>
+   <reference bind="addProviderUpdater" cardinality="1..n" interface="ch.eugster.colibri.provider.service.ProviderUpdater" name="ProviderUpdater" policy="dynamic" unbind="removeProviderUpdater"/>
    <reference bind="setTransferAgent" cardinality="1..1" interface="ch.eugster.colibri.persistence.transfer.services.TransferAgent" name="TransferAgent" policy="static" unbind="unsetTransferAgent"/>
 </scr:component>

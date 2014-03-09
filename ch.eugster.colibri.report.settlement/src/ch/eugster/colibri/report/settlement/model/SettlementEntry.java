@@ -1,5 +1,6 @@
 package ch.eugster.colibri.report.settlement.model;
 
+import java.util.Calendar;
 import java.util.HashMap;
 
 public class SettlementEntry extends HashMap<String, Object> implements Comparable<SettlementEntry>
@@ -83,6 +84,17 @@ public class SettlementEntry extends HashMap<String, Object> implements Comparab
 		this.put("code", code);
 	}
 
+	public Calendar getDate()
+	{
+		Object object = get("date");
+		return (Calendar) object;
+	}
+	
+	public void setDate(Calendar date)
+	{
+		this.put("date", date);
+	}
+	
 	public int getGroup()
 	{
 		Object object = get("group");
@@ -134,4 +146,5 @@ public class SettlementEntry extends HashMap<String, Object> implements Comparab
 	{
 		this.put("amount2", amount2);
 	}
+	
 }

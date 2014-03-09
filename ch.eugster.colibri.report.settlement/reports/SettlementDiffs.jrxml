@@ -4,8 +4,6 @@
 	<parameter name="printTime" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="salespoints" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="dateRange" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="settlements" class="java.lang.String"/>
-	<parameter name="receiptCount" class="java.lang.String"/>
 	<parameter name="header" class="java.lang.String"/>
 	<field name="salespoint" class="java.lang.String"/>
 	<field name="settlement" class="java.lang.String"/>
@@ -24,7 +22,7 @@
 		<groupHeader>
 			<band height="40" splitType="Stretch">
 				<textField>
-					<reportElement uuid="abf88111-33ec-477e-b8c8-b9222863042b" positionType="Float" mode="Opaque" x="0" y="21" width="519" height="19" backcolor="#C0C0C0"/>
+					<reportElement positionType="Float" mode="Opaque" x="0" y="21" width="519" height="19" backcolor="#C0C0C0" uuid="abf88111-33ec-477e-b8c8-b9222863042b"/>
 					<textElement verticalAlignment="Middle">
 						<font size="9"/>
 					</textElement>
@@ -35,7 +33,7 @@
 		<groupFooter>
 			<band height="19" splitType="Stretch">
 				<rectangle>
-					<reportElement uuid="af121bf8-57cf-4ca0-b4a2-e12d6492e782" positionType="Float" x="0" y="0" width="520" height="19" backcolor="#C0C0C0"/>
+					<reportElement positionType="Float" x="0" y="0" width="520" height="19" backcolor="#C0C0C0" uuid="af121bf8-57cf-4ca0-b4a2-e12d6492e782"/>
 					<graphicElement>
 						<pen lineWidth="0.0" lineStyle="Solid"/>
 					</graphicElement>
@@ -48,21 +46,21 @@
 		<groupHeader>
 			<band height="15" splitType="Stretch">
 				<textField>
-					<reportElement uuid="b03a0d09-042d-4a49-80fb-35bc14029f56" positionType="Float" mode="Opaque" x="0" y="0" width="314" height="12" backcolor="#E8E8E8"/>
+					<reportElement positionType="Float" mode="Opaque" x="0" y="0" width="314" height="12" backcolor="#E8E8E8" uuid="b03a0d09-042d-4a49-80fb-35bc14029f56"/>
 					<textElement>
 						<font size="8"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement uuid="7ace6a72-7639-4447-9b99-5416cf954fa5" positionType="Float" mode="Opaque" x="314" y="0" width="111" height="12" backcolor="#E8E8E8"/>
+					<reportElement positionType="Float" mode="Opaque" x="314" y="0" width="111" height="12" backcolor="#E8E8E8" uuid="7ace6a72-7639-4447-9b99-5416cf954fa5"/>
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
 					<text><![CDATA[Datum]]></text>
 				</staticText>
 				<staticText>
-					<reportElement uuid="1c9de956-9ca1-4c31-bfb6-0358008ce80e" positionType="Float" mode="Opaque" x="425" y="0" width="94" height="12" backcolor="#E8E8E8"/>
+					<reportElement positionType="Float" mode="Opaque" x="425" y="0" width="94" height="12" backcolor="#E8E8E8" uuid="1c9de956-9ca1-4c31-bfb6-0358008ce80e"/>
 					<textElement textAlignment="Right">
 						<font size="8"/>
 					</textElement>
@@ -73,14 +71,14 @@
 		<groupFooter>
 			<band height="19" splitType="Stretch">
 				<textField>
-					<reportElement uuid="c0561d45-0915-4a4c-a44f-0b2327e76a80" positionType="Float" mode="Opaque" x="1" y="4" width="424" height="15" backcolor="#E8E8E8"/>
+					<reportElement positionType="Float" mode="Opaque" x="1" y="4" width="424" height="15" backcolor="#E8E8E8" uuid="c0561d45-0915-4a4c-a44f-0b2327e76a80"/>
 					<textElement verticalAlignment="Middle">
 						<font size="8" isBold="false"/>
 					</textElement>
 					<textFieldExpression><![CDATA["Differenz kumuliert"]]></textFieldExpression>
 				</textField>
 				<textField pattern="#,##0.00" isBlankWhenNull="true">
-					<reportElement uuid="f713d64e-b7f0-4514-aa10-93ca9c945674" positionType="Float" mode="Opaque" x="425" y="4" width="94" height="15" backcolor="#E8E8E8"/>
+					<reportElement positionType="Float" mode="Opaque" x="425" y="4" width="94" height="15" backcolor="#E8E8E8" uuid="f713d64e-b7f0-4514-aa10-93ca9c945674"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font size="8" isBold="false"/>
 					</textElement>
@@ -92,63 +90,63 @@
 	<title>
 		<band height="114" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="37f2c824-8b39-40d9-b1e2-9627c3ad163f" x="0" y="59" width="228" height="20"/>
+				<reportElement x="0" y="59" width="228" height="20" uuid="37f2c824-8b39-40d9-b1e2-9627c3ad163f"/>
 				<textElement>
 					<font fontName="Arial" size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tagesabschlussdifferenzen]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="6a29eaa6-4c8b-4e32-8dfe-37c48dda8d26" positionType="Float" x="369" y="1" width="150" height="14"/>
+				<reportElement positionType="Float" x="369" y="1" width="150" height="14" uuid="6a29eaa6-4c8b-4e32-8dfe-37c48dda8d26"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{printTime}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="a4d47988-f773-4e40-9835-60825691846d" positionType="Float" x="0" y="83" width="500" height="12"/>
+				<reportElement positionType="Float" x="0" y="83" width="500" height="12" uuid="a4d47988-f773-4e40-9835-60825691846d"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{salespoints}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="5fe64e74-e1f5-4d44-82dd-692c6e3bfdff" positionType="Float" x="0" y="95" width="500" height="12"/>
+				<reportElement positionType="Float" x="0" y="95" width="500" height="12" uuid="5fe64e74-e1f5-4d44-82dd-692c6e3bfdff"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{dateRange}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement uuid="028f3a1a-0c42-4b96-b76f-244b387b7cef" positionType="Float" x="0" y="0" width="354" height="60"/>
+				<reportElement positionType="Float" x="0" y="0" width="354" height="60" uuid="028f3a1a-0c42-4b96-b76f-244b387b7cef"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{header}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement uuid="6e310b6f-d66a-4399-850f-a4892a312625" positionType="Float" x="1" y="110" width="518" height="1"/>
+				<reportElement positionType="Float" x="1" y="110" width="518" height="1" uuid="6e310b6f-d66a-4399-850f-a4892a312625"/>
 			</line>
 		</band>
 	</title>
 	<detail>
 		<band height="14" splitType="Stretch">
 			<textField>
-				<reportElement uuid="cc42a102-1aac-4b45-a1fe-b6f1e06fd907" positionType="Float" x="0" y="2" width="314" height="11"/>
+				<reportElement positionType="Float" x="0" y="2" width="314" height="11" uuid="cc42a102-1aac-4b45-a1fe-b6f1e06fd907"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{settlement}]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00" isBlankWhenNull="true">
-				<reportElement uuid="6bbae435-acfb-49c4-b1d2-eceef388e47d" positionType="Float" x="425" y="2" width="94" height="11"/>
+				<reportElement positionType="Float" x="425" y="2" width="94" height="11" uuid="6bbae435-acfb-49c4-b1d2-eceef388e47d"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField pattern="dd.MM.yy HH:mm">
-				<reportElement uuid="a38a02d4-d9ff-4cb4-8c44-3f414fab9476" positionType="Float" x="314" y="2" width="111" height="11"/>
+				<reportElement positionType="Float" x="314" y="2" width="111" height="11" uuid="a38a02d4-d9ff-4cb4-8c44-3f414fab9476"/>
 				<textElement textAlignment="Right">
 					<font size="8"/>
 				</textElement>
@@ -159,7 +157,7 @@
 	<pageFooter>
 		<band height="28" splitType="Stretch">
 			<textField>
-				<reportElement uuid="e0cd46de-8dbb-4414-a5db-15bbbb682453" x="281" y="15" width="238" height="13"/>
+				<reportElement x="281" y="15" width="238" height="13" uuid="e0cd46de-8dbb-4414-a5db-15bbbb682453"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="8"/>
 				</textElement>

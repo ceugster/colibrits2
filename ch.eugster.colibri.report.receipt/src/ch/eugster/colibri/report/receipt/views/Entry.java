@@ -16,6 +16,7 @@ public class Entry extends HashMap<String, Object> implements Comparable<Entry>
 	public Entry(Position position)
 	{
 		super();
+		boolean plus = position.getPrice() > 0;
 		this.put("receiptId", position.getReceipt().getId());
 		this.put("section", new Integer(0));
 		this.put("receiptNumber", position.getReceipt().getNumber().toString());
@@ -25,10 +26,11 @@ public class Entry extends HashMap<String, Object> implements Comparable<Entry>
 		this.put("text", getText(position));
 		this.put("price", position.getPrice());
 		this.put("quantity", position.getQuantity());
-		this.put("discount", DecimalFormat.getPercentInstance().format(position.getDiscount()));
+		this.put("discount", DecimalFormat.getPercentInstance().format(Math.abs(position.getDiscount())));
 		this.put("amount1", position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
 		this.put("taxCode", DecimalFormat.getPercentInstance().format(position.getCurrentTax().getPercentage()) + " " + position.getCurrentTax().getTax().getTaxType().getCode());
-		this.put("amount2", position.getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
+		double amount = position.getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
+		this.put("amount2", plus ? -Math.abs(amount) : Math.abs(amount));
 	}
 
 	public Entry(Payment payment)

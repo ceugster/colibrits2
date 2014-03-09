@@ -15,7 +15,6 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -25,6 +24,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
@@ -61,7 +61,6 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.progress.UIJob;
 import org.jdom.Attribute;
 import org.jdom.DocType;
 import org.jdom.Document;
@@ -660,9 +659,10 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			dialog.run(true, true, new IRunnableWithProgress() 
 			{
 				@Override
-				public void run(IProgressMonitor monitor)
+				public void run(IProgressMonitor iProgressMonitor)
 						throws InvocationTargetException, InterruptedException 
 				{
+					SubMonitor monitor = SubMonitor.convert(iProgressMonitor);
 					try
 					{
 						monitor.beginTask("Importiere...", files.length);
@@ -671,7 +671,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 							Document document = load(file);
 							@SuppressWarnings("unchecked")
 							List<Element> elements = document.getRootElement().getChildren("receipt");
-							doImport(new SubProgressMonitor(monitor, elements.size()), elements, file, result);
+							doImport(monitor.newChild(elements.size()), elements, file, result);
 						}
 					}
 					finally
@@ -814,7 +814,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			printer.close();
 		}
 	}
-	private boolean doImport(IProgressMonitor monitor, List<Element> elements, File file, Result result)
+	private boolean doImport(IProgressMonitor subMonitor, List<Element> elements, File file, Result result)
 	{
 		if (!saveDirectory.exists())
 		{
@@ -829,61 +829,65 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 			PersistenceService service = persistenceServiceTracker.getService();
 			if (service != null)
 			{
+				SubMonitor monitor = SubMonitor.convert(subMonitor);
 				SalespointQuery salespointQuery = (SalespointQuery) service.getServerService().getQuery(Salespoint.class);
-				monitor.subTask(file.getName() + " wird importiert...");
+//				monitor.subTask(file.getName() + " wird importiert...");
+				monitor.beginTask(file.getName(), elements.size());
 				try
 				{
-					for (Object object : elements)
+					result.files++;
+					for (Element element : elements)
 					{
-						if (object instanceof Element)
+						if (monitor.isCanceled())
 						{
-							Element element = (Element) object;
-							if (monitor.isCanceled())
+							return false;
+						}
+						result.read++;
+						try
+						{
+							String mappingId = element.getAttributeValue("salespoint-id");
+							Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
+							if (salespoints.isEmpty())
 							{
-								return false;
+								result.error++;
+								log(printer, "Warnung: Kasse mit ExportId " + mappingId + " ist nicht vorhanden.");
 							}
-							result.read++;
-							try
+							else
 							{
-								String mappingId = element.getAttributeValue("salespoint-id");
-								Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
-								if (!salespoints.isEmpty())
+								Salespoint salespoint = salespoints.iterator().next();
+								Settlement settlement = null;
+								Long settled = getSettlementTimeInMillis(element.getAttributeValue("settlement"));
+								Calendar calendar = GregorianCalendar.getInstance();
+								calendar.setTimeInMillis(settled.longValue());
+								if (settled != null)
 								{
-									Salespoint salespoint = salespoints.iterator().next();
-									Settlement settlement = null;
-									Long settled = getSettlementTimeInMillis(element.getAttributeValue("settlement"));
-									Calendar calendar = GregorianCalendar.getInstance();
-									calendar.setTimeInMillis(settled.longValue());
-									if (settled != null)
+									settlement = getSettlement(service, salespoint, settled.longValue());
+								}
+								Receipt receipt = this.convertToReceipt(element, settlement);
+								if (!receiptExists(service, receipt.getOtherId()))
+								{
+	//								service.getServerService().getQuery(Receipt.class);
+									service.getServerService().persist(receipt, false);
+									result.write++;
+								}
+								else
+								{
+									result.exist++;
+									if (printer != null)
 									{
-										settlement = getSettlement(service, salespoint, settled.longValue());
+										String id = element.getAttributeValue("id");
+										log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
 									}
-									Receipt receipt = this.convertToReceipt(element, settlement);
-									if (!receiptExists(service, receipt.getOtherId()))
-									{
-		//								service.getServerService().getQuery(Receipt.class);
-										service.getServerService().persist(receipt, false);
-										result.write++;
-									}
-									else
-									{
-										result.exist++;
-										if (printer != null)
-										{
-											String id = element.getAttributeValue("id");
-											log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
-										}
-										Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + element.getAttributeValue("id") + ": Beleg existiert bereits.");
-									}
+									Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + element.getAttributeValue("id") + ": Beleg existiert bereits.");
 								}
 							}
-							catch (Exception e)
-							{
-								Activator.getDefault().log(LogService.LOG_ERROR, "Fehler beim verarbeiten von Beleg mit der Id " + element.getAttributeValue("id") + ": " + e.getMessage());
-								result.error++;
-								String id = element.getAttributeValue("id");
-								log(printer, "Fehler in Beleg " + id + ": " + e.getLocalizedMessage());
-							}
+						}
+						catch (Exception e)
+						{
+							Activator.getDefault().log(LogService.LOG_ERROR, "Fehler beim verarbeiten von Beleg mit der Id " + element.getAttributeValue("id") + ": " + e.getMessage());
+							result.error++;
+							String id = element.getAttributeValue("id");
+							log(printer, "Fehler in Beleg " + id + ": " + e.getLocalizedMessage());
 						}
 						monitor.worked(1);
 					}

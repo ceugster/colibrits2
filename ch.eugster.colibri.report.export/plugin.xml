@@ -27,7 +27,7 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="menu?ch.eugster.colibri.report.menu.views?after=additions">
+            locationURI="menu:ch.eugster.colibri.report.menu.views?after=additions">
          <command
                commandId="org.eclipse.ui.views.showView"
                label="Import/Export"
@@ -40,7 +40,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:ch.eugster.colibri.report.perspective.toolbar?after=additions">
+            locationURI="toolbar:ch.eugster.colibri.report.toolbar.perspectives?after=additions">
          <command
                commandId="org.eclipse.ui.perspectives.showPerspective"
                label="Import/Export"

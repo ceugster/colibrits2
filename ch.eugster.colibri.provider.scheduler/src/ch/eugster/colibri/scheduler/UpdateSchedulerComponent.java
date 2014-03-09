@@ -318,7 +318,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 		{
 			if (providerUpdater.doUpdatePositions())
 			{
-				Collection<Position> positions = providerUpdater.getPositions(persistenceService.getCacheService(), getSchedulerCount());
+				Collection<Position> positions = providerUpdater.getPositions(persistenceService, getSchedulerCount());
 				return providerUpdater.updatePositions(persistenceService, positions);
 			}
 			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());

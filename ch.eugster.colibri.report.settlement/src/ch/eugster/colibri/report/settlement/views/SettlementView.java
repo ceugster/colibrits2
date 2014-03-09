@@ -60,9 +60,9 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 
 	private ISettlementCompositeChild selectedChild;
 
-	private Salespoint[] selectedSalespoints;
-	
-	private Calendar[] selectedDateRange;
+//	private Salespoint[] selectedSalespoints;
+//	
+//	private Calendar[] selectedDateRange;
 	
 	private ReportService.Destination selectedDestination;
 
@@ -97,7 +97,7 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		TabItem item = new TabItem(tabFolder, SWT.NONE);
-		item.setText("Nach Datumsbereich");
+		item.setText("Datumsbereich");
 		SettlementDateRangeComposite dateRangeComposite = new SettlementDateRangeComposite(tabFolder, this, SWT.NONE);
 		item.setControl(dateRangeComposite);
 		tabFolder.setSelection(item);
@@ -107,6 +107,18 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 		SettlementNumberComposite numberComposite = new SettlementNumberComposite(tabFolder, this, SWT.NONE);
 		numberComposite.addSelectionChangedListener(this);
 		item.setControl(numberComposite);
+
+		item = new TabItem(tabFolder, SWT.NONE);
+		item.setText("Differenzliste");
+		SettlementDifferenceComposite differenceComposite = new SettlementDifferenceComposite(tabFolder, this, SWT.NONE);
+		differenceComposite.addSelectionChangedListener(this);
+		item.setControl(differenceComposite);
+
+		item = new TabItem(tabFolder, SWT.NONE);
+		item.setText("Rabattliste");
+		SettlementDiscountComposite discountComposite = new SettlementDiscountComposite(tabFolder, this, SWT.NONE);
+		discountComposite.addSelectionChangedListener(this);
+		item.setControl(discountComposite);
 
 		// item = new TabItem(tabFolder, SWT.NONE);
 		// item.setText("Abschlüsse über Periode");
@@ -189,8 +201,8 @@ public class SettlementView extends ViewPart implements IViewPart, ISelectionLis
 						MessageDialog.openInformation(null, "Keine Daten vorhanden", "Für die gewählte Selektion sind keine Daten vorhanden (aus der Vorgängerversion übernommene Daten sind für diese Auswertung nicht abrufbar).");
 						return;
 					}
-					selectedSalespoints = getSelectedSalespoints();
-					selectedDateRange = getSelectedDateRange();
+//					selectedSalespoints = getSelectedSalespoints();
+//					selectedDateRange = getSelectedDateRange();
 					selectedDestination = getSelectedDestination();
 					selectedFormat = getSelectedFormat();
 					final Hashtable<String, Object> parameters = selectedChild.getParameters();

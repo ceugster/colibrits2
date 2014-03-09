@@ -1820,6 +1820,7 @@ ch.eugster.colibri.report.settlement/reports/SettlementStatistics_old.jrxml -tex
 ch.eugster.colibri.report.settlement/reports/SingleSettlementReport.jrxml -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/Activator.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/ReportSettlementPerspective.java -text
+ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/model/DifferenceEntry.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/model/Section.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/model/SettlementEntry.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/AbstractSettlementCompositeChild.java -text
@@ -1827,6 +1828,8 @@ ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/vi
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/Row.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementContentProvider.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementDateRangeComposite.java -text
+ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementDifferenceComposite.java -text
+ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementDiscountComposite.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementLabelProvider.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementNotSettledFilter.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementNumberComposite.java -text

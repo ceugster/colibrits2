@@ -199,7 +199,14 @@ public class PositionListView extends ViewPart implements ISelectionListener, IS
 					}
 					else
 					{
-						cell.setText(position.getProduct().getExternalProductGroup().format());
+						if (position.getProduct().getExternalProductGroup() == null)
+						{
+							cell.setText(position.getProductGroup().getCode() + " - " + position.getProductGroup().getName());
+						}
+						else
+						{
+							cell.setText(position.getProduct().getExternalProductGroup().format());
+						}
 					}
 				}
 			}

@@ -5,7 +5,7 @@ Name ColibriTS
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 3.7.2-1.0.0.201402231900
+!define VERSION 3.7.2-1.0.0.201403081000
 !define COMPANY "Christian Eugster"
 !define URL http://eugster-informatik.ch/
 !define PRODUCT_PATH C:\Programme\ColibriTSII\release-${VERSION}
@@ -77,14 +77,18 @@ Section -Main SEC0000
     File /r ${PRODUCT_PATH}\p2\*
     SetOutPath $INSTDIR\jre
     File /r ${COMMON_PATH}\jre\*
+    SetOutPath $INSTDIR\dll\com4j
+    File /r ${COMMON_PATH}\dll\com4j\com4j-x86.dll
     SetOutPath $INSTDIR\plugins
     File /r ${PRODUCT_PATH}\plugins\*
+    SetOutPath $INSTDIR\readme
+    File /r ${PRODUCT_PATH}\readme\*
     SetOutPath $INSTDIR\readme
     File /r ${PRODUCT_PATH}\readme\*
     SetOutPath $INSTDIR
     File /r ${PRODUCT_PATH}\.eclipseproduct
     File /r ${PRODUCT_PATH}\admin.exe
-    File /r ${COMMON_PATH}\admin.ini
+    File /r ${PRODUCT_PATH}\admin.ini
     File /r ${PRODUCT_PATH}\artifacts.xml
     File /r ${COMMON_PATH}\client.exe
     File /r ${COMMON_PATH}\client.ini
