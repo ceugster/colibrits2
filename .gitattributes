@@ -1008,6 +1008,9 @@ ch.eugster.colibri.drivers.derby/lib/derby.jar -text
 ch.eugster.colibri.drivers.derby/lib/derbyclient.jar -text
 ch.eugster.colibri.drivers.derby/lib/derbynet.jar -text
 ch.eugster.colibri.drivers.derby/lib/derbytools.jar -text
+ch.eugster.colibri.drivers.mysql.feature/.project -text
+ch.eugster.colibri.drivers.mysql.feature/build.properties -text
+ch.eugster.colibri.drivers.mysql.feature/feature.xml -text
 ch.eugster.colibri.drivers.postgresql.feature/.project -text
 ch.eugster.colibri.drivers.postgresql.feature/build.properties -text
 ch.eugster.colibri.drivers.postgresql.feature/feature.xml -text
