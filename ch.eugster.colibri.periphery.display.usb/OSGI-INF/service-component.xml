@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.colibri.periphery.display.usb">
+   <implementation class="ch.eugster.colibri.periphery.display.usb.service.UsbCustomerDisplayService"/>
+   <property name="custom.device" type="String" value="USB Kundendisplay"/>
+   <property name="custom.group" type="Integer" value="1"/>
+   <property name="custom.port" type="String" value="COM4:"/>
+   <property name="custom.convert" type="String">#Ä
+196=91
+#Ö
+214=92
+#Ü
+220=93
+#ä
+228=123
+#ö
+246=124
+#ü
+252=125
+   </property>
+   <property name="custom.cols" type="Integer" value="20"/>
+   <property name="custom.rows" type="Integer" value="2"/>
+   <property name="custom.delay" type="Integer" value="5"/>
+   <reference bind="setLogService" cardinality="0..n" interface="org.osgi.service.log.LogService" name="LogService" policy="static" unbind="unsetLogService"/>
+   <reference bind="setPersistenceService" cardinality="1..1" interface="ch.eugster.colibri.persistence.service.PersistenceService" name="PersistenceService" policy="static" unbind="unsetPersistenceService"/>
+   <reference bind="setEventAdmin" cardinality="0..1" interface="org.osgi.service.event.EventAdmin" name="EventAdmin" policy="static" unbind="unsetEventAdmin"/>
+   <service>
+      <provide interface="ch.eugster.colibri.periphery.display.service.CustomerDisplayService"/>
+   </service>
+</scr:component>
