@@ -1863,6 +1863,9 @@ ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/vi
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementNotSettledFilter.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementNumberComposite.java -text
 ch.eugster.colibri.report.settlement/src/ch/eugster/colibri/report/settlement/views/SettlementView.java -text
+ch.eugster.colibri.report.tax.feature/.project -text
+ch.eugster.colibri.report.tax.feature/build.properties -text
+ch.eugster.colibri.report.tax.feature/feature.xml -text
 ch.eugster.colibri.report.tax/.classpath -text
 ch.eugster.colibri.report.tax/.project -text
 ch.eugster.colibri.report.tax/.settings/org.eclipse.core.resources.prefs -text
