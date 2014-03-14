@@ -5,11 +5,11 @@ Name ColibriTS
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 3.7.2-1.0.0.201403081000
+!define VERSION 3.7.2-2.0.2.201403131800
 !define COMPANY "Christian Eugster"
 !define URL http://eugster-informatik.ch/
-!define PRODUCT_PATH C:\Programme\ColibriTSII\release-${VERSION}
-!define COMMON_PATH C:\Programme\ColibriTSII\common
+!define PRODUCT_PATH C:\Projekte\Colibrits2\Product\release-${VERSION}
+!define COMMON_PATH C:\Projekte\Colibrits2\Install\common
 
 # MUI Symbol Definitions
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install-blue-full.ico"
