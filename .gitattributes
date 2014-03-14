@@ -2005,6 +2005,9 @@ ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/viewer/actions/
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/viewer/actions/ZoomOutAction.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/viewer/util/BrowserUtils.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/viewer/util/Compatibility.java -text
+ch.eugster.colibri.scheduler.feature/.project -text
+ch.eugster.colibri.scheduler.feature/build.properties -text
+ch.eugster.colibri.scheduler.feature/feature.xml -text
 ch.eugster.colibri.settlement.feature/.project -text
 ch.eugster.colibri.settlement.feature/build.properties -text
 ch.eugster.colibri.settlement.feature/feature.xml -text

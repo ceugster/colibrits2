@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ch.eugster.colibri.scheduler.feature"
+      label="Scheduler Feature"
+      version="1.0.0.qualifier"
+      provider-name="Christian Eugster">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="ch.eugster.colibri.persistence.transfer"/>
+      <import plugin="ch.eugster.colibri.provider"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.jobs"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.osgi.services"/>
+   </requires>
+
+   <plugin
+         id="ch.eugster.colibri.scheduler"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
