@@ -1753,6 +1753,9 @@ ch.eugster.colibri.report.list/build.properties -text
 ch.eugster.colibri.report.list/src/ch/eugster/colibri/report/list/Activator.java -text
 ch.eugster.colibri.report.list/src/ch/eugster/colibri/report/list/views/ListView.java -text
 ch.eugster.colibri.report.list/src/ch/eugster/colibri/report/list/views/ReportLabelProvider.java -text
+ch.eugster.colibri.report.productgroup.feature/.project -text
+ch.eugster.colibri.report.productgroup.feature/build.properties -text
+ch.eugster.colibri.report.productgroup.feature/feature.xml -text
 ch.eugster.colibri.report.productgroup/.classpath -text
 ch.eugster.colibri.report.productgroup/.project -text
 ch.eugster.colibri.report.productgroup/.settings/org.eclipse.core.resources.prefs -text

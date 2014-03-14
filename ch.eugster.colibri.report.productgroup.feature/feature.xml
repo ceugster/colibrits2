@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ch.eugster.colibri.report.productgroup.feature"
+      label="Modul Warengruppenstatistik"
+      version="1.0.0.qualifier"
+      provider-name="Christian Eugster">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="ch.eugster.colibri.report.daterange"/>
+      <import plugin="ch.eugster.colibri.report.destination"/>
+      <import plugin="ch.eugster.colibri.report"/>
+      <import plugin="ch.eugster.colibri.report.salespoint"/>
+   </requires>
+
+   <plugin
+         id="ch.eugster.colibri.report.productgroup"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
