@@ -153,8 +153,10 @@ public class ReceiptLayoutCustomerSection extends AbstractLayoutSection
 						}
 						case S:
 						{
-							return layoutSection.replaceMarker(Double.valueOf(receipt.getCustomer().getAccount())
-									.toString(), marker, false);
+							double account = receipt.getCustomer().getAccount();
+							amountFormatter.setMaximumFractionDigits(receipt.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
+							amountFormatter.setMinimumFractionDigits(receipt.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
+							return layoutSection.replaceMarker(amountFormatter.format(account), marker, false);
 						}
 						default:
 						{

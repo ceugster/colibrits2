@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
@@ -25,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -836,6 +836,8 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 				try
 				{
 					result.files++;
+					Salespoint salespoint = null;
+					Settlement settlement = null;
 					for (Element element : elements)
 					{
 						if (monitor.isCanceled())
@@ -846,40 +848,50 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 						try
 						{
 							String mappingId = element.getAttributeValue("salespoint-id");
-							Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
-							if (salespoints.isEmpty())
+							if (salespoint == null || !salespoint.getMapping().equals(mappingId))
 							{
-								result.error++;
-								log(printer, "Warnung: Kasse mit ExportId " + mappingId + " ist nicht vorhanden.");
-							}
-							else
-							{
-								Salespoint salespoint = salespoints.iterator().next();
-								Settlement settlement = null;
-								Long settled = getSettlementTimeInMillis(element.getAttributeValue("settlement"));
-								Calendar calendar = GregorianCalendar.getInstance();
-								calendar.setTimeInMillis(settled.longValue());
-								if (settled != null)
+								Collection<Salespoint> salespoints = salespointQuery.selectByMapping(mappingId);
+								if (salespoints.isEmpty())
 								{
-									settlement = getSettlement(service, salespoint, settled.longValue());
-								}
-								Receipt receipt = this.convertToReceipt(element, settlement);
-								if (!receiptExists(service, receipt.getOtherId()))
-								{
-	//								service.getServerService().getQuery(Receipt.class);
-									service.getServerService().persist(receipt, false);
-									result.write++;
+									result.error++;
+									log(printer, "Warnung: Kasse mit ExportId " + mappingId + " ist nicht vorhanden.");
+									continue;
 								}
 								else
 								{
-									result.exist++;
-									if (printer != null)
-									{
-										String id = element.getAttributeValue("id");
-										log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
-									}
-									Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + element.getAttributeValue("id") + ": Beleg existiert bereits.");
+									salespoint = salespoints.iterator().next();
 								}
+								
+							}
+							Long settled = getSettlementTimeInMillis(element.getAttributeValue("settlement"));
+							if (settled == null)
+							{
+								result.error++;
+								log(printer, "Warnung: Abschluss hat keine Abschlussdatum ist nicht vorhanden.");
+								continue;
+							}
+							Calendar calendar = GregorianCalendar.getInstance();
+							calendar.setTimeInMillis(settled.longValue());
+							if (settlement == null || !settlement.getSettled().equals(calendar))
+							{
+								settlement = getSettlement(service, salespoint, settled.longValue());
+							}
+							Long otherId = getOtherId(element);
+							if (!receiptExists(service, otherId))
+							{
+								Receipt receipt = this.convertToReceipt(element, settlement);
+								service.getServerService().persist(receipt, false);
+								result.write++;
+							}
+							else
+							{
+								result.exist++;
+								if (printer != null)
+								{
+									String id = element.getAttributeValue("id");
+									log(printer, "Warnung: Beleg " + id + " ist bereits vorhanden.");
+								}
+								Activator.getDefault().log(LogService.LOG_ERROR, "Beleg mit der Id " + element.getAttributeValue("id") + ": Beleg existiert bereits.");
 							}
 						}
 						catch (Exception e)

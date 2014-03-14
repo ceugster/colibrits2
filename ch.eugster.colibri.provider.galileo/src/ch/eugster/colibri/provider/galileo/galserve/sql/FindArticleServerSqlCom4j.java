@@ -158,22 +158,16 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		position.setProviderBooked(false);
 		position.setOrdered(((Boolean)this.galserve.bestellt()).booleanValue());
 
-		if (position.getPrice() == position.getReceipt().getSettlement().getSalespoint().getProposalPrice())
+		if (position.getPrice() == position.getReceipt().getSettlement().getSalespoint().getProposalPrice() || position.getPrice() == 0D)
 		{
 			final double price = ((Double)this.galserve.preis()).doubleValue();
-			if (position.getPrice() != price)
-			{
-				position.setPrice(price);
-			}
+			position.setPrice(price);
 		}
 
-		if (position.getQuantity() == position.getReceipt().getSettlement().getSalespoint().getProposalQuantity())
+		if (position.getQuantity() == position.getReceipt().getSettlement().getSalespoint().getProposalQuantity() || position.getQuantity() == 0)
 		{
 			final int quantity = ((Integer)this.galserve.menge()).intValue();
-			if (position.getQuantity() == 0)
-			{
-				position.setQuantity(quantity);
-			}
+			position.setQuantity(quantity == 0 ? 1 : quantity);
 		}
 
 		setExternalProductGroup(position);
@@ -246,6 +240,8 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		{
 			position.setOrder(this.galserve.bestnummer().toString());
 			position.setFromStock(((Boolean)this.galserve.lagerabholfach()).booleanValue());
+			position.getReceipt().setCustomer(this.getCustomer(((Integer) this.galserve.kundennr()).intValue()));
+			position.getReceipt().setCustomerCode(position.getReceipt().getCustomer().getId().toString());
 		}
 	}
 
@@ -358,7 +354,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 	@Override
 	public IStatus start()
 	{
-		super.start();
+		this.status = super.start();
 		try
 		{
 			this.galserve = ClassFactory.creategdserve2g();

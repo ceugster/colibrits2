@@ -19,6 +19,7 @@ import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.model.CurrentTaxCodeMapping;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
@@ -57,12 +58,6 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 		return galserve;
 	}
 	
-	public boolean isConnect()
-	{
-		IProperty property = properties.get(GalileoProperty.CONNECT.key());
-		return Integer.valueOf(property.value()).intValue() > 0;
-	}
-
 	protected void setEbookProduct(final Barcode barcode, final Position position)
 	{
 		Product product = Product.newInstance(position);
@@ -176,7 +171,6 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 							{
 								try
 								{
-									
 									if (this.getGalserve().do_getkunde(customerId))
 									{
 										this.updatePosition(barcode, position);
@@ -664,7 +658,13 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 			}
 		}
 
-		return this.galileoTransactionWritten();
+		IStatus status = this.galileoTransactionWritten();
+		if (status.isOK())
+		{
+			position.setProviderBooked(true);
+			this.updateCustomerAccount(position);
+		}
+		return status;
 	}
 
 	private Integer getGalileoCustomerCode(final Receipt receipt)
@@ -691,14 +691,22 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 
 	private String getTaxCode(Position position)
 	{
-		String tax = null;
+		String tax = "0";
 		if (this.configuration.canMap(position.getCurrentTax()))
 		{
-			tax = position.getCurrentTax().getCurrentTaxCodeMapping(position.getProvider()).getCode();
+			CurrentTaxCodeMapping mapping = position.getCurrentTax().getCurrentTaxCodeMapping(position.getProvider());
+			if (mapping != null)
+			{
+				tax = mapping.getCode();
+			}
 		}
 		else if (this.configuration.canMap(position.getCurrentTax().getTax()))
 		{
-			tax = position.getCurrentTax().getTax().getTaxCodeMapping(position.getProvider()).getCode();
+			TaxCodeMapping mapping = position.getCurrentTax().getTax().getTaxCodeMapping(position.getProvider());
+			if (mapping != null)
+			{
+				tax = mapping.getCode();
+			}
 		}
 		return tax;
 	}
@@ -721,21 +729,21 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 
 			if (position.getProduct() == null)
 			{
-				this.getGalserve().vwgname(position.getProductGroup().getName());
-				this.getGalserve().vwgruppe(position.getProductGroup().getCode());
+				this.getGalserve().vwgname(cut(position.getProductGroup().getName(), 30));
+				this.getGalserve().vwgruppe(cut(position.getProductGroup().getCode(), 2));
 			}
 			else
 			{
 				this.getGalserve().vnummer(position.getProduct().getCode());
 				if (position.getOption().equals(Position.Option.PAYED_INVOICE))
 				{
-					this.getGalserve().vwgname(position.getProductGroup().getName());
-					this.getGalserve().vwgruppe(position.getProductGroup().getCode());
+					this.getGalserve().vwgname(cut(position.getProductGroup().getName(), 30));
+					this.getGalserve().vwgruppe(cut(position.getProductGroup().getCode(), 2));
 				}
 				else
 				{
-					this.getGalserve().vwgname(position.getProduct().getExternalProductGroup().getText());
-					this.getGalserve().vwgruppe(position.getProduct().getExternalProductGroup().getCode());
+					this.getGalserve().vwgname(cut(position.getProduct().getExternalProductGroup().getText(), 30));
+					this.getGalserve().vwgruppe(cut(position.getProduct().getExternalProductGroup().getCode(), 3));
 					try
 					{
 						TaxCodeMapping taxCodeMapping = position.getCurrentTax().getTax().getTaxCodeMapping(Activator.getDefault().getConfiguration().getProviderId());
@@ -759,6 +767,15 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 		return status;
 	}
 
+	private String cut(String value, int maxlength)
+	{
+		if (value == null)
+		{
+			return "";
+		}
+		return value.length() > maxlength ? value.substring(0, maxlength) : value;
+	}
+	
 	private IStatus doVerkauf(Position position, IStatus status)
 	{
 		if (status.getSeverity() == IStatus.OK)
@@ -953,6 +970,8 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 		{
 			position.setOrder(this.getGalserve().bestnummer().toString());
 			position.setFromStock(((Boolean)this.getGalserve().lagerabholfach()).booleanValue());
+			position.getReceipt().setCustomer(this.getCustomer(((Integer) this.galserve.kundennr()).intValue()));
+			position.getReceipt().setCustomerCode(position.getReceipt().getCustomer().getId().toString());
 		}
 	}
 
@@ -992,17 +1011,17 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 	@Override
 	public IStatus start()
 	{
-		status = super.start();
+		this.status = super.start();
 		try
 		{
-			this.galserve = ch.eugster.colibri.provider.galileo.galserve.old.ClassFactory.creategdserve();
+			this.galserve = ClassFactory.creategdserve();
 		}
 		catch (Exception e)
 		{
-			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
 					"Die Verbindung zu Warenbewirtschaftung kann nicht hergestellt werden.", e);
 		}
-		return status;
+		return this.status;
 	}
 	
 	@Override
@@ -1050,7 +1069,7 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 	{
 		IProperty property = properties.get(GalileoProperty.KEEP_CONNECTION.key());
 		int keepConnection = Integer.valueOf(property.value()).intValue();
-		if (force || (!this.wasOpen && this.open && keepConnection == 0))
+		if (this.open && (force || (!this.wasOpen && keepConnection == 0)))
 		{
 			this.galserve.do_NClose();
 			this.open = false;

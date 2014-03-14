@@ -28,6 +28,8 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 
 	protected static NumberFormat simpleIntegerFormatter = DecimalFormat.getIntegerInstance();
 
+	protected static NumberFormat amountFormatter = DecimalFormat.getNumberInstance();
+
 	private final ILayoutSectionType layoutSectionType;
 
 	private String titlePattern;

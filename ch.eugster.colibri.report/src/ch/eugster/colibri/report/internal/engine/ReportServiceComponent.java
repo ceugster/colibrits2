@@ -89,14 +89,17 @@ public class ReportServiceComponent implements ReportService
 				case PDF:
 				{
 					JasperExportManager.exportReportToPdfFile(jasperPrint, file.getAbsolutePath());
+					break;
 				}
 				case HTML:
 				{
 					JasperExportManager.exportReportToHtmlFile(jasperPrint, file.getAbsolutePath());
+					break;
 				}
 				case XML:
 				{
 					JasperExportManager.exportReportToXmlFile(jasperPrint, file.getAbsolutePath(), true);
+					break;
 				}
 			}
 		}

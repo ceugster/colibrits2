@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/iText-2.1.7.js1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-beanutils-1.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-collections-2.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-digester-2.1.jar"/>

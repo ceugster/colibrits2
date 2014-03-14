@@ -616,6 +616,8 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 			{
 				if (this.getGalserve().do_wgstorno())
 				{
+					position.setProviderBooked(true);
+					this.updateCustomerAccount(position);
 					log(LogService.LOG_INFO, "Galileo: do_wgstorno() für " + position.getProductGroup().getName()
 								+ " aufgerufen... Ok!");
 				}
@@ -635,8 +637,11 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		{
 			try
 			{
-				if (this.getGalserve().do_wgverkauf())
+				boolean sold = this.getGalserve().do_wgverkauf();
+				if (sold)
 				{
+					position.setProviderBooked(true);
+					this.updateCustomerAccount(position);
 					log(LogService.LOG_INFO, "Galileo: do_wgverkauf() für " + position.getProductGroup().getName()
 								+ " aufgerufen... Ok!");
 				}
@@ -739,6 +744,19 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 				{
 					this.getGalserve().vwgname(cut(position.getProduct().getExternalProductGroup().getText(), 30));
 					this.getGalserve().vwgruppe(cut(position.getProduct().getExternalProductGroup().getCode(), 3));
+					try
+					{
+						TaxCodeMapping taxCodeMapping = position.getCurrentTax().getTax().getTaxCodeMapping(Activator.getDefault().getConfiguration().getProviderId());
+						if (taxCodeMapping.isDeleted())
+						{
+							throw new NullPointerException();
+						}
+						this.getGalserve().vmwst(taxCodeMapping.getCode());
+					}
+					catch (NullPointerException e)
+					{
+//						String msg = "Beim Versuch, die Warenbewirtschaftung zu aktualisieren, ist ein Fehler aufgetreten (Fehler Mwst-Mapping ungültig).";
+					}
 				}
 			}
 		}
@@ -952,6 +970,8 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		{
 			position.setOrder(this.getGalserve().bestnummer().toString());
 			position.setFromStock(((Boolean)this.getGalserve().lagerabholfach()).booleanValue());
+			position.getReceipt().setCustomer(this.getCustomer(((Integer) this.galserve.kundennr()).intValue()));
+			position.getReceipt().setCustomerCode(position.getReceipt().getCustomer().getId().toString());
 		}
 	}
 
