@@ -1008,6 +1008,9 @@ ch.eugster.colibri.drivers.derby/lib/derby.jar -text
 ch.eugster.colibri.drivers.derby/lib/derbyclient.jar -text
 ch.eugster.colibri.drivers.derby/lib/derbynet.jar -text
 ch.eugster.colibri.drivers.derby/lib/derbytools.jar -text
+ch.eugster.colibri.drivers.sqlserver.feature/.project -text
+ch.eugster.colibri.drivers.sqlserver.feature/build.properties -text
+ch.eugster.colibri.drivers.sqlserver.feature/feature.xml -text
 ch.eugster.colibri.encryption.feature/.project -text
 ch.eugster.colibri.encryption.feature/build.properties -text
 ch.eugster.colibri.encryption.feature/feature.xml -text
