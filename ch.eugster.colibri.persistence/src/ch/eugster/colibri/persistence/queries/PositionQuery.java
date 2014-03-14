@@ -1089,12 +1089,30 @@ public class PositionQuery extends AbstractQuery<Position>
 					.equal(salespoints[i]));
 		}
 		expression = expression.and(sps);
+
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.between(dateRange[0], dateRange[1]));
+		}
+		else if (dateRange[0] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.greaterThanEqual(dateRange[0]));
+		}
+		else if (dateRange[1] != null)
+		{
+			expression = expression.and(new ExpressionBuilder().get("receipt").get("timestamp")
+					.lessThanEqual(dateRange[1]));
+		}
+
 		Expression alloc = new ExpressionBuilder().get("productGroup").get("productGroupType")
 				.equal(ProductGroupType.ALLOCATION);
 		Expression withd = new ExpressionBuilder().get("productGroup").get("productGroupType")
 				.equal(ProductGroupType.WITHDRAWAL);
 
 		expression = expression.and(alloc.or(withd));
+
 		List<Position> internals = this.select(expression);
 		return internals;
 	}

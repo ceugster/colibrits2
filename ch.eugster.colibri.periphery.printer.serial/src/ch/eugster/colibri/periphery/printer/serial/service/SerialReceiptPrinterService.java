@@ -1,7 +1,11 @@
 package ch.eugster.colibri.periphery.printer.serial.service;
 
-import java.io.PrintStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collection;
+
+import javax.comm.CommPort;
+import javax.comm.CommPortIdentifier;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -19,7 +23,9 @@ import ch.eugster.colibri.persistence.model.Stock;
 
 public class SerialReceiptPrinterService extends AbstractReceiptPrinterService 
 {
-	private PrintStream printer;
+	private CommPort commPort;
+	
+	private OutputStream printer;
 	
 	protected void activate(ComponentContext context)
 	{
@@ -35,9 +41,20 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		if (this.printer != null)
 		{
-			this.printer.flush();
-			this.printer.close();
+			try 
+			{
+				this.printer.flush();
+				this.printer.close();
+			} 
+			catch (IOException e) 
+			{
+			}
 			this.printer = null;
+		}
+		if (this.commPort != null)
+		{
+			this.commPort.close();
+			this.commPort = null;
 		}
 	}
 
@@ -45,10 +62,13 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		try
 		{
-			this.printer = new PrintStream(deviceName);
-			this.printer.print(new char[] { AsciiConstants.ESC, AsciiConstants.AT });
-			this.printer.print(new char[] { AsciiConstants.ESC, AsciiConstants.S });
-			this.printer.print(new char[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
+			String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(port);
+			commPort = portId.open("posprinter", 2000);
+			printer = commPort.getOutputStream();
+			print(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+			print(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
+			print(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
 		}
 		catch (final Exception e)
 		{
@@ -74,7 +94,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
 			}
 			final String printable = this.getConverter().convert(text);
-			printer.print(printable + "\n");
+			println(printable.getBytes());
 			this.cutPaper(this.getLinesBeforeCut());
 			closePrinter();
 		}
@@ -82,11 +102,17 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 
 	private void printNVBitImage(int n, int m)
 	{
-		this.printer.write(AsciiConstants.FS);
-		this.printer.write(AsciiConstants.p);
-		this.printer.write(n);
-		this.printer.write(m);
-		this.printer.flush();
+		try 
+		{
+			this.printer.write(AsciiConstants.FS);
+			this.printer.write(AsciiConstants.p);
+			this.printer.write(n);
+			this.printer.write(m);
+			this.printer.flush();
+		} 
+		catch (IOException e) 
+		{
+		}
 	}
 	
 	@Override
@@ -105,12 +131,46 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 			Converter converter = new Converter(settings == null ? this.getReceiptPrinterSettings().getConverter() : settings.getConverter());
 			final String printable = converter.convert(text);
-			printer.print(printable + "\n");
+			println(printable.getBytes());
 			this.cutPaper(settings == null ? this.getReceiptPrinterSettings().getLinesBeforeCut() : settings.getLinesBeforeCut());
 			closePrinter();
 		}
 	}
 
+	private void print(byte[] bytes)
+	{
+		try 
+		{
+			printer.write(bytes);
+		} 
+		catch (IOException e) 
+		{
+		}
+	}
+	
+	private void println(byte[] bytes)
+	{
+		try 
+		{
+			printer.write(bytes);
+			printer.write(new byte[] { '\n' });
+		} 
+		catch (IOException e) 
+		{
+		}
+	}
+	
+	private void println()
+	{
+		try 
+		{
+			printer.write(new byte[] { '\n' });
+		} 
+		catch (IOException e) 
+		{
+		}
+	}
+	
 	@Override
 	public void print(String[] text) 
 	{
@@ -127,7 +187,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			for (String line : text)
 			{
 				final String printable = this.getConverter().convert(line);
-				printer.print(printable + "\n");
+				println(printable.getBytes());
 			}
 			this.cutPaper(this.getLinesBeforeCut());
 			this.closePrinter();
@@ -154,11 +214,11 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 				{
 					if (salespoint.getPaymentType().getCurrency().getId().equals(stock.getPaymentType().getCurrency().getId()))
 					{
-						this.printer.print(new char[] { 16, 20, 1, 0, 4});
+						this.print(new byte[] { 16, 20, 1, 0, 4});
 					}
 					else
 					{
-						this.printer.print(new char[] { 16, 20, 1, 1, 4});
+						this.print(new byte[] { 16, 20, 1, 1, 4});
 					}
 				}
 			}
@@ -206,7 +266,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 			if (printer != null)
 			{
-				printer.print(printable + "\n");
+				println(printable.getBytes());
 				this.cutPaper(feed);
 			}
 		} 
@@ -221,9 +281,9 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		for (int i = 0; i < linesBeforeCut; i++)
 		{
-			this.printer.println();
+			this.println();
 		}
-		String cut = new String(new char[] { 29, 86, 0 });
-		this.printer.println(cut);
+		String cut = new String(new byte[] { 29, 86, 0 });
+		this.println(cut.getBytes());
 	}
 }

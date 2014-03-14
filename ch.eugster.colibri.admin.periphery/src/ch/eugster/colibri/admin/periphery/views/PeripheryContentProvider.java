@@ -208,10 +208,13 @@ public class PeripheryContentProvider implements ITreeContentProvider
 					for (ServiceReference<DisplayService> displayServiceReference : displayServiceReferences)
 					{
 						DisplayService displayService = Activator.getDefault().getBundle().getBundleContext().getService(displayServiceReference);
-						ILayoutType layoutType = displayService.getLayoutType(customerDisplayService);
-						if (layoutType != null && layoutType.hasCustomerEditableAreaTypes())
+						if (displayService != null)
 						{
-							hasChildren = true;
+							ILayoutType layoutType = displayService.getLayoutType(customerDisplayService);
+							if (layoutType != null && layoutType.hasCustomerEditableAreaTypes())
+							{
+								hasChildren = true;
+							}
 						}
 					}
 				}

@@ -28,6 +28,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.actions.BackAction;
+import ch.eugster.colibri.client.ui.actions.BackFromSettleAction;
 import ch.eugster.colibri.client.ui.actions.ClearAction;
 import ch.eugster.colibri.client.ui.actions.DiscountAction;
 import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
@@ -164,6 +165,10 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			this.getReceiptWrapper().getReceipt().setCustomer(null);
 		}
 		else if (event.getActionCommand().equals(BackAction.ACTION_COMMAND))
+		{
+			this.fireStateChange(new StateChangeEvent(this.getCurrentState(), this.oldState));
+		}
+		else if (event.getActionCommand().equals(BackFromSettleAction.ACTION_COMMAND))
 		{
 			if (this.getMainTabbedPane().settlementRequired())
 			{

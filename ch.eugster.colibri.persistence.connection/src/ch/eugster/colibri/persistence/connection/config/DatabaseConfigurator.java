@@ -421,7 +421,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		{
 			ProductGroup productGroup = ProductGroup.newInstance(ProductGroupType.SALES_RELATED, settings);
 			productGroup.setAccount(null);
-			productGroup.setCode("Default WG");
+			productGroup.setCode("999");
 			productGroup.setDefaultTax(tax);
 			productGroup.setMappingId(null);
 			productGroup.setName("Default WG");

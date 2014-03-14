@@ -1,19 +1,29 @@
 package ch.eugster.colibri.periphery.display.serial.service;
 
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
+import javax.comm.CommPort;
+import javax.comm.CommPortIdentifier;
+import javax.comm.NoSuchPortException;
+import javax.comm.PortInUseException;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import ch.eugster.colibri.periphery.constants.AsciiConstants;
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.display.serial.Activator;
 import ch.eugster.colibri.periphery.display.service.AbstractCustomerDisplayService;
 
 public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 {
-	private PrintStream display;
+	private CommPort commPort;
+	
+	private OutputStream  display;
 
 	@Override
 	public void clearDisplay()
@@ -21,7 +31,13 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		this.openDisplay();
 		if (this.display != null)
 		{
-			this.display.print((char) 0x0c);
+			try 
+			{
+				this.display.write(new byte[] { 0x0c });
+			} 
+			catch (IOException e) 
+			{
+			}
 		}
 		this.closeDisplay();
 	}
@@ -57,10 +73,12 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (this.display != null)
 		{
 			String print = this.correctText(text);
-			System.out.println(print);
-			for (int i = 0; i < print.length(); i++)
+			try 
 			{
-				this.display.write(print.charAt(i));
+				this.display.write(print.getBytes());
+			} 
+			catch (IOException e) 
+			{
 			}
 		}
 		this.closeDisplay();
@@ -74,10 +92,12 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (this.display != null)
 		{
 			String print = this.correctText(new Converter(converter), text);
-			System.out.println(print);
-			for (int i = 0; i < print.length(); i++)
+			try 
 			{
-				this.display.write(print.charAt(i));
+				this.display.write(print.getBytes());
+			} 
+			catch (IOException e) 
+			{
 			}
 		}
 		this.closeDisplay();
@@ -87,7 +107,20 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	{
 		if (this.display != null)
 		{
-			this.display.close();
+			try 
+			{
+				this.display.flush();
+				this.display.close();
+			} 
+			catch (IOException e) 
+			{
+			}
+			this.display = null;
+		}
+		if (this.commPort != null)
+		{
+			this.commPort.close();
+			this.commPort = null;
 		}
 	}
 
@@ -95,7 +128,14 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	{
 		try
 		{
-			this.display = new PrintStream(this.getPort());
+			String port = getPort();
+			port = port.endsWith(":") ? port.substring(0, port.length() - 1) : port;
+			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(port);
+			commPort = portId.open("customerdisplay", 2000);
+			display = commPort.getOutputStream();
+			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+//			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
+//			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
 		}
 		catch (final FileNotFoundException e)
 		{
@@ -103,6 +143,30 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 			{
 				this.getEventAdmin().sendEvent(
 						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Das Kundendisplay kann nicht angesprochen werden.")));
+			}
+		} 
+		catch (NoSuchPortException e) 
+		{
+			if (this.getEventAdmin() != null)
+			{
+				this.getEventAdmin().sendEvent(
+						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Port " + getPort() + " für das Kundendisplay existiert nicht.")));
+			}
+		} 
+		catch (PortInUseException e) 
+		{
+			if (this.getEventAdmin() != null)
+			{
+				this.getEventAdmin().sendEvent(
+						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Port " + getPort() + " wird bereits verwendet.")));
+			}
+		} 
+		catch (IOException e) 
+		{
+			if (this.getEventAdmin() != null)
+			{
+				this.getEventAdmin().sendEvent(
+						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Ein IO-Fehler ist aufgetreten.")));
 			}
 		}
 	}

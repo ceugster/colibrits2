@@ -14,6 +14,7 @@ Import-Package: ch.eugster.colibri.display.area,
  ch.eugster.colibri.display.service,
  ch.eugster.colibri.periphery.display.service,
  ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.model.payment,
  ch.eugster.colibri.persistence.model.print,
  org.osgi.framework;version="1.6.0"
 Require-Bundle: org.eclipse.osgi;bundle-version="3.7.2",

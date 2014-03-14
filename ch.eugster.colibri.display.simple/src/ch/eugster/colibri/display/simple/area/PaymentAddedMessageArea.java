@@ -13,6 +13,7 @@ import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 
 public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayoutArea
@@ -269,7 +270,15 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 		}
 		private String getText(Payment payment, int minLength)
 		{
-			String text = pad(payment.getPaymentType().getName(), minLength);
+			String text = null;
+			if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CASH))
+			{
+				text = pad("Bargeld", minLength);
+			}
+			else
+			{
+				text = pad(payment.getPaymentType().getName(), minLength);
+			}
 			return text;
 		}
 		

@@ -11,17 +11,17 @@ import java.awt.event.ActionEvent;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 
-public class BackAction extends ProfileAction
+public class BackFromSettleAction extends ProfileAction
 {
 	private static final long serialVersionUID = 0l;
 
 	public static final String TEXT = "Zurück";
 
-	public static final String ACTION_COMMAND = "back.from.settle.action";
+	public static final String ACTION_COMMAND = "back.action";
 
-	public BackAction(final Profile profile)
+	public BackFromSettleAction(final Profile profile)
 	{
-		super(BackAction.TEXT, BackAction.ACTION_COMMAND, profile);
+		super(BackFromSettleAction.TEXT, BackFromSettleAction.ACTION_COMMAND, profile);
 	}
 
 	@Override

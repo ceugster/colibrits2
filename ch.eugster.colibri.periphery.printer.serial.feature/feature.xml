@@ -213,11 +213,11 @@ litigation.
    </license>
 
    <requires>
-      <import plugin="ch.eugster.colibri.periphery"/>
       <import plugin="ch.eugster.colibri.persistence"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="ch.eugster.colibri.periphery" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

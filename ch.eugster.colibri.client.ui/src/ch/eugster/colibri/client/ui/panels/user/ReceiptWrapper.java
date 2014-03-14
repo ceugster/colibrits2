@@ -244,7 +244,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		}
 	}
 	
-	Receipt prepareReceipt()
+	public Receipt prepareReceipt()
 	{
 		if (this.receipt != null)
 		{
@@ -325,9 +325,11 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 ////					Long receiptId = ReceiptWrapper.this.receipt.getId();
 					try
 					{
-						ReceiptWrapper.this.receipt = (Receipt) persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
+						persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
+						
 						if (!ReceiptWrapper.this.receipt.isDeleted())
 						{
+							ReceiptWrapper.this.updateCustomerForReceiptPrint();
 							ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
 						}
 						userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
@@ -353,6 +355,20 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		job.schedule();
 	}
 
+	private void updateCustomerForReceiptPrint()
+	{
+		if (this.receipt.getCustomer() != null)
+		{
+			for (Position position : this.receipt.getPositions())
+			{
+				if (position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
+				{
+					receipt.getCustomer().addAccount(position.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.NETTO));
+				}
+			}
+		}
+	}
+	
 	public void fireReceiptChangeEvent(final ReceiptChangeEvent event)
 	{
 		final ReceiptChangeListener[] listeners = this.receiptChangeListeners.toArray(new ReceiptChangeListener[0]);

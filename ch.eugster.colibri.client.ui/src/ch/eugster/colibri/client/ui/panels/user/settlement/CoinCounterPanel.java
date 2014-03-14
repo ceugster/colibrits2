@@ -32,7 +32,7 @@ import javax.swing.event.ChangeListener;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
-import ch.eugster.colibri.client.ui.actions.BackAction;
+import ch.eugster.colibri.client.ui.actions.BackFromSettleAction;
 import ch.eugster.colibri.client.ui.actions.SettleAction;
 import ch.eugster.colibri.client.ui.buttons.ProfileButton;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
@@ -132,7 +132,7 @@ public class CoinCounterPanel extends ProfilePanel
 		settleButton.addActionListener(this.userPanel);
 		panel.add(settleButton);
 
-		final BackAction backAction = new BackAction(this.userPanel.getProfile());
+		final BackFromSettleAction backAction = new BackFromSettleAction(this.userPanel.getProfile());
 		final ProfileButton backButton = new ProfileButton(backAction, this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		backButton.addActionListener(this.userPanel);
 		panel.add(backButton);

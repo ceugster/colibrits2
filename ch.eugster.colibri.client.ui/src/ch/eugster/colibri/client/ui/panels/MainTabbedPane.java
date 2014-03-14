@@ -55,6 +55,7 @@ import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.SalespointCustomerDisplaySettings;
+import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
@@ -207,10 +208,12 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		}
 		if (this.getSalespoint().getSettlement() == null)
 		{
+			updateSettlementTimestamp();
 			return false;
 		}
 		if (this.getSalespoint().getSettlement().getSettled() != null)
 		{
+			updateSettlementTimestamp();
 			return false;
 		}
 		
@@ -224,26 +227,51 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private boolean mustSettle(PersistenceService persistenceService)
 	{
+		Salespoint salespoint = this.clientView.getSalespoint();
+		ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+		if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
+		{
+			if (settlementIsBeforeToday(salespoint.getSettlement()))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			updateSettlementTimestamp();
+		}
+		return false;
+	}
+	
+	public boolean settlementIsBeforeToday(Settlement settlement)
+	{
+		Calendar today = GregorianCalendar.getInstance();
+		today.set(Calendar.HOUR_OF_DAY, 0);
+		today.set(Calendar.MINUTE, 0);
+		today.set(Calendar.SECOND, 0);
+		today.set(Calendar.MILLISECOND, 0);
+		return settlement.getTimestamp().before(today);
+	}
+
+	private void updateSettlementTimestamp()
+	{
 		try
 		{
-			Salespoint salespoint = (Salespoint) persistenceService.getCacheService().find(Salespoint.class, this.getSalespoint().getId());
-			ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
-			if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
+			PersistenceService service = persistenceServiceTracker.getService();
+			if (getSalespoint().getSettlement() == null || getSalespoint().getSettlement().getSettled() != null)
 			{
-				Calendar today = GregorianCalendar.getInstance();
-				today.set(Calendar.HOUR_OF_DAY, 0);
-				today.set(Calendar.MINUTE, 0);
-				today.set(Calendar.SECOND, 0);
-				today.set(Calendar.MILLISECOND, 0);
-				boolean settle = salespoint.getSettlement().getTimestamp().before(today);
-				return settle;
+				getSalespoint().setSettlement(Settlement.newInstance(getSalespoint()));
 			}
+			else
+			{
+				getSalespoint().getSettlement().setTimestamp(GregorianCalendar.getInstance());
+			}
+			clientView.updateSalespoint((Salespoint) service.getCacheService().merge(getSalespoint()));
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
 		}
-		return false;
 	}
 	
 	public MainPanel getCurrentPanel()

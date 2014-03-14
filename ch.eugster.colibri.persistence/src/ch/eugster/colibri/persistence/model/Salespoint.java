@@ -524,7 +524,7 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 		{
 			if (this.forceSettlement == null || this.forceSettlement.booleanValue() != forceSettlement)
 			{
-				this.propertyChangeSupport.firePropertyChange("forceSettlement", this.forceSettlement, this.forceSettlement = null);
+				this.propertyChangeSupport.firePropertyChange("forceSettlement", this.forceSettlement, this.forceSettlement = forceSettlement);
 			}
 		}
 	}

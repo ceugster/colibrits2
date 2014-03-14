@@ -792,6 +792,7 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/Disposable.java -t
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/ActionResolver.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/AdminAction.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/BackAction.java -text
+ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/BackFromSettleAction.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/CifferAction.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/ClearAction.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/actions/ConfigurableAction.java -text
@@ -1111,6 +1112,7 @@ ch.eugster.colibri.periphery/.project -text
 ch.eugster.colibri.periphery/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery/build.properties -text
+ch.eugster.colibri.periphery/lib/comm.jar -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/Activator.java -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/constants/AsciiConstants.java -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/converters/Converter.java -text

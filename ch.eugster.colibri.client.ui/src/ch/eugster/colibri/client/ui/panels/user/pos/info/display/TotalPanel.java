@@ -27,11 +27,11 @@ public class TotalPanel extends DisplayPanel
 	@Override
 	public void setData(final Receipt receipt)
 	{
-		if (receipt.getPositionAmount(Receipt.QuotationType.REFERENCE_CURRENCY, Position.AmountType.NETTO) != 0D)
-		{
+//		if (receipt.getPositionAmount(Receipt.QuotationType.REFERENCE_CURRENCY, Position.AmountType.NETTO) != 0D)
+//		{
 			defaultCurrencyAmount = receipt.getPositionDefaultCurrencyAmount(AmountType.NETTO);
 			foreignCurrencyAmount = receipt.getPositionDefaultForeignCurrencyAmount(AmountType.NETTO);
-		}
+//		}
 	}
 
 	@Override

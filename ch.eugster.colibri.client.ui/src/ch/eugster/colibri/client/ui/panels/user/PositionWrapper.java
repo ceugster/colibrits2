@@ -267,7 +267,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				return false;
 			}
 		}
-		if (this.position.getPrice() == 0d)
+		if (!this.position.isOrdered() && this.position.getPrice() == 0d)
 		{
 			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
 			return false;

@@ -500,7 +500,8 @@ public class CommonSettings extends AbstractEntity implements IReplicatable
 		this.propertyChangeSupport.firePropertyChange("maximizedClientWindow", this.maximizedClientWindow, this.maximizedClientWindow = maximizedClientWindow);
 	}
 
-	public boolean isForceSettlement() {
+	public boolean isForceSettlement() 
+	{
 		return forceSettlement;
 	}
 

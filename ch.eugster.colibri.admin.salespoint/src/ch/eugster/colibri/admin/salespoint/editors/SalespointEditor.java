@@ -553,9 +553,9 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		salespoint.setHost(this.host.getText());
 		salespoint.setLocation(this.location.getText());
 		salespoint.setMapping(this.mappingId.getText());
-		salespoint.setForceSettlement(forceSettlement.getSelection());
-		salespoint.setAllowTestSettlement(allowTestSettlement.getSelection());
-		salespoint.setForceCashCheck(forceCashCheck.getSelection());
+		salespoint.setForceSettlement(this.forceSettlement.getSelection());
+		salespoint.setAllowTestSettlement(this.allowTestSettlement.getSelection());
+		salespoint.setForceCashCheck(this.forceCashCheck.getSelection());
 		if (startReceiptNumber != null)
 		{
 			try

@@ -323,4 +323,9 @@ public class Customer
 	{
 		this.zip = zip;
 	}
+	
+	public void addAccount(double amount)
+	{
+		this.account += amount;
+	}
 }
