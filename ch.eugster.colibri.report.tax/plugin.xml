@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="ch.eugster.colibri.report.tax.ReportTaxPerspective"
+            id="ch.eugster.colibri.report.tax.perspective"
+            name="Mehrwertsteuerliste">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="ch.eugster.colibri.report.tax.category"
+            class="ch.eugster.colibri.report.tax.views.TaxView"
+            id="ch.eugster.colibri.report.tax.view"
+            name="Mehrwertsteuerliste"
+            restorable="true">
+      </view>
+      <category
+            id="ch.eugster.colibri.report.tax.category"
+            name="Mehrwertsteuern">
+      </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:ch.eugster.colibri.report.menu.views?after=additions">
+         <command
+               commandId="org.eclipse.ui.views.showView"
+               label="Mehrwertsteuerliste"
+               style="push">
+            <parameter
+                  name="org.eclipse.ui.views.showView.viewId"
+                  value="ch.eugster.colibri.report.tax.view">
+            </parameter>
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:ch.eugster.colibri.report.toolbar.perspectives?after=additions">
+         <command
+               commandId="org.eclipse.ui.perspectives.showPerspective"
+               label="Mehrwertsteuern"
+               mode="FORCE_TEXT"
+               style="radio"
+               tooltip="Zur Perspktive Mehrwertsteuern wechseln">
+            <parameter
+                  name="org.eclipse.ui.perspectives.showPerspective.perspectiveId"
+                  value="ch.eugster.colibri.report.tax.perspective">
+            </parameter>
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>
