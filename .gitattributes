@@ -1646,6 +1646,15 @@ ch.eugster.colibri.provider.voucher.feature/feature.xml -text
 ch.eugster.colibri.provider.voucher.webservice.feature/.project -text
 ch.eugster.colibri.provider.voucher.webservice.feature/build.properties -text
 ch.eugster.colibri.provider.voucher.webservice.feature/feature.xml -text
+ch.eugster.colibri.provider.voucher.webservice.ui/.classpath -text
+ch.eugster.colibri.provider.voucher.webservice.ui/.project -text
+ch.eugster.colibri.provider.voucher.webservice.ui/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.provider.voucher.webservice.ui/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.provider.voucher.webservice.ui/build.properties -text
+ch.eugster.colibri.provider.voucher.webservice.ui/plugin.xml -text
+ch.eugster.colibri.provider.voucher.webservice.ui/src/ch/eugster/colibri/provider/voucher/webservice/ui/Activator.java -text
+ch.eugster.colibri.provider.voucher.webservice.ui/src/ch/eugster/colibri/provider/voucher/webservice/ui/SetVoucherPaymentTypeHandler.java -text
+ch.eugster.colibri.provider.voucher.webservice.ui/src/ch/eugster/colibri/provider/voucher/webservice/ui/SetVoucherProductGroupHandler.java -text
 ch.eugster.colibri.provider.voucher.webservice/.classpath -text
 ch.eugster.colibri.provider.voucher.webservice/.project -text
 ch.eugster.colibri.provider.voucher.webservice/.settings/org.eclipse.jdt.core.prefs -text

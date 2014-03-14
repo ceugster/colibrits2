@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:ch.eugster.colibri.admin.product.view?after=additions">
+         <command
+               commandId="ch.eugster.colibri.provider.voucher.webservice.setproductgroup"
+               label="Für eGutscheine verwenden"
+               style="push">
+         </command>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:ch.eugster.colibri.admin.payment.view?after=additions">
+         <command
+               commandId="ch.eugster.colibri.provider.voucher.webservice.setpaymenttype"
+               label="Für eGutscheine verwenden"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="ch.eugster.colibri.provider.voucher.webservice.ui.SetVoucherProductGroupHandler"
+            id="ch.eugster.colibri.provider.voucher.webservice.setproductgroup"
+            name="SetProductGroup">
+      </command>
+      <command
+            defaultHandler="ch.eugster.colibri.provider.voucher.webservice.ui.SetVoucherPaymentTypeHandler"
+            id="ch.eugster.colibri.provider.voucher.webservice.setpaymenttype"
+            name="SetPaymentType">
+      </command>
+   </extension>
+
+</plugin>

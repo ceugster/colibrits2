@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: eGutschein Menus für Administrator
+Bundle-SymbolicName: ch.eugster.colibri.provider.voucher.webservice.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: ch.eugster.colibri.provider.voucher.webservice.ui.Activator
+Bundle-Vendor: Christian Eugster
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.expressions;bundle-version="3.4.300"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: ch.eugster.colibri.admin.ui.handlers,
+ ch.eugster.colibri.persistence.model,
+ ch.eugster.colibri.persistence.model.payment,
+ ch.eugster.colibri.persistence.model.product,
+ ch.eugster.colibri.persistence.queries,
+ ch.eugster.colibri.persistence.service
