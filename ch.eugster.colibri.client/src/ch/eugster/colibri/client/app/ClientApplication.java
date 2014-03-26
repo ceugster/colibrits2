@@ -80,20 +80,20 @@ public class ClientApplication implements IApplication
 				else
 				{
 					Activator.getDefault().log(LogService.LOG_INFO, "Replikation erfolgreich durchgeführt.");
-					ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
-					tracker.open();
-					EventAdmin eventAdmin = tracker.getService();
-					if (eventAdmin != null)
-					{
-						Event event = new Event("ch/eugster/colibri/persistence/replication/completed", new HashMap<String, Object>());
-						eventAdmin.sendEvent(event);
-					}
 				}
 			}
 		}
 		finally
 		{
 			replicationServiceTracker.close();
+			ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+			tracker.open();
+			EventAdmin eventAdmin = tracker.getService();
+			if (eventAdmin != null)
+			{
+				Event event = new Event("ch/eugster/colibri/persistence/replication/completed", new HashMap<String, Object>());
+				eventAdmin.sendEvent(event);
+			}
 		}
 	}
 

@@ -355,6 +355,7 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/handlers/E
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/handlers/EditTabHandler.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/handlers/SetPaymentDefaultTabHandler.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/handlers/SetPositionDefaultTabHandler.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/AbstractSetOtherMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/AlignMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/ColorMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/DefaultPopupMenu.java -text
@@ -370,8 +371,12 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/Paym
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/ProductGroupPopupMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/ResetToStandardMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/RestitutionPopupMenu.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectBackgroundColorTargetMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectCurrencyMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectCustomerPopupMenu.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectFontSizeTargetMenu.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectFontStyleTargetMenu.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectForegroundColorTargetMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectImageMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectPaymentTypeMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SelectProductGroupMenuItem.java -text
@@ -382,6 +387,10 @@ ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetC
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetFontSizeMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetFontStyleMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetNameMenuItem.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetOtherBackgroundColorMenuItem.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetOtherFontSizeMenuItem.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetOtherFontStyleMenuItem.java -text
+ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetOtherForegroundColorMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/SetValueMenuItem.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/StoreReceiptPopupMenu.java -text
 ch.eugster.colibri.admin.profile/src/ch/eugster/colibri/admin/profile/menus/VerticalAlignMenu.java -text
@@ -916,6 +925,7 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settle
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settlement/MoneyRow.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/user/settlement/VoucherRow.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/views/ClientView.java -text
+ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/views/ShowProviderErrorListDialog.java -text
 ch.eugster.colibri.client/.classpath -text
 ch.eugster.colibri.client/.project -text
 ch.eugster.colibri.client/.settings/org.eclipse.pde.core.prefs -text
@@ -1380,7 +1390,6 @@ ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductG
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProductGroupMapping.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Profile.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProviderProperty.java -text
-ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ProviderState.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Receipt.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/ReceiptPrinterSettings.java -text
 ch.eugster.colibri.persistence/src/ch/eugster/colibri/persistence/model/Role.java -text

@@ -35,17 +35,20 @@ public class NameablePopupMenu extends KeyPopupMenu
 		/*
 		 * Schriftgrösse
 		 */
-		this.add(new FontSizeMenu(this.editor, this.button, 8, 25));
+		this.add(new SelectFontSizeTargetMenu(this.editor, this.button));
 		/*
 		 * Schriftstil
 		 */
-		this.add(new FontStyleMenu(this.editor, this.button));
+		this.add(new SelectFontStyleTargetMenu(this.editor, this.button));
 
 		this.addSeparator();
 		/*
 		 * Farbe
 		 */
-		this.add(new ColorMenu(this.editor, this.button));
+		this.add(new SelectForegroundColorTargetMenu(this.editor, this.button));
+		this.add(new SelectBackgroundColorTargetMenu(this.editor, this.button));
+
+		this.addSeparator();
 		/*
 		 * Ausrichtung
 		 */

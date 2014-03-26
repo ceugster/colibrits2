@@ -15,7 +15,6 @@ public class KeyboardEventDispatcher implements KeyEventDispatcher
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e)
 	{
-		System.out.print(e.getKeyChar());
 		return false;
 	}
 	

@@ -145,7 +145,7 @@ public class Ean13 extends AbstractBarcode
 			case ORDER:
 			{
 				position.setOrdered(true);
-				position.setOrder(this.getDetail());
+				position.setOrder(this.getCode());
 				break;
 			}
 			case CUSTOMER:

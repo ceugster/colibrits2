@@ -127,10 +127,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private Salespoint salespoint;
 	
-	private long lastFailoverMessage;
+	private long lastFailoverMessage = 0l;
+	
+	private long lastWarnMessage = 0l;
 	
 	private Long frequency = null;
-
+	
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
 	public boolean addShutdownListener(final ShutdownListener listener)
@@ -298,54 +300,107 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		return properties.get(UpdateScheduler.SchedulerProperty.SCHEDULER_FAILOVER_MESSAGE_FREQUENCY.key()).value();
 	}
 	
+	private void showErrorMessage(Event event)
+	{
+		if (event.getTopic().equals(Topic.SCHEDULED.topic()) || 
+				event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+				event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()) ||
+				event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
+		{
+			if (frequency == null)
+			{
+				try
+				{
+					frequency = Long.valueOf(getMessageFrequency()).longValue() * 60000;
+				}
+				catch(NumberFormatException e)
+				{
+					frequency = 3600000L;
+				}
+			}
+			Boolean force = (Boolean) event.getProperty("force");
+			boolean doForce = force == null ? false : force.booleanValue();
+			long now = GregorianCalendar.getInstance().getTimeInMillis();
+			long diff = now - this.lastFailoverMessage;
+			if (doForce || diff > frequency)
+			{
+				lastFailoverMessage = now;
+				final String message = "Die Verbindung zum Server kann zur Zeit nicht hergestellt werden."
+						+ "\nTiteleingaben müssen manuell vorgenommen werden." 
+						+ "\nAktualisierungen können nicht durchgeführt werden."
+						+ "\nStarten Sie den Hauptrechner oder Server neu."
+						+ "\n\nFalls das Problem weiterhin besteht, kontaktieren Sie bitte die Hotline von Comelivres AG.";
+				if (message != null)
+				{
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+									.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
+				}
+			}
+		}
+		else if (event.getTopic().equals(Topic.PRINT_SETTLEMENT.topic()) || event.getTopic().equals(Topic.PRINT_RECEIPT.topic()) || event.getTopic().equals(Topic.PRINT_VOUCHER.topic()))
+		{
+			final IStatus status = (IStatus) event.getProperty("status");
+			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
+					: status.getMessage();
+			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
+					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
+		}
+	}
+
+	private void showWarningMessage(Event event)
+	{
+		if (event.getTopic().equals(Topic.SCHEDULED.topic()) || 
+				event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+				event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+		{
+			if (frequency == null)
+			{
+				try
+				{
+					frequency = Long.valueOf(getMessageFrequency()).longValue() * 60000;
+				}
+				catch(NumberFormatException e)
+				{
+					frequency = 3600000L;
+				}
+			}
+			Boolean force = (Boolean) event.getProperty("force");
+			boolean doForce = force == null ? false : force.booleanValue();
+			long now = GregorianCalendar.getInstance().getTimeInMillis();
+			long diff = now - this.lastWarnMessage;
+			if (doForce || diff > frequency)
+			{
+				lastWarnMessage = now;
+				final String message = (String) event.getProperty(EventConstants.MESSAGE);
+				if (message != null)
+				{
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+									.getProfile(), "Aktualisierungsproblem", message, MessageDialog.TYPE_WARN);
+				}
+			}
+		}
+		else if (event.getTopic().equals(Topic.PRINT_SETTLEMENT.topic()) || event.getTopic().equals(Topic.PRINT_RECEIPT.topic()) || event.getTopic().equals(Topic.PRINT_VOUCHER.topic()))
+		{
+			final IStatus status = (IStatus) event.getProperty("status");
+			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
+					: status.getMessage();
+			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
+					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
+		}
+	}
+
 	@Override
 	public void handleEvent(final Event event)
 	{
 		Object ex = event.getProperty(EventConstants.EXCEPTION);
 		if (ex instanceof Exception)
 		{
-			if (event.getTopic().equals(Topic.SCHEDULED.topic()) || 
-					event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
-					event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()) ||
-					event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
-			{
-				if (frequency == null)
-				{
-					try
-					{
-						frequency = Long.valueOf(getMessageFrequency()).longValue() * 60000;
-					}
-					catch(NumberFormatException e)
-					{
-						frequency = 3600000L;
-					}
-				}
-//				Boolean force = (Boolean) event.getProperty("force");
-				long now = GregorianCalendar.getInstance().getTimeInMillis();
-				long diff = now - this.lastFailoverMessage;
-				if (diff > frequency)
-				{
-					lastFailoverMessage = now;
-					final String message = "Die Verbindung zum Server kann zur Zeit nicht hergestellt werden."
-							+ "\nTiteleingaben müssen manuell vorgenommen werden." 
-							+ "\nAktualisierungen können nicht durchgeführt werden."
-							+ "\nStarten Sie den Hauptrechner oder Server neu."
-							+ "\n\nFalls das Problem weiterhin besteht, kontaktieren Sie bitte die Hotline von Comelivres AG.";
-					if (message != null)
-					{
-						MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-										.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
-					}
-				}
-			}
-			else if (event.getTopic().equals(Topic.PRINT_SETTLEMENT.topic()) || event.getTopic().equals(Topic.PRINT_RECEIPT.topic()) || event.getTopic().equals(Topic.PRINT_VOUCHER.topic()))
-			{
-				final IStatus status = (IStatus) event.getProperty("status");
-				final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
-						: status.getMessage();
-				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
-						.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
-			}
+			showErrorMessage(event);
+		}
+		IStatus status = (IStatus) event.getProperty("status");
+		if (status != null && status.getSeverity() == IStatus.WARNING)
+		{
+			this.showWarningMessage(event);
 		}
 		this.updateTransferMessage(event);
 		this.updateProviderMessage(event);
@@ -483,10 +538,20 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 							ClientView.this.providerInformation.setErrorText(status.getMessage());
 							ClientView.this.providerInformation.setErrorImage(registry.get("error"));
 						}
+						else if (status.getSeverity() == IStatus.WARNING)
+						{
+							long count = countProviderUpdates(salespoint, provider.getProviderId());
+							status = new Status(IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
+									"Verbuchen: " + count);
+							ClientView.this.providerInformation.setErrorImage(null);
+							ClientView.this.providerInformation.setErrorText(null);
+							ClientView.this.providerInformation.setText(status.getMessage());
+							ClientView.this.providerInformation.setImage(registry.get(Topic.SCHEDULED_PROVIDER_UPDATE.icon(status)));
+						}
 						else if (status.getSeverity() == IStatus.OK)
 						{
 							long count = countProviderUpdates(salespoint, provider.getProviderId());
-							status = new Status(count == 0D ? IStatus.OK : IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
+							status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
 									"Verbuchen: " + count);
 							ClientView.this.providerInformation.setErrorImage(null);
 							ClientView.this.providerInformation.setErrorText(null);
@@ -646,6 +711,20 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				this.providerInformation.setImage(image);
 			}
 		}
+//		this.providerInformation.setActionHandler(new Action() 
+//		{
+//			@Override
+//			public void run() 
+//			{
+//				System.out.println();
+//			}
+//
+//			@Override
+//			public void runWithEvent(org.eclipse.swt.widgets.Event event) 
+//			{
+//				System.out.println();
+//			}
+//		});
 		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.providerInformation);
 
 //		this.customerInformation = new StatusLineContributionItem("customer.information", true, 84);
@@ -922,5 +1001,4 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			eventAdmin.sendEvent(this.getEvent(topics));
 		}
 	}
-
 }

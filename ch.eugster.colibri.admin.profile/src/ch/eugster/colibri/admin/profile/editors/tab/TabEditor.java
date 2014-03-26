@@ -116,7 +116,9 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 	
 	private Composite buttonField;
 
-	private final Map<Integer, HashMap<Integer, Key[]>> keyMap = new HashMap<Integer, HashMap<Integer, Key[]>>();
+	private Frame frame;
+	
+	private final Map<Integer, Map<Integer, Key[]>> keyMap = new HashMap<Integer, Map<Integer, Key[]>>();
 
 	public TabEditor()
 	{
@@ -186,7 +188,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		failOverState = state;
 	}
 
-	public Map<Integer, HashMap<Integer, Key[]>> getKeyMap()
+	public Map<Integer, Map<Integer, Key[]>> getKeyMap()
 	{
 		return this.keyMap;
 	}
@@ -479,8 +481,8 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 	private void addNewKeys(final Tab tab)
 	{
 		final Collection<Key> existingKeys = tab.getKeys();
-		final Collection<HashMap<Integer, Key[]>> rows = this.keyMap.values();
-		for (final HashMap<Integer, Key[]> row : rows)
+		final Collection<Map<Integer, Key[]>> rows = this.keyMap.values();
+		for (final Map<Integer, Key[]> row : rows)
 		{
 			final Collection<Key[]> keys = row.values();
 			for (final Key[] key : keys)
@@ -713,7 +715,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		//		frameComposite.setLayoutData(gridData);
 		buttonField.setLayout(layout);
 
-		final Frame frame = SWT_AWT.new_Frame(buttonField);
+		frame = SWT_AWT.new_Frame(buttonField);
 		frame.setLayout(new java.awt.BorderLayout());
 
 		this.panel = new JPanel();
@@ -767,6 +769,11 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		return sashForm;
 	}
 
+	public Frame getFrame()
+	{
+		return frame;
+	}
+	
 	private Control fillGeneralSection(final Section parent)
 	{
 		final TableWrapLayout layout = new TableWrapLayout();
@@ -812,7 +819,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		final Key[] keys = tab.getKeys().toArray(new Key[0]);
 		for (final Key key : keys)
 		{
-			HashMap<Integer, Key[]> cols = this.keyMap.get(new Integer(key.getTabRow()));
+			Map<Integer, Key[]> cols = this.keyMap.get(new Integer(key.getTabRow()));
 			if (cols == null)
 			{
 				cols = new HashMap<Integer, Key[]>();
@@ -936,8 +943,8 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 	{
 		Message msg = null;
 
-		final Collection<HashMap<Integer, Key[]>> cols = this.keyMap.values();
-		for (final HashMap<Integer, Key[]> col : cols)
+		final Collection<Map<Integer, Key[]>> cols = this.keyMap.values();
+		for (final Map<Integer, Key[]> col : cols)
 		{
 			for (final Key[] keys : col.values())
 			{
@@ -1048,7 +1055,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		final Collection<Key> keys = tab.getKeys();
 		for (Key key : keys)
 		{
-			final HashMap<Integer, Key[]> row = this.keyMap.get(Integer.valueOf(key.getTabRow()));
+			final Map<Integer, Key[]> row = this.keyMap.get(Integer.valueOf(key.getTabRow()));
 			final Key[] mappedKeys = row.get(Integer.valueOf(key.getTabCol()));
 			if ((mappedKeys != null) && (mappedKeys[1] != null))
 			{
@@ -1068,7 +1075,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 
 		for (int i = 0; i < rows; i++)
 		{
-			final HashMap<Integer, Key[]> row = this.keyMap.get(new Integer(i));
+			final Map<Integer, Key[]> row = this.keyMap.get(new Integer(i));
 			if (row == null)
 			{
 				for (int j = 0; j < cols; j++)

@@ -168,8 +168,7 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 
 	@Basic
 	@Column(name = "po_provider_state")
-	@Enumerated(EnumType.ORDINAL)
-	private ProviderState providerState;
+	private int providerState = 0;
 
 	@Basic
 	@Index
@@ -527,7 +526,7 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	public void setQuantity(int quantity)
 	{
 		this.propertyChangeSupport.firePropertyChange("quantity", this.quantity, this.quantity = quantity);
-		this.setDiscount(this.getDiscount());
+//		this.setDiscount(this.getDiscount());
 	}
 
 	public void setReceipt(final Receipt receipt)
@@ -710,12 +709,12 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 		return otherId;
 	}
 
-	public ProviderState getProviderState() 
+	public int getProviderState() 
 	{
 		return providerState;
 	}
 
-	public void setProviderState(ProviderState providerState) 
+	public void setProviderState(int providerState) 
 	{
 		this.propertyChangeSupport.firePropertyChange("providerState", this.providerState, this.providerState = providerState);
 	}

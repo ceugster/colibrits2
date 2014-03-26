@@ -17,7 +17,6 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
-import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Version;
 
 import com.microsoft.sqlserver.jdbc.SQLServerDriver;
@@ -710,7 +709,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 									this.log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
-									sql = "UPDATE colibri_position (po_provider_state) VALUES (" + ProviderState.BOOKED.ordinal() + ")";
+									sql = "UPDATE colibri_position (po_provider_state) VALUES (1)";
 									this.log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
@@ -724,7 +723,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 									this.log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
-									sql = "UPDATE colibri_payment (pa_provider_state) VALUES (" + ProviderState.BOOKED.ordinal() + ")";
+									sql = "UPDATE colibri_payment (pa_provider_state) VALUES (1)";
 									this.log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									this.log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");

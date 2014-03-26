@@ -104,35 +104,29 @@ This Agreement is governed by the laws of the State of New York and the intellec
    </license>
 
    <requires>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions" version="3.4.300" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.forms" version="3.5.101" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="ch.eugster.colibri.persistence" version="1.0.0" match="compatible"/>
       <import plugin="ch.eugster.colibri.provider"/>
-      <import plugin="ch.eugster.colibri.provider.voucher"/>
       <import plugin="ch.eugster.colibri.scheduler"/>
       <import plugin="ch.eugster.colibri.ui" version="1.0.0" match="compatible"/>
       <import plugin="org.eclipse.core.commands"/>
-      <import plugin="org.eclipse.core.expressions" version="3.4.200" match="compatible"/>
-      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="compatible"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.swt"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.ui.forms" version="3.5.0" match="compatible"/>
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.osgi"/>
       <import plugin="ch.eugster.colibri.display"/>
       <import plugin="ch.eugster.colibri.periphery.display"/>
-      <import plugin="org.eclipse.osgi.services" version="3.2.100" match="compatible"/>
       <import plugin="ch.eugster.colibri.periphery.printer"/>
       <import plugin="ch.eugster.colibri.print"/>
-      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.expressions" version="3.4.300" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.forms" version="3.5.101" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.views" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.preferences"/>
-      <import plugin="org.eclipse.ui.views"/>
-      <import plugin="org.eclipse.core.jobs"/>
-      <import plugin="org.eclipse.swt" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.osgi.util" version="3.2.200" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.swt" version="3.5.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

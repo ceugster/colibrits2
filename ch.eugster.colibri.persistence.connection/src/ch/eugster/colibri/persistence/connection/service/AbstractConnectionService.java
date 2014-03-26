@@ -391,16 +391,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		catch (Exception e)
 		{
 			Activator.getDefault().log(LogService.LOG_INFO, "EntityManager konnte nicht kreiert werden.");
-			String[] args = Platform.getCommandLineArgs();
-			String app = "ch.eugster.colibri.admin.application";
-			for (int i = 0; i < args.length; i++)
-			{
-				if (args[i].equals("-application"))
-				{
-					app = args[i + 1];
-					break;
-				}
-			}
+			String app = System.getProperty("eclipse.application");
 			if (app.equals("ch.eugster.colibri.client.application"))
 			{
 				resetEntityManager(e);

@@ -47,17 +47,20 @@ public class StoreReceiptPopupMenu extends KeyPopupMenu
 		/*
 		 * Schriftgrösse
 		 */
-		this.add(new FontSizeMenu(editor, button, 8, 25));
+		this.add(new SelectFontSizeTargetMenu(this.editor, this.button));
 		/*
 		 * Schriftstil
 		 */
-		this.add(new FontStyleMenu(editor, button));
+		this.add(new SelectFontStyleTargetMenu(this.editor, this.button));
 
-		addSeparator();
+		this.addSeparator();
 		/*
 		 * Farbe
 		 */
-		this.add(new ColorMenu(editor, button));
+		this.add(new SelectForegroundColorTargetMenu(this.editor, this.button));
+		this.add(new SelectBackgroundColorTargetMenu(this.editor, this.button));
+
+		this.addSeparator();
 		/*
 		 * Ausrichtung
 		 */

@@ -84,8 +84,7 @@ public class Payment extends AbstractEntity implements IPrintable
 
 	@Basic
 	@Column(name = "pa_provider_state", columnDefinition="INTEGER")
-	@Enumerated
-	private ProviderState providerState;
+	private int providerState;
 
 	@Basic
 	@Column(name = "pa_other_id", columnDefinition="BIGINT")
@@ -237,11 +236,12 @@ public class Payment extends AbstractEntity implements IPrintable
 		this.propertyChangeSupport.firePropertyChange("code", this.code, this.code = code);
 	}
 
-	public ProviderState getProviderState() {
+	public int getProviderState() 
+	{
 		return providerState;
 	}
 
-	public void setProviderState(ProviderState providerState) 
+	public void setProviderState(int providerState) 
 	{
 		this.propertyChangeSupport.firePropertyChange("providerState", this.providerState, this.providerState = providerState);
 	}

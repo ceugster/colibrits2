@@ -36,12 +36,12 @@ public abstract class MainPanel extends ProfilePanel implements TitleProvider, K
 	@Override
 	public boolean dispatchKeyEvent(final KeyEvent event)
 	{
-		if (event.getID() == KeyEvent.KEY_PRESSED)
+		if (event.getID() == KeyEvent.KEY_PRESSED || event.getKeyCode() == KeyEvent.VK_ENTER)
 		{
 			fireKeyEvent(event);
-			return true;
+//			return true;
 		}
-		return false;
+		return true;
 	}
 
 	public void fireKeyEvent(final KeyEvent event)

@@ -155,8 +155,8 @@ public class KeyDropTargetListener implements DropTargetListener
 		this.target.add(editor.createPopupMenu(this.target, editor));
 		this.target.update(editor.getFailOverState());
 
-		final Map<Integer, HashMap<Integer, Key[]>> keyMap = editor.getKeyMap();
-		HashMap<Integer, Key[]> cols = keyMap.get(new Integer(keys[1].getTabRow()));
+		final Map<Integer, Map<Integer, Key[]>> keyMap = editor.getKeyMap();
+		Map<Integer, Key[]> cols = keyMap.get(new Integer(keys[1].getTabRow()));
 		if (cols == null)
 		{
 			cols = new HashMap<Integer, Key[]>();
