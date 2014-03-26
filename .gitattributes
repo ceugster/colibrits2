@@ -1031,6 +1031,13 @@ ch.eugster.colibri.drivers.mysql/lib/mysql-connector-java-5.1.7-bin.jar -text
 ch.eugster.colibri.drivers.postgresql.feature/.project -text
 ch.eugster.colibri.drivers.postgresql.feature/build.properties -text
 ch.eugster.colibri.drivers.postgresql.feature/feature.xml -text
+ch.eugster.colibri.drivers.postgresql/.classpath -text
+ch.eugster.colibri.drivers.postgresql/.project -text
+ch.eugster.colibri.drivers.postgresql/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.drivers.postgresql/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.drivers.postgresql/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.drivers.postgresql/build.properties -text
+ch.eugster.colibri.drivers.postgresql/lib/postgresql-8.4-701.jdbc4.jar -text
 ch.eugster.colibri.drivers.sqlserver.feature/.project -text
 ch.eugster.colibri.drivers.sqlserver.feature/build.properties -text
 ch.eugster.colibri.drivers.sqlserver.feature/feature.xml -text

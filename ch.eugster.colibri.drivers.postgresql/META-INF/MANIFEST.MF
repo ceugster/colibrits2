@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Postgresql Driver Bundle
+Bundle-SymbolicName: ch.eugster.colibri.drivers.postgresql;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ClassPath: lib/postgresql-8.4-701.jdbc4.jar,
+ .
+Export-Package: org.postgresql
