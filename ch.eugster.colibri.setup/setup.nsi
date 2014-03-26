@@ -5,7 +5,7 @@ Name ColibriTS
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 3.7.2-2.0.2.201403131800
+!define VERSION 3.7.2-2.0.6.201403191200
 !define COMPANY "Christian Eugster"
 !define URL http://eugster-informatik.ch/
 !define PRODUCT_PATH C:\Projekte\Colibrits2\Product\release-${VERSION}
@@ -13,13 +13,13 @@ Name ColibriTS
 
 # MUI Symbol Definitions
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install-blue-full.ico"
-!define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_FINISHPAGE_AUTOCLOSE
 !define MUI_STARTMENUPAGE_REGISTRY_ROOT HKLM
 !define MUI_STARTMENUPAGE_REGISTRY_KEY ${REGKEY}
 !define MUI_STARTMENUPAGE_REGISTRY_VALUENAME StartMenuGroup
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER ColibriTS
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall-colorful.ico"
-!define MUI_UNFINISHPAGE_NOAUTOCLOSE
+#!define MUI_UNFINISHPAGE_NOAUTOCLOSE
 
 
 
@@ -31,15 +31,12 @@ Name ColibriTS
 # Variables
 Var StartMenuGroup
 
-
-
-
 # Installer pages
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_STARTMENU Application $StartMenuGroup
 !insertmacro MUI_PAGE_INSTFILES
-!insertmacro MUI_PAGE_FINISH
+#!insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 

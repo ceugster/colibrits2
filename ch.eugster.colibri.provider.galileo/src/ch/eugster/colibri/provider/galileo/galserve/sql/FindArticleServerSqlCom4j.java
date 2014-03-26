@@ -6,8 +6,6 @@
  */
 package ch.eugster.colibri.provider.galileo.galserve.sql;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.Collection;
 import java.util.Map;
 
@@ -109,10 +107,20 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 							}
 							else
 							{
-								msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
-										+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
-								status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
-								log(LogService.LOG_INFO, (msg));
+								if (position.isOrdered())
+								{
+									msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
+											+ barcode.getProductCode() + " konnte nicht gefunden werden.";
+									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+									log(LogService.LOG_INFO, (msg));
+								}
+								else
+								{
+									msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
+											+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
+									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+									log(LogService.LOG_INFO, (msg));
+								}
 							}
 						}
 						catch(Exception e)
@@ -175,9 +183,6 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		
 		position.setOption(position.isOrdered() ? Position.Option.ORDERED : Position.Option.ARTICLE);
 		this.setOrder(position);
-
-		final boolean noDiscount = ((Boolean)this.galserve.keinrabatt()).booleanValue();
-		this.setDiscount(position, noDiscount);
 	}
 
 	private void setTax(Position position)
@@ -199,40 +204,6 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		}
 	}
 	
-	private void setDiscount(final Position position, final boolean noDiscount)
-	{
-		if (!noDiscount)
-		{
-			double nachlass = 0D;
-			Object object = this.galserve.nnachlass();
-			if (object instanceof Integer)
-			{
-				nachlass = ((Integer) object).doubleValue();
-			}
-			else if (object instanceof Double)
-			{
-				nachlass = ((Double) object).doubleValue();
-			}
-			else if (object instanceof Float)
-			{
-				nachlass = ((Float) object).doubleValue();
-			}
-			double discount = BigDecimal.valueOf(nachlass).round(new MathContext(2)).doubleValue();
-			if (discount == 0D)
-			{
-				if (((position.getReceipt().getCustomer() != null) && (position.getReceipt().getCustomer()
-						.getDiscount() != 0)))
-				{
-					discount = position.getReceipt().getCustomer().getDiscount();
-				}
-			}
-			if (discount > 0D)
-			{
-				position.setDiscount(discount);
-			}
-		}
-	}
-
 	private void setOrder(final Position position)
 	{
 		position.setOrdered(((Boolean)this.galserve.bestellt()).booleanValue());
@@ -240,7 +211,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		{
 			position.setOrder(this.galserve.bestnummer().toString());
 			position.setFromStock(((Boolean)this.galserve.lagerabholfach()).booleanValue());
-			position.getReceipt().setCustomer(this.getCustomer(((Integer) this.galserve.kundennr()).intValue()));
+			position.getReceipt().setCustomer(this.updateCustomer(((Integer) this.galserve.kundennr()).intValue()));
 			position.getReceipt().setCustomerCode(position.getReceipt().getCustomer().getId().toString());
 		}
 	}
@@ -283,7 +254,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		position.getProduct().setExternalProductGroup(externalProductGroup);
 	}
 	
-	protected Customer getCustomer(final int customerId)
+	protected Customer updateCustomer(final int customerId)
 	{
 		final Customer customer = new Customer();
 		customer.setAccount(((Double) this.galserve.nkundkonto()).doubleValue());

@@ -190,14 +190,16 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 					IStatus transferStatus = transfer(new SubProgressMonitor(monitor, getSchedulerCount()));
 					sendUpdateEvent(Topic.SCHEDULED_TRANSFER, transferStatus);
 					monitor.worked(1);
-					if (transferStatus.getSeverity() == IStatus.ERROR)
+					if (transferStatus.getSeverity() == IStatus.ERROR || transferStatus.getSeverity() == IStatus.WARNING)
 					{
 						status = transferStatus;
 					}
-					if (providerStatus.getSeverity() == IStatus.ERROR)
+					if (providerStatus.getSeverity() == IStatus.ERROR || transferStatus.getSeverity() == IStatus.WARNING)
 					{
 						status = providerStatus;
 					}
+//					persistenceService.getCacheService().clearCache();
+//					persistenceService.getServerService().clearCache();
 				}
 			}
 			finally
@@ -226,23 +228,34 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 						.getProperties().get("component.name"));
 				properties
 						.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
-				if (status.getException() != null)
+				if (status.getSeverity() == IStatus.WARNING)
 				{
-					properties.put(EventConstants.EXCEPTION, status.getException());
-					String msg = status.getException().getMessage();
-					properties.put(EventConstants.EXCEPTION_MESSAGE, msg == null ? "" : msg);
-
-					if (this.showFailoverMessage)
+					if (status.getException() != null)
 					{
-						properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
-						this.showFailoverMessage = false;
+						String msg = status.getException().getMessage();
+						properties.put(EventConstants.MESSAGE, msg == null ? "" : msg);
 					}
 				}
 				else
 				{
-					if (!this.showFailoverMessage)
+					if (status.getException() != null)
 					{
-						this.showFailoverMessage = true;
+						properties.put(EventConstants.EXCEPTION, status.getException());
+						String msg = status.getException().getMessage();
+						properties.put(EventConstants.EXCEPTION_MESSAGE, msg == null ? "" : msg);
+	
+						if (this.showFailoverMessage)
+						{
+							properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
+							this.showFailoverMessage = false;
+						}
+					}
+					else
+					{
+						if (!this.showFailoverMessage)
+						{
+							this.showFailoverMessage = true;
+						}
 					}
 				}
 				properties.put("topic", topic);
@@ -283,7 +296,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 						if (providerUpdater.doUpdatePositions())
 						{
 							IStatus status = updatePositions(providerUpdater, persistenceService);
-							if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+							if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL || status.getSeverity() == IStatus.WARNING)
 							{
 								return status;
 							}
@@ -294,7 +307,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 						{
 							IStatus status = updatePayments(providerUpdater, persistenceService);
 							monitor.worked(1);
-							if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL)
+							if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.CANCEL || status.getSeverity() == IStatus.CANCEL)
 							{
 								return status;
 							}

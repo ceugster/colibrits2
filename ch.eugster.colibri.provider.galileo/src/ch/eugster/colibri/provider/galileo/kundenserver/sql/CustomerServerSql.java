@@ -77,9 +77,9 @@ public class CustomerServerSql extends CustomerServer
 				customer.setFirstname(CustomerServerSql.this.kserver.cvorname().toString());
 				customer.setHasAccount((Boolean) CustomerServerSql.this.kserver.lkundkarte());
 				customer.setAccount((Double) CustomerServerSql.this.kserver.nkundkonto());
-				final double nachlass = Math.abs((Double) CustomerServerSql.this.kserver.nnachlass());
-				final double discount = BigDecimal.valueOf(nachlass / 100).round(new MathContext(2)).doubleValue();
-				customer.setDiscount(discount);
+//				final double nachlass = Math.abs((Double) CustomerServerSql.this.kserver.nnachlass());
+//				final double discount = BigDecimal.valueOf(nachlass / 100).round(new MathContext(2)).doubleValue();
+//				customer.setDiscount(discount);
 				Object object = CustomerServerSql.this.kserver.lrggewaehlt();
 				if (object instanceof Boolean && ((Boolean) object).booleanValue())
 				{
@@ -92,7 +92,7 @@ public class CustomerServerSql extends CustomerServer
 						position.setProduct(product);
 						position.setQuantity(1);
 						position.setPrice((Double) CustomerServerSql.this.kserver.nrgbetrag());
-						position.setDiscount(discount);
+//						position.setDiscount(discount);
 						position.setSearchValue(product.getInvoiceNumber());
 						position.setProductGroup(productGroup);
 						position.setOption(Option.PAYED_INVOICE);

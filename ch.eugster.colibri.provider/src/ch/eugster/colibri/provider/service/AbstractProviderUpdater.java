@@ -46,8 +46,8 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 			for (Position position : positions)
 			{
 				status = updateProvider(position);
-				if (status.isOK())
-				{
+//				if (status.isOK())
+//				{
 					try
 					{
 						if (!position.isServerUpdated())
@@ -60,6 +60,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 									serverPosition.setServerUpdated(true);
 									serverPosition.setProviderBooked(position.isProviderBooked());
 									persistenceService.getServerService().merge(serverPosition);
+									position.setServerUpdated(true);
 								}
 								catch (Exception e)
 								{
@@ -70,20 +71,16 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 					}
 					finally
 					{
-						if (status.getSeverity() == IStatus.OK)
+						try
 						{
-							try
-							{
-								position.setServerUpdated(true);
-								position = (Position) persistenceService.getCacheService().merge(position);
-							}
-							catch(Exception e)
-							{
-								status = getStatus(e);
-							}
+							position = (Position) persistenceService.getCacheService().merge(position);
+						}
+						catch(Exception e)
+						{
+							status = getStatus(e);
 						}
 					}
-				}
+//				}
 			}
 		}
 		return status;

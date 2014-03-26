@@ -27,7 +27,7 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("AAAAAAAAAAAAAAAA WWW FFFFFFFFF LLLLLLLLLLL");
+		builder = builder.append("AAAAAAAAAAAA WWW MMM FFFFFFFFF LLLLLLLLLLL");
 		return builder.toString();
 	}
 
@@ -147,7 +147,7 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 
 	public enum DetailKey implements IKey
 	{
-		A, W, L, F;
+		A, W, L, F, M;
 
 		@Override
 		public String label()
@@ -161,6 +161,10 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 				case W:
 				{
 					return "Währung";
+				}
+				case M:
+				{
+					return "Anzahl Zahlungen";
 				}
 				case L:
 				{
@@ -216,6 +220,11 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 								.getDefaultFractionDigits());
 						final String formattedAmount = SettlementLayoutPaymentSection.amountFormatter.format(amount);
 						return layoutArea.replaceMarker(formattedAmount, marker, false);
+					}
+					case M:
+					{
+						final int quantity = payment.getQuantity();
+						return layoutArea.replaceMarker(DecimalFormat.getIntegerInstance().format(quantity), marker, false);
 					}
 					case F:
 					{

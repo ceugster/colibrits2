@@ -107,12 +107,15 @@ public class FileLoggerComponent implements LogListener
 	@Override
 	public void logged(LogEntry entry)
 	{
-		String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
-		out.println(log);
-		Throwable exception = entry.getException();
-		if (exception != null)
+		if (entry.getLevel() < LogService.LOG_INFO)
 		{
-			exception.printStackTrace();
+			String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
+			out.println(log);
+			Throwable exception = entry.getException();
+			if (exception != null)
+			{
+				exception.printStackTrace();
+			}
 		}
 	}
 

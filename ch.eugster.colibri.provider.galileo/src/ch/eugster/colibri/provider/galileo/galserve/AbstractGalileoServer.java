@@ -135,14 +135,14 @@ public abstract class AbstractGalileoServer implements IServer
 
 	protected void setCustomer(final Barcode barcode, final Position position)
 	{
-		position.getReceipt().setCustomer(this.getCustomer(this.getCustomerId(barcode)));
+		position.getReceipt().setCustomer(this.updateCustomer(this.getCustomerId(barcode)));
 	}
 
 	protected abstract void setProduct(Barcode barcode, Position position);
 
 	protected abstract void setEbookProduct(Barcode barcode, Position position);
 
-	protected abstract Customer getCustomer(final int customerId);
+	protected abstract Customer updateCustomer(final int customerId);
 
 	public IStatus getStatus()
 	{

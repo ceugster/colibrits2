@@ -77,9 +77,9 @@ public class CustomerServerOld extends CustomerServer
 				customer.setFirstname(CustomerServerOld.this.kserver.cvorname().toString());
 				customer.setHasAccount((Boolean) CustomerServerOld.this.kserver.lkundkarte());
 				customer.setAccount((Double) CustomerServerOld.this.kserver.nkundkonto());
-				final double nachlass = Math.abs((Double) CustomerServerOld.this.kserver.nnachlass());
-				final double discount = BigDecimal.valueOf(nachlass / 100).round(new MathContext(2)).doubleValue();
-				customer.setDiscount(discount);
+//				final double nachlass = Math.abs((Double) CustomerServerOld.this.kserver.nnachlass());
+//				final double discount = BigDecimal.valueOf(nachlass / 100).round(new MathContext(2)).doubleValue();
+//				customer.setDiscount(discount);
 				Object object = CustomerServerOld.this.kserver.lrggewaehlt();
 				if (object instanceof Boolean && ((Boolean) object).booleanValue())
 				{
@@ -92,7 +92,7 @@ public class CustomerServerOld extends CustomerServer
 						position.setProduct(product);
 						position.setQuantity(1);
 						position.setPrice((Double) CustomerServerOld.this.kserver.nrgbetrag());
-						position.setDiscount(discount);
+//						position.setDiscount(discount);
 						position.setSearchValue(product.getInvoiceNumber());
 						position.setProductGroup(productGroup);
 						position.setOption(Option.PAYED_INVOICE);

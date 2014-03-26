@@ -1568,6 +1568,7 @@ ch.eugster.colibri.product/.project -text
 ch.eugster.colibri.product/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.product/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.product/build.properties -text
+ch.eugster.colibri.product/colibri.empty.product -text
 ch.eugster.colibri.product/colibri.full.product -text
 ch.eugster.colibri.product/icons/kasse_128x128.bmp -text
 ch.eugster.colibri.product/icons/kasse_128x128.png -text
@@ -1723,6 +1724,7 @@ ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/Activator.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IDirtyable.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IProperty.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderConfiguration.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderState.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderTaxCode.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/AbstractProviderQuery.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/AbstractProviderService.java -text
