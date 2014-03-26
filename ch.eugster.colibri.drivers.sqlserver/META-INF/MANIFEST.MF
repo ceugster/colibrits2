@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sqlserver Driver Bundle
+Bundle-SymbolicName: ch.eugster.colibri.drivers.sqlserver;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ClassPath: lib/sqljdbc4.jar,
+ .
+Export-Package: com.microsoft.sqlserver.jdbc

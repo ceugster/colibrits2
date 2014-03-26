@@ -1041,6 +1041,13 @@ ch.eugster.colibri.drivers.postgresql/lib/postgresql-8.4-701.jdbc4.jar -text
 ch.eugster.colibri.drivers.sqlserver.feature/.project -text
 ch.eugster.colibri.drivers.sqlserver.feature/build.properties -text
 ch.eugster.colibri.drivers.sqlserver.feature/feature.xml -text
+ch.eugster.colibri.drivers.sqlserver/.classpath -text
+ch.eugster.colibri.drivers.sqlserver/.project -text
+ch.eugster.colibri.drivers.sqlserver/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.drivers.sqlserver/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.drivers.sqlserver/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.drivers.sqlserver/build.properties -text
+ch.eugster.colibri.drivers.sqlserver/lib/sqljdbc4.jar -text
 ch.eugster.colibri.encryption.feature/.project -text
 ch.eugster.colibri.encryption.feature/build.properties -text
 ch.eugster.colibri.encryption.feature/feature.xml -text
