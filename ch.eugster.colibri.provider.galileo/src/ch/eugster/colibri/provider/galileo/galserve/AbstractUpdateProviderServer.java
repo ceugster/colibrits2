@@ -323,8 +323,8 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 				 */
 				try
 				{
-//					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
-//					{
+					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
+					{
 						if (doSellArticle(position.getCode()))
 						{
 							status = update(position, false, ProviderState.BOOKED ^ position.getProviderState(), "do_verkauf", status, true);
@@ -333,7 +333,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 						{
 							status = warn(position, position.getProviderState() | ProviderState.BOOK_ERROR, "do_verkauf", "");
 						}
-//					}
+					}
 				}
 				catch(Exception e)
 				{
@@ -344,8 +344,8 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 			{
 				try
 				{
-//					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
-//					{
+					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
+					{
 						if (doReverseArticle(position.getCode()))
 						{
 							status = update(position, false, ProviderState.BOOKED ^ position.getProviderState(), "do_storno", status, true);
@@ -354,7 +354,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 						{
 							status = warn(position, ProviderState.BOOK_ERROR | position.getProviderState(), "do_storno", "");
 						}
-//					}
+					}
 				}
 				catch(Exception e)
 				{

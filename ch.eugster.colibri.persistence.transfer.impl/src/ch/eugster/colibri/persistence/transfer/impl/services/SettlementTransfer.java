@@ -55,6 +55,28 @@ public class SettlementTransfer extends AbstractTransfer
 		return status;
 	}
 	
+	private void updateServerStock(Settlement settlement)
+	{
+		final List<Stock> stocks = settlement.getSalespoint().getStocks();
+		for (final Stock stock : stocks)
+		{
+			if (stock.isVariable())
+			{
+				stock.setLastCashSettlement(settlement);
+				double newStock = 0D;
+				List<SettlementMoney> moneys = settlement.getMoneys();
+				for (SettlementMoney money : moneys)
+				{
+					if (money.getStock().getId().equals(stock.getId()))
+					{
+						newStock += money.getAmount();
+					}
+				}
+				stock.setAmount(newStock);
+			}
+		}
+	}
+
 	private IStatus transfer(List<Settlement> localSettlements) throws Exception
 	{
 		IStatus status = getStatus(null);
@@ -74,6 +96,7 @@ public class SettlementTransfer extends AbstractTransfer
 					}
 					serverSettlement = serverSalespoint.getSettlement();
 					serverSettlement = updateServerSettlement(localSettlement, serverSettlement);
+					updateServerStock(serverSettlement);
 					localSettlement.setOtherId(serverSettlement.getId());
 					persistenceService.getCacheService().merge(localSettlement);
 					serverSalespoint.setSettlement(Settlement.newInstance(serverSalespoint));

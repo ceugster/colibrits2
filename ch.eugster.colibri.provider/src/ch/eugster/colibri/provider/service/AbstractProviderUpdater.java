@@ -57,9 +57,12 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 								try
 								{
 									Position serverPosition = (Position) persistenceService.getServerService().find(Position.class, position.getOtherId());
-									serverPosition.setServerUpdated(true);
-									serverPosition.setProviderBooked(position.isProviderBooked());
-									persistenceService.getServerService().merge(serverPosition);
+									if (serverPosition != null)
+									{
+										serverPosition.setServerUpdated(true);
+										serverPosition.setProviderBooked(position.isProviderBooked());
+										persistenceService.getServerService().merge(serverPosition);
+									}
 									position.setServerUpdated(true);
 								}
 								catch (Exception e)

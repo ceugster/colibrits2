@@ -8,6 +8,7 @@ import java.util.Currency;
 
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementPayment;
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
@@ -192,7 +193,14 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 				{
 					case A:
 					{
-						final String name = payment.getPaymentType().getName();
+						String name = payment.getPaymentType().getName();
+						if (payment.getDefaultCurrencyAmount() < 0)
+						{
+							if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+							{
+								name = "Rückgutschein";
+							}
+						}
 						return layoutArea.replaceMarker(name, marker, true);
 					}
 					case W:
