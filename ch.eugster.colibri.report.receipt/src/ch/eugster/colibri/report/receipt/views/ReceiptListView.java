@@ -31,6 +31,7 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.User;
@@ -55,6 +56,8 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 	private ReceiptStateViewerFilter stateFilter;
 
 	private UserViewerFilter userFilter;
+	
+	private ProductGroupViewerFilter productGroupFilter;
 	
 	private PaymentTypeViewerFilter paymentTypeFilter;
 	
@@ -122,10 +125,11 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 		settlementFilter = new SettlementViewerFilter();
 		userFilter = new UserViewerFilter();
 		stateFilter = new ReceiptStateViewerFilter();
+		productGroupFilter = new ProductGroupViewerFilter();
 		paymentTypeFilter = new PaymentTypeViewerFilter();
 		amountFilter = new AmountViewerFilter();
 		
-		ViewerFilter[] filters = new ViewerFilter[] { settlementFilter, userFilter, stateFilter, paymentTypeFilter, amountFilter,
+		ViewerFilter[] filters = new ViewerFilter[] { settlementFilter, userFilter, stateFilter, productGroupFilter, paymentTypeFilter, amountFilter,
 				new DeletedEntityViewerFilter() };
 
 		this.viewer = new TableViewer(table);
@@ -364,6 +368,15 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 				else if (ssel.getFirstElement() instanceof User)
 				{
 					userFilter.setUser((User) ssel.getFirstElement());
+					this.viewer.refresh();
+					TableItem[] objects = this.viewer.getTable().getItems();
+					setSummary(objects);
+					viewer.setSelection(objects.length == 0 ? new StructuredSelection() : new StructuredSelection(
+							new Object[] { objects[0] }));
+				}
+				else if (ssel.getFirstElement() instanceof ProductGroup)
+				{
+					productGroupFilter.setProductGroup((ProductGroup) ssel.getFirstElement());
 					this.viewer.refresh();
 					TableItem[] objects = this.viewer.getTable().getItems();
 					setSummary(objects);

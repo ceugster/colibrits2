@@ -1860,6 +1860,10 @@ ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/Pa
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/PaymentTypeViewerFilter.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/PositionContentProvider.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/PositionListView.java -text
+ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ProductGroupContentProvider.java -text
+ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ProductGroupLabelProvider.java -text
+ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ProductGroupSorter.java -text
+ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ProductGroupViewerFilter.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ReceiptContentProvider.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ReceiptFilterView.java -text
 ch.eugster.colibri.report.receipt/src/ch/eugster/colibri/report/receipt/views/ReceiptListView.java -text

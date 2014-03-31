@@ -47,7 +47,7 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 
 	public static final Dimension MIN_BUTTON_SIZE = new Dimension(60, 40);
 
-	public static final Dimension PREFERRED_BUTTON_SIZE = new Dimension(80, 60);
+	public static final Dimension PREFERRED_BUTTON_SIZE = new Dimension(60, 60);
 
 	public static final Dimension MAX_BUTTON_SIZE = new Dimension(480, 360);
 

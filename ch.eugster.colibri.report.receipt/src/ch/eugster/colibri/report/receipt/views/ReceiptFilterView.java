@@ -69,12 +69,15 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.queries.PaymentTypeQuery;
+import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.SettlementQuery;
@@ -104,6 +107,8 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 	private ComboViewer userViewer;
 
 	private ComboViewer stateViewer;
+	
+	private ComboViewer productGroupViewer;
 	
 	private ComboViewer paymentTypeViewer;
 	
@@ -298,7 +303,28 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		this.userViewer.addSelectionChangedListener(this);
 
 		group = new Group(composite, SWT.NONE);
-		group.setText("Detailfilter");
+		group.setText("Positionenfilter");
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		group.setLayout(new GridLayout(3, false));
+
+		label = new Label(group, SWT.None);
+		label.setLayoutData(new GridData());
+		label.setText("Warengruppe");
+
+		gridData = new GridData(GridData.FILL_HORIZONTAL);
+		gridData.horizontalSpan = 2;
+		
+		combo = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+		combo.setLayoutData(gridData);
+
+		this.productGroupViewer = new ComboViewer(combo);
+		this.productGroupViewer.setContentProvider(new ProductGroupContentProvider());
+		this.productGroupViewer.setLabelProvider(new ProductGroupLabelProvider());
+		this.productGroupViewer.setSorter(new ProductGroupSorter());
+		this.productGroupViewer.addSelectionChangedListener(this);
+
+		group = new Group(composite, SWT.NONE);
+		group.setText("Zahlungsfilter");
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		group.setLayout(new GridLayout(3, false));
 
@@ -1010,6 +1036,14 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		}
 		try
 		{
+			this.settings.getLong("product.group.filter");
+		}
+		catch (final NumberFormatException e)
+		{
+			this.settings.put("product.group.filter", 0);
+		}
+		try
+		{
 			this.settings.getLong("payment.type.filter");
 		}
 		catch (final NumberFormatException e)
@@ -1062,6 +1096,8 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				this.settlementViewer.setSelection(new StructuredSelection(new Settlement[0]));
 				this.userViewer.setInput(null);
 				this.userViewer.setSelection(new StructuredSelection(new User[0]));
+				this.productGroupViewer.setInput(null);
+				this.productGroupViewer.setSelection(new StructuredSelection(new PaymentType[0]));
 				this.paymentTypeViewer.setInput(null);
 				this.paymentTypeViewer.setSelection(new StructuredSelection(new PaymentType[0]));
 			}
@@ -1163,6 +1199,41 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				}
 			}
 
+			id = Long.valueOf(this.settings.getLong("product.group.filter"));
+			final ProductGroupQuery productGroupQuery = (ProductGroupQuery) persistenceService.getServerService().getQuery(ProductGroup.class);
+			Collection<ProductGroup> allProductGroups = new ArrayList<ProductGroup>();
+			ProductGroup emptyProductGroup = ProductGroup.newInstance(ProductGroupType.SALES_RELATED, null);
+			allProductGroups.add(emptyProductGroup);
+			allProductGroups.addAll(productGroupQuery.selectAll(false));
+			ProductGroup[] productGroups = allProductGroups.toArray(new ProductGroup[0]);
+			this.productGroupViewer.setInput(productGroups);
+			if (productGroups.length > 0)
+			{
+				for (final ProductGroup productGroup : productGroups)
+				{
+					if (productGroup.getId() == null)
+					{
+						if (id.longValue() == 0L)
+						{
+							this.productGroupViewer.setSelection(new StructuredSelection(new ProductGroup[] { productGroup }));
+							break;
+						}
+					}
+					else
+					{
+						if (productGroup.getId().equals(id))
+						{
+							this.productGroupViewer.setSelection(new StructuredSelection(new ProductGroup[] { productGroup }));
+							break;
+						}
+					}
+				}
+				if (this.productGroupViewer.getSelection().isEmpty())
+				{
+					this.productGroupViewer.setSelection(new StructuredSelection(productGroups[0]));
+				}
+			}
+			
 			id = Long.valueOf(this.settings.getLong("payment.type.filter"));
 			final PaymentTypeQuery paymentTypeQuery = (PaymentTypeQuery) persistenceService.getServerService().getQuery(PaymentType.class);
 			Collection<PaymentType> allPaymentTypes = new ArrayList<PaymentType>();
@@ -1194,7 +1265,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				}
 				if (this.paymentTypeViewer.getSelection().isEmpty())
 				{
-					this.paymentTypeViewer.setSelection(new StructuredSelection(users[0]));
+					this.paymentTypeViewer.setSelection(new StructuredSelection(paymentTypes[0]));
 				}
 			}
 			
@@ -1354,6 +1425,18 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				final User user = (User) ssel.getFirstElement();
 				ReceiptFilterView.this.settings
 						.put("user.filter", user.getId() == null ? 0l : user.getId().longValue());
+				event = new SelectionChangedEvent(this, ssel);
+				fireSelectionChanged(event);
+			}
+		}
+		else if (event.getSource().equals(productGroupViewer))
+		{
+			StructuredSelection ssel = (StructuredSelection) event.getSelection();
+			if (ssel.getFirstElement() instanceof ProductGroup)
+			{
+				final ProductGroup productGroup = (ProductGroup) ssel.getFirstElement();
+				ReceiptFilterView.this.settings
+						.put("product.group.filter", productGroup.getId() == null ? 0l : productGroup.getId().longValue());
 				event = new SelectionChangedEvent(this, ssel);
 				fireSelectionChanged(event);
 			}

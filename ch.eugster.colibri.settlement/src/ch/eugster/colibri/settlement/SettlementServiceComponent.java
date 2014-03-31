@@ -128,6 +128,7 @@ public class SettlementServiceComponent implements SettlementService
 					try
 					{
 						settlement = (Settlement) persistenceService.getCacheService().merge(settlement);
+//						settlement.setSalespoint((Salespoint) persistenceService.getCacheService().merge(settlement.getSalespoint()));
 						eventAdmin.sendEvent(getEvent());
 					}
 					catch (Exception e)
@@ -236,7 +237,7 @@ public class SettlementServiceComponent implements SettlementService
 				{
 					if (money.getStock().getId().equals(stock.getId()))
 					{
-						newStock += stock.getAmount();
+						newStock += money.getAmount();
 					}
 				}
 				stock.setAmount(newStock);
