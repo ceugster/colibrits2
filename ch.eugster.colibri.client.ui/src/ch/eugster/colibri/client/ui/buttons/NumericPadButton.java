@@ -16,9 +16,9 @@ public class NumericPadButton extends ProfileButton
 {
 	public static final long serialVersionUID = 0l;
 
-	public static final Dimension MIN_BUTTON_SIZE = new Dimension(80, 60);
+	public static final Dimension MIN_BUTTON_SIZE = new Dimension(80, 40);
 
-	public static final Dimension PREFERRED_BUTTON_SIZE = new Dimension(100, 80);
+	public static final Dimension PREFERRED_BUTTON_SIZE = new Dimension(100, 40);
 
 	public static final Dimension MAX_BUTTON_SIZE = new Dimension(500, 200);
 

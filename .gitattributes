@@ -871,6 +871,7 @@ ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/events/StateChange
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/events/StateChangeListener.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/events/StateChangeProvider.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/handlers/ShowPerspectiveHandler.java -text
+ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/layout/PercentLayout.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/ColibriFocusTraversalPolicy.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/ConfigurablePanel.java -text
 ch.eugster.colibri.client.ui/src/ch/eugster/colibri/client/ui/panels/IConfigurable.java -text

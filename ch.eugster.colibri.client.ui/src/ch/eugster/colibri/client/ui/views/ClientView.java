@@ -38,11 +38,13 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
@@ -153,6 +155,16 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	@Override
 	public void createPartControl(final Composite parent)
 	{
+		this.getViewSite().getWorkbenchWindow().getShell().addListener (SWT.Resize,  new Listener () 
+		{
+			@Override
+			public void handleEvent(org.eclipse.swt.widgets.Event event) 
+			{
+				Rectangle rect = ClientView.this.getViewSite().getWorkbenchWindow().getShell().getClientArea ();
+				System.out.println(rect);
+			}
+		});
+
 		StringBuilder errors = new StringBuilder();
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		String msg = "Die Verbindung zur lokalen Datenbank kann nicht hergestellt werden.";

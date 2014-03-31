@@ -6,7 +6,9 @@
  */
 package ch.eugster.colibri.client.ui.panels.user;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +28,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
+import se.datadosen.component.buttonbar.PercentLayout;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.actions.BackAction;
 import ch.eugster.colibri.client.ui.actions.BackFromSettleAction;
@@ -519,7 +522,13 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			final JPanel panel = this.getPanel(this.profile, this.profile.getTopLeft());
 			if (panel != null)
 			{
-				this.leftPosPanel.add(panel);
+//				this.leftPosPanel.add(panel);
+				int topPercent = this.profile.getTopPercent();
+				if (topPercent == 0)
+				{
+					topPercent = 55;
+				}
+				this.leftPosPanel.add(panel, String.valueOf(topPercent) + "%");
 			}
 		}
 
@@ -528,7 +537,8 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			final JPanel panel = this.getPanel(this.profile, this.profile.getBottomLeft());
 			if (panel != null)
 			{
-				this.leftPosPanel.add(panel);
+//				this.leftPosPanel.add(panel);
+				this.leftPosPanel.add(panel, "*");
 			}
 		}
 
@@ -593,7 +603,8 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 
 	private void init()
 	{
-		this.setLayout(new GridLayout(1, 2));
+//		this.setLayout(new GridLayout(1, 2));
+		this.setLayout(new PercentLayout(PercentLayout.HORIZONTAL, 0));
 
 		this.valueDisplay = new ValueDisplay(this, "");
 
@@ -605,8 +616,17 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		 * left side of the pos frame
 		 */
 		this.leftPanel = new JPanel();
+		Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+		screen.width = screen.width / 2;
+		this.leftPanel.setPreferredSize(screen);
 		this.leftPanel.setLayout(new CardLayout());
-		this.add(this.leftPanel);
+//		this.add(this.leftPanel);
+		int leftPercent = this.profile.getLeftPercent();
+		if (leftPercent == 0)
+		{
+			leftPercent = 55;
+		}
+		this.add(this.leftPanel, String.valueOf(leftPercent) + "%");
 		/*
 		 * parked receipts
 		 */
@@ -622,7 +642,8 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		 */
 		this.rightPanel = new JPanel();
 		this.rightPanel.setLayout(new CardLayout());
-		this.add(this.rightPanel);
+//		this.add(this.rightPanel);
+		this.add(this.rightPanel, "*");
 		/*
 		 * coin counter
 		 */
@@ -632,7 +653,8 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		 * left side
 		 */
 		this.leftPosPanel = new JPanel();
-		this.leftPosPanel.setLayout(new GridLayout(2, 1));
+//		this.leftPosPanel.setLayout(new GridLayout(2, 1));
+		this.leftPosPanel.setLayout(new PercentLayout(PercentLayout.VERTICAL, 0));
 		this.leftPanel.add(UserPanel.PANEL_LEFT_POS, this.leftPosPanel);
 		/*
 		 * right side

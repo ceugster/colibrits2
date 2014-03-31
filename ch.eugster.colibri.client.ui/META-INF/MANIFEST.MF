@@ -3,8 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: ColibriTS Client  UI Plugin
 Bundle-SymbolicName: ch.eugster.colibri.client.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-ClassPath: .,
- icons/
+Bundle-ClassPath: lib/jalbum-core.jar,
+ icons/,
+ .
 Bundle-Activator: ch.eugster.colibri.client.ui.Activator
 Bundle-Localization: plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

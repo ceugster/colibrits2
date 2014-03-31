@@ -49,7 +49,9 @@ public final class QuantityAction extends UserPanelProfileAction
 		}
 		if (result == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 		{
-			userPanel.getPositionWrapper().getPosition().setQuantity(userPanel.getValueDisplay().getQuantity());
+			int qty = userPanel.getPositionWrapper().getPosition().getQuantity();
+			int newQty = userPanel.getValueDisplay().getQuantity();
+			userPanel.getPositionWrapper().getPosition().setQuantity(qty < 0 ? -newQty : newQty);
 		}
 		userPanel.getPositionListPanel().getModel().actionPerformed(event);
 	}
