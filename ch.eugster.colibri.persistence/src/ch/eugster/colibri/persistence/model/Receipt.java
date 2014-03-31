@@ -792,22 +792,18 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		for (final Position position : this.getPositions())
 		{
-			if (position.isDeleted() != deleted)
-			{
-				position.setDeleted(deleted);
-			}
+			position.setDeleted(deleted);
 		}
 		for (final Payment payment : this.getPayments())
 		{
-			if (payment.isDeleted() != deleted)
-			{
-				payment.setDeleted(deleted);
-			}
+			payment.setDeleted(deleted);
 		}
-		if (!this.isDeleted())
-		{
-			super.setDeleted(deleted);
-		}
+		super.setDeleted(deleted);
+	}
+
+	public void delete()
+	{
+		setDeleted(true);
 	}
 
 	public void setForeignCurrency(final Currency foreignCurrency)

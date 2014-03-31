@@ -2,7 +2,6 @@ package ch.eugster.colibri.persistence.queries;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -44,7 +43,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.count(expression);
 	}
 
-	public Collection<Receipt> selectSavedBySettlement(Settlement settlement)
+	public List<Receipt> selectSavedBySettlement(Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.SAVED));
@@ -155,12 +154,12 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return find(expression);
 	}
 
-	public Collection<Receipt> selectBySalespointAndDate(Salespoint salespoint, Calendar from, Calendar to)
+	public List<Receipt> selectBySalespointAndDate(Salespoint salespoint, Calendar from, Calendar to)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("settlement").get("salespoint")
 				.equal(salespoint);
 		expression = expression.and(new ExpressionBuilder().get("timestamp").between(from, to));
-		final Collection<Receipt> receipts = this.select(expression);
+		final List<Receipt> receipts = this.select(expression);
 		return receipts;
 
 	}
@@ -175,26 +174,26 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 
 	}
 
-	public Collection<Receipt> selectBySalespointAndNumber(Salespoint salespoint, String number)
+	public List<Receipt> selectBySalespointAndNumber(Salespoint salespoint, String number)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("settlement").get("salespoint")
 				.equal(salespoint);
 		expression = expression.and(new ExpressionBuilder().get("number").equal(number));
 		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
-		final Collection<Receipt> receipts = this.select(expression);
+		final List<Receipt> receipts = this.select(expression);
 		return receipts;
 
 	}
 
-	public Collection<Receipt> selectByNumber(Long number)
+	public List<Receipt> selectByNumber(Long number)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("number").equal(number);
-		final Collection<Receipt> receipts = this.select(expression);
+		final List<Receipt> receipts = this.select(expression);
 		return receipts;
 
 	}
 
-	public Collection<Receipt> selectBySettlement(final Settlement settlement, Receipt.State[] states)
+	public List<Receipt> selectBySettlement(final Settlement settlement, Receipt.State[] states)
 	{
 		Expression state = null;
 		if (states == null)
@@ -217,11 +216,11 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
 		expression = expression.and(state);
-		final Collection<Receipt> receipts = this.select(expression);
+		final List<Receipt> receipts = this.select(expression);
 		return receipts;
 	}
 
-	public Collection<Receipt> selectBySettlementAndUser(final Settlement settlement, final User user,
+	public List<Receipt> selectBySettlementAndUser(final Settlement settlement, final User user,
 			Receipt.State[] states)
 	{
 		Expression state = null;
@@ -246,11 +245,11 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		expression = expression.and(new ExpressionBuilder().get("user").equal(user));
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
 		expression = expression.and(state);
-		final Collection<Receipt> receipts = this.select(expression);
+		final List<Receipt> receipts = this.select(expression);
 		return receipts;
 	}
 
-	public Collection<Receipt> selectParked(final Salespoint salespoint)
+	public List<Receipt> selectParked(final Salespoint salespoint)
 	{
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settlement").get("salespoint").equal(salespoint));
@@ -258,7 +257,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.select(expression);
 	}
 
-	public Collection<Receipt> selectParked(final User user)
+	public List<Receipt> selectParked(final User user)
 	{
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("user").equal(user));
@@ -266,7 +265,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.select(expression);
 	}
 	
-	public Collection<Receipt> selectParked(final Settlement settlement)
+	public List<Receipt> selectParked(final Settlement settlement)
 	{
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
@@ -277,7 +276,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 	public int removeParked(final Salespoint salespoint)
 	{
 		int result = 0;
-		Collection<Receipt> receipts = selectParked(salespoint);
+		List<Receipt> receipts = selectParked(salespoint);
 		for (Receipt receipt : receipts)
 		{
 			try
@@ -293,7 +292,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return result;
 	}
 
-	public Collection<Receipt> selectProviderNotUpdated(final int maxResults)
+	public List<Receipt> selectProviderNotUpdated(final int maxResults)
 	{
 		Expression deleted = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
 		deleted = deleted.and(new ExpressionBuilder().anyOfAllowingNone("positions").get("deleted").equal(false));
@@ -310,7 +309,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 				.equal(true)));
 
 		final Expression states = saved.or(reversed);
-		final Collection<Receipt> receipts = this.select(deleted.and(states), maxResults);
+		final List<Receipt> receipts = this.select(deleted.and(states), maxResults);
 		return receipts;
 	}
 
@@ -326,12 +325,12 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.getReversedReceipts(null, receipts);
 	}
 
-	public Collection<Receipt> selectTransferables()
+	public List<Receipt> selectTransferables()
 	{
 		return this.selectTransferables(0);
 	}
 
-	public Collection<Receipt> selectTransferables(Settlement settlement)
+	public List<Receipt> selectTransferables(Settlement settlement)
 	{
 		return this.selectTransferables(settlement, 0);
 	}

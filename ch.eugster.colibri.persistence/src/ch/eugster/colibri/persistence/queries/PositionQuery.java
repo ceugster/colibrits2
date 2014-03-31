@@ -38,7 +38,6 @@ import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.User;
-import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
 public class PositionQuery extends AbstractQuery<Position>
@@ -53,16 +52,17 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	public Collection<Position> countBySearchValue(final String searchValue)
 	{
-		final Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
 		final Expression parked = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.PARKED);
 		final Expression value = new ExpressionBuilder().get("searchValue").equal(searchValue);
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		return this.select(deleted.and(parked.and(value)));
 	}
 
 	public long countProviderUpdates(Salespoint salespoint, String providerId, boolean updateServer)
 	{
-		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
-		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
@@ -138,8 +138,8 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, boolean updateServer, final int maxRows)
 	{
-		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
-		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
@@ -425,7 +425,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	public Map<String, Map<Long, ProductGroupEntry>> selectProductGroupStatistics(Salespoint[] salespoints, Calendar[] dateRange,
 			String provider, boolean withExpenses, boolean withOtherSales, boolean previousYear)
 	{
-		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED).and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
 		if (provider != null && !provider.isEmpty())
 		{
 			Expression productGroup = new ExpressionBuilder().get("productGroup").anyOfAllowingNone("productGroupMappings").get("provider").equal(provider);
@@ -462,6 +462,10 @@ public class PositionQuery extends AbstractQuery<Position>
 			dates = new ExpressionBuilder().get("receipt").get("timestamp").lessThanEqual(dateRange[1]);
 		}
 		Expression expression = state.and(sales).and(dates).and(sps);
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
 
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 //		reportQuery.addAttribute("salespointId", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
@@ -538,7 +542,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	public Map<Long, Map<String, Map<Long, ProductGroupEntry>>> selectProductGroupStatisticsBySalespoint(Salespoint[] salespoints, Calendar[] dateRange,
 			String provider, boolean withExpenses, boolean withOtherSales, boolean previousYear)
 	{
-		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED).and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
 		if (provider != null && !provider.isEmpty())
 		{
 			Expression productGroup = new ExpressionBuilder().get("productGroup").anyOfAllowingNone("productGroupMappings").get("provider").equal(provider);
@@ -575,6 +579,10 @@ public class PositionQuery extends AbstractQuery<Position>
 			dates = new ExpressionBuilder().get("receipt").get("timestamp").lessThanEqual(dateRange[1]);
 		}
 		Expression expression = state.and(sales).and(dates).and(sps);
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
 
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("salespointId", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
@@ -797,7 +805,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		Currency currency = salespoints[0].getCommonSettings().getReferenceCurrency();
 
 		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
-		Expression expression = state.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = state.and(deleted);
+		
 		Expression allocation = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.ALLOCATION);
 		Expression withdrawal = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.WITHDRAWAL);
 		Expression internal = allocation.and(withdrawal);
@@ -861,10 +872,12 @@ public class PositionQuery extends AbstractQuery<Position>
 			return new ArrayList<ReportQueryResult>();
 		}
 
-		Currency currency = salespoints[0].getCommonSettings().getReferenceCurrency();
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
-		Expression expression = state.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = state.and(deleted);
+
 		if (onlyWithDiscount)
 		{
 			Expression discount = new ExpressionBuilder().get("discount").notEqual(0D);
@@ -924,8 +937,11 @@ public class PositionQuery extends AbstractQuery<Position>
 			return new ArrayList<Position>();
 		}
 
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
 		Expression state = new ExpressionBuilder(getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
-		Expression expression = state.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = state.and(deleted);
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -964,9 +980,13 @@ public class PositionQuery extends AbstractQuery<Position>
 
 		ProductGroup payedInvoice = salespoints[0].getCommonSettings().getPayedInvoice();
 
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		Expression state = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = state.and(deleted);
+		
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -1005,9 +1025,14 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private List<ReportQueryResult> selectPositionsBySettlement(final Settlement settlement)
 	{
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
+		expression = expression.and(deleted);
+		
 		Expression allocation = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.ALLOCATION);
 		Expression withdrawal = new ExpressionBuilder().get("productGroup").get("productGroupType").notEqual(ProductGroupType.WITHDRAWAL);
 		Expression internal = allocation.and(withdrawal);
@@ -1036,11 +1061,14 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private Collection<Position> selectPayedInvoicesBySettlement(final Settlement settlement)
 	{
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
-
+		expression = expression.and(deleted);
+		
 		ProductGroup payedInvoiceGroup = settlement.getSalespoint().getCommonSettings().getPayedInvoice();
 		if (payedInvoiceGroup == null)
 		{
@@ -1055,11 +1083,14 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private List<Position> selectInternalsBySettlement(final Settlement settlement)
 	{
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
-
+		expression = expression.and(deleted);
+		
 		Expression alloc = new ExpressionBuilder().get("productGroup").get("productGroupType")
 				.equal(ProductGroupType.ALLOCATION);
 		Expression withd = new ExpressionBuilder().get("productGroup").get("productGroupType")
@@ -1078,9 +1109,13 @@ public class PositionQuery extends AbstractQuery<Position>
 			return new ArrayList<Position>();
 		}
 
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		Expression state = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = state.and(deleted);
+
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -1119,9 +1154,14 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private List<Position> selectRestitutedPositionsBySettlement(final Settlement settlement)
 	{
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("settlement").equal(settlement);
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		Expression expression = new ExpressionBuilder(this.getEntityClass());
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
+		
 		expression = expression.and(new ExpressionBuilder().get("quantity").lessThan(0));
 
 		Expression restitution = new ExpressionBuilder().get("productGroup").get("productGroupType")
@@ -1140,8 +1180,12 @@ public class PositionQuery extends AbstractQuery<Position>
 			return new ArrayList<Position>();
 		}
 
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		Expression state = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
+		Expression expression = state.and(deleted);
+		
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -1179,10 +1223,13 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private List<ReportQueryResult> selectTaxesBySettlement(final Settlement settlement)
 	{
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
-		expression = expression.get("receipt").get("settlement").equal(settlement);
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
 
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("currentTax", new ExpressionBuilder().get("currentTax").get("id"));
@@ -1203,9 +1250,13 @@ public class PositionQuery extends AbstractQuery<Position>
 	private Collection<ReportQueryResult> selectTaxesBySalespointsAndDateRange(final Salespoint[] salespoints,
 			Calendar[] dates)
 	{
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+
+		Expression state = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
 				.equal(Receipt.State.SAVED);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = state.and(deleted);
+
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("internal").equal(false));
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
@@ -1249,7 +1300,6 @@ public class PositionQuery extends AbstractQuery<Position>
 			Calendar[] dateRange, int[] weekdays, int[] hourRange)
 	{
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		expression = expression.and(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED));
 
 		if (salespoints != null && salespoints.length > 0)
@@ -1296,6 +1346,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		}
 
 		expression.and(new ExpressionBuilder().get("receipt").get("hour").between(hourRange[0], hourRange[1]));
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
 
 		Map<Long, DayTimeRow> rows = new HashMap<Long, DayTimeRow>();
 

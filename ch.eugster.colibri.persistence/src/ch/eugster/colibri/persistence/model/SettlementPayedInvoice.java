@@ -60,6 +60,12 @@ public class SettlementPayedInvoice extends SettlementAbstractSinglePosition imp
 	protected SettlementPayedInvoice(final Settlement settlement, final Position position)
 	{
 		super(settlement, position);
+		this.setPosition(position);
+	}
+	
+	public void setPosition(Position position)
+	{
+		super.setPosition(position);
 		this.setQuantity(1);
 		this.setDate(position.getProduct() == null ? null : position.getProduct().getInvoiceDate());
 		this.setNumber(position.getProduct() == null ? null : position.getProduct().getInvoiceNumber());

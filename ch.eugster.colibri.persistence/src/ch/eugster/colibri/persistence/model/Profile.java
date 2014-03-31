@@ -44,6 +44,14 @@ public class Profile extends AbstractEntity implements IReplicatable
 	private String name;
 
 	@Basic
+	@Column(name = "pr_left_percent")
+	protected int leftPercent;
+
+	@Basic
+	@Column(name = "pr_top_percent")
+	protected int topPercent;
+
+	@Basic
 	@Column(name = "pr_top_left")
 	@Enumerated
 	protected PanelType topLeft;
@@ -972,6 +980,26 @@ public class Profile extends AbstractEntity implements IReplicatable
 	{
 		final Profile profile = (Profile) AbstractEntity.newInstance(new Profile());
 		return profile;
+	}
+
+	public int getLeftPercent() 
+	{
+		return leftPercent;
+	}
+
+	public void setLeftPercent(int leftPercent) 
+	{
+		this.propertyChangeSupport.firePropertyChange("leftPercent", this.leftPercent, this.leftPercent = leftPercent);
+	}
+
+	public int getTopPercent() 
+	{
+		return topPercent;
+	}
+
+	public void setTopPercent(int topPercent) 
+	{
+		this.propertyChangeSupport.firePropertyChange("topPercent", this.topPercent, this.topPercent = topPercent);
 	}
 
 	public enum PanelType

@@ -34,7 +34,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
-		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		final Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
 
@@ -54,9 +54,12 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.get("receipt").get("settlement").equal(settlement);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED));
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("internal").equal(false));
 		
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
+
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("paymentType", new ExpressionBuilder().get("paymentType").get("id"));
 
@@ -84,11 +87,13 @@ public class PaymentQuery extends AbstractQuery<Payment>
 	public List<ReportQueryResult> selectPaymentsBySalespointsAndDateRange(final Salespoint[] salespoints,
 			Calendar[] dateRange)
 	{
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
-				.equal(Receipt.State.SAVED);
-		expression = expression.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state").equal(Receipt.State.SAVED);
 		expression = expression.and(new ExpressionBuilder().get("receipt").get("internal").equal(false));
-		
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		expression = expression.and(deleted);
+
 		Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 				.equal(salespoints[0]);
 		for (int i = 1; i < salespoints.length; i++)
@@ -114,6 +119,8 @@ public class PaymentQuery extends AbstractQuery<Payment>
 					.lessThanEqual(dateRange[1]));
 		}
 
+		List<Payment> payments = this.select(expression);
+		
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("paymentType", new ExpressionBuilder().get("paymentType").get("id"));
 
@@ -334,7 +341,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
-		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("providerId").equal(providerId);
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
@@ -356,7 +363,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
-		deleted = deleted.and(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("providerId").equal(providerId);
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
