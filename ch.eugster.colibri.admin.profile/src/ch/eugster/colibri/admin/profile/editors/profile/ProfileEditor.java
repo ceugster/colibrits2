@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Scale;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorPart;
@@ -65,6 +66,7 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ColumnLayoutData;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
@@ -125,6 +127,10 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 
 	private Label bottomRight;
 
+	private Spinner leftPercent;
+	
+	private Spinner topPercent;
+	
 	private Color lightGrey = new Color(PlatformUI.getWorkbench().getDisplay(), 230, 230, 230);
 
 	/*
@@ -367,6 +373,8 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		}
 		this.bottomRight.setData(ProfileEditor.KEY_PANEL, profile.getBottomRight());
 
+		this.leftPercent.setSelection(profile.getLeftPercent());
+		this.topPercent.setSelection(profile.getTopPercent());
 		/*
 		 * Display
 		 */
@@ -523,6 +531,9 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		profile.setTopRight((PanelType) this.topRight.getData(ProfileEditor.KEY_PANEL));
 		profile.setBottomLeft((PanelType) this.bottomLeft.getData(ProfileEditor.KEY_PANEL));
 		profile.setBottomRight((PanelType) this.bottomRight.getData(ProfileEditor.KEY_PANEL));
+		
+		profile.setLeftPercent(leftPercent.getSelection());
+		profile.setTopPercent(topPercent.getSelection());
 		/*
 		 * Display panel
 		 */
@@ -2262,6 +2273,91 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 		gridData.minimumHeight = bounds.height;
 		this.bottomRight.setLayoutData(gridData);
 
+		final Composite sizePanel = new Composite(composite, SWT.None);
+		sizePanel.setLayoutData(new TableWrapData(TableWrapData.FILL));
+		sizePanel.setLayout(new GridLayout(3, true));
+
+		Label label = this.formToolkit.createLabel(sizePanel, "Breite linke Fensterhälfte");
+		label.setLayoutData(new GridData());
+		
+		gridData = new GridData();
+		gridData.widthHint = 32;
+		
+		this.leftPercent = new Spinner(sizePanel, SWT.None);
+		this.leftPercent.setLayoutData(gridData);
+		this.leftPercent.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TREE_BORDER);
+		this.leftPercent.setDigits(0);
+		this.leftPercent.setIncrement(1);
+		this.leftPercent.setPageIncrement(10);
+		this.leftPercent.setMaximum(100);
+		this.leftPercent.setMinimum(0);
+		this.leftPercent.addModifyListener(new ModifyListener() 
+		{
+			@Override
+			public void modifyText(ModifyEvent e)
+			{
+				
+			}});
+		this.leftPercent.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				ProfileEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+				widgetSelected(e);
+			}
+		});
+		formToolkit.adapt(leftPercent);
+		
+		label = this.formToolkit.createLabel(sizePanel, "%");
+		label.setLayoutData(new GridData());
+		
+		label = this.formToolkit.createLabel(sizePanel, "Höhe linker oberer Fensterteil");
+		label.setLayoutData(new GridData());
+		
+		gridData = new GridData();
+		gridData.widthHint = 32;
+		
+		this.topPercent = new Spinner(sizePanel, SWT.None);
+		this.topPercent.setLayoutData(gridData);
+		this.topPercent.setData(FormToolkit.KEY_DRAW_BORDER, FormToolkit.TREE_BORDER);
+		this.topPercent.setDigits(0);
+		this.topPercent.setIncrement(1);
+		this.topPercent.setPageIncrement(10);
+		this.topPercent.setMaximum(100);
+		this.topPercent.setMinimum(0);
+		this.topPercent.addModifyListener(new ModifyListener() 
+		{
+			@Override
+			public void modifyText(ModifyEvent e)
+			{
+				
+			}});
+		this.topPercent.addSelectionListener(new SelectionListener() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				ProfileEditor.this.setDirty(true);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e)
+			{
+				widgetSelected(e);
+			}
+		});
+		formToolkit.adapt(topPercent);
+		this.formToolkit.paintBordersFor(sizePanel);
+		
+		label = this.formToolkit.createLabel(sizePanel, "%");
+		label.setLayoutData(new GridData());
+		
 		this.formToolkit.paintBordersFor(composite);
 
 		return composite;
