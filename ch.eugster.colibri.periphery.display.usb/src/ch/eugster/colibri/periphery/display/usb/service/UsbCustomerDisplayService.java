@@ -1,6 +1,5 @@
 package ch.eugster.colibri.periphery.display.usb.service;
 
-import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -8,6 +7,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
+import ch.eugster.colibri.periphery.constants.AsciiConstants;
 import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.display.service.AbstractCustomerDisplayService;
 import ch.eugster.colibri.periphery.display.usb.Activator;
@@ -22,7 +22,7 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		this.openDisplay();
 		if (this.display != null)
 		{
-			this.display.print((char) 0x0c);
+			this.display.write((byte) 0x0c);
 		}
 		this.closeDisplay();
 	}
@@ -97,15 +97,16 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		try
 		{
 			this.display = new PrintStream(this.getPort());
+			this.display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
 		}
-		catch (final FileNotFoundException e)
+		catch (final Exception e)
 		{
 			if (this.getEventAdmin() != null)
 			{
 				this.getEventAdmin().sendEvent(
 						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Das Kundendisplay kann nicht angesprochen werden.")));
 			}
-		}
+		} 
 	}
 
 }
