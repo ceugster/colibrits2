@@ -1210,6 +1210,8 @@ ch.eugster.colibri.persistence.connection/lib/migration/jakarta-regexp-1.3.jar -
 ch.eugster.colibri.persistence.connection/plugin.xml -text
 ch.eugster.colibri.persistence.connection/src/META-INF/persistence.xml -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/Activator.java -text
+ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/ColibriContext.java -text
+ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/ColibriContextFactory.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/ServerExceptionHandler.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/AbstractConfigurator.java -text
 ch.eugster.colibri.persistence.connection/src/ch/eugster/colibri/persistence/connection/config/AbstractInitializer.java -text

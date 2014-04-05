@@ -13,6 +13,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
 
@@ -65,6 +67,7 @@ public class Activator extends AbstractUIPlugin
 
 	private Document oldDocument;
 	
+	private Context ctx;
 	/**
 	 * The constructor
 	 */
@@ -272,6 +275,9 @@ public class Activator extends AbstractUIPlugin
 	{
 		super.start(context);
 		Activator.plugin = this;
+		Hashtable<String, Object> environment = new Hashtable<String, Object>();
+		environment.put(Context.INITIAL_CONTEXT_FACTORY, "ch.eugster.colibri.persistence.connection.ColibriContextFactory");
+		ctx = new InitialContext(environment);
 
 		this.logServiceTracker = new ServiceTracker<LogService, LogService>(context, LogService.class, null);
 		this.logServiceTracker.open();
@@ -319,6 +325,8 @@ public class Activator extends AbstractUIPlugin
 		this.logServiceTracker.close();
 		
 		this.saveDocument(document);
+
+		ctx.close();
 
 		Activator.plugin = null;
 		super.stop(context);
