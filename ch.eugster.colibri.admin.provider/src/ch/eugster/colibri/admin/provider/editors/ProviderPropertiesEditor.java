@@ -173,7 +173,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 						{
 							try
 							{
-								persistenceService.getServerService().merge(property.getPersistedProperty());
+								property.setPersistedProperty((ProviderProperty) persistenceService.getServerService().merge(property.getPersistedProperty()));
 							} 
 							catch (Exception e) 
 							{
