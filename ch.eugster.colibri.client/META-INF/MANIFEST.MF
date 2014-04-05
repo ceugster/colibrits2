@@ -7,22 +7,7 @@ Bundle-Activator: ch.eugster.colibri.client.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
-Import-Package: ch.eugster.colibri.persistence.replication.service,
- org.eclipse.core.runtime;version="3.4.0",
- org.eclipse.core.runtime.jobs,
- org.eclipse.equinox.app;version="1.1.0",
- org.eclipse.jface.action,
- org.eclipse.jface.dialogs,
- org.eclipse.jface.preference,
- org.eclipse.swt,
- org.eclipse.swt.events,
- org.eclipse.swt.graphics,
- org.eclipse.swt.widgets,
- org.eclipse.ui,
- org.eclipse.ui.application,
- org.eclipse.ui.plugin,
- org.eclipse.ui.progress,
- org.osgi.framework;version="1.6.0",
- org.osgi.service.event;version="1.3.0",
- org.osgi.service.log;version="1.3.0",
- org.osgi.util.tracker;version="1.5.0"
+Import-Package: ch.eugster.colibri.persistence.replication.service
+Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.osgi.services;bundle-version="3.3.0"
