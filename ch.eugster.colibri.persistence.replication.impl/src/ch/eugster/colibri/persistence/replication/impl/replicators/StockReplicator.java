@@ -47,6 +47,8 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 					if (target == null)
 					{
 						target = this.replicate(source);
+						target.getSalespoint().addStock(target);
+						target.getPaymentType().addStock(target);
 					}
 					else
 					{
@@ -58,8 +60,6 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 						target = this.replicate(source, target);
 					}
 					target = (Stock) merge(target);
-					target.getSalespoint().addStock(target);
-					target.getPaymentType().addStock(target);
 				}
 				if (monitor != null)
 				{
