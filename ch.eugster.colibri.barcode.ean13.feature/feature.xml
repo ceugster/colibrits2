@@ -111,8 +111,8 @@ This Agreement is governed by the laws of the State of New York and the intellec
    <requires>
       <import plugin="ch.eugster.colibri.barcode"/>
       <import plugin="ch.eugster.colibri.persistence"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="org.eclipse.osgi.services"/>
+      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi" version="3.7.2" match="greaterOrEqual"/>
    </requires>
 
    <plugin
