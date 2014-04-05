@@ -131,7 +131,8 @@ public class SettlementLayoutExpensesSection extends AbstractLayoutSection
 	{
 		if (printable instanceof Settlement)
 		{
-			return ((Settlement) printable).countPositions(ProductGroupType.NON_SALES_RELATED) > 0;
+			Settlement settlement = (Settlement) printable;
+			return settlement.countPositions(ProductGroupType.EXPENSES_INVESTMENT) > 0 || settlement.countPositions(ProductGroupType.EXPENSES_MATERIAL) > 0;
 		}
 		return true;
 	}

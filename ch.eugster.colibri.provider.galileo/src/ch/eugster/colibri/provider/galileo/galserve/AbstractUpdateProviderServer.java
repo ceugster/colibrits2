@@ -57,12 +57,13 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 			{
 				if (this.open())
 				{
+					Barcode barcode = null;
 					/*
 					 * Zuerst Receipt und Position aktualisieren, falls sie im Failovermodus erfasst worden ist.
 					 */
 					if (position.getReceipt().getCustomer() == null && position.getReceipt().getCustomerCode() != null && position.getReceipt().getCustomerCode().length() > 0)
 					{
-						final Barcode barcode = this.createCustomerBarcode(position.getReceipt().getCustomerCode());
+						barcode = this.createCustomerBarcode(position.getReceipt().getCustomerCode());
 						if (barcode != null)
 						{
 							int customerId = this.getCustomerId(barcode);
@@ -90,7 +91,6 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 					}
 					if (position.getSearchValue() != null && position.getProduct() == null)
 					{
-						Barcode barcode = null;
 						BarcodeVerifier[] verifiers = this.getBarcodeVerifiers();
 						for (BarcodeVerifier verifier : verifiers)
 						{
@@ -323,8 +323,8 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 				 */
 				try
 				{
-					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
-					{
+//					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
+//					{
 						if (doSellArticle(position.getCode()))
 						{
 							status = update(position, false, ProviderState.BOOKED ^ position.getProviderState(), "do_verkauf", status, true);
@@ -333,7 +333,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 						{
 							status = warn(position, position.getProviderState() | ProviderState.BOOK_ERROR, "do_verkauf", "");
 						}
-					}
+//					}
 				}
 				catch(Exception e)
 				{
@@ -344,8 +344,8 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 			{
 				try
 				{
-					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
-					{
+//					if ((position.getProviderState() & ProviderState.BOOKED) != 0)
+//					{
 						if (doReverseArticle(position.getCode()))
 						{
 							status = update(position, false, ProviderState.BOOKED ^ position.getProviderState(), "do_storno", status, true);
@@ -354,7 +354,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 						{
 							status = warn(position, ProviderState.BOOK_ERROR | position.getProviderState(), "do_storno", "");
 						}
-					}
+//					}
 				}
 				catch(Exception e)
 				{
@@ -577,7 +577,10 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		if (status.getSeverity() == IStatus.OK)
 		{
 			status = this.sellArticle(position);
-			status = this.removeOrdered(position, status);
+			if (position.getOrder() != null)
+			{
+				status = this.removeOrdered(position, status);
+			}
 		}
 		return status;
 	}

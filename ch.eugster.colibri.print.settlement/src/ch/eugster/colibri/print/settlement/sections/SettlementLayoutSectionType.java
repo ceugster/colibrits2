@@ -5,7 +5,7 @@ import ch.eugster.colibri.print.section.ILayoutSectionType;
 
 public enum SettlementLayoutSectionType implements ILayoutSectionType
 {
-	HEADER, PRODUCT_GROUP, OTHER_SALES, EXPENSES, PAYMENT, SUMMARY, TAX, PAYED_INVOICE, RESTITUTION, INTERNAL, REVERSED_RECEIPT, SETTLEMENT, MONEY, FOOTER;
+	HEADER, PRODUCT_GROUP, OTHER_SALES, EXPENSES, PRODUCT_GROUP_SUMMARY, PAYMENT, SUMMARY, TAX, PAYED_INVOICE, RESTITUTION, INTERNAL, REVERSED_RECEIPT, SETTLEMENT, MONEY, FOOTER;
 
 	private int columnCount = 42;
 
@@ -37,6 +37,10 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 			case EXPENSES:
 			{
 				return 128;
+			}
+			case PRODUCT_GROUP_SUMMARY:
+			{
+				return 48;
 			}
 			case PAYMENT:
 			{
@@ -119,6 +123,14 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 				if (this.layoutSection == null)
 				{
 					this.layoutSection = new SettlementLayoutExpensesSection(this);
+				}
+				return this.layoutSection;
+			}
+			case PRODUCT_GROUP_SUMMARY:
+			{
+				if (this.layoutSection == null)
+				{
+					this.layoutSection = new SettlementLayoutProductGroupSummarySection(this);
 				}
 				return this.layoutSection;
 			}
@@ -230,6 +242,10 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 			{
 				return "section.settlement.expenses";
 			}
+			case PRODUCT_GROUP_SUMMARY:
+			{
+				return "section.settlement.productgroup.summary";
+			}
 			case PAYMENT:
 			{
 				return "section.settlement.payment";
@@ -297,6 +313,10 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 			case EXPENSES:
 			{
 				return "Ausgaben";
+			}
+			case PRODUCT_GROUP_SUMMARY:
+			{
+				return "Total Warengruppen";
 			}
 			case PAYMENT:
 			{

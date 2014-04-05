@@ -24,7 +24,6 @@ import ch.eugster.colibri.persistence.model.SettlementReceipt;
 import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.Stock;
-import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.queries.SettlementQuery;
 import ch.eugster.colibri.persistence.service.CacheService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -84,8 +83,7 @@ public class SettlementTransfer extends AbstractTransfer
 		{
 			if (localSettlement.getOtherId() == null)
 			{
-				SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getServerService().getQuery(Salespoint.class);
-				Salespoint serverSalespoint = (Salespoint) salespointQuery.find(localSettlement.getSalespoint().getId());
+				Salespoint serverSalespoint = (Salespoint) persistenceService.getServerService().find(Salespoint.class, localSettlement.getSalespoint().getId());
 				Settlement serverSettlement = null;
 				try
 				{

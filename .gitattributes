@@ -1545,6 +1545,7 @@ ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sect
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutPayedInvoiceSection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutPaymentSection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutProductGroupSection.java -text
+ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutProductGroupSummarySection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutReceiptSection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutRestitutionSection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutSectionType.java -text

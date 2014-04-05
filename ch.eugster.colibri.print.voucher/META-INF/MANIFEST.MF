@@ -14,5 +14,6 @@ Import-Package: ch.eugster.colibri.periphery.printer.service,
  ch.eugster.colibri.persistence.model.print,
  ch.eugster.colibri.persistence.model.product,
  ch.eugster.colibri.print.section,
- ch.eugster.colibri.print.service,
- org.osgi.framework;version="1.6.0"
+ ch.eugster.colibri.print.service
+Require-Bundle: org.eclipse.osgi;bundle-version="3.7.2",
+ org.eclipse.osgi.services;bundle-version="3.3.0"
