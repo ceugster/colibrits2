@@ -215,16 +215,15 @@ litigation.
    <requires>
       <import plugin="ch.eugster.colibri.persistence"/>
       <import plugin="ch.eugster.colibri.persistence.replication"/>
-      <import plugin="org.eclipse.core.commands"/>
-      <import plugin="org.eclipse.core.expressions"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.jobs"/>
-      <import plugin="org.eclipse.jface"/>
-      <import plugin="org.eclipse.swt"/>
-      <import plugin="org.eclipse.ui.workbench"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="org.eclipse.osgi.services"/>
-      <import plugin="javax.persistence"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="javax.persistence" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.expressions" version="3.4.300" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.persistence.antlr" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.persistence.asm" version="3.3.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.persistence.core" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.persistence.jpa" version="2.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
