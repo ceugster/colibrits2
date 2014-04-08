@@ -8,6 +8,7 @@ package ch.eugster.colibri.provider.galileo.galserve;
 
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -226,6 +227,12 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		return status;
 	}
 
+	protected ExternalProductGroup getDefaultExternalProductGroup(Position position)
+	{
+		List<ProductGroupMapping> mappings = position.getReceipt().getSettlement().getSalespoint().getCommonSettings().getDefaultProductGroup().getProductGroupMappings(position.getProvider());
+		return mappings.get(0).getExternalProductGroup();
+	}
+	
 	protected abstract boolean doSearch(Barcode barcode);
 	
 	protected abstract boolean doGetCustomer(Integer customerId);

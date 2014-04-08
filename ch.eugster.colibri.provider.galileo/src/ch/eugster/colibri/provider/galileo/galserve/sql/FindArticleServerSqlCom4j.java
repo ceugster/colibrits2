@@ -210,6 +210,11 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		if (position.isOrdered())
 		{
 			position.setOrder(this.galserve.bestnummer().toString());
+			position.setOrderedQuantity(((Integer)this.galserve.menge()).intValue());
+			if (position.getQuantity() > position.getOrderedQuantity())
+			{
+				position.setQuantity(position.getOrderedQuantity());
+			}
 			position.setFromStock(((Boolean)this.galserve.lagerabholfach()).booleanValue());
 			position.getReceipt().setCustomer(this.updateCustomer(((Integer) this.galserve.kundennr()).intValue()));
 			position.getReceipt().setCustomerCode(position.getReceipt().getCustomer().getId().toString());

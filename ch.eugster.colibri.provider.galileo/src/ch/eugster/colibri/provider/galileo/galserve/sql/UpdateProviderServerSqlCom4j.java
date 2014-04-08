@@ -147,6 +147,11 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 				}
 				else
 				{
+					if (position.getProduct().getExternalProductGroup() == null)
+					{
+						ExternalProductGroup epg = this.getDefaultExternalProductGroup(position);
+						position.getProduct().setExternalProductGroup(epg);
+					}
 					this.galserve.vwgname(cut(position.getProduct().getExternalProductGroup().getText(), 30));
 					this.galserve.vwgruppe(cut(position.getProduct().getExternalProductGroup().getCode(), 3));
 					try

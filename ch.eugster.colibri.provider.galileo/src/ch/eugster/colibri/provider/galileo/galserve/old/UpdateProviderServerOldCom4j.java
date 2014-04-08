@@ -6,6 +6,7 @@
  */
 package ch.eugster.colibri.provider.galileo.galserve.old;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -17,6 +18,7 @@ import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Product;
+import ch.eugster.colibri.persistence.model.ProductGroupMapping;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.model.product.Customer;
@@ -147,6 +149,11 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 				}
 				else
 				{
+					if (position.getProduct().getExternalProductGroup() == null)
+					{
+						ExternalProductGroup epg = this.getDefaultExternalProductGroup(position);
+						position.getProduct().setExternalProductGroup(epg);
+					}
 					this.galserve.vwgname(cut(position.getProduct().getExternalProductGroup().getText(), 30));
 					this.galserve.vwgruppe(cut(position.getProduct().getExternalProductGroup().getCode(), 3));
 					try
