@@ -790,6 +790,7 @@ ch.eugster.colibri.client.ui/icons/save_edit.png -text
 ch.eugster.colibri.client.ui/icons/sunshine.png -text
 ch.eugster.colibri.client.ui/icons/undo_edit.png -text
 ch.eugster.colibri.client.ui/icons/wait.gif -text
+ch.eugster.colibri.client.ui/lib/jalbum-core.jar -text
 ch.eugster.colibri.client.ui/plugin.properties -text
 ch.eugster.colibri.client.ui/plugin.xml -text
 ch.eugster.colibri.client.ui/plugin_de.properties -text
