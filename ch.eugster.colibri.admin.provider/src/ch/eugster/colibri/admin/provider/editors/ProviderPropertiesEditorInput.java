@@ -119,7 +119,8 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 
 	public IStatus checkConnection(Map<String, IProperty> properties)
 	{
-		return updateScheduler == null ? providerUpdater.testConnection(properties) : Status.OK_STATUS;
+//		return updateScheduler == null ? providerUpdater.testConnection(properties) : Status.OK_STATUS;
+		return providerUpdater.testConnection(properties);
 	}
 	
 	public Map<String, IProperty> getDefaultProperties()

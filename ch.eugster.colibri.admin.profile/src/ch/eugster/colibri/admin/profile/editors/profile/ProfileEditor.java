@@ -2296,8 +2296,9 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 			@Override
 			public void modifyText(ModifyEvent e)
 			{
-				
-			}});
+				ProfileEditor.this.setDirty(true);
+			}
+		});
 		this.leftPercent.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -2336,8 +2337,9 @@ public class ProfileEditor extends AbstractEntityEditor<Profile>
 			@Override
 			public void modifyText(ModifyEvent e)
 			{
-				
-			}});
+				ProfileEditor.this.setDirty(true);
+			}
+		});
 		this.topPercent.addSelectionListener(new SelectionListener() {
 
 			@Override
