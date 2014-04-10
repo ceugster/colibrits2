@@ -15,7 +15,6 @@ import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.persistence.config.PersistenceUnitProperties;

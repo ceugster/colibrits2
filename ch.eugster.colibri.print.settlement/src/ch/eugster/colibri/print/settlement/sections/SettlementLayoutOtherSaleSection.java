@@ -38,7 +38,7 @@ public class SettlementLayoutOtherSaleSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Sonstige Verkäufe\n");
+		builder = builder.append("Sonstige Verkäufe     M     Betrag    MwSt\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}

@@ -112,17 +112,28 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return value;
 	}
 
-	public long countRemainingToTransfer()
+	private Expression createSelectTransferablesExpression()
 	{
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
-		// Expression states = new
-		// ExpressionBuilder().get("state").equal(Receipt.State.CLOSED);
 		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED);
 		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.SAVED));
-
-		expression = expression.and(states);
-		return this.count(expression);
+		return expression.and(states);
+	}
+	
+	private Expression createSelectTransferablesFromSettlementExpression(Settlement settlement)
+	{
+		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
+		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
+		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
+		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
+		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
+		return expression.and(states);
+	}
+	
+	public long countRemainingToTransfer()
+	{
+		return this.count(createSelectTransferablesExpression());
 	}
 
 	// public Receipt findBySalespointAndNumber(final Salespoint salespoint,
@@ -337,34 +348,17 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 
 	public List<Receipt> selectTransferables(final int maxResults)
 	{
-		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
-		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
-		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
-		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
-		expression = expression.and(states);
-		return this.select(expression, maxResults);
+		return this.select(createSelectTransferablesExpression(), maxResults);
 	}
 
 	public List<Receipt> selectTransferables(final Settlement settlement, final int maxResults)
 	{
-		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
-		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
-		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
-		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
-		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
-		expression = expression.and(states);
-		return this.select(expression, maxResults);
+		return this.select(createSelectTransferablesFromSettlementExpression(settlement), maxResults);
 	}
 
 	public long countTransferables(Settlement settlement)
 	{
-		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
-		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
-		expression = expression.and(new ExpressionBuilder().get("transferred").equal(false));
-		Expression states = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
-		states = states.or(new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED));
-		expression = expression.and(states);
-		return this.count(expression);
+		return this.count(createSelectTransferablesFromSettlementExpression(settlement));
 	}
 
 	@Override

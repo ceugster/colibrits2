@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="2.0.11.201404061600" useFeatures="true" includeLaunchers="true">
+<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="2.0.13.201404091600" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/ch.eugster.colibri.product/icons/kasse_128x128.png"/>
@@ -17,9 +17,7 @@
       <programArgs>-data
 @user.home/colibri
 -consoleLog
--console
--eclipselink.jdbc.timeout
-5</programArgs>
+-console</programArgs>
       <vmArgs>-Declipse.p2.profile=profile
 -Declipse.p2.data.area=@config.dir/../p2
 -Declipse.application=ch.eugster.colibri.admin.application

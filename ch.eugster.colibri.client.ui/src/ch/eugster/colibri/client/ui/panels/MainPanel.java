@@ -30,7 +30,7 @@ public abstract class MainPanel extends ProfilePanel implements TitleProvider, K
 	@Override
 	public void addKeyListener(final KeyListener listener)
 	{
-		keyListeners.add(listener);
+		this.keyListeners.add(listener);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public abstract class MainPanel extends ProfilePanel implements TitleProvider, K
 
 	public void fireKeyEvent(final KeyEvent event)
 	{
-		final KeyListener[] listeners = keyListeners.toArray(new KeyListener[0]);
+		final KeyListener[] listeners = this.keyListeners.toArray(new KeyListener[0]);
 		for (final KeyListener listener : listeners)
 		{
 			listener.keyPressed(event);

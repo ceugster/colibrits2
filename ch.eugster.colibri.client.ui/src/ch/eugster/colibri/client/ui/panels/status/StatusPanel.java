@@ -1,15 +1,22 @@
 package ch.eugster.colibri.client.ui.panels.status;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
@@ -20,7 +27,7 @@ import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.panels.MainPanel;
 import ch.eugster.colibri.persistence.model.Profile;
 
-public class StatusPanel extends MainPanel implements LogListener 
+public class StatusPanel extends MainPanel implements LogListener, EventHandler
 {
 	private JTextArea textArea;
 
@@ -36,7 +43,18 @@ public class StatusPanel extends MainPanel implements LogListener
         textArea.setWrapStyleWord(true);
         
         this.setLayout(new BorderLayout());
-		this.add(new JScrollPane(textArea));
+//        JPanel panel = new JPanel(new GridLayout(1, 5));
+//        
+//        Icon icon = createImageIcon("icons/Galileo.png", "Galileo");
+//        JLabel label = new JLabel(icon);
+//        panel.add(label);
+//        
+//        icon = createImageIcon("icons/Galileo.png", "Galileo");
+//        label = new JLabel(icon);
+//        panel.add(label);
+//
+//        this.add(panel, BorderLayout.CENTER);
+		this.add(new JScrollPane(textArea), BorderLayout.SOUTH);
 
 	    //  We use a ServiceListener to dynamically keep track of all the LogReaderService service being
 	    //  registered or unregistered
@@ -63,6 +81,12 @@ public class StatusPanel extends MainPanel implements LogListener
 	}
 
 	@Override
+	public void handleEvent(Event event) 
+	{
+//		event.getProperty(EventConstants.EXCEPTION) != null;
+	}
+
+	@Override
 	public void dispose() 
 	{
 		tracker.close();
@@ -82,6 +106,20 @@ public class StatusPanel extends MainPanel implements LogListener
 
 	}
 
+	protected ImageIcon createImageIcon(String path, String description) 
+	{
+		java.net.URL imgURL = getClass().getResource(path);
+		if (imgURL != null) 
+		{
+			return new ImageIcon(imgURL, description);
+		} 
+		else 
+		{
+			System.err.println("Couldn't find file: " + path);
+			return null;
+		}
+	}
+	
 	@Override
 	public String getTitle() 
 	{

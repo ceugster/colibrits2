@@ -39,7 +39,7 @@ public class SettlementLayoutExpensesSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Ausgaben\n");
+		builder = builder.append("Ausgaben              M     Betrag    MwSt\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}

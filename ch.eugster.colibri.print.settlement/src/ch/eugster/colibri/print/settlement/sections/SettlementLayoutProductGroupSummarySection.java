@@ -156,7 +156,7 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 
 	public enum DetailKey implements IKey
 	{
-		M, A;
+		M, A, T;
 
 		@Override
 		public String label()
@@ -170,6 +170,10 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 				case A:
 				{
 					return "Summe Bewegungen";
+				}
+				case T:
+				{
+					return "Summe Mehrwertsteuer";
 				}
 				default:
 				{
@@ -197,6 +201,19 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 						final Currency currency = position.getSettlement().getSalespoint().getPaymentType()
 								.getCurrency().getCurrency();
 						double amount = position.getDefaultCurrencyAmount();
+						SettlementLayoutProductGroupSummarySection.amountFormatter.setGroupingUsed(false);
+						SettlementLayoutProductGroupSummarySection.amountFormatter.setMinimumFractionDigits(currency
+								.getDefaultFractionDigits());
+						SettlementLayoutProductGroupSummarySection.amountFormatter.setMaximumFractionDigits(currency
+								.getDefaultFractionDigits());
+						return layoutArea.replaceMarker(SettlementLayoutProductGroupSummarySection.amountFormatter.format(amount),
+								marker, false);
+					}
+					case T:
+					{
+						final Currency currency = position.getSettlement().getSalespoint().getPaymentType()
+								.getCurrency().getCurrency();
+						double amount = position.getTaxAmount();
 						SettlementLayoutProductGroupSummarySection.amountFormatter.setGroupingUsed(false);
 						SettlementLayoutProductGroupSummarySection.amountFormatter.setMinimumFractionDigits(currency
 								.getDefaultFractionDigits());

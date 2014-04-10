@@ -31,9 +31,7 @@ import ch.eugster.colibri.client.ui.events.PositionChangeListener;
 import ch.eugster.colibri.client.ui.events.ReceiptChangeMediator;
 import ch.eugster.colibri.client.ui.panels.user.pos.numeric.ValueDisplay;
 import ch.eugster.colibri.persistence.model.CommonSettings;
-import ch.eugster.colibri.persistence.model.PaymentType;
 import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.TaxType;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
@@ -121,7 +119,10 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			@Override
 			public void keyPressed(final KeyEvent e)
 			{
-				PositionWrapper.this.keyPressed(e);
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
+					PositionWrapper.this.keyPressed(e);
+				}
 			}
 		});
 
@@ -218,15 +219,14 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	public boolean isPositionComplete()
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter PositionWrapper.isPositionComplete()");
 		if (this.position.getForeignCurrency() == null)
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position enthält keine Währung");
 			return false;
 		}
 		if (this.position.getProductGroup() == null)
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position enthält keine Warengruppe");
 			return false;
 		}
 		if (this.position.getProduct() != null)
@@ -235,7 +235,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			{
 				if (this.position.getProduct().getExternalProductGroup() == null)
 				{
-					Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+					Activator.getDefault().log(LogService.LOG_WARNING, "Die Position enthält keine externe Warengruppe");
 					return false;
 				}
 			}
@@ -249,7 +249,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			{
 				if (this.position.getCurrentTax() == null)
 				{
-					Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+					Activator.getDefault().log(LogService.LOG_WARNING, "Die Position enthält keine Mehrwertsteuer");
 					return false;
 				}
 			}
@@ -258,21 +258,21 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		{
 			if (this.position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
 			{
-				Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+				Activator.getDefault().log(LogService.LOG_WARNING, "Die Position enthält keine Option (Bestellt/Lager)");
 				return false;
 			}
 		}
 		if (!this.position.isOrdered() && this.position.getPrice() == 0d)
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position hat keinen Preice");
 			return false;
 		}
 		if (this.position.getQuantity() == 0)
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position hat keine Menge");
 			return false;
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.isPositionComplete()");
+		Activator.getDefault().log(LogService.LOG_INFO, "Die Position ist vollständig");
 		return true;
 	}
 
@@ -733,15 +733,15 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		return barcode;
 	}
 	
-	private ProductGroup getDefaultVoucherProductGroup()
-	{
-		return this.userPanel.getSalespoint().getCommonSettings().getDefaultVoucherProductGroup();
-	}
-
-	private PaymentType getDefaultVoucherPaymentType()
-	{
-		return this.userPanel.getSalespoint().getCommonSettings().getDefaultVoucherPaymentType();
-	}
+//	private ProductGroup getDefaultVoucherProductGroup()
+//	{
+//		return this.userPanel.getSalespoint().getCommonSettings().getDefaultVoucherProductGroup();
+//	}
+//
+//	private PaymentType getDefaultVoucherPaymentType()
+//	{
+//		return this.userPanel.getSalespoint().getCommonSettings().getDefaultVoucherPaymentType();
+//	}
 
 	private boolean verifyOrderedNotYetScanned(final Barcode barcode)
 	{

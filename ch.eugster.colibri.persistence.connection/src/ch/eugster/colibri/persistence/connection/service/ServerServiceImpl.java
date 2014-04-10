@@ -9,8 +9,8 @@ import javax.persistence.EntityManagerFactory;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.eclipse.persistence.logging.SessionLog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jdom.Element;
@@ -84,6 +84,12 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	@Override
 	protected IStatus updateDatabase(final Properties properties)
 	{
+		final Element connection = Activator.getDefault().getCurrentConnectionElement();
+		if (Boolean.valueOf(connection
+				.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE)).booleanValue())
+		{
+			return Status.OK_STATUS;
+		}
 		final DatabaseUpdater databaseUpdater = DatabaseUpdater.newInstance(properties);
 		return databaseUpdater.updateDatabase();
 	}
@@ -140,7 +146,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		}
 
 //		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, ServerExceptionHandler.class.getName());
-		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
+//		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
 		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
 		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, "ch.eugster.colibri.persistence.connection.ServerExceptionHandler");
 
@@ -152,7 +158,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		}
 		else
 		{
-			map.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
+			map.put(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
 			map.put(PersistenceUnitProperties.DDL_GENERATION_MODE, PersistenceUnitProperties.DDL_BOTH_GENERATION);
 		}
 

@@ -149,10 +149,14 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		{
 			if (this.userPanel.getValueDisplay().testAmount() == 0d)
 			{
-//				if (this.getPaymentType().getPaymentTypeGroup().isChargable())
-//				{
+				if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+				{
+					return this.userPanel.getValueDisplay().testAmount() > 0D;
+				}
+				else
+				{
 					return this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D;
-//				}
+				}
 //				else
 //				{
 //					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getId()))

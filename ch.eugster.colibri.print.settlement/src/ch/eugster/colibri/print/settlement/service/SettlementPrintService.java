@@ -40,4 +40,9 @@ public class SettlementPrintService extends AbstractPrintService
 		return Activator.PLUGIN_ID;
 	}
 
+	protected boolean openDrawerAllowed()
+	{
+		return true;
+	}
+
 }

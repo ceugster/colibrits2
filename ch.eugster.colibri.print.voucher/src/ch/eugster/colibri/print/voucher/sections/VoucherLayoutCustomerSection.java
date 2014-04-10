@@ -19,9 +19,9 @@ public class VoucherLayoutCustomerSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("------------------------------------------");
-		builder = builder.append("Kundenkarte:    KKKKKKKKKKK\n");
-		builder = builder.append("Kontostand:     SSSSSSSSSSS\n");
+//		builder = builder.append("------------------------------------------");
+//		builder = builder.append("Kundenkarte:    KKKKKKKKKKK\n");
+//		builder = builder.append("Kontostand:     SSSSSSSSSSS\n");
 		return builder.toString();
 	}
 

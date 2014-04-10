@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext;
 
 public class Activator implements BundleActivator
 {
-	public static final String PLUGIN_ID = "ch.eugster.colibri.periphery.opos.printer";
+	public static final String PLUGIN_ID = "ch.eugster.colibri.periphery.printer.serial";
 
 	private static BundleContext context;
 

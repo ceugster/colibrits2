@@ -38,7 +38,7 @@ public class SettlementLayoutProductGroupSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Warengruppen\n");
+		builder = builder.append("Warengruppen          M     Betrag    MwSt\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}

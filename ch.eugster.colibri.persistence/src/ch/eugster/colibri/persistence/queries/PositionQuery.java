@@ -59,25 +59,34 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.select(deleted.and(parked.and(value)));
 	}
 
-	public long countProviderUpdates(Salespoint salespoint, String providerId, boolean updateServer)
+	private Expression createProviderUpdatesExpression(Salespoint salespoint, String providerId, boolean updateServer)
 	{
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
-		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
-		
-		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
 		if (updateServer)
 		{
-			saved = saved.and(new ExpressionBuilder().get("providerBooked").equal(false));
+			provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
 		}
+		else
+		{
+			provider = provider.and(update);
+		}
+		
+		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
+		saved = saved.and(new ExpressionBuilder().get("providerBooked").equal(false));
 
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(new ExpressionBuilder().get("providerBooked").equal(true));
 		
-		final Expression select = deleted.and(provider).and(saved.or(reversed));
+		return deleted.and(provider).and(saved.or(reversed));
+	}
+	
+	public long countProviderUpdates(Salespoint salespoint, String providerId, boolean updateServer)
+	{
+		final Expression select = createProviderUpdatesExpression(salespoint, providerId, updateServer);
 		final long value = this.count(select);
 		return value;
 	}
@@ -138,25 +147,8 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, boolean updateServer, final int maxRows)
 	{
-		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
-		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
-
-		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
-		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
-		provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
-		
-		Expression saved = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.SAVED);
-		if (updateServer)
-		{
-			saved = saved.and(new ExpressionBuilder().get("providerBooked").equal(false));
-		}
-
-		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
-		reversed = reversed.and(new ExpressionBuilder().get("providerBooked").equal(true));
-		
-		final Expression select = deleted.and(provider).and(saved.or(reversed));
+		final Expression select = createProviderUpdatesExpression(salespoint, providerId, updateServer);
 		final Collection<Position> positions = this.select(select, maxRows);
-
 		return positions;
 	}
 

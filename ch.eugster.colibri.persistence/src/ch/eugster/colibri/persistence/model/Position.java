@@ -46,7 +46,6 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -56,6 +55,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Index;
@@ -196,6 +196,9 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Convert("booleanConverter")
 	private boolean serverUpdated;
 
+	@Transient
+	private int orderedQuantity;
+	
 	protected Position()
 	{
 		super();
@@ -750,6 +753,16 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 
 	public void setServerUpdated(boolean serverUpdated) {
 		this.serverUpdated = serverUpdated;
+	}
+
+	public int getOrderedQuantity() 
+	{
+		return orderedQuantity;
+	}
+
+	public void setOrderedQuantity(int orderedQuantity) 
+	{
+		this.orderedQuantity = orderedQuantity;
 	}
 
 	public enum AmountType

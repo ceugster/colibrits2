@@ -127,6 +127,8 @@ public class ProfileReplicator extends AbstractEntityReplicator<Profile>
 		target.setValueLabelFg(source.getValueLabelFg());
 		target.setValueLabelFontSize(source.getValueLabelFontSize());
 		target.setValueLabelFontStyle(source.getValueLabelFontStyle());
+		target.setLeftPercent(source.getLeftPercent());
+		target.setTopPercent(source.getTopPercent());
 		for (Configurable sourceConfigurable : source.getConfigurables())
 		{
 			boolean found = false;

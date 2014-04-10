@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent;
 import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 
 public final class QuantityAction extends UserPanelProfileAction
@@ -36,10 +37,11 @@ public final class QuantityAction extends UserPanelProfileAction
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		final int quantity = userPanel.getValueDisplay().testQuantity();
-
+		final int inputQuantity = userPanel.getValueDisplay().testQuantity();
+		Position position = userPanel.getPositionWrapper().getPosition();
+		int currentQuantity = position.getQuantity();
 		int result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES;
-		if ((maxRange > 0) && (maxRange < Math.abs(quantity)))
+		if ((maxRange > 0) && (maxRange < Math.abs(inputQuantity)))
 		{
 			final String title = "Eingabeüberprüfung";
 			final String message = "Die eingegebene Menge ist sehr hoch. Soll sie trotzdem akzeptiert werden?";
@@ -47,11 +49,23 @@ public final class QuantityAction extends UserPanelProfileAction
 			result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
 					.getFrame(), profile, title, message, messageType);
 		}
+		else if (userPanel.getPositionWrapper().getPosition().isOrdered())
+		{
+			if (position.getOrderedQuantity() > 0 ? position.getOrderedQuantity() < inputQuantity : position.getQuantity() < inputQuantity)
+			{
+				final String title = "Eingabeüberprüfung";
+				final String message = "Die eingegebene Menge ist höher als die bestellte Menge.";
+				final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
+				result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
+						.getFrame(), profile, title, message, messageType);
+				userPanel.getValueDisplay().getQuantity();
+				return;
+			}
+		}
 		if (result == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 		{
-			int qty = userPanel.getPositionWrapper().getPosition().getQuantity();
 			int newQty = userPanel.getValueDisplay().getQuantity();
-			userPanel.getPositionWrapper().getPosition().setQuantity(qty < 0 ? -newQty : newQty);
+			userPanel.getPositionWrapper().getPosition().setQuantity(currentQuantity < 0 ? -newQty : newQty);
 		}
 		userPanel.getPositionListPanel().getModel().actionPerformed(event);
 	}

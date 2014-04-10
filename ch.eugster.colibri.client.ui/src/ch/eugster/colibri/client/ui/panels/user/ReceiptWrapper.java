@@ -16,10 +16,8 @@ import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -42,7 +40,6 @@ import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
-import ch.eugster.colibri.persistence.rules.LocalDatabaseRule;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
@@ -307,11 +304,12 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	public void storeReceipt(final boolean deleted)
 	{
-		Job job = new Job("Storing Receipt...")
-		{
-			@Override
-			public IStatus run(IProgressMonitor monitor) 
-			{
+//		Job job = new Job("Storing Receipt...")
+//		{
+//			@Override
+//			public IStatus run(IProgressMonitor monitor) 
+//			{
+//				
 				ReceiptWrapper.this.receipt.setDeleted(deleted);
 				ReceiptWrapper.this.receipt.setState(Receipt.State.SAVED);
 				ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getSalespoint().getNextReceiptNumber());
@@ -345,15 +343,15 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 					}
 					finally
 					{
-						persistenceService.getCacheService().clearCache();
+//						persistenceService.getCacheService().clearCache();
 					}
 				}
-				return Status.OK_STATUS;
-			}
-		};
-		job.setRule(LocalDatabaseRule.getRule());
-		job.setPriority(Job.INTERACTIVE);
-		job.schedule();
+//				return Status.OK_STATUS;
+//			}
+//		};
+//		job.setRule(LocalDatabaseRule.getRule());
+//		job.setPriority(Job.INTERACTIVE);
+//		job.schedule();
 	}
 
 	private void updateCustomerForReceiptPrint()

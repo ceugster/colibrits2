@@ -147,8 +147,8 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		this.fg = new java.awt.Color(profile.getTabbedPaneFg());
 		this.bg = new java.awt.Color(profile.getTabbedPaneBg());
 
-		final StatusPanel statusPanel = new StatusPanel(this.getSalespoint().getProfile());
-		this.add("Status", statusPanel);
+//		final StatusPanel statusPanel = new StatusPanel(this.getSalespoint().getProfile());
+//		this.add("Status", statusPanel);
 
 		final LoginPanel loginPanel = new LoginPanel(this.getSalespoint().getProfile());
 		loginPanel.addLoginListener(this);

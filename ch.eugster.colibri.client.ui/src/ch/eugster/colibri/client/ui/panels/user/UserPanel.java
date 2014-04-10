@@ -6,7 +6,6 @@
  */
 package ch.eugster.colibri.client.ui.panels.user;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -498,6 +497,10 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 			else if (newState.equals(UserPanel.State.POSITION_INPUT))
 			{
 				this.showPositionPanels();
+				if (event.getOldState() == null || event.getOldState().equals(UserPanel.State.COIN_COUNTER))
+				{
+					this.prepareReceipt();
+				}
 			}
 		}
 	}

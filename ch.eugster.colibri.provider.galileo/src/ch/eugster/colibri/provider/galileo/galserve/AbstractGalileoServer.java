@@ -41,7 +41,7 @@ public abstract class AbstractGalileoServer implements IServer
 
 	protected ServiceTracker<BarcodeVerifier, BarcodeVerifier> barcodeVerifierTracker;
 
-	protected IStatus status = Status.OK_STATUS;
+	protected IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " wurde erfolgreich hergestellt.");
 
 	public AbstractGalileoServer(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{

@@ -7,17 +7,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.eclipse.persistence.logging.SessionLog;
 import org.jdom.Element;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
+import ch.eugster.colibri.persistence.connection.config.TaxUpdater;
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Entity;
@@ -59,7 +61,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER, EmbeddedDriver.class.getName());
 		properties.setProperty(PersistenceUnitProperties.JDBC_URL, "jdbc:derby:" + connection.getText());
 		properties.setProperty(PersistenceUnitProperties.JDBC_USER, connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER));
-		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, connection.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD));
+		properties.setProperty(PersistenceUnitProperties.JDBC_PASSWORD, "");
 		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, "Derby");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Activator.getDefault().getLogLevel());
 		
@@ -80,7 +82,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		{
 			String url = properties.getProperty(PersistenceUnitProperties.JDBC_URL);
 			properties.setProperty(PersistenceUnitProperties.JDBC_URL, url.concat(";create=true"));
-			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
+			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
 			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
 					PersistenceUnitProperties.DDL_DATABASE_GENERATION);
 		}
@@ -118,7 +120,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		}
 
 		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
-		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.ALL_LABEL);
+//		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.ALL_LABEL);
 
 		final StringBuilder url = new StringBuilder(properties.getProperty(PersistenceUnitProperties.JDBC_URL));
 		final File[] files = Activator.getDefault().getDerbyHome().listFiles(new FilenameFilter()

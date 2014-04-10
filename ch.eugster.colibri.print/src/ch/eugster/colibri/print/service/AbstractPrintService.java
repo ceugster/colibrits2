@@ -78,6 +78,8 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 		final ILayoutType layoutType = this.getLayoutType(receiptPrinterService);
 		this.layoutTypes.put(receiptPrinterService.getReceiptPrinterSettings().getComponentName(), layoutType);
 	}
+	
+	protected abstract boolean openDrawerAllowed();
 
 	@Override
 	public ComponentContext getContext()
@@ -167,7 +169,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 									Boolean property = (Boolean) event.getProperty("open.drawer");
 									boolean openDrawer = property == null ? false : property.booleanValue();
 									log(LogService.LOG_INFO, "Schublade öffnen: " + Boolean.valueOf(openDrawer).toString());
-									if (openDrawer)
+									if (openDrawer && this.openDrawerAllowed())
 									{
 										if (printable instanceof Receipt)
 										{

@@ -99,7 +99,7 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 									if (userPanel.getReceiptWrapper().getReceipt().getId() != null)
 									{
 										userPanel.getReceiptWrapper().getReceipt().setDeleted(true);
-										userPanel.getReceiptWrapper().storeReceipt();
+										userPanel.getReceiptWrapper().storeReceipt(true);
 									}
 									userPanel.prepareReceipt();
 									model.fireTableDataChanged();

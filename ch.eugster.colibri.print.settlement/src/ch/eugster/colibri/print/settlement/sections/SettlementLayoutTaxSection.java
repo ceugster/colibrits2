@@ -37,7 +37,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Mehrwertsteuern\n");
+		builder = builder.append("Mehrwertsteuern       %    Betrag     Mwst");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -46,8 +46,8 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	public String getDefaultPatternTotal()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Mehrwertsteuern         AAAAAAAAA MMMMMMMM\n");
+		builder = builder.append("------------------------------------------");
+		builder = builder.append("Mehrwertsteuern         AAAAAAAAA MMMMMMMM");
 		builder = builder.append("==========================================");
 		return builder.toString();
 	}

@@ -46,7 +46,7 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("Zahlungsarten                  LLLLLLLLLLL\n");
+		builder = builder.append("Zahlungsarten    MMM           LLLLLLLLLLL\n");
 		builder = builder.append("==========================================");
 		return builder.toString();
 	}
@@ -284,7 +284,7 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 
 	public enum TotalKey implements IKey
 	{
-		L;
+		L, M;
 
 		@Override
 		public String label()
@@ -294,6 +294,10 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 				case L:
 				{
 					return "Summe Zahlungen LW";
+				}
+				case M:
+				{
+					return "Anzahl Zahlungen";
 				}
 				default:
 				{
@@ -320,6 +324,12 @@ public class SettlementLayoutPaymentSection extends AbstractLayoutSection
 						SettlementLayoutPaymentSection.amountFormatter.setMaximumFractionDigits(currency
 								.getDefaultFractionDigits());
 						return layoutArea.replaceMarker(SettlementLayoutPaymentSection.amountFormatter.format(amount),
+								marker, false);
+					}
+					case M:
+					{
+						final int quantity = detail.getQuantity();
+						return layoutArea.replaceMarker(DecimalFormat.getIntegerInstance().format(quantity),
 								marker, false);
 					}
 					default:

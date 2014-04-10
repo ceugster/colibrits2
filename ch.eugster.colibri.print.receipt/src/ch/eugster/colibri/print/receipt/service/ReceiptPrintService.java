@@ -26,4 +26,8 @@ public class ReceiptPrintService extends AbstractPrintService
 		return "Layout Beleg bearbeiten";
 	}
 
+	protected boolean openDrawerAllowed()
+	{
+		return true; 
+	}
 }

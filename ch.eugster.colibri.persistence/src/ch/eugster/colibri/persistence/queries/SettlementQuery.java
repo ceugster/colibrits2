@@ -49,15 +49,6 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		return settlements;
 	}
 
-	public long countTransferables()
-	{
-		Expression expression = new ExpressionBuilder(Settlement.class).get("deleted").equal(false);
-		expression = expression.and(new ExpressionBuilder().get("settled").notNull());
-		expression = expression.and(new ExpressionBuilder().get("otherId").isNull());
-		long count = this.count(expression);
-		return count;
-	}
-
 	public Collection<Settlement> selectBySalespointsAndSettled(final Salespoint[] salespoints, final Long settledFrom,
 			final Long settledTo)
 	{
@@ -109,12 +100,24 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		return Settlement.class;
 	}
 
+	public long countTransferables()
+	{
+		long count = this.count(createTransferablesExpression());
+		return count;
+	}
+
 	public List<Settlement> selectTransferables()
+	{
+		List<Settlement> settlements = this.select(createTransferablesExpression(), 0);
+		return settlements;
+	}
+
+	private Expression createTransferablesExpression()
 	{
 		Expression expression = new ExpressionBuilder(Settlement.class).get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settled").notNull());
 		expression = expression.and(new ExpressionBuilder().get("otherId").isNull());
-		List<Settlement> settlements = this.select(expression, 0);
-		return settlements;
+		return expression;
 	}
+
 }

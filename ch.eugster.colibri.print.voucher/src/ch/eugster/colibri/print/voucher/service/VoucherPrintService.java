@@ -26,4 +26,8 @@ public class VoucherPrintService extends AbstractPrintService
 		return Activator.PLUGIN_ID;
 	}
 
+	protected boolean openDrawerAllowed()
+	{
+		return false;
+	}
 }
