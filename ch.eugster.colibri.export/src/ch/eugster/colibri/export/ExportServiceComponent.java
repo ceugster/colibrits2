@@ -103,7 +103,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 	protected void activate(ComponentContext context)
 	{
 		this.context = context;
-		log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " registriert.");
+		log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " registriert.");
 	}
 	
 	public void addBarcodeVerifier(BarcodeVerifier barcodeVerifier)
@@ -144,7 +144,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 				{
 					Receipt receipt = (Receipt) printable;
 					this.update(receipt);
-					log(LogService.LOG_INFO, "Beleg " + receipt.getNumber() + " exportiert.");
+					log(LogService.LOG_DEBUG, "Beleg " + receipt.getNumber() + " exportiert.");
 				}
 			}
 			else if (event.getTopic().equals(Topic.PRINT_SETTLEMENT.topic()))
@@ -160,7 +160,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 						DateFormat format = SimpleDateFormat.getDateTimeInstance();
 						settle = format.format(settlement.getSettled().getTime()) + " ";
 					}
-					log(LogService.LOG_INFO, "Abschluss " + settle == null ? "" : settle + "exportiert.");
+					log(LogService.LOG_DEBUG, "Abschluss " + settle == null ? "" : settle + "exportiert.");
 				}
 			}
 		}
@@ -190,7 +190,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 		{
 			export = initialize();
 		}
-		log(LogService.LOG_INFO, "Exportdokument geladen.");
+		log(LogService.LOG_DEBUG, "Exportdokument geladen.");
 	}
 
 	private Document initialize()
@@ -243,7 +243,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 				FileOutputStream out = new FileOutputStream(getFile(filename));
 				outputter.output(export, out);
 				out.close();
-				log(LogService.LOG_INFO, "Export ausgeführt.");
+				log(LogService.LOG_DEBUG, "Export ausgeführt.");
 			} 
 			catch (FileNotFoundException e) 
 			{
@@ -333,7 +333,7 @@ public class ExportServiceComponent implements ExportService, EventHandler
 	protected void deactivate(ComponentContext context)
 	{
 		this.save(WORK_FILE);
-		log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " registriert.");
+		log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " registriert.");
 		this.context = null;
 	}
 

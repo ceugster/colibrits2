@@ -55,7 +55,7 @@ public class SimpleEncryptionService implements EncryptionService
 	{
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + context.getProperties().get("component.name") + " aktiviert.");
+			this.logService.log(LogService.LOG_DEBUG, "Service " + context.getProperties().get("component.name") + " aktiviert.");
 		}
 	}
 
@@ -63,7 +63,7 @@ public class SimpleEncryptionService implements EncryptionService
 	{
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + context.getProperties().get("component.name") + " deaktiviert.");
+			this.logService.log(LogService.LOG_DEBUG, "Service " + context.getProperties().get("component.name") + " deaktiviert.");
 		}
 	}
 
