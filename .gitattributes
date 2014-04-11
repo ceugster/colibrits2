@@ -1068,6 +1068,13 @@ ch.eugster.colibri.encryption.simple/lib/jasypt-1.7-lite.jar -text
 ch.eugster.colibri.encryption.simple/lib/jasypt-1.7.jar -text
 ch.eugster.colibri.encryption.simple/src/ch/eugster/colibri/encryption/simple/Activator.java -text
 ch.eugster.colibri.encryption.simple/src/ch/eugster/colibri/encryption/simple/service/SimpleEncryptionService.java -text
+ch.eugster.colibri.encryption.test/.classpath -text
+ch.eugster.colibri.encryption.test/.project -text
+ch.eugster.colibri.encryption.test/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.encryption.test/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.encryption.test/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.encryption.test/build.properties -text
+ch.eugster.colibri.encryption.test/src/ch/eugster/colibri/encryption/test/EncryptionTest.java -text
 ch.eugster.colibri.encryption/.classpath -text
 ch.eugster.colibri.encryption/.project -text
 ch.eugster.colibri.encryption/.settings/org.eclipse.pde.core.prefs -text
