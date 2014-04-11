@@ -43,7 +43,7 @@ public class PersistenceServiceImpl implements PersistenceService
 	{
 		if (this.cacheService == null)
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Instantiiere Cache Service.");
+			Activator.getDefault().log(LogService.LOG_DEBUG, "Instantiiere Cache Service.");
 			this.cacheService = new CacheServiceImpl(this);
 		}
 		return this.cacheService;
@@ -66,7 +66,7 @@ public class PersistenceServiceImpl implements PersistenceService
 	{
 		if (this.serverService == null)
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Instantiiere Service für Server Datenbank...");
+			Activator.getDefault().log(LogService.LOG_DEBUG, "Instantiiere Service für Server Datenbank...");
 			this.serverService = new ServerServiceImpl(this);
 		}
 		return this.serverService;
@@ -104,7 +104,7 @@ public class PersistenceServiceImpl implements PersistenceService
 
 	private void activate()
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Aktiviere Service " + this.getClass().getName() + ".");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Aktiviere Service " + this.getClass().getName() + ".");
 		String[] args = Platform.getApplicationArgs();
 		for (int i = 0; i < args.length; i++)
 		{

@@ -25,7 +25,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 {
 	public static DatabaseUpdater newInstance(Properties properties)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter DatabaseUpdater.newInstance()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter DatabaseUpdater.newInstance()");
 		String driverName = properties.getProperty(PersistenceUnitProperties.JDBC_DRIVER);
 		if (SQLServerDriver.class.getName().equals(driverName)) 
 		{
@@ -47,7 +47,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 		{
 			return new PostgresqlDatabaseUpdater(properties);
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit DatabaseUpdater.newInstance()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit DatabaseUpdater.newInstance()");
 		return null;
 	}
 	
@@ -63,7 +63,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 
 	public IStatus updateDatabase(boolean server)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter DatabaseUpdater.updateDatabase()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter DatabaseUpdater.updateDatabase()");
 		IStatus status = Status.OK_STATUS;
 		final Connection connection = this.createConnection();
 		if (connection != null)
@@ -71,7 +71,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 			status = this.updateStructure(connection, server);
 			this.releaseConnection(connection);
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit DatabaseUpdater.updateDatabase()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit DatabaseUpdater.updateDatabase()");
 		return status;
 	}
 	
@@ -167,7 +167,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 	 */
 	private IStatus updateStructure(final Connection connection, boolean server)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter DatabaseUpdater.updateStructure()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter DatabaseUpdater.updateStructure()");
 		final Class<?> clazz = Version.class;
 		final Table table = clazz.getAnnotation(Table.class);
 		String tableName = "colibri_version";

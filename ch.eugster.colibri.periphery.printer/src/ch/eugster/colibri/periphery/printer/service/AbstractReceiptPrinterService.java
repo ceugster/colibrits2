@@ -126,7 +126,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " aktiviert.");
+			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
 		}
 		SalespointQuery query = (SalespointQuery) this.persistenceService.getCacheService().getQuery(Salespoint.class);
 		salespoint = query.getCurrentSalespoint();
@@ -136,7 +136,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 	{
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " deaktiviert.");
+			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
 		}
 	}
 

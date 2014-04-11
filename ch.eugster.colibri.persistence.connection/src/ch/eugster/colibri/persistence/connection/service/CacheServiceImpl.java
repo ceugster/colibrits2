@@ -46,7 +46,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	@Override
 	public Properties getProperties()
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.getProperties()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter CacheServiceImpl.getProperties()");
 		final Element connection = Activator.getDefault().getCurrentConnectionElement();
 		/*
 		 * Use ONLY the embedded (local) database, no server database!
@@ -92,13 +92,13 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 //			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
 //					PersistenceUnitProperties.DDL_SQL_SCRIPT_GENERATION);
 //		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.getProperties()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit CacheServiceImpl.getProperties()");
 		return properties;
 	}
 
 	private Map<String, Object> getEntityManagerProperties(final Properties properties)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.getEntityManagerProperties()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter CacheServiceImpl.getEntityManagerProperties()");
 		final Map<String, Object> map = new HashMap<String, Object>();
 
 		@SuppressWarnings("unchecked")
@@ -132,7 +132,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 				{
 					return name.toUpperCase().equals(properties.getProperty(ConnectionService.KEY_NAME).toUpperCase());
 				}
-				Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.getEntityManagerProperties()");
+				Activator.getDefault().log(LogService.LOG_DEBUG, "Exit CacheServiceImpl.getEntityManagerProperties()");
 				return false;
 			}
 		});
@@ -146,16 +146,16 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 
 //		printProperties(map);
 
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.getEntityManagerProperties()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit CacheServiceImpl.getEntityManagerProperties()");
 		return map;
 	}
 
 	@Override
 	protected IStatus updateDatabase(final Properties properties)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.updateDatabase()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter CacheServiceImpl.updateDatabase()");
 		final DatabaseUpdater databaseUpdater = DatabaseUpdater.newInstance(properties);
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.updateDatabase()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit CacheServiceImpl.updateDatabase()");
 		return databaseUpdater.updateDatabase(false);
 	}
 
@@ -168,11 +168,11 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	@Override
 	protected EntityManagerFactory createEntityManagerFactory(IStatus status, Properties properties)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter CacheServiceImpl.createEntityManagerFactory()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter CacheServiceImpl.createEntityManagerFactory()");
 		Map<String, Object> map = getEntityManagerProperties(properties);
 		EntityManagerFactory factory = this.getPersistenceService().getPersistenceProvider()
 				.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_LOCAL, map);
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit CacheServiceImpl.createEntityManagerFactory()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit CacheServiceImpl.createEntityManagerFactory()");
 		return factory;
 	}
 

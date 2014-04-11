@@ -221,7 +221,7 @@ public class ReplicationServiceImpl implements ReplicationService
 	{
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name")
+			this.logService.log(LogService.LOG_DEBUG, "Service " + componentContext.getProperties().get("component.name")
 					+ " aktiviert");
 		}
 	}
@@ -229,7 +229,7 @@ public class ReplicationServiceImpl implements ReplicationService
 	{
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name")
+			this.logService.log(LogService.LOG_DEBUG, "Service " + componentContext.getProperties().get("component.name")
 					+ " deaktiviert");
 		}
 	}

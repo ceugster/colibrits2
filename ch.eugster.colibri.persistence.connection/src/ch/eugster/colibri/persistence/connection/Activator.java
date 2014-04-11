@@ -140,6 +140,13 @@ public class Activator extends AbstractUIPlugin
 		}
 		return this.oldDocument;
 	}
+	
+	public String getPersistenceLogDir()
+	{
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final File root = workspace.getRoot().getRawLocation().toFile();
+		return root.getAbsolutePath() + File.separator + "logs";
+	}
 
 	public File getFile()
 	{
@@ -304,7 +311,7 @@ public class Activator extends AbstractUIPlugin
 			startPersistenceService();
 		}
 
-		this.log(LogService.LOG_INFO, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestartet.");
+		this.log(LogService.LOG_DEBUG, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestartet.");
 	}
 
 	/*
@@ -317,7 +324,7 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		this.log(LogService.LOG_INFO, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestoppt.");
+		this.log(LogService.LOG_DEBUG, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestoppt.");
 
 		this.eventAdminTracker.close();
 //		this.persistenceProviderTracker.close();

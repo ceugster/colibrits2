@@ -226,7 +226,7 @@ public class Product extends AbstractEntity
 		this.propertyChangeSupport.firePropertyChange("externalProductGroup", this.externalProductGroup,
 				this.externalProductGroup = externalProductGroup);
 
-		if (this.externalProductGroup != null)
+		if (this.externalProductGroup != null && this.getPosition().getProductGroup() == null)
 		{
 			if ((externalProductGroup.getProductGroupMapping() != null)
 					&& !externalProductGroup.getProductGroupMapping().isDeleted())

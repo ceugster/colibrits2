@@ -39,6 +39,7 @@ package ch.eugster.colibri.persistence.model;
  * 
  */
 import java.util.Comparator;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -466,13 +467,22 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 		Activator.getDefault().log("Enter Position.setProductGroup()");
 		this.propertyChangeSupport.firePropertyChange("productGroup", this.productGroup,
 				this.productGroup = productGroup);
-		if (productGroup == null)
+		if (this.productGroup == null)
 		{
 			this.setPrice(this.receipt.getSettlement().getSalespoint().getProposalPrice());
 			this.setQuantity(this.receipt.getSettlement().getSalespoint().getProposalQuantity());
 		}
 		else
 		{
+			if (this.product != null && this.product.getExternalProductGroup() == null)
+			{
+				List<ProductGroupMapping> mappings = this.productGroup.getProductGroupMappings(this.getProvider());
+				if (!mappings.isEmpty())
+				{
+					this.product.setExternalProductGroup(mappings.get(0).getExternalProductGroup());
+				}
+			}
+			
 			final Tax tax = productGroup.getDefaultTax();
 			if ((this.getCurrentTax() == null) || !this.getCurrentTax().getId().equals(tax.getCurrentTax().getId()))
 			{

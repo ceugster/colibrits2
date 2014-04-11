@@ -1,5 +1,6 @@
 package ch.eugster.colibri.persistence.connection.service;
 
+import java.io.File;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,6 +120,9 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, target);
 		properties.setProperty(PersistenceUnitProperties.CONNECTION_POOL_WAIT, "3000");
 		properties.setProperty(PersistenceUnitProperties.QUERY_TIMEOUT, "0");
+		properties.setProperty(PersistenceUnitProperties.LOGGING_FILE, Activator.getDefault().getPersistenceLogDir()+ File.separator + "persistence.log");
+		properties.setProperty(PersistenceUnitProperties.LOGGING_TIMESTAMP, "true");
+		properties.setProperty(PersistenceUnitProperties.LOGGING_LOGGER, "DefaultLogger");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_LEVEL, Activator.getDefault().getLogLevel());
 		return properties;
 	}
