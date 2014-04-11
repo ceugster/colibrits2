@@ -27,6 +27,7 @@ import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditor;
 import ch.eugster.colibri.admin.provider.editors.ProviderPropertiesEditorInput;
 import ch.eugster.colibri.admin.ui.views.AbstractEntityView;
 import ch.eugster.colibri.persistence.model.CommonSettings;
+import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderConfigurator;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
@@ -141,10 +142,10 @@ public class CommonSettingsView extends AbstractEntityView implements IDoubleCli
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
-			if (persistenceService.getServerService().isConnected())
+			if (persistenceService.getServerService().isLocal() || persistenceService.getServerService().isConnected())
 			{
-				CommonSettings settings = (CommonSettings) persistenceService.getServerService().find(CommonSettings.class,
-						Long.valueOf(1L));
+				CommonSettingsQuery query = (CommonSettingsQuery) persistenceService.getServerService().getQuery(CommonSettings.class);
+				CommonSettings settings = query.findDefault();
 				if (settings != null)
 				{
 					try

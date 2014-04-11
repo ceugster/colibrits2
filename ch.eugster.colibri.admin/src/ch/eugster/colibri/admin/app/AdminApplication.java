@@ -22,7 +22,7 @@ public class AdminApplication implements IApplication
 	@Override
 	public Object start(final IApplicationContext context) throws Exception
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Anwendung " + Activator.PLUGIN_ID + " gestartet");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Anwendung " + Activator.PLUGIN_ID + " gestartet");
 
 		final Display display = PlatformUI.createDisplay();
 		try

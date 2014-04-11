@@ -82,7 +82,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService log = (LogService) this.logServiceTracker.getService();
 		if (log != null)
 		{
-			log.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
+			log.log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
 		}
 	}
 
@@ -99,7 +99,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService log = (LogService) this.logServiceTracker.getService();
 		if (log != null)
 		{
-			log.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
+			log.log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 		}
 
 		this.logServiceTracker.close();
