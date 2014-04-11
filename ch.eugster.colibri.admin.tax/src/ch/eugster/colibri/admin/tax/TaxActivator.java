@@ -117,7 +117,7 @@ public class TaxActivator extends AbstractUIPlugin
 		final LogService log = (LogService) this.logServiceTracker.getService();
 		if (log != null)
 		{
-			log.log(LogService.LOG_INFO, "Plugin " + TaxActivator.PLUGIN_ID + " gestartet.");
+			log.log(LogService.LOG_DEBUG, "Plugin " + TaxActivator.PLUGIN_ID + " gestartet.");
 		}
 
 	}
@@ -135,7 +135,7 @@ public class TaxActivator extends AbstractUIPlugin
 		final LogService log = (LogService) this.logServiceTracker.getService();
 		if (log != null)
 		{
-			log.log(LogService.LOG_INFO, "Plugin " + TaxActivator.PLUGIN_ID + " gestoppt.");
+			log.log(LogService.LOG_DEBUG, "Plugin " + TaxActivator.PLUGIN_ID + " gestoppt.");
 		}
 
 		this.logServiceTracker.close();

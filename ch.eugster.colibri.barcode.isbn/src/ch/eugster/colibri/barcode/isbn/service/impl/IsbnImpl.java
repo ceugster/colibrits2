@@ -52,7 +52,7 @@ public class IsbnImpl implements BarcodeVerifier, IsbnConverter
 		this.context = componentContext;
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name") + " aktiviert.");
+			this.logService.log(LogService.LOG_DEBUG, "Service " + componentContext.getProperties().get("component.name") + " aktiviert.");
 		}
 	}
 
@@ -61,7 +61,7 @@ public class IsbnImpl implements BarcodeVerifier, IsbnConverter
 		this.context = null;
 		if (this.logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name") + " deaktiviert.");
+			this.logService.log(LogService.LOG_DEBUG, "Service " + componentContext.getProperties().get("component.name") + " deaktiviert.");
 		}
 	}
 

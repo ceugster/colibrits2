@@ -28,7 +28,7 @@ public class Activator implements BundleActivator
 		final LogService logService = (LogService) this.logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
+			logService.log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
 		}
 	}
 
@@ -38,7 +38,7 @@ public class Activator implements BundleActivator
 		final LogService logService = (LogService) this.logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
+			logService.log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 		}
 
 		this.logServiceTracker.close();

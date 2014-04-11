@@ -54,7 +54,7 @@ public class Activator extends AbstractUIPlugin
 		this.logServiceTracker.open();
 
 		logService = this.logServiceTracker.getService();
-		log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
+		log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
 	}
 
 	/*
@@ -67,7 +67,7 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
+		log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 		this.logServiceTracker.close();
 		Activator.plugin = null;
 		super.stop(context);
