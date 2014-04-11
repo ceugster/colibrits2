@@ -64,12 +64,12 @@ public abstract class AbstractProviderService implements ProviderService
 	protected void activate(final ComponentContext componentContext)
 	{
 		this.context = componentContext;
-		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
+		log(LogService.LOG_DEBUG, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void deactivate(final ComponentContext componentContext)
 	{
-		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name")
+		log(LogService.LOG_DEBUG, "Service " + this.context.getProperties().get("component.name")
 					+ " deaktiviert.");
 		this.context = null;
 	}

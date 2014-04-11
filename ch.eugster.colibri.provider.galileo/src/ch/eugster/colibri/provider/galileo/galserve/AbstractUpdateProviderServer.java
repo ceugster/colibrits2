@@ -249,7 +249,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 	
 	protected abstract String getInvoiceError();
 	
-	protected abstract boolean doPayInvoice(Integer invoiceNumber);
+	protected abstract boolean doPayInvoice(Long invoiceNumber);
 	
 	protected abstract IStatus setProviderValues(Position position);
 	
@@ -491,15 +491,15 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		return value.length() > maxlength ? value.substring(0, maxlength) : value;
 	}
 	
-	protected Integer getGalileoCustomerCode(final Receipt receipt)
+	protected Long getGalileoCustomerCode(final Receipt receipt)
 	{
-		Integer value = null;
+		Long value = null;
 		if (receipt.getCustomer() == null)
 		{
 			if (receipt.getCustomerCode().isEmpty())
 			{
 				log(LogService.LOG_INFO, "Keine Kundendaten mit Suche verbunden.");
-				value = Integer.valueOf(0);
+				value = Long.valueOf(0);
 			}
 			else
 			{
@@ -510,7 +510,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		{
 			value = this.convert(receipt.getCustomerCode());
 		}
-		return value == null ? Integer.valueOf(0) : value;
+		return value == null ? Long.valueOf(0) : value;
 	}
 
 	protected String getTaxCode(Position position)
@@ -601,7 +601,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		IStatus status = this.setProviderValues(position);
 		if (status.getSeverity() == IStatus.OK)
 		{
-			final Integer invoiceNumber = this.convert(position.getProduct().getInvoiceNumber());
+			final Long invoiceNumber = this.convert(position.getProduct().getInvoiceNumber());
 			if (invoiceNumber != null)
 			{
 				try
@@ -786,7 +786,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		return barcode;
 	}
 	
-	protected Integer convert(final String code)
+	protected Long convert(final String code)
 	{
 		if (code == null)
 		{
@@ -794,10 +794,10 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 			return null;
 		}
 
-		Integer id = null;
+		Long id = null;
 		try
 		{
-			id = Integer.valueOf(code);
+			id = Long.valueOf(code);
 			log(LogService.LOG_INFO, "Code: " + code + " konvertiert.");
 		}
 		catch (final NumberFormatException e)

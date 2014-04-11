@@ -260,7 +260,7 @@ public class GalileoConfiguratorComponent extends AbstractProviderService implem
 	{
 		super.activate(componentContext);
 		this.loadProperties(persistenceService.getServerService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
-		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
+		log(LogService.LOG_DEBUG, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void confirmChanges(final String code)
@@ -272,7 +272,7 @@ public class GalileoConfiguratorComponent extends AbstractProviderService implem
 	{
 		if (logService != null)
 		{
-			this.logService.log(LogService.LOG_INFO, "Service " + componentContext.getProperties().get("component.name")
+			this.logService.log(LogService.LOG_DEBUG, "Service " + componentContext.getProperties().get("component.name")
 					+ " deaktiviert.");
 		}
 	}

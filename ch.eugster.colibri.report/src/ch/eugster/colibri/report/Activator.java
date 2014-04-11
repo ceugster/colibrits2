@@ -50,7 +50,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService logService = this.logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
+			logService.log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestartet.");
 		}
 		context.registerService(ReportService.class.getName(), new ReportServiceComponent(),
 				new Hashtable<String, Object>());
@@ -69,7 +69,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService logService = this.logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
+			logService.log(LogService.LOG_DEBUG, "Plugin " + Activator.PLUGIN_ID + " gestoppt.");
 		}
 
 		this.logServiceTracker.close();

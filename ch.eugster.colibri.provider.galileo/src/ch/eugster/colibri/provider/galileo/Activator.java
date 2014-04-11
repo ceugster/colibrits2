@@ -46,7 +46,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService logService = (LogService) logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + context.getBundle().getSymbolicName() + " gestartet.");
+			logService.log(LogService.LOG_DEBUG, "Plugin " + context.getBundle().getSymbolicName() + " gestartet.");
 		}
 		
 		
@@ -65,7 +65,7 @@ public class Activator extends AbstractUIPlugin
 		final LogService logService = (LogService) logServiceTracker.getService();
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Plugin " + context.getBundle().getSymbolicName() + " gestoppt.");
+			logService.log(LogService.LOG_DEBUG, "Plugin " + context.getBundle().getSymbolicName() + " gestoppt.");
 		}
 
 		logServiceTracker.close();

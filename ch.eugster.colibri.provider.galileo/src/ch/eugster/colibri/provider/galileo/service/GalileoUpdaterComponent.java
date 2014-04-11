@@ -152,7 +152,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 			this.loadProperties(persistenceService.getServerService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
 			this.startUpdateProviderServer();
 		}
-		log(LogService.LOG_INFO, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
+		log(LogService.LOG_DEBUG, "Service " + this.context.getProperties().get("component.name") + " aktiviert.");
 	}
 
 	protected void deactivate(final ComponentContext componentContext)

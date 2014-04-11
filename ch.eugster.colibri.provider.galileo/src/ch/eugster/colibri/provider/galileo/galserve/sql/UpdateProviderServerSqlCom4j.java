@@ -105,9 +105,10 @@ public class UpdateProviderServerSqlCom4j extends AbstractUpdateProviderServer i
 		return status;
 	}
 
-	protected boolean doPayInvoice(Integer invoiceNumber)
+	protected boolean doPayInvoice(Long invoiceNumber)
 	{
-		return this.galserve.do_BucheRechnung(invoiceNumber);
+		log(LogService.LOG_INFO, "Rechnung " + invoiceNumber.toString() + " wird verbucht.");
+		return this.galserve.do_BucheRechnung(invoiceNumber.intValue());
 	}
 
 	protected String getInvoiceError()
