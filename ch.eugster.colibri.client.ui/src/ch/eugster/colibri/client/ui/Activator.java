@@ -213,7 +213,7 @@ public class Activator extends AbstractUIPlugin
 		this.logServiceTracker.open();
 
 		logService = (LogService) this.logServiceTracker.getService();
-		log(LogService.LOG_INFO, "Bundle " + context.getBundle().getSymbolicName() + " gestartet.");
+		log(LogService.LOG_DEBUG, "Bundle " + context.getBundle().getSymbolicName() + " gestartet.");
 	}
 
 	/*
@@ -226,7 +226,7 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
-		log(LogService.LOG_INFO, "Bundle " + context.getBundle().getSymbolicName() + " gestoppt.");
+		log(LogService.LOG_DEBUG, "Bundle " + context.getBundle().getSymbolicName() + " gestoppt.");
 		this.logServiceTracker.close();
 		Activator.plugin = null;
 		super.stop(context);

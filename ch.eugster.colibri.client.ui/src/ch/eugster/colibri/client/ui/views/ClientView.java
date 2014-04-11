@@ -423,7 +423,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	{
 		super.init(site);
 
-		Activator.getDefault().log(LogService.LOG_INFO, "Registriere Anwendungs-Instanz.");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Registriere Anwendungs-Instanz.");
 
 		ClientView.instance = this;
 

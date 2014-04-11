@@ -38,7 +38,7 @@ public final class PriceAction extends UserPanelProfileAction
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter PriceAction.actionPerformed()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PriceAction.actionPerformed()");
 		final double price = userPanel.getValueDisplay().testAmount();
 
 		int result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES;
@@ -55,7 +55,7 @@ public final class PriceAction extends UserPanelProfileAction
 			userPanel.getPositionWrapper().getPosition().setPrice(userPanel.getValueDisplay().getAmount());
 		}
 		userPanel.getPositionListPanel().getModel().actionPerformed(event);
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit PriceAction.actionPerformed()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PriceAction.actionPerformed()");
 	}
 
 	@Override

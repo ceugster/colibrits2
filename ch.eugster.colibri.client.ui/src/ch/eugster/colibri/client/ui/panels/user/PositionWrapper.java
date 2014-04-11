@@ -307,7 +307,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	{
 		if (event.getKeyCode() == KeyEvent.VK_ENTER)
 		{
-			log(LogService.LOG_INFO, "Enter Key pressed.");
+			log(LogService.LOG_DEBUG, "Enter Key pressed.");
 			final String input = this.valueDisplay.readAndInitDisplay();
 			if ((input != null) && (input.length() > 0))
 			{
@@ -566,7 +566,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	public Position preparePosition(final Receipt receipt)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter PositionWrapper.preparePosition()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionWrapper.preparePosition()");
 		final Position newPosition = Position.newInstance(receipt);
 		final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
 		if (providerQuery != null)
@@ -577,7 +577,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				newPosition.setBookProvider(providerQuery.getConfiguration().updateLocalItems());
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.preparePosition()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionWrapper.preparePosition()");
 		return replacePosition(newPosition);
 	}
 	
@@ -625,7 +625,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	public Position replacePosition(final Position position)
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter PositionWrapper.replacePosition()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionWrapper.replacePosition()");
 		this.firePositionChangeEvent(new PositionChangeEvent(this.position, position));
 		if (this.position != null)
 		{
@@ -637,7 +637,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRODUCT_GROUP, this);
 		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_QUANTITY, this);
 		this.position.addPropertyChangeListener(PositionWrapper.KEY_PROPERTY_PRICE, this);
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit PositionWrapper.replacePosition()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionWrapper.replacePosition()");
 		return this.position;
 	}
 

@@ -242,7 +242,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 
 	public double testAmount()
 	{
-		Activator.getDefault().log(LogService.LOG_INFO, "Enter ValueDisplay.testAmount()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter ValueDisplay.testAmount()");
 		double amount = 0d;
 
 		try
@@ -253,7 +253,7 @@ public class ValueDisplay extends JLabel implements ActionListener, PropertyChan
 		{
 			amount = 0d;
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit ValueDisplay.testAmount()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit ValueDisplay.testAmount()");
 		return amount;
 	}
 

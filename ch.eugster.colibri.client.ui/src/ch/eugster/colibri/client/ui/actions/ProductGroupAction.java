@@ -60,7 +60,7 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		log(LogService.LOG_INFO, "Enter ProductGroupAction.actionPerformed()");
+		log(LogService.LOG_DEBUG, "Enter ProductGroupAction.actionPerformed()");
 		if (this.setExternalProductGroup(this.getProductGroup()))
 		{
 			if (this.userPanel.getValueDisplay().testAmount() != 0d)
@@ -69,7 +69,7 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 			}
 			this.userPanel.getPositionListPanel().getModel().actionPerformed(event);
 		}
-		log(LogService.LOG_INFO, "Exit ProductGroupAction.actionPerformed()");
+		log(LogService.LOG_DEBUG, "Exit ProductGroupAction.actionPerformed()");
 	}
 
 	protected void log(int level, String message)
@@ -91,20 +91,20 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 
 	public ProductGroup getProductGroup()
 	{
-		log(LogService.LOG_INFO, "Enter ProductGroupAction.getProductGroup()");
+		log(LogService.LOG_DEBUG, "Enter ProductGroupAction.getProductGroup()");
 		ProductGroup productGroup = null;
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			productGroup = (ProductGroup) persistenceService.getCacheService().find(ProductGroup.class, this.key.getParentId());
 		}
-		log(LogService.LOG_INFO, "Exit ProductGroupAction.getProductGroup()");
+		log(LogService.LOG_DEBUG, "Exit ProductGroupAction.getProductGroup()");
 		return productGroup;
 	}
 
 	public boolean setExternalProductGroup(final ProductGroup productGroup)
 	{
-		log(LogService.LOG_INFO, "Enter ProductGroupAction.setExternalProductGroup()");
+		log(LogService.LOG_DEBUG, "Enter ProductGroupAction.setExternalProductGroup()");
 		if (productGroup == null)
 		{
 			return false;
@@ -133,7 +133,7 @@ public final class ProductGroupAction extends ConfigurableAction implements Disp
 				}
 			}
 		}
-		log(LogService.LOG_INFO, "Exit ProductGroupAction.setExternalProductGroup()");
+		log(LogService.LOG_DEBUG, "Exit ProductGroupAction.setExternalProductGroup()");
 		return true;
 	}
 
