@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="ch.eugster.log.file.handlers.OpenLogLevelDialogHandler"
+            id="ch.eugster.log.file.set.loglevel"
+            name="LogLevel Setzen">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="menu:ch.eugster.colibri.admin.menu.actions?after=additions">
+         <separator
+               name="ch.eugster.log.file.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="ch.eugster.log.file.set.loglevel"
+               label="Protokollierungstufe setzen"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>

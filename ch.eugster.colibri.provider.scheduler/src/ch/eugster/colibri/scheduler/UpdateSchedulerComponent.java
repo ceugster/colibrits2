@@ -143,7 +143,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 			}
 		});
 		this.updateScheduler.schedule(getDelay());
-		this.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " aktiviert.");
+		this.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
 	}
 
 	private void log(int level, String message)
@@ -162,7 +162,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 			this.updateScheduler = null;
 		}
 		this.context = null;
-		this.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " deaktiviert.");
+		this.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
 	}
 
 	private class UpdateSchedulerJob extends Job

@@ -13,13 +13,14 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogEntry;
 import org.osgi.service.log.LogListener;
 import org.osgi.service.log.LogReaderService;
-import org.osgi.service.log.LogService;
 
 public class FileLoggerComponent implements LogListener
 {
 	private LogReaderService logReaderService;
 	
 	private PrintStream out;
+
+	private int logLevel;
 	
 	protected void setLogReaderService(LogReaderService logReaderService)
 	{
@@ -28,6 +29,7 @@ public class FileLoggerComponent implements LogListener
 
 	protected void unsetLogReaderService(LogReaderService logReaderService)
 	{
+		this.logReaderService.removeLogListener(this);
 		this.logReaderService = null;
 	}
 
@@ -37,7 +39,7 @@ public class FileLoggerComponent implements LogListener
 		{
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			File root = workspace.getRoot().getRawLocation().toFile();
-	
+
 			final File logFolder = new File(root.getAbsolutePath() + File.separator + "logs");
 			if (!logFolder.exists())
 			{
@@ -96,53 +98,34 @@ public class FileLoggerComponent implements LogListener
 		try
 		{
 			out.close();
+			out = null;
 		}
 		catch(Exception e)
 		{
 			
 		}
-		logReaderService.removeLogListener(this);
 	}
 
 	@Override
 	public void logged(LogEntry entry)
 	{
-		if (entry.getLevel() < LogService.LOG_INFO)
+		if (out != null)
 		{
-			String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
-			out.println(log);
-			Throwable exception = entry.getException();
-			if (exception != null)
+			if (this.logLevel == 0)
 			{
-				exception.printStackTrace();
+				this.logLevel = Activator.getDefault().getCurrentLogLevel();
 			}
-		}
-	}
 
-	private String getLevelAsString(int level)
-	{
-		switch (level)
-		{
-		case LogService.LOG_DEBUG:
-		{
-			return "DEBUG";
-		}
-		case LogService.LOG_INFO:
-		{
-			return "INFO";
-		}
-		case LogService.LOG_WARNING:
-		{
-			return "WARNING";
-		}
-		case LogService.LOG_ERROR:
-		{
-			return "ERROR";
-		}
-		default:
-		{
-			return "UNKNOWN";
-		}
+			if (entry.getLevel() <= this.logLevel)
+			{
+				String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", Activator.getDefault().getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
+				out.println(log);
+				Throwable exception = entry.getException();
+				if (exception != null)
+				{
+					exception.printStackTrace();
+				}
+			}
 		}
 	}
 }

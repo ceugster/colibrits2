@@ -5,7 +5,7 @@ Name ColibriTS
 
 # General Symbol Definitions
 !define REGKEY "SOFTWARE\$(^Name)"
-!define VERSION 3.7.2-2.0.10.201404012200
+!define VERSION 3.7.2-2.0.14.201404102100
 !define COMPANY "Christian Eugster"
 !define URL http://eugster-informatik.ch/
 !define PRODUCT_PATH C:\Projekte\Colibrits2\Product\release-${VERSION}

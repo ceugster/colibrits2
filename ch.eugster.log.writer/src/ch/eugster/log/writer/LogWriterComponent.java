@@ -19,11 +19,11 @@ public class LogWriterComponent
 
 	protected void activate(ComponentContext context)
 	{
-		logService.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " aktiviert.");
+		logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
 	}
 
 	protected void deactivate(ComponentContext context)
 	{
-		logService.log(LogService.LOG_INFO, "Service " + this.getClass().getName() + " deaktiviert.");
+		logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
 	}
 }

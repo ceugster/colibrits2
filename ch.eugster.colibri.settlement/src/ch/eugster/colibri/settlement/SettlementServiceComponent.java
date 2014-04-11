@@ -53,7 +53,7 @@ public class SettlementServiceComponent implements SettlementService
 		this.context = componentContext;
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Service " + context.getProperties().get("component.name") + " aktiviert.");
+			logService.log(LogService.LOG_DEBUG, "Service " + context.getProperties().get("component.name") + " aktiviert.");
 		}
 	}
 
@@ -61,7 +61,7 @@ public class SettlementServiceComponent implements SettlementService
 	{
 		if (logService != null)
 		{
-			logService.log(LogService.LOG_INFO, "Service " + context.getProperties().get("component.name") + " deaktiviert.");
+			logService.log(LogService.LOG_DEBUG, "Service " + context.getProperties().get("component.name") + " deaktiviert.");
 		}
 		this.context = null;
 	}
