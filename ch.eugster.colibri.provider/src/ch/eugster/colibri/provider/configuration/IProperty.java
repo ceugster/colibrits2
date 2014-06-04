@@ -505,16 +505,30 @@ public interface IProperty
 				int val = getInt(value);
 				Composite composite = (Composite) control;
 				org.eclipse.swt.widgets.Control[] children = composite.getChildren();
-				for (org.eclipse.swt.widgets.Control child : children)
+				if (children.length == 1)
 				{
-					if (child instanceof Button)
+					if (children[0] instanceof Button)
 					{
-						Button button = (Button) child;
-						Integer i = (Integer) button.getData("value");
-						if (i.intValue() == val)
+						Button button = (Button) children[0];
+						button.setSelection(val == 0 ? false : true);
+						composite.setData("value", val);
+						break;
+					}
+				}
+				else
+				{
+					for (org.eclipse.swt.widgets.Control child : children)
+					{
+						if (child instanceof Button)
 						{
-							button.setSelection(true);
-							composite.setData("value", i);
+							Button button = (Button) child;
+							Integer i = (Integer) button.getData("value");
+							if (i.intValue() == val)
+							{
+								button.setSelection(true);
+								composite.setData("value", i);
+								break;
+							}
 						}
 					}
 				}

@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
+import java.util.List;
 
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementTax;
@@ -29,7 +30,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("BBBBBBBBBBBBBBBBB PPPPP AAAAAAAAA MMMMMMMM");
+		builder = builder.append("BBBBBBBBBBBBBBBBB MMMMM AAAAAAAAA TTTTTTTT");
 		return builder.toString();
 	}
 
@@ -37,7 +38,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Mehrwertsteuern       %    Betrag     Mwst");
+		builder = builder.append("Mehrwertsteuern       M    Betrag     Mwst");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -47,7 +48,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------");
-		builder = builder.append("Mehrwertsteuern         AAAAAAAAA MMMMMMMM");
+		builder = builder.append("Mehrwertsteuern   MMMMM AAAAAAAAA TTTTTTTT");
 		builder = builder.append("==========================================");
 		return builder.toString();
 	}
@@ -152,7 +153,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 
 	public enum DetailKey implements IKey
 	{
-		B, P, A, M;
+		B, M, A, T;
 
 		@Override
 		public String label()
@@ -163,15 +164,15 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 				{
 					return "Steuerbezeichnung";
 				}
-				case P:
+				case M:
 				{
-					return "Steuerprozent";
+					return "Menge";
 				}
 				case A:
 				{
 					return "Basisbetrag";
 				}
-				case M:
+				case T:
 				{
 					return "Steuerbetrag";
 				}
@@ -193,20 +194,25 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 				{
 					case B:
 					{
+						double percentage = tax.getCurrentTax().getPercentage();
+						percentFormatter.setMinimumFractionDigits(0);
+						percentFormatter.setMaximumFractionDigits(2);
 						String text = tax.getCurrentTax().getTax().getText();
 						if ((text == null) || text.isEmpty())
 						{
 							text = tax.getCurrentTax().getTax().getTaxType().getName() + " "
 									+ tax.getCurrentTax().getTax().getTaxRate().getName();
 						}
+						text = text + " " + percentFormatter.format(percentage);
 						return layoutArea.replaceMarker(text, marker, true);
 					}
-					case P:
+					case M:
 					{
-						SettlementLayoutTaxSection.percentFormatter.setMaximumFractionDigits(1);
-						final double percentage = tax.getCurrentTax().getPercentage();
-						final String percentageString = SettlementLayoutTaxSection.percentFormatter.format(percentage);
-						return layoutArea.replaceMarker(percentageString, marker, false);
+//						SettlementLayoutTaxSection.percentFormatter.setMaximumFractionDigits(1);
+//						final double percentage = tax.getCurrentTax().getPercentage();
+//						final String percentageString = SettlementLayoutTaxSection.percentFormatter.format(percentage);
+						String qty = Integer.toString(tax.getQuantity());
+						return layoutArea.replaceMarker(qty, marker, false);
 					}
 					case A:
 					{
@@ -220,7 +226,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 						final String amount = SettlementLayoutTaxSection.amountFormatter.format(tax.getBaseAmount());
 						return layoutArea.replaceMarker(amount, marker, false);
 					}
-					case M:
+					case T:
 					{
 						final Currency currency = tax.getSettlement().getSalespoint().getPaymentType().getCurrency()
 								.getCurrency();
@@ -261,7 +267,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 
 	public enum TotalKey implements IKey
 	{
-		A, M;
+		A, M, T;
 
 		@Override
 		public String label()
@@ -273,6 +279,10 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 					return "Total Basisbetrag";
 				}
 				case M:
+				{
+					return "Menge";
+				}
+				case T:
 				{
 					return "Total Mehrwertsteuer";
 				}
@@ -288,31 +298,51 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 		{
 			if (printable instanceof SettlementTax)
 			{
-				final SettlementTax tax = (SettlementTax) printable;
-
+				final SettlementTax settlementTax = (SettlementTax) printable;
+				List<SettlementTax> taxes = settlementTax.getSettlement().getTaxes();
 				switch (this)
 				{
 					case A:
 					{
-						final Currency currency = tax.getSettlement().getSalespoint().getPaymentType().getCurrency()
+						double amount = 0d;
+						for (SettlementTax tax : taxes)
+						{
+							amount += tax.getBaseAmount();
+						}
+						final Currency currency = settlementTax.getSettlement().getSalespoint().getPaymentType().getCurrency()
 								.getCurrency();
 						SettlementLayoutTaxSection.amountFormatter.setMinimumFractionDigits(currency
 								.getDefaultFractionDigits());
 						SettlementLayoutTaxSection.amountFormatter.setMaximumFractionDigits(currency
 								.getDefaultFractionDigits());
-						final String amount = SettlementLayoutTaxSection.amountFormatter.format(tax.getBaseAmount());
-						return layoutArea.replaceMarker(amount, marker, false);
+						final String amountText = SettlementLayoutTaxSection.amountFormatter.format(amount);
+						return layoutArea.replaceMarker(amountText, marker, false);
 					}
 					case M:
 					{
-						final Currency currency = tax.getSettlement().getSalespoint().getPaymentType().getCurrency()
+						int quantity = 0;
+						for (SettlementTax tax : taxes)
+						{
+							quantity += tax.getQuantity();
+						}
+						final String qty = Integer.toString(quantity);
+						return layoutArea.replaceMarker(qty, marker, false);
+					}
+					case T:
+					{
+						double amount = 0d;
+						for (SettlementTax tax : taxes)
+						{
+							amount += tax.getTaxAmount();
+						}
+						final Currency currency = settlementTax.getSettlement().getSalespoint().getPaymentType().getCurrency()
 								.getCurrency();
 						SettlementLayoutTaxSection.amountFormatter.setMinimumFractionDigits(currency
 								.getDefaultFractionDigits());
 						SettlementLayoutTaxSection.amountFormatter.setMaximumFractionDigits(currency
 								.getDefaultFractionDigits());
-						final String amount = SettlementLayoutTaxSection.amountFormatter.format(-tax.getTaxAmount());
-						return layoutArea.replaceMarker(amount, marker, false);
+						final String amountText = SettlementLayoutTaxSection.amountFormatter.format(amount);
+						return layoutArea.replaceMarker(amountText, marker, false);
 					}
 					default:
 					{

@@ -33,7 +33,7 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("WWW TTTTTTTTTTTTTT DDDDDDDDDDD CCCCCCCCCCC");
+		builder = builder.append("WWW TTTTTTTTTTTTTTTT DDDDDDDDDD CCCCCCCCCC");
 		return builder.toString();
 	}
 
@@ -41,7 +41,7 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("WWW Kassastock       gerechnet     gezählt\n");
+		builder = builder.append("WWW Kassastock             SOLL        IST\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -51,7 +51,7 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 	{
 		StringBuilder builder = new StringBuilder();
 		builder = builder.append("------------------------------------------\n");
-		builder = builder.append("WWW Kassastock     DDDDDDDDDDD CCCCCCCCCCC\n");
+		builder = builder.append("WWW Kassabestand neu DDDDDDDDDD CCCCCCCCCC\n");
 		builder = builder.append("==========================================");
 		return builder.toString();
 	}
@@ -241,28 +241,14 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 					}
 					case T:
 					{
-						final String text = detail.getPart().label(detail);
+						String text = detail.getPart().label(detail);
 						return layoutArea.replaceMarker(text, marker, true);
 					}
 					case D:
 					{
-
-						final java.util.Currency currency = detail.getPaymentType().getCurrency().getCurrency();
-						SettlementLayoutSettlementSection.doubleFormatter.setGroupingUsed(false);
-						SettlementLayoutSettlementSection.doubleFormatter.setMinimumFractionDigits(currency
-								.getDefaultFractionDigits());
-						SettlementLayoutSettlementSection.doubleFormatter.setMaximumFractionDigits(currency
-								.getDefaultFractionDigits());
-						return layoutArea.replaceMarker(
-								SettlementLayoutSettlementSection.doubleFormatter.format(detail.getDebit()), marker,
-								false);
-					}
-					case C:
-					{
-						String value = null;
-						if (detail.getPart().equals(Part.BEGIN_STOCK))
+						if (detail.getPart().equals(Part.DIFFERENCE) && detail.getDebit() == 0D)
 						{
-							value = layoutArea.replaceMarker("", marker, false);
+							return layoutArea.replaceMarker("", marker, true);
 						}
 						else
 						{
@@ -272,11 +258,30 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 									.getDefaultFractionDigits());
 							SettlementLayoutSettlementSection.doubleFormatter.setMaximumFractionDigits(currency
 									.getDefaultFractionDigits());
-							value = layoutArea.replaceMarker(
+							return layoutArea.replaceMarker(
+									SettlementLayoutSettlementSection.doubleFormatter.format(detail.getDebit()), marker,
+									false);
+						}
+
+					}
+					case C:
+					{
+						if (detail.getPart().equals(Part.DIFFERENCE) && detail.getCredit() == 0D)
+						{
+							return layoutArea.replaceMarker("", marker, true);
+						}
+						else
+						{
+							final java.util.Currency currency = detail.getPaymentType().getCurrency().getCurrency();
+							SettlementLayoutSettlementSection.doubleFormatter.setGroupingUsed(false);
+							SettlementLayoutSettlementSection.doubleFormatter.setMinimumFractionDigits(currency
+									.getDefaultFractionDigits());
+							SettlementLayoutSettlementSection.doubleFormatter.setMaximumFractionDigits(currency
+									.getDefaultFractionDigits());
+							return layoutArea.replaceMarker(
 									SettlementLayoutSettlementSection.doubleFormatter.format(detail.getCredit()),
 									marker, false);
 						}
-						return value;
 					}
 					default:
 					{

@@ -216,6 +216,15 @@ litigation.
       <update label="ColibriTS II Update Site" url="http://eugster-informatik.ch/colibrits/updates"/>
    </url>
 
+   <requires>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="ch.eugster.colibri.periphery.printer"/>
+      <import plugin="ch.eugster.colibri.persistence"/>
+      <import plugin="ch.eugster.colibri.print"/>
+      <import plugin="org.eclipse.osgi"/>
+   </requires>
+
    <plugin
          id="ch.eugster.colibri.print.settlement"
          download-size="0"

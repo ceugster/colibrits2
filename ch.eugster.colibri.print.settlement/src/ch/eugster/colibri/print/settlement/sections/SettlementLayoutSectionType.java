@@ -5,7 +5,7 @@ import ch.eugster.colibri.print.section.ILayoutSectionType;
 
 public enum SettlementLayoutSectionType implements ILayoutSectionType
 {
-	HEADER, PRODUCT_GROUP, OTHER_SALES, EXPENSES, PRODUCT_GROUP_SUMMARY, PAYMENT, SUMMARY, TAX, PAYED_INVOICE, RESTITUTION, INTERNAL, REVERSED_RECEIPT, SETTLEMENT, MONEY, FOOTER;
+	HEADER, PRODUCT_GROUP, OTHER_SALES, EXPENSES, PRODUCT_GROUP_SUMMARY, PAYMENT, SUMMARY, TAX, PAYED_INVOICE, RESTITUTION, INTERNAL, REVERSED_RECEIPT, SETTLEMENT, VOUCHER, MONEY, FOOTER;
 
 	private int columnCount = 42;
 
@@ -71,6 +71,10 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 				return 48;
 			}
 			case SETTLEMENT:
+			{
+				return 48;
+			}
+			case VOUCHER:
 			{
 				return 48;
 			}
@@ -198,6 +202,14 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 				}
 				return this.layoutSection;
 			}
+			case VOUCHER:
+			{
+				if (this.layoutSection == null)
+				{
+					this.layoutSection = new SettlementLayoutVoucherSection(this);
+				}
+				return this.layoutSection;
+			}
 			case MONEY:
 			{
 				if (this.layoutSection == null)
@@ -278,6 +290,10 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 			{
 				return "section.settlement.settlement";
 			}
+			case VOUCHER:
+			{
+				return "section.settlement.voucher";
+			}
 			case MONEY:
 			{
 				return "section.settlement.money";
@@ -349,6 +365,10 @@ public enum SettlementLayoutSectionType implements ILayoutSectionType
 			case SETTLEMENT:
 			{
 				return "Tagesabschluss";
+			}
+			case VOUCHER:
+			{
+				return "Gutscheine";
 			}
 			case MONEY:
 			{

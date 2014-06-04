@@ -2,6 +2,7 @@ package ch.eugster.colibri.provider.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 
@@ -17,7 +18,7 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 public abstract class AbstractProviderUpdater extends AbstractProviderService implements ProviderUpdater 
 {
 	@Override
-	public Collection<Position> getPositions(PersistenceService service,
+	public List<Position> getPositions(PersistenceService service,
 			int max) 
 	{
 		SalespointQuery salespointQuery = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);

@@ -5,12 +5,14 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Currency;
+import java.util.List;
 
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementPayment;
 import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
+import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
 import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
 import ch.eugster.colibri.print.section.ILayoutSection;
@@ -38,7 +40,7 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 	public String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Total Bewegungen   MMMM AAAAAAAAAA\n");
+		builder = builder.append("Total Bewegungen   MMMM AAAAAAAAAA TTTTTTT\n");
 		return builder.toString();
 	}
 
@@ -101,29 +103,7 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 			if (printable instanceof Settlement)
 			{
 				final Settlement settlement = (Settlement) printable;
-
-				final Collection<SettlementPayment> settlementPayments = settlement.getPayments();
-				SettlementPayment payment = SettlementPayment.newInstance(settlement, null);
-				for (final SettlementPayment settlementPayment : settlementPayments)
-				{
-					payment.setQuantity(payment.getQuantity() + settlementPayment.getQuantity());
-					payment.setDefaultCurrencyAmount(payment.getDefaultCurrencyAmount()
-							+ settlementPayment.getDefaultCurrencyAmount());
-				}
-
-				final Collection<SettlementPosition> settlementPositions = settlement.getPositions();
-				SettlementPosition position = SettlementPosition.newInstance(settlement, null, null);
-				for (final SettlementPosition settlementPosition : settlementPositions)
-				{
-					position.setQuantity(position.getQuantity() + settlementPosition.getQuantity());
-					position.setDefaultCurrencyAmount(position.getDefaultCurrencyAmount()
-							+ settlementPosition.getDefaultCurrencyAmount());
-				}
-
-				Collection<IPrintable> printables = new ArrayList<IPrintable>();
-				printables.add(payment);
-				printables.add(position);
-				lines.addAll(prepareAreaDetail(printables.toArray(new IPrintable[0])));
+				lines.addAll(super.prepareAreaDetail(settlement));
 			}
 		}
 		return lines;
@@ -185,22 +165,40 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 		@Override
 		public String replace(final ILayoutSection layoutArea, final IPrintable printable, final String marker)
 		{
-			if (printable instanceof SettlementPosition)
+			if (printable instanceof Settlement)
 			{
-				final SettlementPosition position = (SettlementPosition) printable;
-
+				final Settlement settlement = (Settlement) printable;
+				List<SettlementPosition> positions = settlement.getPositions();
+				
 				switch (this)
 				{
 					case M:
 					{
-						String quantity = Integer.valueOf(position.getQuantity()).toString();
-						return layoutArea.replaceMarker(quantity, marker, false);
+						int quantity = 0;
+						for (SettlementPosition position : positions)
+						{
+							ProductGroupGroup group = position.getProductGroup().getProductGroupType().getParent();
+							if (group.equals(ProductGroupGroup.SALES) || group.equals(ProductGroupGroup.EXPENSES))
+							{
+								quantity += position.getQuantity();
+							}
+						}
+						String qty = Integer.toString(quantity);
+						return layoutArea.replaceMarker(qty, marker, false);
 					}
 					case A:
 					{
-						final Currency currency = position.getSettlement().getSalespoint().getPaymentType()
+						double amount = 0d;
+						for (SettlementPosition position : positions)
+						{
+							ProductGroupGroup group = position.getProductGroup().getProductGroupType().getParent();
+							if (group.equals(ProductGroupGroup.SALES) || group.equals(ProductGroupGroup.EXPENSES))
+							{
+								amount += position.getDefaultCurrencyAmount();
+							}
+						}
+						final Currency currency = settlement.getSalespoint().getPaymentType()
 								.getCurrency().getCurrency();
-						double amount = position.getDefaultCurrencyAmount();
 						SettlementLayoutProductGroupSummarySection.amountFormatter.setGroupingUsed(false);
 						SettlementLayoutProductGroupSummarySection.amountFormatter.setMinimumFractionDigits(currency
 								.getDefaultFractionDigits());
@@ -211,9 +209,17 @@ public class SettlementLayoutProductGroupSummarySection extends AbstractLayoutSe
 					}
 					case T:
 					{
-						final Currency currency = position.getSettlement().getSalespoint().getPaymentType()
+						double amount = 0d;
+						for (SettlementPosition position : positions)
+						{
+							ProductGroupGroup group = position.getProductGroup().getProductGroupType().getParent();
+							if (group.equals(ProductGroupGroup.SALES) || group.equals(ProductGroupGroup.EXPENSES))
+							{
+								amount -= position.getTaxAmount();
+							}
+						}
+						final Currency currency = settlement.getSalespoint().getPaymentType()
 								.getCurrency().getCurrency();
-						double amount = position.getTaxAmount();
 						SettlementLayoutProductGroupSummarySection.amountFormatter.setGroupingUsed(false);
 						SettlementLayoutProductGroupSummarySection.amountFormatter.setMinimumFractionDigits(currency
 								.getDefaultFractionDigits());

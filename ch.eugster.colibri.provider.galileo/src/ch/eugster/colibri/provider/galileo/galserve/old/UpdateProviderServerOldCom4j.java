@@ -105,7 +105,7 @@ public class UpdateProviderServerOldCom4j extends AbstractUpdateProviderServer i
 		return status;
 	}
 
-	protected boolean doPayInvoice(Long invoiceNumber)
+	protected boolean doPayInvoice(Integer invoiceNumber)
 	{
 		return this.galserve.do_BucheRechnung(invoiceNumber.intValue());
 	}

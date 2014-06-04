@@ -1581,6 +1581,7 @@ ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sect
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutSummarySection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutTaxSection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutType.java -text
+ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/sections/SettlementLayoutVoucherSection.java -text
 ch.eugster.colibri.print.settlement/src/ch/eugster/colibri/print/settlement/service/SettlementPrintService.java -text
 ch.eugster.colibri.print.voucher.feature/.project -text
 ch.eugster.colibri.print.voucher.feature/build.properties -text

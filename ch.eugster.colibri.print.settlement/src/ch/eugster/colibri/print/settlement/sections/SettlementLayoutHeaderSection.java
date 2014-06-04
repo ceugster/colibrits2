@@ -1,15 +1,19 @@
 package ch.eugster.colibri.print.settlement.sections;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
+import ch.eugster.colibri.persistence.service.SettlementService;
 import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
 import ch.eugster.colibri.print.section.ILayoutSection;
 import ch.eugster.colibri.print.section.ILayoutSectionType;
+import ch.eugster.colibri.print.section.ILayoutSection.AreaType;
 
 public class SettlementLayoutHeaderSection extends AbstractLayoutSection
 {
@@ -22,11 +26,6 @@ public class SettlementLayoutHeaderSection extends AbstractLayoutSection
 	protected String getDefaultPatternDetail()
 	{
 		StringBuilder builder = new StringBuilder();
-		String header = this.getCommonSettingsHeader();
-		if (header != null)
-		{
-			builder.append(header);
-		}
 		builder = builder.append("\n");
 		builder = builder.append("\n");
 		builder = builder.append("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK\n");
@@ -37,7 +36,56 @@ public class SettlementLayoutHeaderSection extends AbstractLayoutSection
 	}
 
 	@Override
+	protected String getDefaultPatternTitle()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder = builder.append("\n");
+		builder = builder.append("\n");
+		builder = builder.append("******************************************\n");
+		builder = builder.append("\n");
+		builder = builder.append("        Tagesabschluss provisorisch\n");
+		builder = builder.append("\n");
+		builder = builder.append("******************************************\n");
+		return builder.toString();
+	}
+
+	protected Collection<String> prepareAreaTitle(final IPrintable printable)
+	{
+		final Collection<String> lines = new ArrayList<String>();
+		if (printable instanceof Settlement)
+		{
+			Settlement settlement = (Settlement) printable;
+			if (settlement.getState() != null && settlement.getState().equals(SettlementService.State.PROVISIONAL))
+			{
+				if (printIt(AreaType.TITLE, printable))
+				{
+					final Collection<String> patternLines = adaptPatternTitle(this.getPattern(AreaType.TITLE), printable);
+					final String[] markers = this.getMarkers(AreaType.TITLE, patternLines);
+					for (String patternLine : patternLines)
+					{
+						for (final String marker : markers)
+						{
+							patternLine = this.replace(AreaType.TITLE, printable, marker, patternLine);
+						}
+						if (!patternLine.trim().isEmpty() || this.getPrintOption(AreaType.TITLE).equals(PrintOption.ALWAYS))
+						{
+							lines.add(patternLine);
+						}
+					}
+				}
+			}
+		}
+		return lines;
+	}
+
+	@Override
 	protected PrintOption getDefaultPrintOptionDetail()
+	{
+		return PrintOption.ALWAYS;
+	}
+
+	@Override
+	protected PrintOption getDefaultPrintOptionTitle()
 	{
 		return PrintOption.ALWAYS;
 	}
@@ -75,7 +123,7 @@ public class SettlementLayoutHeaderSection extends AbstractLayoutSection
 	@Override
 	protected boolean hasTitleArea()
 	{
-		return false;
+		return true;
 	}
 
 	@Override

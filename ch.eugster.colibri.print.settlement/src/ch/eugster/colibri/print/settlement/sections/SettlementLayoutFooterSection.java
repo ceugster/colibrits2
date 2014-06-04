@@ -35,7 +35,7 @@ public class SettlementLayoutFooterSection extends AbstractLayoutSection
 		{
 			n = n.append(" ");
 		}
-		builder = builder.append("------------------------------------------\n");
+//		builder = builder.append("------------------------------------------\n");
 		builder = builder.append(n.toString() + "\n");
 		return builder.toString();
 	}

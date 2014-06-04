@@ -47,6 +47,26 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		super(persistenceService, properties);
 	}
 	
+	public Customer getCustomer(int customerId)
+	{
+		Customer customer = null;
+		if (isConnect())
+		{
+			log(LogService.LOG_INFO, "Verbindung öffnen.");
+			if (this.open())
+			{
+				if (this.galserve.do_getkunde(customerId))
+				{
+					log(LogService.LOG_INFO, "Kunden gefunden; aktualisieren.");
+					customer = this.updateCustomer(customerId);
+				}
+
+				this.close();
+			}
+		}
+		return customer;
+	}
+	
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{

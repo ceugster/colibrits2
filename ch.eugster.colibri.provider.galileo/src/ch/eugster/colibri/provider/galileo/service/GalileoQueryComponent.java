@@ -19,6 +19,7 @@ import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CurrentTax;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
@@ -48,6 +49,23 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 
 	public GalileoQueryComponent()
 	{
+	}
+	
+	public void updateCustomer(Receipt receipt)
+	{
+		String code = receipt.getCustomerCode();
+		if (code != null)
+		{
+			try
+			{
+				int customerId = Integer.valueOf(code);
+				receipt.setCustomer(this.findArticleServer.getCustomer(customerId));
+			}
+			catch (NumberFormatException e)
+			{
+//				receipt.setCustomer(null);
+			}
+		}
 	}
 
 	public void setStatus(IStatus status)

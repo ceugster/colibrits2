@@ -844,7 +844,6 @@ public abstract class AbstractLayoutSection implements ILayoutSection
 			final String[] markers = this.getMarkers(AreaType.DETAIL, patternLines);
 			for (String patternLine : patternLines)
 			{
-
 				for (final String marker : markers)
 				{
 					patternLine = this.replace(AreaType.DETAIL, printable, marker, patternLine);

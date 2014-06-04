@@ -15,6 +15,7 @@ import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementDetail;
+import ch.eugster.colibri.persistence.model.SettlementDetail.Part;
 import ch.eugster.colibri.persistence.model.SettlementInternal;
 import ch.eugster.colibri.persistence.model.SettlementMoney;
 import ch.eugster.colibri.persistence.model.SettlementPayedInvoice;
@@ -63,15 +64,18 @@ public class SettlementTransfer extends AbstractTransfer
 			{
 				stock.setLastCashSettlement(settlement);
 				double newStock = 0D;
-				List<SettlementMoney> moneys = settlement.getMoneys();
-				for (SettlementMoney money : moneys)
+				List<SettlementDetail> details = settlement.getDetails();
+				for (SettlementDetail detail : details)
 				{
-					if (money.getStock().getId().equals(stock.getId()))
+					if (detail.getStock().getId().equals(stock.getId()))
 					{
-						newStock += money.getAmount();
+						if (detail.getPart().equals(Part.INCOME))
+						{
+							newStock = detail.getCredit();
+						}
 					}
 				}
-				stock.setAmount(newStock);
+				stock.setAmount(stock.getAmount() + newStock);
 			}
 		}
 	}
