@@ -90,6 +90,7 @@ public class VoucherRow
 		final SettlementMoney money = SettlementMoney.newInstance(settlement, this.stock, this.voucherButton.getKey().paymentType);
 		money.setText(this.voucherButton.getKey().paymentType.getName());
 		money.setCode(this.voucherButton.getKey().paymentType.getCode());
+		money.setQuantity(this.getCount());
 		money.setAmount(this.getValue());
 		return money;
 	}
@@ -117,7 +118,8 @@ public class VoucherRow
 	public void setCount(final int count)
 	{
 		this.count = count;
-		this.countButton.setText(this.integerFormatter.format(this.getCount()));
+		this.countButton.setText(this.integerFormatter.format(count));
+		
 	}
 
 	public void setValue(final double value)
@@ -140,6 +142,11 @@ public class VoucherRow
 			}
 		});
 		return button;
+	}
+	
+	public void clear()
+	{
+		this.countButton.doClick();
 	}
 
 	private VoucherButton createVoucherButton(Key key)

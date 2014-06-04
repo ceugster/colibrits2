@@ -298,7 +298,7 @@ public class CoinCounterPanel extends ProfilePanel
 					@Override
 					public void actionPerformed(final ActionEvent e)
 					{
-						voucherRow.setCount(0);
+						voucherRow.clear();
 						;
 					}
 				});
@@ -405,9 +405,9 @@ public class CoinCounterPanel extends ProfilePanel
 
 	private Collection<SettlementDetail> getSettlementDetails(final Stock stock, final Settlement settlement)
 	{
-		final Collection<SettlementDetail> details = new ArrayList<SettlementDetail>();
-		details.addAll(this.getSettlementSummary(stock, settlement));
-		return details;
+//		final Collection<SettlementDetail> details = new ArrayList<SettlementDetail>();
+		return this.getSettlementSummary(stock, settlement);
+//		return details;
 	}
 
 	private Collection<SettlementMoney> getSettlementMoney(final Stock stock, final Settlement settlement)
@@ -424,6 +424,7 @@ public class CoinCounterPanel extends ProfilePanel
 
 		SettlementDetail detail = SettlementDetail.newInstance(settlement, stock);
 		detail.setDebit(stock.getAmount());
+		detail.setCredit(stock.getAmount());
 		detail.setVariableStock(stock.isVariable());
 		detail.setPart(Part.BEGIN_STOCK);
 		details.add(detail);
@@ -437,14 +438,14 @@ public class CoinCounterPanel extends ProfilePanel
 				creditAmount += moneyRow.getMoney().getSum();
 			}
 		}
-		final VoucherRow[] voucherRows = this.voucherRows.get(stock.getId());
-		if (voucherRows != null)
-		{
-			for (final VoucherRow voucherRow : voucherRows)
-			{
-				creditAmount += voucherRow.getValue();
-			}
-		}
+//		final VoucherRow[] voucherRows = this.voucherRows.get(stock.getId());
+//		if (voucherRows != null)
+//		{
+//			for (final VoucherRow voucherRow : voucherRows)
+//			{
+//				creditAmount += voucherRow.getValue();
+//			}
+//		}
 
 		double debitAmount = this.getTotalIncome(settlement, stock.getPaymentType().getCurrency());
 
@@ -458,11 +459,18 @@ public class CoinCounterPanel extends ProfilePanel
 		debitAmount += stock.getAmount();
 		creditAmount += stock.getAmount();
 
-		double diff = debitAmount + stock.getAmount() - creditAmount;
+//		detail = SettlementDetail.newInstance(settlement, stock);
+//		detail.setDebit(debitAmount);
+//		detail.setCredit(creditAmount);
+//		detail.setVariableStock(stock.isVariable());
+//		detail.setPart(Part.END_STOCK);
+//		details.add(detail);
+
+		double diff = creditAmount - debitAmount;
 
 		detail = SettlementDetail.newInstance(settlement, stock);
-		detail.setDebit(diff < 0D ? Math.abs(diff) : 0D);
-		detail.setCredit(diff < 0D ? 0D : diff);
+		detail.setDebit(diff < 0D ? 0D : diff);
+		detail.setCredit(diff < 0D ? Math.abs(diff) : 0D);
 		detail.setVariableStock(stock.isVariable());
 		detail.setPart(Part.DIFFERENCE);
 		details.add(detail);
@@ -479,7 +487,7 @@ public class CoinCounterPanel extends ProfilePanel
 		if (service != null)
 		{
 			final PaymentQuery query = (PaymentQuery) service.getCacheService().getQuery(Payment.class);
-			return query.sumCashAndVoucher(settlement, currency);
+			return query.sumCash(settlement, currency);
 		}
 		tracker.close();
 		return 0;

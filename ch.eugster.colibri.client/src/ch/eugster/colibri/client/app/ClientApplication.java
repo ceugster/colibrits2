@@ -23,39 +23,6 @@ public class ClientApplication implements IApplication
 {
 	public static final String ID = "ch.eugster.colibri.client.application";
 
-//	private void replicate()
-//	{
-//		final ServiceTracker<ReplicationService, ReplicationService> replicationServiceTracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle()
-//				.getBundleContext(), ReplicationService.class, null);
-//		try
-//		{
-//			replicationServiceTracker.open();
-//
-//			final ReplicationService replicationService = replicationServiceTracker.getService();
-//			if (replicationService != null)
-//			{
-//				UIJob job = new UIJob("Lokale Daten werden abgeglichen...")
-//				{
-//					@Override
-//					public IStatus runInUIThread(IProgressMonitor monitor) 
-//					{
-//						Shell shell = new Shell(this.getDisplay());
-//						replicationService.replicate(shell);
-//						return Status.OK_STATUS;
-//					}
-//					
-//				};
-//				job.setUser(true);
-//				job.setPriority(Job.INTERACTIVE);
-//				job.schedule();
-//			}
-//		}
-//		finally
-//		{
-//			replicationServiceTracker.close();
-//		}
-//	}
-	
 	private void replicate(Display display)
 	{
 		Activator.getDefault().log(LogService.LOG_INFO, "Suche Service für die Replikation...");
@@ -107,7 +74,6 @@ public class ClientApplication implements IApplication
 	public Object start(final IApplicationContext context) throws Exception
 	{
 		Activator.getDefault().log(LogService.LOG_INFO, "Starte " + ClientApplication.ID + ".");
-
 		Activator.getDefault().log(LogService.LOG_INFO, "Kreiere Display...");
 		final Display display = PlatformUI.createDisplay();
 		try
@@ -176,4 +142,5 @@ public class ClientApplication implements IApplication
 			}
 		});
 	}
+
 }

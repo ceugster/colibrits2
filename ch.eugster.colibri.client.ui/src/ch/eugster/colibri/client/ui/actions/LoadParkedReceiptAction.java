@@ -46,6 +46,10 @@ public class LoadParkedReceiptAction extends UserPanelProfileAction implements L
 	{
 		Receipt receipt = selectionModel.getSelectedReceipt();
 		receipt = userPanel.getReceiptWrapper().replaceReceipt(receipt);
+		if (receipt.getCustomerCode() != null)
+		{
+			this.userPanel.getPositionWrapper().updateCustomer(receipt);
+		}
 		userPanel.getPositionWrapper().preparePosition(receipt);
 		userPanel.getPaymentWrapper().preparePayment(receipt);
 		userPanel.fireStateChange(new StateChangeEvent(userPanel.getCurrentState(), UserPanel.State.POSITION_INPUT));

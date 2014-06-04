@@ -206,6 +206,18 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 //		}
 		return this.position.getPrice() == 0d ? true : false;
 	}
+	
+	public void updateCustomer(Receipt receipt)
+	{
+		if (receipt.getCustomerCode() != null)
+		{
+			ProviderQuery query = this.providerQueryTracker.getService();
+			if (query != null)
+			{
+				query.updateCustomer(receipt);
+			}
+		}
+	}
 
 	public boolean doesPositionNeedQuantity()
 	{
@@ -267,7 +279,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position hat keinen Preice");
 			return false;
 		}
-		if (this.position.getQuantity() == 0)
+		if (this.position.getQuantity() == 0 || (this.position.isOrdered() && this.position.getOrderedQuantity() == 0))
 		{
 			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position hat keine Menge");
 			return false;

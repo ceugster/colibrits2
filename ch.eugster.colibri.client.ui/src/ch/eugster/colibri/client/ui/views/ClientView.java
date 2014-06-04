@@ -404,6 +404,20 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	@Override
 	public void handleEvent(final Event event)
 	{
+		if (event.getTopic().equals(Topic.DATABASE_COMPATIBILITY_ERROR.topic()))
+		{
+			UIJob job = new UIJob("Datenbankfehler")
+			{
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) 
+				{
+					org.eclipse.jface.dialogs.MessageDialog.openWarning(ClientView.this.getSite().getShell(), "Datenbankfehler", Topic.DATABASE_COMPATIBILITY_ERROR.error());
+					PlatformUI.getWorkbench().close();
+					return Status.CANCEL_STATUS;
+				}
+			};
+			job.schedule();
+		}
 		Object ex = event.getProperty(EventConstants.EXCEPTION);
 		if (ex instanceof Exception)
 		{
@@ -437,6 +451,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		t.add(Topic.PRINT_VOUCHER.topic());
 		t.add(Topic.SETTLE_PERFORMED.topic());
 		t.add(Topic.PROVIDER_QUERY.topic());
+		t.add(Topic.DATABASE_COMPATIBILITY_ERROR.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 
 		final EventHandler eventHandler = this;

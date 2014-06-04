@@ -85,7 +85,7 @@ public class SettleAction extends ProfileAction
 				}
 
 				SettlementService.State state = SettlementService.State.DEFINITIVE;
-				if (coinCounterPanel.getUserPanel().getSalespoint().getCommonSettings().isAllowTestSettlement())
+				if (coinCounterPanel.getUserPanel().getSalespoint().isAllowTestSettlement())
 				{
 					int result = MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.profile,
 							"Provisorischer Abschluss", "Wollen Sie einen provisorischen Abschluss vornehmen?",
@@ -112,7 +112,7 @@ public class SettleAction extends ProfileAction
 							new StateChangeEvent(coinCounterPanel.getUserPanel().getCurrentState(),
 									UserPanel.State.POSITION_INPUT));
 				}
-				printSettlement(settlement);
+				printSettlement(settlement, state);
 			}
 		}
 		catch (Exception e)
@@ -129,7 +129,7 @@ public class SettleAction extends ProfileAction
 		}
 	}
 
-	private void printSettlement(Settlement settlement)
+	private void printSettlement(Settlement settlement, SettlementService.State state)
 	{
 		final ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(),
 				EventAdmin.class, null);
@@ -137,14 +137,15 @@ public class SettleAction extends ProfileAction
 		final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent(tracker, Topic.PRINT_SETTLEMENT.topic(), settlement));
+			eventAdmin.sendEvent(this.getEvent(tracker, Topic.PRINT_SETTLEMENT.topic(), settlement, state));
 		}
 		tracker.close();
 	}
 
-	private Event getEvent(final ServiceTracker<EventAdmin, EventAdmin> tracker, final String topics, final Settlement settlement)
+	private Event getEvent(final ServiceTracker<EventAdmin, EventAdmin> tracker, final String topics, final Settlement settlement, SettlementService.State state)
 	{
-		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		settlement.setState(state);
+		Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext());
 		properties.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
 		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
@@ -153,6 +154,7 @@ public class SettleAction extends ProfileAction
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), settlement);
 		properties.put("force", true);
+		properties.put("state", state);
 		properties.put("status", Status.OK_STATUS);
 		return new Event(topics, properties);
 	}

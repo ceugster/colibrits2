@@ -99,6 +99,8 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 		else
 		{
 			this.userPanel.getPaymentWrapper().getPayment().setAmount(this.key.getValue());
+			this.userPanel.getValueDisplay().getAmount();
+
 		}
 		if (this.getPaymentType().getPaymentTypeGroup().isChargable())
 		{

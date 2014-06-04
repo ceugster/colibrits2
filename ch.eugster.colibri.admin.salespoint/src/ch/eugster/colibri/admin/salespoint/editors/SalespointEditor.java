@@ -1762,6 +1762,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 						periphery.setCols(cols == null ? 0 : cols.intValue());
 						periphery.setConverter((String) getConverter(reference.getProperty("custom.convert")));
 						periphery.setPort((String) reference.getProperty("custom.port"));
+						periphery.setPrintLogoMode(PrintMode.NORMAL);
 						try
 						{
 							periphery = (ReceiptPrinterSettings) persistenceService.getServerService().merge(periphery);

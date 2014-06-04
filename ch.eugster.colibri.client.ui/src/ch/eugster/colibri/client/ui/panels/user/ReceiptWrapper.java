@@ -188,13 +188,19 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 	{
 		this.receipt.setState(Receipt.State.PARKED);
 		this.receipt.setNumber(this.userPanel.getSalespoint().getNextParkedReceiptNumber());
-//		updateVoucherProvider();
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
 			try
 			{
 				persistenceService.getCacheService().merge(this.receipt);
+				
+				userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
+				ReceiptWrapper.this.prepareReceipt();
+				ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
+				ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
+				ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
+						UserPanel.State.POSITION_INPUT));
 			} 
 			catch (Exception e) 
 			{

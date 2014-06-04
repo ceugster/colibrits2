@@ -8,8 +8,11 @@ package ch.eugster.colibri.admin.periphery.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Properties;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -61,7 +64,7 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 
 	private Spinner cols;
 
-//	private Spinner delay;
+	private Text test;
 
 	private IDialogSettings settings;
 
@@ -497,8 +500,21 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 		final GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.heightHint = 26;
 
-		final Text test = this.formToolkit.createText(composite, "Ä Ö Ü ä ö ü", SWT.MULTI | SWT.WRAP);
+		String testText = settings.get("customer.display.editor.test.value");
+		if (testText == null) 
+		{
+			testText = "Ä Ö Ü ä ö ü";
+		}
+		test = this.formToolkit.createText(composite, testText, SWT.MULTI | SWT.WRAP);
 		test.setLayoutData(gridData);
+		test.addModifyListener(new ModifyListener() 
+		{
+			@Override
+			public void modifyText(ModifyEvent e) 
+			{
+				settings.put("customer.display.editor.test.value", test.getText());
+			}
+		});
 
 		final Button button = this.formToolkit.createButton(composite, "Test", SWT.PUSH);
 		button.setLayoutData(new GridData());
@@ -520,7 +536,16 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 				{
 					final CustomerDisplayService service = Activator.getDefault().getBundle().getBundleContext().getService(reference);
 					final CustomerDisplayService display = (CustomerDisplayService) service;
-					display.displayText(CustomerDisplayEditor.this.converter.getText(), test.getText());
+					Properties props = new Properties();
+					props.setProperty("port", CustomerDisplayEditor.this.port.getText());
+					props.setProperty("converter", CustomerDisplayEditor.this.converter.getText());
+					props.setProperty("cols", CustomerDisplayEditor.this.cols.getText());
+					props.setProperty("rows", CustomerDisplayEditor.this.rows.getText());
+					IStatus status = display.testDisplay(props, CustomerDisplayEditor.this.test.getText());
+					if (status.getSeverity() == IStatus.ERROR)
+					{
+						MessageDialog.openInformation(getSite().getShell(), "Anzeige", status.getMessage());
+					}
 				}
 			}
 		});
