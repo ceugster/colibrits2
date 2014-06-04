@@ -47,8 +47,8 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 					if (target == null)
 					{
 						target = this.replicate(source);
-						target.getSalespoint().addStock(target);
-						target.getPaymentType().addStock(target);
+//						target.getSalespoint().addStock(target);
+//						target.getPaymentType().addStock(target);
 					}
 					else
 					{
@@ -60,6 +60,14 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 						target = this.replicate(source, target);
 					}
 					target = (Stock) merge(target);
+					if (!target.getSalespoint().getStocks().contains(target))
+					{
+						target.getSalespoint().getStocks().add(target);
+					}
+					if (!target.getPaymentType().getStocks().contains(target))
+					{
+						target.getPaymentType().getStocks().add(target);
+					}
 				}
 				if (monitor != null)
 				{
@@ -82,7 +90,8 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 	protected Stock replicate(final Stock source)
 	{
 		final Salespoint salespoint = (Salespoint) this.persistenceService.getCacheService().find(Salespoint.class, source.getSalespoint().getId());
-		final Stock target = this.replicate(source, Stock.newInstance(salespoint));
+		final PaymentType paymentType= (PaymentType) this.persistenceService.getCacheService().find(PaymentType.class, source.getPaymentType().getId());
+		final Stock target = this.replicate(source, Stock.newInstance(salespoint, paymentType));
 		return target;
 	}
 
@@ -91,7 +100,6 @@ public class StockReplicator extends AbstractEntityReplicator<Stock>
 	{
 		target = super.replicate(source, target);
 		target.setAmount(source.getAmount());
-		target.setPaymentType((PaymentType) this.persistenceService.getCacheService().find(PaymentType.class, source.getPaymentType().getId()));
 		target.setVariable(source.isVariable());
 		return target;
 	}

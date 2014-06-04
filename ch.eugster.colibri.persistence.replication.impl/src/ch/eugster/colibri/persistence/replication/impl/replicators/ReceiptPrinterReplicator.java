@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import ch.eugster.colibri.persistence.model.PrintMode;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.queries.ReceiptPrinterSettingsQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -84,7 +85,7 @@ public class ReceiptPrinterReplicator extends AbstractEntityReplicator<ReceiptPr
 		target.setName(source.getName());
 		target.setPort(source.getPort());
 		target.setPrintLogo(source.isPrintLogo());
-		target.setPrintLogoMode(source.getPrintLogoMode());
+		target.setPrintLogoMode(source.getPrintLogoMode() == null ? PrintMode.NORMAL : source.getPrintLogoMode());
 		target.setLinesBeforeCut(source.getLinesBeforeCut());
 		return target;
 	}

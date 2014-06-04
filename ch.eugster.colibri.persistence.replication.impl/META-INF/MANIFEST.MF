@@ -7,7 +7,8 @@ Bundle-Activator: ch.eugster.colibri.persistence.replication.impl.Activator
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Christian Eugster
 Service-Component: OSGI-INF/service-component.xml
-Import-Package: ch.eugster.colibri.persistence.model,
+Import-Package: ch.eugster.colibri.persistence.events,
+ ch.eugster.colibri.persistence.model,
  ch.eugster.colibri.persistence.queries,
  ch.eugster.colibri.persistence.replication.service,
  ch.eugster.colibri.persistence.rules,
