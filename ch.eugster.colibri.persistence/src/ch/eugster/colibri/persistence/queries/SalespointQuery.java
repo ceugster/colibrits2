@@ -86,6 +86,10 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 				}
 			}
 		}
+		else
+		{
+			this.thisSalespoint = (Salespoint) this.getConnectionService().refresh(this.thisSalespoint);
+		}
 		return this.thisSalespoint;
 	}
 

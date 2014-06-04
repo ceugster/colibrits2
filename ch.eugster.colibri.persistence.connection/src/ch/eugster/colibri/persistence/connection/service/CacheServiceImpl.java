@@ -82,7 +82,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		{
 			String url = properties.getProperty(PersistenceUnitProperties.JDBC_URL);
 			properties.setProperty(PersistenceUnitProperties.JDBC_URL, url.concat(";create=true"));
-			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.CREATE_ONLY);
+			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.DROP_AND_CREATE);
 			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION_MODE,
 					PersistenceUnitProperties.DDL_DATABASE_GENERATION);
 		}

@@ -202,7 +202,7 @@ public class SettlementDetail extends AbstractEntity implements Comparable<Settl
 
 	public enum Part
 	{
-		BEGIN_STOCK, INCOME, DIFFERENCE;
+		BEGIN_STOCK, INCOME, END_STOCK, DIFFERENCE;
 
 		public String label(final SettlementDetail detail)
 		{
@@ -216,9 +216,17 @@ public class SettlementDetail extends AbstractEntity implements Comparable<Settl
 				{
 					return "Bewegungen";
 				}
+				case END_STOCK:
+				{
+					return "Kassenbestand";
+				}
 				case DIFFERENCE:
 				{
-					return "Differenz";
+					if (detail.getCredit() == detail.getDebit())
+					{
+						return "Kein Fehlbetrag";
+					}
+					return detail.getCredit() >  detail.getDebit() ? "Zuviel in Kasse" : "Zuwenig in Kasse";
 				}
 				default:
 				{

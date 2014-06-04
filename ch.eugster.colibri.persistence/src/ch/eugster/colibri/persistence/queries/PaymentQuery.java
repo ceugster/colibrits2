@@ -179,6 +179,26 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		return amount == null ? 0D : amount.doubleValue();
 	}
 
+	public double sumCash(final Settlement settlement, final Currency currency)
+	{
+		final PaymentTypeGroup[] paymentTypeGroups = new PaymentTypeGroup[] { PaymentTypeGroup.CASH };
+		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("receipt").get("state")
+				.equal(Receipt.State.SAVED);
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("settlement").equal(settlement));
+		expression = expression.and(new ExpressionBuilder().get("paymentType").get("currency").equal(currency));
+		expression = expression.and(new ExpressionBuilder().get("paymentType").get("paymentTypeGroup")
+				.in(paymentTypeGroups));
+
+		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+		reportQuery.addSum("amount", new ExpressionBuilder().get("amount"), Double.class);
+
+		final Query query = JpaHelper.createQuery(reportQuery, this.getConnectionService().getEntityManager());
+//		Double result = (Double) query.getSingleResult();
+		ReportQueryResult result = (ReportQueryResult) query.getSingleResult();
+		Double amount = (Double) result.get("amount");
+		return amount == null ? 0D : amount.doubleValue();
+	}
+
 	public double getDifferenceSinceLastSettlement(final Stock stock, final Settlement settlement,
 			final Currency currency)
 	{

@@ -59,6 +59,10 @@ public enum PaymentTypeGroup implements IPaymentTypeGroup
 		{
 			return true;
 		}
+		else if (this.equals(CASH))
+		{
+			return false;
+		}
 		else
 		{
 			return false;

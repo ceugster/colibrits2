@@ -36,6 +36,8 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 {
 	private LoginDialog loginDialog;
 	
+	private Topic databaseCompatibilityErrorTopic = null;
+	
 	public ServerServiceImpl(final PersistenceService persistenceService)
 	{
 		super(persistenceService);
@@ -212,6 +214,18 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	public ConnectionType getConnectionType() 
 	{
 		return ConnectionType.SERVER;
+	}
+
+	@Override
+	public void setDatabaseCompatibilityErrorTopic(Topic topic) 
+	{
+		this.databaseCompatibilityErrorTopic = topic;
+	}
+
+	@Override
+	public Topic getDatabaseCompatibilityErrorTopic() 
+	{
+		return this.databaseCompatibilityErrorTopic;
 	}
 
 }

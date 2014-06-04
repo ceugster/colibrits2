@@ -242,10 +242,6 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 
 	public Long getNextParkedReceiptNumber()
 	{
-		if (this.currentParkedReceiptNumber == 0l)
-		{
-			this.currentParkedReceiptNumber = 0l;
-		}
 		this.setCurrentParkedReceiptNumber(this.currentParkedReceiptNumber + 1l);
 		return this.getCurrentParkedReceiptNumber();
 	}

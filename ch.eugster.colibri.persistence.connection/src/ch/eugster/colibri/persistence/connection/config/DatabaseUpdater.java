@@ -204,9 +204,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 				{
 					status = new Status(
 							IStatus.ERROR,
-							Activator.getDefault().getBundle().getSymbolicName(),
-							"Die Version der Datenbank ist aktueller als die Version der Anwendung. Um Inkonsistenzen in der Datenbank zu vermeiden, wird die Anwendung beendet. Bitte installieren Sie ein Programm, das kompatibel mit der aktuellen Datenbankstruktur ist. Die Datenbankstruktur hat die Version "
-									+ Version.STRUCTURE + ".");
+							Activator.getDefault().getBundle().getSymbolicName(), "ch/eugster/colibri/persistence/connection/compatibility/error");
 				}
 				else
 				{
@@ -999,7 +997,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 			}
 			this.log(status);
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Exit DatabaseUpdater.updateStructure()");
+		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit DatabaseUpdater.updateStructure()");
 		return status;
 	}
 	

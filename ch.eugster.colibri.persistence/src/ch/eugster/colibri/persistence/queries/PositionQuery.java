@@ -145,10 +145,10 @@ public class PositionQuery extends AbstractQuery<Position>
 		return this.getInternalDetails(this.selectInternalsBySalespointsAndDateRange(salespoints, dateRange), null);
 	}
 
-	public Collection<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, boolean updateServer, final int maxRows)
+	public List<Position> selectProviderUpdates(final Salespoint salespoint, String providerId, boolean updateServer, final int maxRows)
 	{
 		final Expression select = createProviderUpdatesExpression(salespoint, providerId, updateServer);
-		final Collection<Position> positions = this.select(select, maxRows);
+		final List<Position> positions = this.select(select, maxRows);
 		return positions;
 	}
 

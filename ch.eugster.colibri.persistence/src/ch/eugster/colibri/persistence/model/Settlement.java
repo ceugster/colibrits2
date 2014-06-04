@@ -28,9 +28,12 @@ import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
+import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
+import ch.eugster.colibri.persistence.service.SettlementService;
 
 @Entity
 @AttributeOverrides({ @AttributeOverride(name = "timestamp", column = @Column(name = "se_timestamp")),
@@ -67,6 +70,10 @@ public class Settlement extends AbstractEntity implements IPrintable
 	@Column(name = "se_other_id")
 	private Long otherId;
 
+	
+	@Transient
+	private SettlementService.State state;
+	
 	@OneToMany(cascade = CascadeType.ALL, fetch = EAGER, mappedBy = "settlement")
 	private List<SettlementPosition> positions = new ArrayList<SettlementPosition>();
 
@@ -266,6 +273,20 @@ public class Settlement extends AbstractEntity implements IPrintable
 		return receiptCount;
 	}
 
+	public List<SettlementPayment> getVouchers()
+	{
+		List<SettlementPayment> vouchers = new ArrayList<SettlementPayment>();
+		List<SettlementPayment> payments = this.getPayments();
+		for (SettlementPayment payment : payments)
+		{
+			if (payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
+			{
+				vouchers.add(payment);
+			}
+		}
+		return vouchers;
+	}
+	
 	public void setRestitutedPositions(List<SettlementRestitutedPosition> restituted)
 	{
 		this.propertyChangeSupport.firePropertyChange("restituted", this.restituted, this.restituted = restituted);
@@ -292,5 +313,13 @@ public class Settlement extends AbstractEntity implements IPrintable
 
 	public void setOtherId(Long otherId) {
 		this.propertyChangeSupport.firePropertyChange("otherId", this.otherId, this.otherId = otherId);
+	}
+
+	public SettlementService.State getState() {
+		return state;
+	}
+
+	public void setState(SettlementService.State state) {
+		this.state = state;
 	}
 }

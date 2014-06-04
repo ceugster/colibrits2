@@ -240,6 +240,7 @@ public class Activator extends AbstractUIPlugin
 
 	public void saveDocument(final Document document)
 	{
+		this.document = document;
 		final Format format = Format.getPrettyFormat();
 		final XMLOutputter outputter = new XMLOutputter();
 		outputter.setFormat(format);

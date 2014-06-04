@@ -16,16 +16,15 @@ import javax.persistence.RollbackException;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.persistence.exceptions.DatabaseException;
-import org.eclipse.ui.PlatformUI;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.TaxUpdater;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.CommonSettings;
 import ch.eugster.colibri.persistence.model.CommonSettingsProperty;
@@ -115,7 +114,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 	private EntityManagerFactory entityManagerFactory;
 
 	private EntityManager entityManager;
-	
+
 	private final Map<Class<? extends AbstractEntity>, AbstractQuery<? extends AbstractEntity>> queryServices = new HashMap<Class<? extends AbstractEntity>, AbstractQuery<? extends AbstractEntity>>();
 
 	protected abstract Properties getProperties();
@@ -127,7 +126,10 @@ public abstract class AbstractConnectionService implements ConnectionService
 	
 	public void clearCache()
 	{
-		this.entityManager.clear();
+		if (this.entityManager != null)
+		{
+			this.entityManager.clear();
+		}
 	}
 	
 	@Override
@@ -312,9 +314,40 @@ public abstract class AbstractConnectionService implements ConnectionService
 			final Properties properties = this.getProperties();
 			Activator.getDefault().log(LogService.LOG_INFO, "Aktualisiere Datenbankversion...");
 			IStatus status = this.updateDatabase(properties);
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Kreiere EntityManagerFactory für Datenbank " + properties.getProperty(PersistenceUnitProperties.JDBC_URL) + ".");
-			entityManagerFactory = createEntityManagerFactory(status, properties);
-			Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManagerFactory für Datenbank kreiert.");
+			if (status.isOK() || status.getSeverity() == IStatus.CANCEL)
+			{
+				Activator.getDefault().log(LogService.LOG_DEBUG, "Kreiere EntityManagerFactory für Datenbank " + properties.getProperty(PersistenceUnitProperties.JDBC_URL) + ".");
+				entityManagerFactory = createEntityManagerFactory(status, properties);
+				Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManagerFactory für Datenbank kreiert.");
+			}
+			else
+			{
+				final Dictionary<String, Object> props = new Hashtable<String, Object>();
+				props.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
+				props.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
+				props.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
+				props.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
+				props.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+				props.put("status", status);
+				props.put("show.failover.message", Boolean.valueOf(true));
+				props.put(EventConstants.EVENT_TOPIC, status.getMessage());
+				props.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
+				props.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+				if (status.getException() != null)
+				{
+					props.put(EventConstants.EXCEPTION, status.getException());
+					props.put(EventConstants.EXCEPTION_MESSAGE, status.getException().getMessage() == null ? "" : status.getException().getMessage());
+				}
+				String database = properties.getProperty(PersistenceUnitProperties.TARGET_DATABASE);
+				String url = properties.getProperty(PersistenceUnitProperties.JDBC_URL);
+				String message = "Die Version der Datenbank " + database + " mit der URL " + url + " ist aktueller als die Version der Anwendung. Um Inkonsistenzen in der Datenbank zu vermeiden, wird die Anwendung beendet. Bitte installieren Sie ein Programm, das kompatibel mit der aktuellen Datenbankstruktur ist. Die Datenbankstruktur hat die Version "
+						+ Version.STRUCTURE + ".";
+				props.put("message", message);
+				props.put("force", Boolean.valueOf(false));
+				final Event event = new Event(Topic.DATABASE_COMPATIBILITY_ERROR.topic(), props);
+				this.persistenceService.setDatabaseCompatibilityError(Topic.DATABASE_COMPATIBILITY_ERROR);
+				this.persistenceService.getEventAdmin().sendEvent(event);
+			}
 		}
 		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.getEntityManagerFactory()");
 		return entityManagerFactory;
@@ -380,12 +413,19 @@ public abstract class AbstractConnectionService implements ConnectionService
 	{
 		try
 		{
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
-			this.entityManager = getEntityManagerFactory().createEntityManager(getEntityManagerFactory().getProperties());
-			Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManager kreiert.");
-			this.entityManager.setFlushMode(FlushModeType.COMMIT);
-			CommonSettingsQuery query = (CommonSettingsQuery) this.getQuery(CommonSettings.class);
-			query.findDefault();
+			if (getEntityManagerFactory() == null)
+			{
+				System.out.println();
+			}
+			else
+			{
+				Activator.getDefault().log(LogService.LOG_DEBUG, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
+				this.entityManager = getEntityManagerFactory().createEntityManager(getEntityManagerFactory().getProperties());
+				Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManager kreiert.");
+				this.entityManager.setFlushMode(FlushModeType.COMMIT);
+				CommonSettingsQuery query = (CommonSettingsQuery) this.getQuery(CommonSettings.class);
+				query.findDefault();
+			}
 		}
 		catch (Exception e)
 		{
@@ -397,8 +437,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 			}
 			else
 			{
-				MessageDialog.openError(null, "Keine Datenbankverbindung", "Es kann keine Datenbankverbindung hergestellt werden. Das Programm wird beendet.");
-					PlatformUI.getWorkbench().close();
+				System.out.println();
 			}
 		}
 		return this.entityManager != null;
@@ -686,23 +725,27 @@ public abstract class AbstractConnectionService implements ConnectionService
 		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManager()");
 		if (entityManager == null || !entityManager.isOpen())
 		{
-			if (entityManagerFactory == null)
+			if (getEntityManagerFactory() == null)
 			{
-				final Properties properties = this.getProperties();
-				entityManager = this.createEntityManager();
-				this.getPersistenceService()
-						.getEventAdmin()
-						.postEvent(
-								this.getEvent(new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), properties
-										.getProperty(PersistenceUnitProperties.JDBC_URL))));
-				if (entityManager != null)
-				{
-					TaxUpdater.updateTaxes(this);
-				}
+//				final Properties properties = this.getProperties();
+//				entityManager = this.createEntityManager();
+//				this.getPersistenceService()
+//						.getEventAdmin()
+//						.postEvent(
+//								this.getEvent(new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), properties
+//										.getProperty(PersistenceUnitProperties.JDBC_URL))));
+//				if (entityManager != null)
+//				{
+//					TaxUpdater.updateTaxes(this);
+//				}
 			}
 			else
 			{
 				entityManager = this.createEntityManager();
+				if (entityManager != null)
+				{
+					TaxUpdater.updateTaxes(this);
+				}
 			}
 		}
 		if (entityManager != null)

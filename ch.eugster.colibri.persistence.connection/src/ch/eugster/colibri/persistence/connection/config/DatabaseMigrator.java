@@ -1384,7 +1384,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 					tax.setId(source.getId());
 					tax.setAccount(source.account);
 					tax.setDeleted(source.deleted);
-
+					tax.setText(this.getTaxText(tax));
 					if (tax.getId().longValue() > maxId)
 					{
 						maxId = tax.getId().longValue();

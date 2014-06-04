@@ -68,6 +68,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.jdom.Attribute;
 import org.jdom.Element;
@@ -753,12 +754,10 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 		final boolean embedded = this.embedded.getSelection();
 		final String text = this.connectionName.getText();
 		String driver = null;
-		String url = null;
 		String target = null;
 		if (embedded)
 		{
 			driver = EmbeddedDriver.class.getName();
-			url = "jdbc:derby:" + text;
 			target = "Derby";
 		}
 		else
@@ -766,7 +765,6 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 			final StructuredSelection ssel = (StructuredSelection) this.drivers.getSelection();
 			final SupportedDriver selectedDriver = (SupportedDriver) ssel.getFirstElement();
 			driver = selectedDriver.getDriver();
-			url = this.url.getText();
 			target = selectedDriver.getTargetDatabase();
 		}
 		final String username = this.user.getText();
@@ -780,13 +778,32 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 				.toString(embedded)));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.TARGET_DATABASE, target));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_DRIVER, driver));
-		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_URL, url));
+		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_URL, getURL()));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_USER, username));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_PASSWORD, password));
 
 		return connection;
 	}
 
+	private String getURL()
+	{
+		StringBuilder fullURL = null;
+		if (this.embedded.getSelection())
+		{
+			fullURL = new StringBuilder("jdbc:derby:" + this.connectionName.getText());
+		}
+		else
+		{
+			fullURL = new StringBuilder(this.url.getText());
+			for (TableItem entry : propertyViewer.getTable().getItems())
+			{
+				Property property = (Property) entry.getData();
+				fullURL = fullURL.append(";" + property.key + "=" + property.value);
+			}
+		}
+		return fullURL.toString();
+	}
+	
 	public boolean useEmbeddedDatabase()
 	{
 		return this.embedded.getSelection();
@@ -798,7 +815,7 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 		final StructuredSelection ssel = (StructuredSelection) DatabaseWizardConnectionPage.this.drivers.getSelection();
 		final SupportedDriver selectedDriver = (SupportedDriver) ssel.getFirstElement();
 		final String driverName = selectedDriver.getDriver();
-		final String url = DatabaseWizardConnectionPage.this.url.getText();
+		final String url = DatabaseWizardConnectionPage.this.getURL();
 		final String username = DatabaseWizardConnectionPage.this.user.getText();
 		final String password = DatabaseWizardConnectionPage.this.password.getText();
 

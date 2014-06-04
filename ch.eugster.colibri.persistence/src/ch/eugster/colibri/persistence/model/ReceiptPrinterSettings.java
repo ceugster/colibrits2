@@ -74,7 +74,7 @@ public class ReceiptPrinterSettings extends AbstractEntity implements IReplicata
 	@Basic
 	@Enumerated(EnumType.ORDINAL)
 	@Column(name = "rp_print_logo_mode")
-	private PrintMode printLogoMode;
+	private PrintMode printLogoMode = PrintMode.NORMAL;
 	
 	@OneToMany
 	@MapKey(name = "printoutType")

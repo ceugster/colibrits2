@@ -1164,6 +1164,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 						catch (final NoResultException e)
 						{
 							tax = Tax.newInstance(taxRate, taxType);
+							tax.setText(this.getTaxText(tax));
 							tax.setId(taxId++);
 							for (int i = 0; i < percentage.length; i++)
 							{
@@ -1298,7 +1299,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		}
 		return status;
 	}
-
+	
 	private void prepareConfiguration(final IProgressMonitor monitor, final Long currencyId)
 	{
 		monitor.beginTask("Die Datenbank wird konfiguriert...", 1);

@@ -15,6 +15,7 @@ import org.jdom.Element;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.connection.Activator;
+import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.queries.SequenceQuery;
 import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -132,4 +133,21 @@ public abstract class AbstractConfigurator
 		sequenceQuery.findAndUpdate(key, value);
 	}
 	
+	protected String getTaxText(Tax tax)
+	{
+		if (tax.getTaxType().getCode().equals("U"))
+		{
+			return "Umsatzst.";
+		}
+		else if (tax.getTaxType().getCode().equals("M"))
+		{
+			return "Vorst. M/D";
+		}
+		else if (tax.getTaxType().getCode().equals("I"))
+		{
+			return "Vorst. I/B";
+		}
+		return "";
+	}
+
 }

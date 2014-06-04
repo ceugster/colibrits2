@@ -9,16 +9,20 @@ package ch.eugster.colibri.persistence.connection.wizard;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.persistence.logging.SessionLog;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.PlatformUI;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.connection.Activator;
@@ -30,6 +34,8 @@ import ch.eugster.pos.db.Salespoint;
 
 public class DatabaseWizard extends Wizard
 {
+	List<Bundle> stoppedBundles = new ArrayList<Bundle>();
+	
 	private Document document;
 
 	private Element selectedConnection;
@@ -46,6 +52,34 @@ public class DatabaseWizard extends Wizard
 	
 	public DatabaseWizard()
 	{
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.provider.galileo"))
+			{
+				try 
+				{
+					bundle.stop();
+				} 
+				catch (BundleException e) 
+				{
+					e.printStackTrace();
+				}
+				stoppedBundles.add(bundle);
+			}
+			else if (bundle.getSymbolicName().equals("ch.eugster.colibri.scheduler"))
+			{
+				try 
+				{
+					bundle.stop();
+				} 
+				catch (BundleException e) 
+				{
+					e.printStackTrace();
+				}
+				stoppedBundles.add(bundle);
+			}
+		}
 		this.document = Activator.getDefault().getDocument();
 		if (this.document == null)
 		{
@@ -74,17 +108,18 @@ public class DatabaseWizard extends Wizard
 	@Override
 	public boolean canFinish()
 	{
-		IWizardPage page = this.getPage("select.connection.wizard.page");
-		if (page instanceof DatabaseWizardSelectConnectionPage)
+		IWizardPage currentPage = this.getContainer().getCurrentPage();
+		if (currentPage instanceof DatabaseWizardSelectConnectionPage)
 		{
-			final DatabaseWizardSelectConnectionPage selectPage = (DatabaseWizardSelectConnectionPage) page;
-			if (!selectPage.canFlipToNextPage())
-			{
-				return true;
-			}
+//			final DatabaseWizardSelectConnectionPage selectPage = (DatabaseWizardSelectConnectionPage) page;
+//			if (!selectPage.canFlipToNextPage())
+//			{
+//				return true;
+//			}
+			return false;
 		}
 
-		page = this.getPage("connection.wizard.page");
+		IWizardPage page = this.getPage("connection.wizard.page");
 		if (page.isPageComplete())
 		{
 			if (page instanceof DatabaseWizardConnectionPage)
@@ -226,6 +261,21 @@ public class DatabaseWizard extends Wizard
 			{
 				tracker.close();
 			}
+			for (Bundle stoppedBundle : stoppedBundles)
+			{
+				try 
+				{
+					stoppedBundle.start();
+				} 
+				catch (BundleException e) 
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		else
+		{
+			PlatformUI.getWorkbench().restart();
 		}
 		return true;
 	}

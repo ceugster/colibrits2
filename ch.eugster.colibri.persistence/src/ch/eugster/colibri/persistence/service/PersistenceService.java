@@ -6,6 +6,8 @@ import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
+import ch.eugster.colibri.persistence.events.Topic;
+
 public interface PersistenceService
 {
 	PersistenceProvider getPersistenceProvider();
@@ -29,5 +31,8 @@ public interface PersistenceService
 	void sendEvent(Event event);
 	
 	int getTimeout();
+	
+	void setDatabaseCompatibilityError(Topic topic);
 
+	Topic getDatabaseCompatibilityError();
 }

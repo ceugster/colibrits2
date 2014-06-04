@@ -9,6 +9,7 @@ import org.osgi.service.event.EventAdmin;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.service.CacheService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.service.ServerService;
@@ -21,6 +22,8 @@ public class PersistenceServiceImpl implements PersistenceService
 
 	private ServerService serverService;
 
+	private Topic databaseCompatibilityError;
+	
 	public PersistenceServiceImpl()
 	{
 		activate();
@@ -139,6 +142,18 @@ public class PersistenceServiceImpl implements PersistenceService
 	public PersistenceProvider getPersistenceProvider()
 	{
 		return Activator.getDefault().getPersistenceProvider();
+	}
+
+	@Override
+	public void setDatabaseCompatibilityError(Topic topic) 
+	{
+		this.databaseCompatibilityError = topic;
+	}
+
+	@Override
+	public Topic getDatabaseCompatibilityError() 
+	{
+		return this.databaseCompatibilityError;
 	}
 
 }
