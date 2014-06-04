@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="ch.eugster.colibri.periphery.printer.usb">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="false" name="ch.eugster.colibri.periphery.printer.usb">
    <implementation class="ch.eugster.colibri.periphery.printer.usb.service.UsbReceiptPrinterService"/>
    <service>
       <provide interface="ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService"/>

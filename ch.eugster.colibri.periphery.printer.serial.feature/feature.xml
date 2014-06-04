@@ -213,11 +213,12 @@ litigation.
    </license>
 
    <requires>
-      <import plugin="ch.eugster.colibri.persistence"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="org.eclipse.osgi.services"/>
       <import plugin="ch.eugster.colibri.periphery" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="ch.eugster.colibri.persistence" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.osgi.services" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="ch.eugster.colibri.periphery.printer" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

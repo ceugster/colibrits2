@@ -38,7 +38,7 @@ public class DummyReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		SalespointReceiptPrinterSettings settings = salespoint == null ? null : salespoint.getReceiptPrinterSettings();
 		Converter converter = new Converter(settings == null ? this.getReceiptPrinterSettings().getConverter() : settings.getConverter());
-		final String printable = converter.convert(text);
+		final byte[] printable = converter.convert(text.getBytes());
 		System.out.println(printable);
 	}
 
@@ -47,7 +47,7 @@ public class DummyReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		for (final String line : text)
 		{
-			final String printable = this.getConverter().convert(line);
+			final byte[] printable = this.getConverter().convert(line.getBytes());
 			System.out.println(printable);
 		}
 	}

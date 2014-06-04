@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE JposEntries PUBLIC "-//JavaPOS//DTD//EN"
+                             "jpos/res/jcl.dtd">
+<JposEntries>
+<!--Saved by JavaPOS jpos.config/loader (JCL) version 2.2.0 on 15.04.14 00:43-->
+    
+    <JposEntry logicalName="LineDisplay">
+        <creation factoryClass="jp.co.epson.uposcommon.util.EpsonJposServiceInstanceFactory" serviceClass="jp.co.epson.upos.disp.DMD120Service"/>
+        <vendor name="SEIKO EPSON" url="http://www.epson.com"/>
+        <jpos category="LineDisplay" version="1.13"/>
+        <product description="Unknown Product Description" name="EPSON Services for JavaPOS(TM) Standard" url="http://www.epson.com"/>
+
+        <!--Other non JavaPOS required property (mostly vendor properties and bus specific properties i.e. RS232 )-->
+        <prop name="FlowType" type="String" value="1"/>
+        <prop name="PrinterConfigurationFile" type="String" value=""/>
+        <prop name="PhysicalPrinterName" type="String" value=""/>
+        <prop name="LogicalPortName" type="String" value="ESDPRT003"/>
+        <prop name="StatusThreadInterval" type="String" value="100"/>
+        <prop name="OutputTimeout" type="String" value="500"/>
+        <prop name="PortType" type="String" value="0"/>
+        <prop name="OutputBufferSize" type="String" value="4096"/>
+        <prop name="CharacterMode" type="String" value="0"/>
+        <prop name="ReceiveTimeout" type="String" value="1000"/>
+        <prop name="PortName" type="String" value="COM4"/>
+        <prop name="OfflineRetryIntervalTime" type="String" value="25"/>
+        <prop name="Upos.USB_Serial" type="String" value="false"/>
+        <prop name="DefaultSlpClampTime" type="String" value="0"/>
+        <prop name="ConnectionType" type="String" value="0"/>
+        <prop name="epson.trace.file" type="String" value="trace.log"/>
+        <prop name="StopBits" type="String" value="0"/>
+        <prop name="PortInterfaceName" type="String" value="Serial"/>
+        <prop name="GraphicWindowLogicalArea" type="String" value="0"/>
+        <prop name="BitLength" type="String" value="8"/>
+        <prop name="Parity" type="String" value="0"/>
+        <prop name="epson.tracing" type="String" value="false"/>
+        <prop name="epson.trace.max.size" type="String" value="1000"/>
+        <prop name="DeviceDesc" type="String" value="EPSON DM-D120 LineDisplay"/>
+        <prop name="SupportStatistics" type="String" value="1"/>
+        <prop name="InputTimeout" type="String" value="100"/>
+        <prop name="MemorySwitch" type="String" value="0"/>
+        <prop name="ReadThreadInterval" type="String" value="-1"/>
+        <prop name="QueuingOfflineTimeout" type="String" value="1000"/>
+        <prop name="InitializeThreadTime" type="String" value="1000"/>
+        <prop name="BaudRate" type="String" value="19200"/>
+        <prop name="TwoByteCharacter" type="String" value="0"/>
+        <prop name="ConfigurationFile" type="String" value="epson/xml/Setting/DM-D120Setting.xml"/>
+        <prop name="DeviceType" type="String" value="2"/>
+        <prop name="Upos.Spec_c" type="String" value="false"/>
+        <prop name="LogicalPortInterfaceName" type="String" value="EPuras"/>
+        <prop name="ReceiveRetryTime" type="String" value="25"/>
+        <prop name="InitializeResponseTimeout" type="String" value="1000"/>
+        <prop name="WriteThreadInterval" type="String" value="-1"/>
+        <prop name="LogObject" type="String" value=""/>
+        <prop name="PhysicalDevice" type="String" value="DM-D120"/>
+        <prop name="InputBufferSize" type="String" value="84"/>
+        <prop name="TransmitTimeout" type="String" value="5000"/>
+        <prop name="OfflineCount" type="String" value="2"/>
+        <prop name="EPurasSupport" type="String" value="TRUE"/>
+        <prop name="TransmitRetryTime" type="String" value="100"/>
+        <prop name="DirectIOEventTimeout" type="String" value="5000"/>
+</JposEntry>
+    
+</JposEntries>

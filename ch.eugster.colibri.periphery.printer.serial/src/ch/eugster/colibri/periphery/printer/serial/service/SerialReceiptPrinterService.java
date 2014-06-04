@@ -1,7 +1,7 @@
 package ch.eugster.colibri.periphery.printer.serial.service;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Collection;
 
 import javax.comm.CommPort;
@@ -25,7 +25,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 {
 	private CommPort commPort;
 	
-	private OutputStream printer;
+	private PrintStream printer;
 	
 	protected void activate(ComponentContext context)
 	{
@@ -41,14 +41,14 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		if (this.printer != null)
 		{
-			try 
-			{
+//			try 
+//			{
 				this.printer.flush();
 				this.printer.close();
-			} 
-			catch (IOException e) 
-			{
-			}
+//			} 
+//			catch (IOException e) 
+//			{
+//			}
 			this.printer = null;
 		}
 		if (this.commPort != null)
@@ -65,7 +65,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
 			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(port);
 			commPort = portId.open("posprinter", 2000);
-			printer = commPort.getOutputStream();
+			printer = new PrintStream(commPort.getOutputStream());
 			print(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
 			print(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
 			print(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
@@ -93,8 +93,8 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			{
 				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
 			}
-			final String printable = this.getConverter().convert(text);
-			println(printable.getBytes());
+			final byte[] printable = this.getConverter().convert(text.getBytes());
+			println(printable);
 			this.cutPaper(this.getLinesBeforeCut());
 			closePrinter();
 		}
@@ -102,17 +102,17 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 
 	private void printNVBitImage(int n, int m)
 	{
-		try 
-		{
+//		try 
+//		{
 			this.printer.write(AsciiConstants.FS);
 			this.printer.write(AsciiConstants.p);
 			this.printer.write(n);
 			this.printer.write(m);
 			this.printer.flush();
-		} 
-		catch (IOException e) 
-		{
-		}
+//		} 
+//		catch (IOException e) 
+//		{
+//		}
 	}
 	
 	@Override
@@ -130,8 +130,8 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
 			}
 			Converter converter = new Converter(settings == null ? this.getReceiptPrinterSettings().getConverter() : settings.getConverter());
-			final String printable = converter.convert(text);
-			println(printable.getBytes());
+			final byte[] printable = converter.convert(text.getBytes());
+			println(printable);
 			this.cutPaper(settings == null ? this.getReceiptPrinterSettings().getLinesBeforeCut() : settings.getLinesBeforeCut());
 			closePrinter();
 		}
@@ -186,8 +186,8 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 			for (String line : text)
 			{
-				final String printable = this.getConverter().convert(line);
-				println(printable.getBytes());
+				final byte[] printable = this.getConverter().convert(line.getBytes());
+				println(printable);
 			}
 			this.cutPaper(this.getLinesBeforeCut());
 			this.closePrinter();
@@ -257,7 +257,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	public void testPrint(String deviceName, String conversions, String text, int feed) 
 	{
 		final Converter converter = new Converter(conversions);
-		final String printable = converter.convert(text);
+		final byte[] printable = converter.convert(text.getBytes());
 		try 
 		{
 			if (printer == null)
@@ -266,7 +266,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 			if (printer != null)
 			{
-				println(printable.getBytes());
+				println(printable);
 				this.cutPaper(feed);
 			}
 		} 

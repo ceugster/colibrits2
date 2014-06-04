@@ -1,6 +1,11 @@
 package ch.eugster.colibri.periphery.display.usb.service;
 
+import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Properties;
+
+import javax.comm.CommPort;
+import javax.comm.CommPortIdentifier;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -57,11 +62,11 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		this.openDisplay();
 		if (this.display != null)
 		{
-			String print = this.correctText(text);
+			byte[] print = this.correctText(text);
 			System.out.println(print);
-			for (int i = 0; i < print.length(); i++)
+			for (int i = 0; i < print.length; i++)
 			{
-				this.display.write(print.charAt(i));
+				this.display.write(print[i]);
 			}
 		}
 		this.closeDisplay();
@@ -74,11 +79,11 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		this.openDisplay();
 		if (this.display != null)
 		{
-			String print = this.correctText(new Converter(converter), text);
+			byte[] print = this.correctText(new Converter(converter), text);
 			System.out.println(print);
-			for (int i = 0; i < print.length(); i++)
+			for (int i = 0; i < print.length; i++)
 			{
-				this.display.write(print.charAt(i));
+				this.display.write(print[i]);
 			}
 		}
 		this.closeDisplay();
@@ -108,5 +113,25 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 			}
 		} 
 	}
+	@Override
+	public IStatus testDisplay(Properties properties, String text) 
+	{
+		try
+		{
+			String port = properties.getProperty("port");
+			PrintStream display = new PrintStream(port);
+			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+			display.write(text.getBytes());
+			display.write("\n\n\n".getBytes());
+			display.flush();
+			display.close();
+		}
+		catch (final Exception e)
+		{
+			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
+		} 
+		return new Status(IStatus.OK, Activator.PLUGIN_ID, "OK");
+	}
+
 
 }

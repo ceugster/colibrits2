@@ -2,7 +2,8 @@ package ch.eugster.colibri.periphery.display.serial.service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Properties;
 
 import javax.comm.CommPort;
 import javax.comm.CommPortIdentifier;
@@ -23,7 +24,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 {
 	private CommPort commPort;
 	
-	private OutputStream  display;
+	private PrintStream display;
 
 	@Override
 	public void clearDisplay()
@@ -72,10 +73,10 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		this.openDisplay();
 		if (this.display != null)
 		{
-			String print = this.correctText(text);
+			byte[] print = this.correctText(text);
 			try 
 			{
-				this.display.write(print.getBytes());
+				this.display.write(print);
 			} 
 			catch (IOException e) 
 			{
@@ -83,7 +84,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		}
 		this.closeDisplay();
 	}
-
+	
 	@Override
 	public void displayText(final String converter, String text)
 	{
@@ -91,10 +92,10 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		this.openDisplay();
 		if (this.display != null)
 		{
-			String print = this.correctText(new Converter(converter), text);
+			byte[] print = this.correctText(new Converter(converter), text);
 			try 
 			{
-				this.display.write(print.getBytes());
+				this.display.write(print);
 			} 
 			catch (IOException e) 
 			{
@@ -107,14 +108,14 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	{
 		if (this.display != null)
 		{
-			try 
-			{
+//			try 
+//			{
 				this.display.flush();
 				this.display.close();
-			} 
-			catch (IOException e) 
-			{
-			}
+//			} 
+//			catch (IOException e) 
+//			{
+//			}
 			this.display = null;
 		}
 		if (this.commPort != null)
@@ -132,7 +133,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 			port = port.endsWith(":") ? port.substring(0, port.length() - 1) : port;
 			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(port);
 			commPort = portId.open("customerdisplay", 2000);
-			display = commPort.getOutputStream();
+			display = new PrintStream(commPort.getOutputStream());
 			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
 //			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
 //			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
@@ -169,6 +170,60 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Ein IO-Fehler ist aufgetreten.")));
 			}
 		}
+	}
+	
+	private int convert(String number)
+	{
+		try
+		{
+			return Integer.valueOf(number).intValue();
+		}
+		catch(NumberFormatException e)
+		{
+			return 0;
+		}
+	}
+
+	@Override
+	public IStatus testDisplay(Properties properties, String text) 
+	{
+		PrintStream display = null;
+		CommPort commPort = null;
+		try
+		{
+			String port = properties.getProperty("port");
+			String converter = properties.getProperty("converter");
+			int rows = convert(properties.getProperty("rows"));
+			int cols = convert(properties.getProperty("cols"));
+			byte[] print = this.correctText(new Converter(converter), text, rows * cols);
+			port = port.endsWith(":") ? port.substring(0, port.length() - 1) : port;
+			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(port);
+			commPort = portId.open("customerdisplay", 2000);
+			display = new PrintStream(commPort.getOutputStream());
+			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
+			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
+			display.write(print);
+			display.write("\n\n\n".getBytes());
+			display.flush();
+		}
+		catch (final Exception e)
+		{
+			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
+		}
+		finally
+		{
+			try
+			{
+				if (display != null) display.close();
+				if (commPort != null) commPort.close();
+			}
+			catch (Exception e)
+			{
+				
+			}
+		}
+		return new Status(IStatus.OK, Activator.PLUGIN_ID, "OK");
 	}
 
 }

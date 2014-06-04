@@ -105,31 +105,31 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		}
 	}
 
-	protected String correctText(final Converter converter, final String text)
+	protected byte[] correctText(final Converter converter, final String text)
 	{
 		return this.correctText(converter, text, this.getColumnCount() * this.getRowCount());
 	}
 
-	protected String correctText(final Converter converter, String text, final int width)
+	protected byte[] correctText(final Converter converter, String text, final int width)
 	{
-		if (text.length() > this.getColumnCount() * this.getRowCount())
+		if (text.length() > width)
 		{
-			text.substring(0, this.getColumnCount() * this.getRowCount());
+			text.substring(0, width);
 		}
-		text = converter.convert(text);
-		if (text.length() < this.getColumnCount() * this.getRowCount())
+		byte[] chars = converter.convert(text.getBytes());
+		if (text.length() < width)
 		{
 			StringBuilder builder = new StringBuilder(text);
-			for (int i = text.length(); i < this.getColumnCount() * this.getRowCount(); i++)
+			for (int i = text.length(); i < width; i++)
 			{
 				builder = builder.append(" ");
 			}
 			text = builder.toString();
 		}
-		return text;
+		return chars;
 	}
 
-	protected String correctText(final String text)
+	protected byte[] correctText(final String text)
 	{
 		return this.correctText(this.getConverter(), text, this.getColumnCount() * this.getRowCount());
 	}

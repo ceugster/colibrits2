@@ -245,6 +245,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		settings.setConverter(converter instanceof String ? (String) converter : "");
 		settings.setName(device instanceof String ? (String) device : "???");
 		settings.setPort(port instanceof String ? (String) port : "");
+		settings.setPrintLogoMode(PrintMode.NORMAL);
 		settings.setLinesBeforeCut(linesBeforeCut instanceof Integer ? ((Integer) linesBeforeCut).intValue() : 0);
 		return settings;
 	}

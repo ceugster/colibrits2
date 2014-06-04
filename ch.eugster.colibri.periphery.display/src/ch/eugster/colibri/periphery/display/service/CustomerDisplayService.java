@@ -1,8 +1,11 @@
 package ch.eugster.colibri.periphery.display.service;
 
+import java.util.Properties;
+
+import org.eclipse.core.runtime.IStatus;
+
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
-import ch.eugster.colibri.persistence.model.SalespointCustomerDisplaySettings;
 
 public interface CustomerDisplayService
 {
@@ -23,4 +26,6 @@ public interface CustomerDisplayService
 //	SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings();
 	
 	String convertToString(Object object);
+	
+	IStatus testDisplay(Properties properties, String text);
 }
