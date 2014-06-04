@@ -6,6 +6,8 @@ import java.util.Hashtable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
@@ -14,10 +16,12 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
@@ -62,12 +66,15 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 
 	private final ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
+	private boolean databaseCompatibilityErrorMessageShown = false;
+	
 	public ReportApplicationActionBarAdvisor(final IActionBarConfigurer configurer)
 	{
 		super(configurer);
 
-		final String[] topics = new String[1];
+		final String[] topics = new String[2];
 		topics[0] = "ch/eugster/colibri/transfer";
+		topics[1] = "ch/eugster/colibri/persistence/connection/compatibility/error";
 
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -87,7 +94,33 @@ public class ReportApplicationActionBarAdvisor extends ActionBarAdvisor implemen
 	@Override
 	public void handleEvent(final Event event)
 	{
-		if (this.connectionInformation != null)
+		if (event.getTopic().equals("ch/eugster/colibri/persistence/connection/compatibility/error"))
+		{
+			if (!this.databaseCompatibilityErrorMessageShown)
+			{
+				this.databaseCompatibilityErrorMessageShown = true;
+				final UIJob job = new UIJob("Shutdown")
+				{
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						String message = (String) event.getProperty("message");
+						MessageDialog.openError(null, "Datenbankfehler", message);
+						return Status.OK_STATUS;
+					}
+				};
+				job.addJobChangeListener(new JobChangeAdapter()
+				{
+					@Override
+					public void done(IJobChangeEvent event) 
+					{
+						PlatformUI.getWorkbench().close();
+					}
+				});
+				job.schedule();
+			}
+		}
+		else if (this.connectionInformation != null)
 		{
 			if (event.getTopic().equals("ch/eugster/colibri/transfer"))
 			{

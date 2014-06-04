@@ -67,9 +67,9 @@ public class SettlementDifferenceComposite extends AbstractSettlementCompositeCh
 	protected void init()
 	{
 		this.setLayout(new GridLayout());
-		Label help = new Label(this, SWT.MULTI | SWT.WRAP);
-		help.setLayoutData(new GridData(GridData.FILL_BOTH));
-		help.setText("Die Differenzliste weist Differenzen der Abschlüsse über die gewählte Periode aus. Diese Auswertung eignet sich nur für Perioden, für die gespeicherte Abschlüsse vorhanden sind.");
+		Label label = new Label(this, SWT.WRAP);
+		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		label.setText("Die Differenzliste weist Differenzen der Abschlüsse über die gewählte Periode aus. Diese Auswertung eignet sich nur für Perioden, für die gespeicherte Abschlüsse vorhanden sind.");
 	}
 
 	@Override

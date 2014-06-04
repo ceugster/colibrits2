@@ -935,10 +935,10 @@ public class ProductGroupView extends ViewPart implements IViewPart, ISelectionL
 				ProductGroupEntry entry = productGroups.get(previousYearEntry.getProductGroupId());
 				if (entry == null)
 				{
-					previousYearEntry = new ProductGroupEntry();
-					previousYearEntry.setProductGroupId(previousYearEntry.getProductGroupId());
-					previousYearEntry.setProductGroupName(previousYearEntry.getProductGroupName());
-					previousYearEntry.setProviderId(previousYearEntry.getProviderId());
+					entry = new ProductGroupEntry();
+					entry.setProductGroupId(previousYearEntry.getProductGroupId());
+					entry.setProductGroupName(previousYearEntry.getProductGroupName());
+					entry.setProviderId(previousYearEntry.getProviderId());
 					productGroups.put(productGroupId, entry);
 				}
 				entry.setStockQuantityPreviousYear(previousYearEntry.getStockQuantity());
