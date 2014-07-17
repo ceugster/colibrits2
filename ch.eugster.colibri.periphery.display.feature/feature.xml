@@ -14,7 +14,7 @@ notwendigen Deklarationen und Servicedefinitionen, sowie die Basisfunktionalitä
       Copyright by Christian Eugster
    </copyright>
 
-   <license url="http://eugster-informatik.ch/colibrits/updates/epl-10.html">
+   <license url="">
       Eclipse Public License - v 1.0
 
 THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC LICENSE (&quot;AGREEMENT&quot;). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE PROGRAM CONSTITUTES RECIPIENT&apos;S ACCEPTANCE OF THIS AGREEMENT.
@@ -115,8 +115,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
          id="ch.eugster.colibri.periphery"
          download-size="0"
          install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
    <plugin
          id="ch.eugster.colibri.periphery.display"

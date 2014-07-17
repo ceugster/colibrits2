@@ -6,8 +6,6 @@
  */
 package ch.eugster.colibri.provider.galileo.kundenserver.sql;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.List;
 import java.util.Map;
 

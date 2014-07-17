@@ -38,7 +38,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	public String getDefaultPatternTitle()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("Mehrwertsteuern       M    Betrag     Mwst");
+		builder = builder.append("Mehrwertsteuern       M    Betrag     Mwst\n");
 		builder = builder.append("------------------------------------------");
 		return builder.toString();
 	}
@@ -47,8 +47,8 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 	public String getDefaultPatternTotal()
 	{
 		StringBuilder builder = new StringBuilder();
-		builder = builder.append("------------------------------------------");
-		builder = builder.append("Mehrwertsteuern   MMMMM AAAAAAAAA TTTTTTTT");
+		builder = builder.append("------------------------------------------\n");
+		builder = builder.append("Mehrwertsteuern   MMMMM AAAAAAAAA TTTTTTTT\n");
 		builder = builder.append("==========================================");
 		return builder.toString();
 	}
@@ -333,7 +333,7 @@ public class SettlementLayoutTaxSection extends AbstractLayoutSection
 						double amount = 0d;
 						for (SettlementTax tax : taxes)
 						{
-							amount += tax.getTaxAmount();
+							amount -= tax.getTaxAmount();
 						}
 						final Currency currency = settlementTax.getSettlement().getSalespoint().getPaymentType().getCurrency()
 								.getCurrency();

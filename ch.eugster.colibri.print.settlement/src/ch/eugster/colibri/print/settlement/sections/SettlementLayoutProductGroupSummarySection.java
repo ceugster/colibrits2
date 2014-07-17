@@ -9,7 +9,6 @@ import java.util.List;
 
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Settlement;
-import ch.eugster.colibri.persistence.model.SettlementPayment;
 import ch.eugster.colibri.persistence.model.SettlementPosition;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;

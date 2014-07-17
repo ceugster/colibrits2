@@ -134,6 +134,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	private long transaction;
 
 	@Basic
+	@Index
 	@Column(name = "re_hour")
 	private int hour;
 

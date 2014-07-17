@@ -7,7 +7,6 @@ import java.util.GregorianCalendar;
 import javax.persistence.EntityManager;
 
 import ch.eugster.colibri.persistence.model.CurrentTax;
-import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.queries.CurrentTaxQuery;
 import ch.eugster.colibri.persistence.queries.TaxQuery;

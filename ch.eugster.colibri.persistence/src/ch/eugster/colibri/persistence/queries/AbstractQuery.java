@@ -1,10 +1,7 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -259,8 +256,8 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 					readAllQuery.setOrderByExpressions(order);
 				}
 				final Query query = createQuery(entityManager, readAllQuery, maxResults);
-				Calendar calendar = GregorianCalendar.getInstance();
-				String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
+//				Calendar calendar = GregorianCalendar.getInstance();
+//				String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
 				result = query.getResultList();
 			}
 		}

@@ -13,7 +13,6 @@ import ch.eugster.colibri.print.section.AbstractLayoutSection;
 import ch.eugster.colibri.print.section.IKey;
 import ch.eugster.colibri.print.section.ILayoutSection;
 import ch.eugster.colibri.print.section.ILayoutSectionType;
-import ch.eugster.colibri.print.section.ILayoutSection.AreaType;
 
 public class SettlementLayoutHeaderSection extends AbstractLayoutSection
 {

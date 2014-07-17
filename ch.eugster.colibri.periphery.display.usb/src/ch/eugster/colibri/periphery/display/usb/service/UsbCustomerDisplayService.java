@@ -1,11 +1,7 @@
 package ch.eugster.colibri.periphery.display.usb.service;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Properties;
-
-import javax.comm.CommPort;
-import javax.comm.CommPortIdentifier;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

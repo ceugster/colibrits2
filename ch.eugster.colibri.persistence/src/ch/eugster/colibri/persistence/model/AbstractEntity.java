@@ -46,6 +46,7 @@ public abstract class AbstractEntity implements Entity
 	private boolean deleted;
 
 	@Basic
+	@Index
 	@Temporal(TemporalType.TIMESTAMP)
 	private Calendar timestamp;
 

@@ -1,11 +1,9 @@
 package ch.eugster.colibri.provider.galileo.galserve;
 
-import com4j.DISPID;
 import com4j.DefaultMethod;
 import com4j.MarshalAs;
 import com4j.NativeType;
 import com4j.ReturnValue;
-import com4j.VTID;
 
 public interface Igdserve {
 

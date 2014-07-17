@@ -13,8 +13,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
 import ch.eugster.colibri.persistence.model.Display;
 import ch.eugster.colibri.persistence.model.DisplayArea;
-import ch.eugster.colibri.persistence.model.Printout;
-import ch.eugster.colibri.persistence.model.PrintoutArea;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.DisplayQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;

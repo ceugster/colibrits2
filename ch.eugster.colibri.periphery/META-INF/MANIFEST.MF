@@ -12,5 +12,5 @@ Export-Package: ch.eugster.colibri.periphery.constants,
  com.sun.comm,
  javax.comm
 Import-Package: org.osgi.framework;version="1.6.0"
-Bundle-ClassPath: lib/comm.jar,
- .
+Bundle-ClassPath: .,
+ lib/comm.jar

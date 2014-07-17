@@ -4,7 +4,6 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
 
-import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Receipt;

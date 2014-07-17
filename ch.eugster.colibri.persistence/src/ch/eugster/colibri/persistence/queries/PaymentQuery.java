@@ -119,8 +119,8 @@ public class PaymentQuery extends AbstractQuery<Payment>
 					.lessThanEqual(dateRange[1]));
 		}
 
-		List<Payment> payments = this.select(expression);
-		
+//		List<Payment> payments = this.select(expression);
+//		
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
 		reportQuery.addAttribute("paymentType", new ExpressionBuilder().get("paymentType").get("id"));
 

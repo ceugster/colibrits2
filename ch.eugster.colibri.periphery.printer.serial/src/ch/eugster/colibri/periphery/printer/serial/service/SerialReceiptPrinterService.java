@@ -41,14 +41,8 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		if (this.printer != null)
 		{
-//			try 
-//			{
-				this.printer.flush();
-				this.printer.close();
-//			} 
-//			catch (IOException e) 
-//			{
-//			}
+			this.printer.flush();
+			this.printer.close();
 			this.printer = null;
 		}
 		if (this.commPort != null)
@@ -102,17 +96,11 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 
 	private void printNVBitImage(int n, int m)
 	{
-//		try 
-//		{
-			this.printer.write(AsciiConstants.FS);
-			this.printer.write(AsciiConstants.p);
-			this.printer.write(n);
-			this.printer.write(m);
-			this.printer.flush();
-//		} 
-//		catch (IOException e) 
-//		{
-//		}
+		this.printer.write(AsciiConstants.FS);
+		this.printer.write(AsciiConstants.p);
+		this.printer.write(n);
+		this.printer.write(m);
+		this.printer.flush();
 	}
 	
 	@Override
@@ -152,7 +140,20 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		try 
 		{
-			printer.write(bytes);
+			for (int i = 0; i < bytes.length; i++)
+			{
+				if (bytes[i] == 64)
+				{
+					printer.write(new byte[] { 27, 82, 0 });
+					printer.flush();
+				}
+				printer.write(bytes[i]);
+				if (bytes[i] == 64)
+				{
+					printer.write(new byte[] { 27, 82, 2 });
+					printer.flush();
+				}
+			}
 			printer.write(new byte[] { '\n' });
 		} 
 		catch (IOException e) 

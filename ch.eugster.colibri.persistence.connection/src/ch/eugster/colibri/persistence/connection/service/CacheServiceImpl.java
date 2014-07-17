@@ -7,19 +7,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.jdom.Element;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
-import ch.eugster.colibri.persistence.connection.config.TaxUpdater;
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Entity;

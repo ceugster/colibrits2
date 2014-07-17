@@ -211,16 +211,21 @@ public class SettlementTransfer extends AbstractTransfer
 		return serverTaxes;
 	}
 
-	private List<SettlementInternal> copySettlementInternals(ServerService serverService, Settlement settlement,
+	private List<SettlementInternal> copySettlementInternals(ServerService serverService, Settlement localSettlement,
 			Settlement serverSettlement)
 	{
-		List<SettlementInternal> internals = settlement.getInternals();
+		List<SettlementInternal> internals = localSettlement.getInternals();
 		List<SettlementInternal> serverInternals = new ArrayList<SettlementInternal>();
 		for (SettlementInternal internal : internals)
 		{
-			Position position = (Position) serverService.find(Position.class, internal.getPosition().getOtherId());
-			SettlementInternal serverInternal = SettlementInternal.newInstance(serverSettlement, position);
+			ProductGroup productGroup = (ProductGroup) serverService.find(ProductGroup.class, internal
+					.getProductGroup().getId());
+			Currency currency = (Currency) serverService.find(Currency.class, internal.getDefaultCurrency().getId());
+			SettlementInternal serverInternal = SettlementInternal
+					.newInstance(serverSettlement, productGroup, currency);
+			serverInternal.setDefaultCurrencyAmount(internal.getDefaultCurrencyAmount());
 			serverInternal.setDeleted(internal.isDeleted());
+			serverInternal.setQuantity(internal.getQuantity());
 			serverInternal.setTimestamp(internal.getTimestamp());
 			serverInternal.setUpdate(0);
 			serverInternal.setVersion(0);

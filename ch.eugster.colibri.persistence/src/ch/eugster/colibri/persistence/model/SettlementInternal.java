@@ -24,6 +24,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
+
 @Entity
 @AttributeOverrides({ @AttributeOverride(name = "timestamp", column = @Column(name = "sepo_timestamp")),
 		@AttributeOverride(name = "version", column = @Column(name = "sepo_version")),
@@ -33,7 +35,7 @@ import javax.persistence.TemporalType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "sepo_type", discriminatorType = DiscriminatorType.STRING, length = 1)
 @DiscriminatorValue(value = "I")
-public class SettlementInternal extends SettlementAbstractSinglePosition implements Comparable<SettlementInternal>
+public class SettlementInternal extends SettlementAbstractPosition implements Comparable<SettlementInternal>
 {
 	@Basic
 	@Temporal(TemporalType.TIMESTAMP)
@@ -48,30 +50,54 @@ public class SettlementInternal extends SettlementAbstractSinglePosition impleme
 	@Column(name = "sepo_foreign_currency_amount", columnDefinition = "DECIMAL(18, 6)")
 	protected double foreignCurrencyAmount;
 
+	@Basic
+	@Column(name = "sepo_quantity")
+	private int quantity;
+
 	protected SettlementInternal()
 	{
 		super();
 	}
 
-	protected SettlementInternal(final Settlement settlement, final Position position)
+	protected SettlementInternal(final Settlement settlement, final ProductGroup productGroup, final Currency currency)
 	{
-		super(settlement, position);
-		this.setDate(position.getReceipt().getTimestamp().getTime());
-		this.setForeignCurrency(position.getForeignCurrency());
-		this.setForeignCurrencyAmount(position.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
-				Position.AmountType.NETTO));
+		super(settlement, productGroup, currency);
 	}
+
+//	protected SettlementInternal(final Settlement settlement, final Position position)
+//	{
+//		super(settlement, productGroup, currency);
+//		this.setDate(position.getReceipt().getTimestamp().getTime());
+//		this.setForeignCurrency(position.getForeignCurrency());
+//		this.setForeignCurrencyAmount(position.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
+//				Position.AmountType.NETTO));
+//	}
 
 	@Override
 	public int compareTo(final SettlementInternal other)
 	{
-		return this.getId().compareTo(other.getId());
+		int result = this.compareTypes(this.getProductGroup().getProductGroupType(), other.getProductGroup()
+				.getProductGroupType());
+//		if (result == 0)
+//		{
+//			result = this.compareCodes(this.getProductGroup().getCode(), other.getProductGroup().getCode());
+//			if (result == 0)
+//			{
+//				result = this.compareNames(this.getProductGroup().getName(), other.getProductGroup().getName());
+//			}
+//		}
+		return result;
 	}
 
-	public static SettlementInternal newInstance(final Settlement settlement, final Position position)
+	private int compareTypes(final ProductGroupType thisType, final ProductGroupType otherType)
 	{
-		return (SettlementInternal) AbstractEntity.newInstance(new SettlementInternal(settlement, position));
+		return thisType.compareTo(otherType);
 	}
+
+//	public static SettlementInternal newInstance(final Settlement settlement, final Position position)
+//	{
+//		return (SettlementInternal) AbstractEntity.newInstance(new SettlementInternal(settlement, position));
+//	}
 
 	public void setDate(Date date)
 	{
@@ -101,6 +127,21 @@ public class SettlementInternal extends SettlementAbstractSinglePosition impleme
 	public void setForeignCurrencyAmount(final double foreignCurrencyAmount)
 	{
 		this.foreignCurrencyAmount = foreignCurrencyAmount;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public static SettlementInternal newInstance(final Settlement settlement, final ProductGroup productGroup,
+			final Currency currency)
+	{
+		return (SettlementInternal) AbstractEntity.newInstance(new SettlementInternal(settlement, productGroup,
+				currency));
 	}
 
 }

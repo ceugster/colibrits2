@@ -67,7 +67,7 @@ public class ReceiptLayoutType extends AbstractLayoutType
 		final Collection<String> document = new ArrayList<String>();
 		if (printable instanceof Receipt)
 		{
-			Receipt receipt = (Receipt) printable;
+//			Receipt receipt = (Receipt) printable;
 			final ReceiptLayoutSectionType[] layoutSectionTypes = (ReceiptLayoutSectionType[]) this
 					.getLayoutSectionTypes();
 			for (final ReceiptLayoutSectionType layoutSectionType : layoutSectionTypes)

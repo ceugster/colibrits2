@@ -9,8 +9,6 @@ package ch.eugster.colibri.persistence.replication.impl.replicators;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 import ch.eugster.colibri.persistence.model.AbstractEntity;
-import ch.eugster.colibri.persistence.model.Sequence;
-import ch.eugster.colibri.persistence.queries.SequenceQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractEntityReplicator<T extends AbstractEntity> implements EntityReplicator<T>
