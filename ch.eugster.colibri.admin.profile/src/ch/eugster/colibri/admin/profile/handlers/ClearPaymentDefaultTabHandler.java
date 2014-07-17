@@ -18,7 +18,6 @@ import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.profile.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
-import ch.eugster.colibri.persistence.model.Configurable;
 import ch.eugster.colibri.persistence.model.Tab;
 
 public class ClearPaymentDefaultTabHandler extends AbstractPersistenceClientHandler

@@ -984,6 +984,7 @@ ch.eugster.colibri.display.simple.feature/build.properties -text
 ch.eugster.colibri.display.simple.feature/feature.xml -text
 ch.eugster.colibri.display.simple/.classpath -text
 ch.eugster.colibri.display.simple/.project -text
+ch.eugster.colibri.display.simple/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.display.simple/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.display.simple/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.display.simple/OSGI-INF/service-component.xml -text

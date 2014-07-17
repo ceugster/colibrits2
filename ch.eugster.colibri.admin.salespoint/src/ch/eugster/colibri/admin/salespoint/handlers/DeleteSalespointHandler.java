@@ -14,7 +14,6 @@ import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.salespoint.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
-import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Salespoint;
 
 /*

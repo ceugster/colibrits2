@@ -9,8 +9,6 @@ package ch.eugster.colibri.admin.salespoint.editors;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
-import ch.eugster.colibri.persistence.model.Profile;
-
 public class LogoLabelProvider extends LabelProvider
 {
 	@Override

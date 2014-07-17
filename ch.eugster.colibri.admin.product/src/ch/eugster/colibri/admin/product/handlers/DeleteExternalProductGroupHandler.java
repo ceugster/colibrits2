@@ -21,7 +21,6 @@ import org.osgi.framework.BundleContext;
 import ch.eugster.colibri.admin.product.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
 import ch.eugster.colibri.persistence.model.ExternalProductGroup;
-import ch.eugster.colibri.persistence.model.ProductGroup;
 
 public class DeleteExternalProductGroupHandler extends AbstractPersistenceClientHandler
 {

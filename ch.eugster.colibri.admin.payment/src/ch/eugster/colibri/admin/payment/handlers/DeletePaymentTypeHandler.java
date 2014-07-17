@@ -6,8 +6,6 @@
  */
 package ch.eugster.colibri.admin.payment.handlers;
 
-import java.text.DecimalFormat;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.EvaluationContext;
@@ -22,7 +20,6 @@ import org.osgi.framework.BundleContext;
 
 import ch.eugster.colibri.admin.payment.Activator;
 import ch.eugster.colibri.admin.ui.handlers.AbstractPersistenceClientHandler;
-import ch.eugster.colibri.persistence.model.Money;
 import ch.eugster.colibri.persistence.model.PaymentType;
 
 public class DeletePaymentTypeHandler extends AbstractPersistenceClientHandler

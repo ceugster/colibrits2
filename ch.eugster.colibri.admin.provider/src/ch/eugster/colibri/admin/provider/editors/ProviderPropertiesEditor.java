@@ -382,12 +382,12 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 		this.firePropertyChange(IEditorPart.PROP_DIRTY);
 	}
 
-	private void showMessage(final String message)
-	{
-		final MessageDialog dialog = new MessageDialog(this.getSite().getShell(), "Ungültiger Wert", null, message,
-				MessageDialog.INFORMATION, new String[] { "OK" }, 0);
-		dialog.setBlockOnOpen(true);
-		dialog.open();
-	}
+//	private void showMessage(final String message)
+//	{
+//		final MessageDialog dialog = new MessageDialog(this.getSite().getShell(), "Ungültiger Wert", null, message,
+//				MessageDialog.INFORMATION, new String[] { "OK" }, 0);
+//		dialog.setBlockOnOpen(true);
+//		dialog.open();
+//	}
 
 }

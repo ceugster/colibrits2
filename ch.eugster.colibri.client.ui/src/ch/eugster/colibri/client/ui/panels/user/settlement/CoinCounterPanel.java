@@ -449,31 +449,31 @@ public class CoinCounterPanel extends ProfilePanel
 
 		double debitAmount = this.getTotalIncome(settlement, stock.getPaymentType().getCurrency());
 
+//		detail = SettlementDetail.newInstance(settlement, stock);
+//		detail.setDebit(debitAmount);
+//		detail.setCredit(0);
+//		detail.setVariableStock(stock.isVariable());
+//		detail.setPart(Part.INCOME);
+//		details.add(detail);
+
+		debitAmount += stock.getAmount();
+//		creditAmount += stock.getAmount();
+
 		detail = SettlementDetail.newInstance(settlement, stock);
 		detail.setDebit(debitAmount);
 		detail.setCredit(creditAmount);
 		detail.setVariableStock(stock.isVariable());
-		detail.setPart(Part.INCOME);
+		detail.setPart(Part.END_STOCK);
 		details.add(detail);
 
-		debitAmount += stock.getAmount();
-		creditAmount += stock.getAmount();
-
+//		double diff = creditAmount - debitAmount;
+//
 //		detail = SettlementDetail.newInstance(settlement, stock);
-//		detail.setDebit(debitAmount);
-//		detail.setCredit(creditAmount);
+//		detail.setDebit(diff < 0D ? 0D : diff);
+//		detail.setCredit(diff < 0D ? Math.abs(diff) : 0D);
 //		detail.setVariableStock(stock.isVariable());
-//		detail.setPart(Part.END_STOCK);
+//		detail.setPart(Part.DIFFERENCE);
 //		details.add(detail);
-
-		double diff = creditAmount - debitAmount;
-
-		detail = SettlementDetail.newInstance(settlement, stock);
-		detail.setDebit(diff < 0D ? 0D : diff);
-		detail.setCredit(diff < 0D ? Math.abs(diff) : 0D);
-		detail.setVariableStock(stock.isVariable());
-		detail.setPart(Part.DIFFERENCE);
-		details.add(detail);
 
 		return details;
 	}
