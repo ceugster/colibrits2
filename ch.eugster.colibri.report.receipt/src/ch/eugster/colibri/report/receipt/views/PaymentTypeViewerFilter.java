@@ -7,7 +7,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
-import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 
 public class PaymentTypeViewerFilter extends ViewerFilter

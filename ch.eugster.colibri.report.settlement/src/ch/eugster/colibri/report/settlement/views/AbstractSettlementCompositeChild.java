@@ -26,7 +26,6 @@ import ch.eugster.colibri.persistence.model.SettlementRestitutedPosition;
 import ch.eugster.colibri.persistence.model.SettlementTax;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
-import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.report.settlement.model.Section;
 import ch.eugster.colibri.report.settlement.model.SettlementEntry;
 
@@ -64,27 +63,6 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 	protected Map<Long, SettlementEntry> createPositionSection(Map<Long, SettlementEntry> section,
 			List<SettlementPosition> positions)
 	{
-//		Collections.sort(positions, new Comparator<SettlementPosition>() 
-//		{
-//			@Override
-//			public int compare(SettlementPosition pos1, SettlementPosition pos2) 
-//			{
-//				String code1 = pos1.getCode() == null ? "" : pos1.getCode();
-//				String code2 = pos2.getCode() == null ? "" : pos2.getCode();
-//				if (code1.isEmpty() || code2.isEmpty())
-//				{
-//					return -code1.compareTo(code2);
-//				}
-//				int val = code1.compareTo(code2);
-//				if (val == 0)
-//				{
-//					String name1 = pos1.getName() == null ? "" : pos1.getName();
-//					String name2 = pos2.getName() == null ? "" : pos2.getName();
-//					val = name1.compareTo(name2);
-//				}
-//				return val;
-//			}
-//		});
 		for (SettlementPosition position : positions)
 		{
 			SettlementEntry entry = section.get(position.getProductGroup().getId());
@@ -154,6 +132,33 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 			amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
 			amount += payment.getDefaultCurrencyAmount();
 			entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+		}
+		return section;
+	}
+
+	protected Map<Long, SettlementEntry> createInternalSection(Map<Long, SettlementEntry> section,
+			List<SettlementInternal> internals)
+	{
+		for (SettlementInternal internal : internals)
+		{
+			SettlementEntry entry = section.get(internal.getProductGroup().getId());
+			if (entry == null)
+			{
+				Section sectionType = internal.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL) ? Section.INTERNAL : Section.POSITION;
+				entry = new SettlementEntry(sectionType);
+				entry.setGroup(internal.getProductGroup().getProductGroupType().ordinal());
+				entry.setCode(internal.getCode());
+				entry.setText(internal.getName());
+				section.put(internal.getProductGroup().getId(), entry);
+			}
+			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue()) + internal.getQuantity();
+			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
+
+			double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
+			amount += internal.getDefaultCurrencyAmount();
+//			entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
+			entry.setAmount1(Double.valueOf(amount));
+			entry.setAmount2(Double.valueOf(0D));
 		}
 		return section;
 	}
@@ -243,44 +248,44 @@ public abstract class AbstractSettlementCompositeChild extends Composite impleme
 		return section;
 	}
 
-	protected Map<Long, SettlementEntry> createInternalSection(Map<Long, SettlementEntry> section,
-			Collection<SettlementInternal> internals, boolean internalDetails)
-	{
-		for (SettlementInternal internal : internals)
-		{
-			Long id = internalDetails ? internal.getPosition().getId() : internal.getPosition().getProductGroup().getId();
-			int groupId = internal.getPosition().getProductGroup().getProductGroupType().ordinal();
-			SettlementEntry entry = section.get(id);
-			if (entry == null)
-			{
-				entry = new SettlementEntry(Section.INTERNAL);
-				section.put(id, entry);
-				entry.setGroup(groupId);
-//				entry.setCode(internal.getPosition().getProductGroup().getCode());
-				entry.setCode(null);
-				entry.setText(internal.getPosition().getProductGroup().getName());
-			}
-			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue())
-					+ internal.getPosition().getQuantity();
-			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
-
-			if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.ALLOCATION))
-			{
-				double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
-				amount += Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
-						Position.AmountType.NETTO));
-				entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
-			}
-			else if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.WITHDRAWAL))
-			{
-				double amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
-				amount -= Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-						Position.AmountType.NETTO));
-				entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
-			}
-		}
-		return section;
-	}
+//	protected Map<Long, SettlementEntry> createInternalSection(Map<Long, SettlementEntry> section,
+//			Collection<SettlementInternal> internals, boolean internalDetails)
+//	{
+//		for (SettlementInternal internal : internals)
+//		{
+//			Long id = internalDetails ? internal.getPosition().getId() : internal.getPosition().getProductGroup().getId();
+//			int groupId = internal.getPosition().getProductGroup().getProductGroupType().ordinal();
+//			SettlementEntry entry = section.get(id);
+//			if (entry == null)
+//			{
+//				entry = new SettlementEntry(Section.INTERNAL);
+//				section.put(id, entry);
+//				entry.setGroup(groupId);
+////				entry.setCode(internal.getPosition().getProductGroup().getCode());
+//				entry.setCode(null);
+//				entry.setText(internal.getPosition().getProductGroup().getName());
+//			}
+//			int quantity = (entry.getQuantity() == null ? 0 : entry.getQuantity().intValue())
+//					+ internal.getPosition().getQuantity();
+//			entry.setQuantity(quantity == 0 ? null : Integer.valueOf(quantity));
+//
+//			if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.ALLOCATION))
+//			{
+//				double amount = entry.getAmount1() == null ? 0D : entry.getAmount1().doubleValue();
+//				amount += Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.FOREIGN_CURRENCY,
+//						Position.AmountType.NETTO));
+//				entry.setAmount1(amount == 0D ? null : Double.valueOf(amount));
+//			}
+//			else if (internal.getPosition().getProductGroup().getProductGroupType().equals(ProductGroupType.WITHDRAWAL))
+//			{
+//				double amount = entry.getAmount2() == null ? 0D : entry.getAmount2().doubleValue();
+//				amount -= Math.abs(internal.getPosition().getAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
+//						Position.AmountType.NETTO));
+//				entry.setAmount2(amount == 0D ? null : Double.valueOf(amount));
+//			}
+//		}
+//		return section;
+//	}
 
 	protected Map<Long, SettlementEntry> createTaxSection(Map<Long, SettlementEntry> section,
 			Collection<SettlementTax> taxes)

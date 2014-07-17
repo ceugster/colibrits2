@@ -22,8 +22,6 @@ import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
 import java.util.PropertyResourceBundle;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -39,7 +37,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -61,20 +58,8 @@ import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.persistence.events.Topic;
-import ch.eugster.colibri.persistence.model.Payment;
-import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Settlement;
-import ch.eugster.colibri.persistence.model.SettlementInternal;
-import ch.eugster.colibri.persistence.model.SettlementPayedInvoice;
-import ch.eugster.colibri.persistence.model.SettlementPayment;
-import ch.eugster.colibri.persistence.model.SettlementPosition;
-import ch.eugster.colibri.persistence.model.SettlementReceipt;
-import ch.eugster.colibri.persistence.model.SettlementTax;
-import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
-import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
-import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SettlementQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.report.settlement.Activator;
@@ -88,7 +73,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 
 	private ComboViewer settlementViewer;
 
-	private Button updateSettlement;
+//	private Button updateSettlement;
 	/**
 	 * @param parent
 	 * @param style
@@ -286,7 +271,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 				settlement.getRestitutedPositions()).values());
 		entries.addAll(createPayedInvoiceSection(new HashMap<Long, SettlementEntry>(), settlement.getPayedInvoices())
 				.values());
-		entries.addAll(createInternalSection(new HashMap<Long, SettlementEntry>(), settlement.getInternals(), false).values());
+		entries.addAll(createInternalSection(new HashMap<Long, SettlementEntry>(), settlement.getInternals()).values());
 		entries.addAll(createReceiptSection(new HashMap<Long, SettlementEntry>(), settlement.getReversedReceipts())
 				.values());
 		entries.addAll(createDetailSection(new HashMap<Long, SettlementEntry>(), settlement.getDetails()).values());
@@ -451,308 +436,310 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 		this.settlementViewer.setSelection(selection);
 	}
 
-	private void updateSettlement(ISelection selection) 
-	{
-		if (selection.isEmpty())
-		{
-			return;
-		}
-		if (selection instanceof IStructuredSelection)
-		{
-			IStructuredSelection ssel = (IStructuredSelection) selection;
-			if (ssel.getFirstElement() instanceof Settlement)
-			{
-				Settlement settlement = (Settlement) ssel.getFirstElement();
-				settlement.setReceiptCount(0L);
-				MessageDialog dialog = new MessageDialog(this.getShell(), "Abschluss aktualisieren", null, "Achtung, Sie sind dabei, den Tagesabschluss vom " + SimpleDateFormat.getInstance().getDateTimeInstance().format(settlement.getSettled().getTime()) + " zu verändern. Diese Änderung kann nicht mehr rückganging gemacht werden. Wollen Sie die Aktualisierung trotzdem durchführen?", MessageDialog.WARNING, new String[] { "Ja", "Nein" }, 1);
-				if (dialog.open() == 0)
-				{
-					ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
-							PersistenceService.class, null);
-					try
-					{
-						tracker.open();
-						PersistenceService service = (PersistenceService) tracker.getService();
-						if (service != null)
-						{
-							ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
-							List<Receipt> receipts = query.selectBySettlement(settlement, new Receipt.State[] {Receipt.State.SAVED, Receipt.State.REVERSED });
-							Map<Long, SettlementPosition> settlementPositions = loadSettlementPositions(settlement);
-							Map<Long, SettlementPayedInvoice> settlementPayedInvoices = loadSettlementPayedInvoices(settlement);
-							Map<Long, SettlementReceipt> settlementReceipts = loadSettlementReceipts(settlement);
-							Map<Long, SettlementInternal> settlementInternals = loadSettlementInternals(settlement);
-//							Map<Long, SettlementTax> settlementTax = loadSettlementTaxes(settlement);
-							Map<Long, SettlementPaymentValue> settlementPayments = loadSettlementPayments(settlement);
-							for (Receipt receipt : receipts)
-							{
-								if (receipt.getState().equals(Receipt.State.REVERSED))
-								{
-									SettlementReceipt settlementReceipt = settlementReceipts.remove(receipt.getId());
-									if (settlementReceipt == null)
-									{
-										settlementReceipt = SettlementReceipt.newInstance(settlement, receipt);
-										settlement.getReversedReceipts().add(settlementReceipt);
-									}
-									else
-									{
-										settlementReceipt.setReceipt(receipt);
-									}
-									settlementReceipt.setDeleted(receipt.isDeleted());
-								}
-								long receiptCount = settlement.getReceiptCount();
-								settlement.setReceiptCount(receiptCount + 1);
-								List<Position> positions = receipt.getPositions();
-								for (Position position : positions)
-								{
-									if (!position.isDeleted())
-									{
-										if (position.getOption().equals(Option.PAYED_INVOICE))
-										{
-											SettlementPayedInvoice settlementPayedInvoice = settlementPayedInvoices.remove(position.getId());
-											if (settlementPayedInvoice == null)
-											{
-												settlementPayedInvoice = SettlementPayedInvoice.newInstance(settlement, position);
-											}
-											else
-											{
-												settlementPayedInvoice.setPosition(position);
-												
-											}
-										}
-										if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
-										{
-											SettlementInternal settlementInternal = settlementInternals.remove(position.getId());
-											if (settlementInternal == null)
-											{
-												settlementInternal = SettlementInternal.newInstance(settlement, position);
-											}
-											else
-											{
-												settlementInternal.setPosition(position);
-												
-											}
-										}
-										if (!receipt.isInternal())
-										{
-											SettlementPosition settlementPosition = settlementPositions.get(position.getProductGroup().getId());
-											if (settlementPosition == null)
-											{
-												settlementPosition = SettlementPosition.newInstance(settlement, position.getProductGroup(), position.getReceipt().getSettlement().getSalespoint().getPaymentType().getCurrency());
-												settlementPosition.setProductGroupType(position.getProductGroup().getProductGroupType());
-												settlement.getPositions().add(settlementPosition);
-											}
-											settlementPosition.setDeleted(false);
-											int qty = settlementPosition.getQuantity();
-											settlementPosition.setQuantity(qty + position.getQuantity());
-											double amount = settlementPosition.getDefaultCurrencyAmount();
-											settlementPosition.setDefaultCurrencyAmount(amount + position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
-											amount = settlementPosition.getTaxAmount();
-											settlementPosition.setTaxAmount(amount + position.getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
-										}
-									}
-								}
-								List<Payment> payments = receipt.getPayments();
-								for (Payment payment : payments)
-								{
-									if (!payment.isDeleted() && !receipt.isInternal())
-									{
-										SettlementPaymentValue paymentValue = settlementPayments.get(payment.getPaymentType().getId());
-										if (paymentValue == null)
-										{
-											paymentValue = new SettlementPaymentValue(createSettlementPayment(payment, settlement));
-											settlementPayments.put(payment.getPaymentType().getId(), paymentValue);
-										}
-										else
-										{
-											SettlementPayment settlementPayment = paymentValue.getRight(payment.getAmount());
-											if (settlementPayment == null)
-											{
-												settlementPayment = createSettlementPayment(payment, settlement);
-												paymentValue.setSettlementPayment(settlementPayment);
-											}
-											else
-											{
-												updateSettlementPayment(payment, settlementPayment);
-											}
-										}
-									}
-								}
-							}
-							if (settlementReceipts.size() > 0)
-							{
-								for (SettlementReceipt settlementReceipt : settlementReceipts.values())
-								{
-									settlementReceipt.setDeleted(true);
-								}
-							}
-							if (settlementPayedInvoices.size() > 0)
-							{
-								for (SettlementPayedInvoice settlementPayedInvoice : settlementPayedInvoices.values())
-								{
-									settlementPayedInvoice.setDeleted(true);
-								}
-							}
-							if (settlementInternals.size() > 0)
-							{
-								for (SettlementInternal settlementInternal : settlementInternals.values())
-								{
-									settlementInternal.setDeleted(true);
-								}
-							}
-							if (settlementPositions.size() > 0)
-							{
-								for (SettlementPosition settlementPosition : settlementPositions.values())
-								{
-									settlementPosition.setDeleted(true);
-								}
-							}
-						}
-					}
-					finally
-					{
-						tracker.close();
-					}
-					tracker.close();
-				}
-			}
-		}
-	}
+//	private void updateSettlement(ISelection selection) 
+//	{
+//		if (selection.isEmpty())
+//		{
+//			return;
+//		}
+//		if (selection instanceof IStructuredSelection)
+//		{
+//			IStructuredSelection ssel = (IStructuredSelection) selection;
+//			if (ssel.getFirstElement() instanceof Settlement)
+//			{
+//				Settlement settlement = (Settlement) ssel.getFirstElement();
+//				settlement.setReceiptCount(0L);
+//				MessageDialog dialog = new MessageDialog(this.getShell(), "Abschluss aktualisieren", null, "Achtung, Sie sind dabei, den Tagesabschluss vom " + SimpleDateFormat.getInstance().getDateTimeInstance().format(settlement.getSettled().getTime()) + " zu verändern. Diese Änderung kann nicht mehr rückganging gemacht werden. Wollen Sie die Aktualisierung trotzdem durchführen?", MessageDialog.WARNING, new String[] { "Ja", "Nein" }, 1);
+//				if (dialog.open() == 0)
+//				{
+//					ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
+//							PersistenceService.class, null);
+//					try
+//					{
+//						tracker.open();
+//						PersistenceService service = (PersistenceService) tracker.getService();
+//						if (service != null)
+//						{
+//							ReceiptQuery query = (ReceiptQuery) service.getServerService().getQuery(Receipt.class);
+//							List<Receipt> receipts = query.selectBySettlement(settlement, new Receipt.State[] {Receipt.State.SAVED, Receipt.State.REVERSED });
+//							Map<Long, SettlementPosition> settlementPositions = loadSettlementPositions(settlement);
+//							Map<Long, SettlementPayedInvoice> settlementPayedInvoices = loadSettlementPayedInvoices(settlement);
+//							Map<Long, SettlementReceipt> settlementReceipts = loadSettlementReceipts(settlement);
+//							Map<Long, SettlementInternal> settlementInternals = loadSettlementInternals(settlement);
+////							Map<Long, SettlementTax> settlementTax = loadSettlementTaxes(settlement);
+//							Map<Long, SettlementPaymentValue> settlementPayments = loadSettlementPayments(settlement);
+//							for (Receipt receipt : receipts)
+//							{
+//								if (receipt.getState().equals(Receipt.State.REVERSED))
+//								{
+//									SettlementReceipt settlementReceipt = settlementReceipts.remove(receipt.getId());
+//									if (settlementReceipt == null)
+//									{
+//										settlementReceipt = SettlementReceipt.newInstance(settlement, receipt);
+//										settlement.getReversedReceipts().add(settlementReceipt);
+//									}
+//									else
+//									{
+//										settlementReceipt.setReceipt(receipt);
+//									}
+//									settlementReceipt.setDeleted(receipt.isDeleted());
+//								}
+//								long receiptCount = settlement.getReceiptCount();
+//								settlement.setReceiptCount(receiptCount + 1);
+//								List<Position> positions = receipt.getPositions();
+//								for (Position position : positions)
+//								{
+//									if (!position.isDeleted())
+//									{
+//										if (position.getOption().equals(Option.PAYED_INVOICE))
+//										{
+//											SettlementPayedInvoice settlementPayedInvoice = settlementPayedInvoices.remove(position.getId());
+//											if (settlementPayedInvoice == null)
+//											{
+//												settlementPayedInvoice = SettlementPayedInvoice.newInstance(settlement, position);
+//											}
+//											else
+//											{
+//												settlementPayedInvoice.setPosition(position);
+//												
+//											}
+//										}
+//										if (position.getProductGroup().getProductGroupType().getParent().equals(ProductGroupGroup.INTERNAL))
+//										{
+//											SettlementInternal settlementInternal = settlementInternals.get(position.getProductGroup().getId());
+//											if (settlementInternal == null)
+//											{
+//												settlementInternal = SettlementInternal.newInstance(settlement, position.getProductGroup(), position.getReceipt().getSettlement().getSalespoint().getPaymentType().getCurrency());
+//												settlementInternal.setProductGroupType(position.getProductGroup().getProductGroupType());
+//												settlement.getInternals().add(settlementInternal);
+//											}
+//											settlementInternal.setDeleted(false);
+//											int qty = settlementInternal.getQuantity();
+//											settlementInternal.setQuantity(qty + position.getQuantity());
+//											double amount = settlementInternal.getDefaultCurrencyAmount();
+//											settlementInternal.setDefaultCurrencyAmount(amount + position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
+//										}
+//										if (!receipt.isInternal())
+//										{
+//											SettlementPosition settlementPosition = settlementPositions.get(position.getProductGroup().getId());
+//											if (settlementPosition == null)
+//											{
+//												settlementPosition = SettlementPosition.newInstance(settlement, position.getProductGroup(), position.getReceipt().getSettlement().getSalespoint().getPaymentType().getCurrency());
+//												settlementPosition.setProductGroupType(position.getProductGroup().getProductGroupType());
+//												settlement.getPositions().add(settlementPosition);
+//											}
+//											settlementPosition.setDeleted(false);
+//											int qty = settlementPosition.getQuantity();
+//											settlementPosition.setQuantity(qty + position.getQuantity());
+//											double amount = settlementPosition.getDefaultCurrencyAmount();
+//											settlementPosition.setDefaultCurrencyAmount(amount + position.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO));
+//											amount = settlementPosition.getTaxAmount();
+//											settlementPosition.setTaxAmount(amount + position.getTaxAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
+//										}
+//									}
+//								}
+//								List<Payment> payments = receipt.getPayments();
+//								for (Payment payment : payments)
+//								{
+//									if (!payment.isDeleted() && !receipt.isInternal())
+//									{
+//										SettlementPaymentValue paymentValue = settlementPayments.get(payment.getPaymentType().getId());
+//										if (paymentValue == null)
+//										{
+//											paymentValue = new SettlementPaymentValue(createSettlementPayment(payment, settlement));
+//											settlementPayments.put(payment.getPaymentType().getId(), paymentValue);
+//										}
+//										else
+//										{
+//											SettlementPayment settlementPayment = paymentValue.getRight(payment.getAmount());
+//											if (settlementPayment == null)
+//											{
+//												settlementPayment = createSettlementPayment(payment, settlement);
+//												paymentValue.setSettlementPayment(settlementPayment);
+//											}
+//											else
+//											{
+//												updateSettlementPayment(payment, settlementPayment);
+//											}
+//										}
+//									}
+//								}
+//							}
+//							if (settlementReceipts.size() > 0)
+//							{
+//								for (SettlementReceipt settlementReceipt : settlementReceipts.values())
+//								{
+//									settlementReceipt.setDeleted(true);
+//								}
+//							}
+//							if (settlementPayedInvoices.size() > 0)
+//							{
+//								for (SettlementPayedInvoice settlementPayedInvoice : settlementPayedInvoices.values())
+//								{
+//									settlementPayedInvoice.setDeleted(true);
+//								}
+//							}
+//							if (settlementInternals.size() > 0)
+//							{
+//								for (SettlementInternal settlementInternal : settlementInternals.values())
+//								{
+//									settlementInternal.setDeleted(true);
+//								}
+//							}
+//							if (settlementPositions.size() > 0)
+//							{
+//								for (SettlementPosition settlementPosition : settlementPositions.values())
+//								{
+//									settlementPosition.setDeleted(true);
+//								}
+//							}
+//						}
+//					}
+//					finally
+//					{
+//						tracker.close();
+//					}
+//					tracker.close();
+//				}
+//			}
+//		}
+//	}
 	
-	private Map<Long, SettlementReceipt> loadSettlementReceipts(Settlement settlement)
-	{
-		Map<Long, SettlementReceipt> receipts = new HashMap<Long, SettlementReceipt>();
-		List<SettlementReceipt> settlementReceipts = settlement.getReversedReceipts();
-		for (SettlementReceipt settlementReceipt : settlementReceipts)
-		{
-			receipts.put(settlementReceipt.getReceiptId(), settlementReceipt);
-		}
-		return receipts;
-	}
+//	private Map<Long, SettlementReceipt> loadSettlementReceipts(Settlement settlement)
+//	{
+//		Map<Long, SettlementReceipt> receipts = new HashMap<Long, SettlementReceipt>();
+//		List<SettlementReceipt> settlementReceipts = settlement.getReversedReceipts();
+//		for (SettlementReceipt settlementReceipt : settlementReceipts)
+//		{
+//			receipts.put(settlementReceipt.getReceiptId(), settlementReceipt);
+//		}
+//		return receipts;
+//	}
 	
-	private Map<Long, SettlementPosition> loadSettlementPositions(Settlement settlement)
-	{
-		Map<Long, SettlementPosition> positions = new HashMap<Long, SettlementPosition>();
-		List<SettlementPosition> settlementPositions = settlement.getPositions();
-		for (SettlementPosition settlementPosition : settlementPositions)
-		{
-			settlementPosition.setDeleted(true);
-			settlementPosition.setQuantity(0);
-			settlementPosition.setTaxAmount(0d);
-			settlementPosition.setDefaultCurrencyAmount(0d);
-			positions.put(settlementPosition.getProductGroup().getId(), settlementPosition);
-		}
-		return positions;
-	}
+//	private Map<Long, SettlementPosition> loadSettlementPositions(Settlement settlement)
+//	{
+//		Map<Long, SettlementPosition> positions = new HashMap<Long, SettlementPosition>();
+//		List<SettlementPosition> settlementPositions = settlement.getPositions();
+//		for (SettlementPosition settlementPosition : settlementPositions)
+//		{
+//			settlementPosition.setDeleted(true);
+//			settlementPosition.setQuantity(0);
+//			settlementPosition.setTaxAmount(0d);
+//			settlementPosition.setDefaultCurrencyAmount(0d);
+//			positions.put(settlementPosition.getProductGroup().getId(), settlementPosition);
+//		}
+//		return positions;
+//	}
 
-	private Map<Long, SettlementPaymentValue> loadSettlementPayments(Settlement settlement)
-	{
-		Map<Long, SettlementPaymentValue> payments = new HashMap<Long, SettlementPaymentValue>();
-		List<SettlementPayment> settlementPayments = settlement.getPayments();
-		for (SettlementPayment settlementPayment : settlementPayments)
-		{
-			settlementPayment.setDeleted(true);
-			SettlementPaymentValue value = payments.get(settlementPayment.getPaymentType());
-			if (value == null)
-			{
-				value = new SettlementPaymentValue(settlementPayment);
-			}
-			else
-			{
-				value.setSettlementPayment(settlementPayment);
-			}
-		}
-		return payments;
-	}
+//	private Map<Long, SettlementPaymentValue> loadSettlementPayments(Settlement settlement)
+//	{
+//		Map<Long, SettlementPaymentValue> payments = new HashMap<Long, SettlementPaymentValue>();
+//		List<SettlementPayment> settlementPayments = settlement.getPayments();
+//		for (SettlementPayment settlementPayment : settlementPayments)
+//		{
+//			settlementPayment.setDeleted(true);
+//			SettlementPaymentValue value = payments.get(settlementPayment.getPaymentType());
+//			if (value == null)
+//			{
+//				value = new SettlementPaymentValue(settlementPayment);
+//			}
+//			else
+//			{
+//				value.setSettlementPayment(settlementPayment);
+//			}
+//		}
+//		return payments;
+//	}
 	
-	private class SettlementPaymentValue
-	{
-		private SettlementPayment payment;
-		
-		private SettlementPayment back;
+//	private class SettlementPaymentValue
+//	{
+//		private SettlementPayment payment;
+//		
+//		private SettlementPayment back;
+//	
+//		public SettlementPaymentValue(SettlementPayment settlementPayment)
+//		{
+//			setSettlementPayment(settlementPayment);
+//		}
+//
+//		private SettlementPayment clear(SettlementPayment settlementPayment)
+//		{
+//			settlementPayment.setDefaultCurrencyAmount(0d);
+//			settlementPayment.setForeignCurrencyAmount(0d);
+//			settlementPayment.setQuantity(0);
+//			return settlementPayment;
+//		}
+//		public void setSettlementPayment(SettlementPayment settlementPayment)
+//		{
+//			if (settlementPayment.getDefaultCurrencyAmount() < 0)
+//			{
+//				this.back = clear(settlementPayment);
+//			}
+//			else
+//			{
+//				this.payment = clear(settlementPayment);
+//			}
+//		}
+//		
+//		public SettlementPayment getBack()
+//		{
+//			return this.back;
+//		}
+//		
+//		public SettlementPayment getPayment()
+//		{
+//			return this.payment;
+//		}
+//		
+//		public SettlementPayment getRight(double amount)
+//		{
+//			if (amount < 0)
+//			{
+//				return this.back;
+//			}
+//			else
+//			{
+//				return this.payment;
+//			}
+//		}
+//	}
+
+//	private SettlementPayment createSettlementPayment(Payment payment, Settlement settlement)
+//	{
+//		SettlementPayment settlementPayment= SettlementPayment.newInstance(settlement, payment.getPaymentType());
+//		return updateSettlementPayment(payment, settlementPayment);
+//	}
 	
-		public SettlementPaymentValue(SettlementPayment settlementPayment)
-		{
-			setSettlementPayment(settlementPayment);
-		}
+//	private SettlementPayment updateSettlementPayment(Payment payment, SettlementPayment settlementPayment)
+//	{
+//		settlementPayment.setDeleted(false);
+//		settlementPayment.setQuantity(settlementPayment.getQuantity() + 1);
+//		settlementPayment.setDefaultCurrencyAmount(payment.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
+//		settlementPayment.setForeignCurrencyAmount(payment.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY));
+//		return settlementPayment;
+//	}
 
-		private SettlementPayment clear(SettlementPayment settlementPayment)
-		{
-			settlementPayment.setDefaultCurrencyAmount(0d);
-			settlementPayment.setForeignCurrencyAmount(0d);
-			settlementPayment.setQuantity(0);
-			return settlementPayment;
-		}
-		public void setSettlementPayment(SettlementPayment settlementPayment)
-		{
-			if (settlementPayment.getDefaultCurrencyAmount() < 0)
-			{
-				this.back = clear(settlementPayment);
-			}
-			else
-			{
-				this.payment = clear(settlementPayment);
-			}
-		}
-		
-		public SettlementPayment getBack()
-		{
-			return this.back;
-		}
-		
-		public SettlementPayment getPayment()
-		{
-			return this.payment;
-		}
-		
-		public SettlementPayment getRight(double amount)
-		{
-			if (amount < 0)
-			{
-				return this.back;
-			}
-			else
-			{
-				return this.payment;
-			}
-		}
-	}
+//	private Map<Long, SettlementPayedInvoice> loadSettlementPayedInvoices(Settlement settlement)
+//	{
+//		Map<Long, SettlementPayedInvoice> payedInvoices = new HashMap<Long, SettlementPayedInvoice>();
+//		List<SettlementPayedInvoice> settlementPayedInvoices = settlement.getPayedInvoices();
+//		for (SettlementPayedInvoice settlementPayedInvoice : settlementPayedInvoices)
+//		{
+//			payedInvoices.put(settlementPayedInvoice.getPositionId(), settlementPayedInvoice);
+//		}
+//		return payedInvoices;
+//	}
 
-	private SettlementPayment createSettlementPayment(Payment payment, Settlement settlement)
-	{
-		SettlementPayment settlementPayment= SettlementPayment.newInstance(settlement, payment.getPaymentType());
-		return updateSettlementPayment(payment, settlementPayment);
-	}
-	
-	private SettlementPayment updateSettlementPayment(Payment payment, SettlementPayment settlementPayment)
-	{
-		settlementPayment.setDeleted(false);
-		settlementPayment.setQuantity(settlementPayment.getQuantity() + 1);
-		settlementPayment.setDefaultCurrencyAmount(payment.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY));
-		settlementPayment.setForeignCurrencyAmount(payment.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY));
-		return settlementPayment;
-	}
-
-	private Map<Long, SettlementPayedInvoice> loadSettlementPayedInvoices(Settlement settlement)
-	{
-		Map<Long, SettlementPayedInvoice> payedInvoices = new HashMap<Long, SettlementPayedInvoice>();
-		List<SettlementPayedInvoice> settlementPayedInvoices = settlement.getPayedInvoices();
-		for (SettlementPayedInvoice settlementPayedInvoice : settlementPayedInvoices)
-		{
-			payedInvoices.put(settlementPayedInvoice.getPositionId(), settlementPayedInvoice);
-		}
-		return payedInvoices;
-	}
-
-	private Map<Long, SettlementInternal> loadSettlementInternals(Settlement settlement)
-	{
-		Map<Long, SettlementInternal> internals = new HashMap<Long, SettlementInternal>();
-		List<SettlementInternal> settlementInternals = settlement.getInternals();
-		for (SettlementInternal settlementInternal : settlementInternals)
-		{
-			internals.put(settlementInternal.getPositionId(), settlementInternal);
-		}
-		return internals;
-	}
+//	private Map<Long, SettlementInternal> loadSettlementInternals(Settlement settlement)
+//	{
+//		Map<Long, SettlementInternal> internals = new HashMap<Long, SettlementInternal>();
+//		List<SettlementInternal> settlementInternals = settlement.getInternals();
+//		for (SettlementInternal settlementInternal : settlementInternals)
+//		{
+//			internals.put(settlementInternal.getProductGroup().getId(), settlementInternal);
+//		}
+//		return internals;
+//	}
 
 //	private Map<Long, SettlementTax> loadSettlementTaxes(Settlement settlement)
 //	{

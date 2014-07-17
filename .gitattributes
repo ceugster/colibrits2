@@ -1823,7 +1823,6 @@ ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderServ
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/service/ProviderUpdater.java -text
 ch.eugster.colibri.report.commons/.classpath -text
 ch.eugster.colibri.report.commons/.project -text
-ch.eugster.colibri.report.commons/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.commons/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.commons/build.properties -text
 ch.eugster.colibri.report.daterange/.classpath -text
@@ -1898,7 +1897,6 @@ ch.eugster.colibri.report.receipt.feature/feature.xml -text
 ch.eugster.colibri.report.receipt/.classpath -text
 ch.eugster.colibri.report.receipt/.project -text
 ch.eugster.colibri.report.receipt/.settings/org.eclipse.core.resources.prefs -text
-ch.eugster.colibri.report.receipt/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.receipt/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.receipt/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.receipt/build.properties -text
@@ -1994,7 +1992,6 @@ ch.eugster.colibri.report.tax.feature/feature.xml -text
 ch.eugster.colibri.report.tax/.classpath -text
 ch.eugster.colibri.report.tax/.project -text
 ch.eugster.colibri.report.tax/.settings/org.eclipse.core.resources.prefs -text
-ch.eugster.colibri.report.tax/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.tax/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.tax/build.properties -text
 ch.eugster.colibri.report.tax/plugin.xml -text
@@ -2009,7 +2006,6 @@ ch.eugster.colibri.report.time.feature/feature.xml -text
 ch.eugster.colibri.report.time/.classpath -text
 ch.eugster.colibri.report.time/.project -text
 ch.eugster.colibri.report.time/.settings/org.eclipse.core.resources.prefs -text
-ch.eugster.colibri.report.time/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.report.time/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.time/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.time/build.properties -text

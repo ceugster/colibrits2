@@ -15,8 +15,6 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanArrayDataSource;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.Job;
 
 import ch.eugster.colibri.report.engine.ReportService;
 import ch.eugster.colibri.report.internal.viewer.ViewerApp;
@@ -25,7 +23,7 @@ public class ReportServiceComponent implements ReportService
 {
 
 	@Override
-	public void export(final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters,
+	public void export(final InputStream report, final Comparable<?>[] beanArray, final Map<String, Object> parameters,
 			final Format format, final File file) throws IllegalArgumentException
 	{
 		Arrays.sort(beanArray);
@@ -34,7 +32,7 @@ public class ReportServiceComponent implements ReportService
 	}
 
 	@Override
-	public void print(final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters,
+	public void print(final InputStream report, final Comparable<?>[] beanArray, final Map<String, Object> parameters,
 			final boolean doNotShowPrintDialog) throws IllegalArgumentException
 	{
 		Arrays.sort(beanArray);
@@ -43,7 +41,7 @@ public class ReportServiceComponent implements ReportService
 	}
 
 	@Override
-	public void view(IProgressMonitor monitor, final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters)
+	public void view(IProgressMonitor monitor, final InputStream report, final Comparable<?>[] beanArray, final Map<String, Object> parameters)
 			throws IllegalArgumentException
 	{
 		Arrays.sort(beanArray);

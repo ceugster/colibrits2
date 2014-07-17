@@ -105,7 +105,7 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 		group.setText("Optionen"); //$NON-NLS-1$
 
 		printInternals = new Button(group, SWT.CHECK);
-		printInternals.setText("Einlagen/Entnahmen detailliert auflisten");
+		printInternals.setText("Einlagen/Entnahmen auflisten");
 		printInternals.setLayoutData(new GridData());
 		printInternals.setSelection(settings.getBoolean("print.detailed.internals"));
 		printInternals.addSelectionListener(new SelectionListener()
@@ -201,8 +201,8 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 			entries.addAll(createPositionSection(service.getServerService()).values());
 			entries.addAll(createPaymentSection(service.getServerService()).values());
 			entries.addAll(createTaxSection(service.getServerService()).values());
-
 			entries.addAll(createInternalSection(service.getServerService()).values());
+
 			if (this.printRestitutedPositions.getSelection())
 			{
 				entries.addAll(createRestitutedPositionSection(service.getServerService()).values());
@@ -256,9 +256,10 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	protected Map<Long, SettlementEntry> createInternalSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementInternal> internals = query.selectInternals(this.parentView.getSelectedSalespoints(),
+		List<SettlementInternal> internals = query.selectInternals(this.parentView.getSelectedSalespoints(),
 				this.parentView.getSelectedDateRange());
-		return createInternalSection(new HashMap<Long, SettlementEntry>(), internals, printInternals.getSelection());
+		Map<Long, SettlementEntry> section = createInternalSection(new HashMap<Long, SettlementEntry>(), internals);
+		return section;
 	}
 
 	protected Map<Long, SettlementEntry> createRestitutedPositionSection(ServerService service)

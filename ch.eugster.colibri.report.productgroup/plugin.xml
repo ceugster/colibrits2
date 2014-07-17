@@ -19,7 +19,7 @@
             restorable="true">
       </view>
       <category
-            id="ch.eugster.colibri.report.settlement.category"
+            id="ch.eugster.colibri.report.productgroup.category"
             name="Warengruppenstatistik">
       </category>
    </extension>

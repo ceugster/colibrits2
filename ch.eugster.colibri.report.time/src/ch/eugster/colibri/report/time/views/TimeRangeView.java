@@ -266,7 +266,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		{
 			int weekdayNumber = i + calendar.getFirstDayOfWeek();
 			weekdayNumber = weekdayNumber <= 7 ? weekdayNumber : weekdayNumber -7;
-			String name = names[weekdayNumber];
+//			String name = names[weekdayNumber];
 			weekdays[i] = new Button(group, SWT.CHECK);
 			weekdays[i].setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			weekdays[i].setText(names[weekdayNumber]);

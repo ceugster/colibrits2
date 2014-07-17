@@ -13,19 +13,19 @@ public interface ReportService
 	void export(final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters,
 			Format format, File file) throws IllegalArgumentException;
 
-	void export(final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters,
+	void export(final InputStream report, final Comparable<?>[] beanArray, final Map<String, Object> parameters,
 			Format format, File file) throws IllegalArgumentException;
 
 	void print(InputStream report, JRDataSource dataSource, Map<String, Object> parameters, boolean doNotShowPrintDialog)
 			throws IllegalArgumentException;
 
-	void print(InputStream report, Comparable[] beanArray, Map<String, Object> parameters, boolean doNotShowPrintDialog)
+	void print(InputStream report, Comparable<?>[] beanArray, Map<String, Object> parameters, boolean doNotShowPrintDialog)
 			throws IllegalArgumentException;
 
 	void view(IProgressMonitor monitor, final InputStream report, final JRDataSource dataSource, final Map<String, Object> parameters)
 			throws IllegalArgumentException;
 
-	void view(IProgressMonitor monitor, final InputStream report, final Comparable[] beanArray, final Map<String, Object> parameters)
+	void view(IProgressMonitor monitor, final InputStream report, final Comparable<?>[] beanArray, final Map<String, Object> parameters)
 			throws IllegalArgumentException;
 
 	public enum Destination
