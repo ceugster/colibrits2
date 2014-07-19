@@ -1,11 +1,10 @@
 package ch.eugster.colibri.periphery.printer.serial.service;
 
+import j.extensions.comm.SerialComm;
+
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
-
-import javax.comm.CommPort;
-import javax.comm.CommPortIdentifier;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -23,17 +22,34 @@ import ch.eugster.colibri.persistence.model.Stock;
 
 public class SerialReceiptPrinterService extends AbstractReceiptPrinterService 
 {
-	private CommPort commPort;
+	private SerialComm serialComm;
 	
 	private PrintStream printer;
 	
-	protected void activate(ComponentContext context)
+	protected void activate(final ComponentContext context)
 	{
 		super.activate(context);
+		String portname = this.getPort();
+		String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
+		SerialComm[] serialComms = SerialComm.getCommPorts();
+		{
+			for (SerialComm serialComm : serialComms)
+			{
+				if (serialComm.getSystemPortName().equals(port)) 
+				{
+					this.serialComm = serialComm;
+					this.serialComm.openPort();
+				}
+			}
+		}
 	}
-	
-	protected void deactivate(ComponentContext context)
+
+	protected void deactivate(final ComponentContext context)
 	{
+		if (this.serialComm != null)
+		{
+			this.serialComm.closePort();
+		}
 		super.deactivate(context);
 	}
 
@@ -45,33 +61,23 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			this.printer.close();
 			this.printer = null;
 		}
-		if (this.commPort != null)
-		{
-			this.commPort.close();
-			this.commPort = null;
-		}
 	}
 
 	private void openPrinter(String deviceName)
 	{
 		try
 		{
-			String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
-			CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(port);
-			commPort = portId.open("posprinter", 2000);
-			printer = new PrintStream(commPort.getOutputStream());
-			print(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-			print(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
-			print(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
+			this.printer = new PrintStream(serialComm.getOutputStream());
+			this.printer.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
 		}
-		catch (final Exception e)
+		catch (IOException e) 
 		{
 			if (this.getEventAdmin() != null)
 			{
 				this.getEventAdmin().sendEvent(
-						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
+						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Port " + getPort() + " wird bereits verwendet.")));
 			}
-		}
+		} 
 	}
 
 	@Override
