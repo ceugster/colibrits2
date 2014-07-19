@@ -1,10 +1,9 @@
 package ch.eugster.colibri.periphery.printer.serial.service;
 
-import j.extensions.comm.SerialComm;
-
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Collection;
+
+import jssc.SerialPort;
+import jssc.SerialPortException;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -22,71 +21,58 @@ import ch.eugster.colibri.persistence.model.Stock;
 
 public class SerialReceiptPrinterService extends AbstractReceiptPrinterService 
 {
-	private SerialComm serialComm;
-	
-	private PrintStream printer;
-	
+	private SerialPort printer;
+
 	protected void activate(final ComponentContext context)
 	{
 		super.activate(context);
 		String portname = this.getPort();
-		String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
-		SerialComm[] serialComms = SerialComm.getCommPorts();
+		if (portname != null)
 		{
-			for (SerialComm serialComm : serialComms)
-			{
-				if (serialComm.getSystemPortName().equals(port)) 
-				{
-					this.serialComm = serialComm;
-					this.serialComm.openPort();
-				}
-			}
+			String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
+	        printer = new SerialPort(port);
+	        try {
+	            printer.openPort();//Open serial port
+	            printer.setParams(SerialPort.BAUDRATE_9600, 
+	                                 SerialPort.DATABITS_8,
+	                                 SerialPort.STOPBITS_1,
+	                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
+	        }
+	        catch (SerialPortException ex) 
+	        {
+	        }
+		}
+	}
+
+	private void sendEvent(Exception e)
+	{
+		if (this.getEventAdmin() != null)
+		{
+			this.getEventAdmin().sendEvent(
+					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
 		}
 	}
 
 	protected void deactivate(final ComponentContext context)
 	{
-		if (this.serialComm != null)
+		if (this.printer != null)
 		{
-			this.serialComm.closePort();
+			try 
+			{
+	            printer.closePort();//Close serial port
+			}
+			catch (final Exception e)
+			{
+				sendEvent(e);
+			}
 		}
 		super.deactivate(context);
 	}
 
-	private void closePrinter()
-	{
-		if (this.printer != null)
-		{
-			this.printer.flush();
-			this.printer.close();
-			this.printer = null;
-		}
-	}
-
-	private void openPrinter(String deviceName)
-	{
-		try
-		{
-			this.printer = new PrintStream(serialComm.getOutputStream());
-			this.printer.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-		}
-		catch (IOException e) 
-		{
-			if (this.getEventAdmin() != null)
-			{
-				this.getEventAdmin().sendEvent(
-						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Port " + getPort() + " wird bereits verwendet.")));
-			}
-		} 
-	}
 
 	@Override
 	public void print(String text) 
 	{
-		if (printer == null)
-		{
-			this.openPrinter(this.getPort());
-		}
 		if (printer != null)
 		{
 			if (this.isPrintLogo())
@@ -96,27 +82,25 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			final byte[] printable = this.getConverter().convert(text.getBytes());
 			println(printable);
 			this.cutPaper(this.getLinesBeforeCut());
-			closePrinter();
 		}
 	}
 
 	private void printNVBitImage(int n, int m)
 	{
-		this.printer.write(AsciiConstants.FS);
-		this.printer.write(AsciiConstants.p);
-		this.printer.write(n);
-		this.printer.write(m);
-		this.printer.flush();
+		try 
+		{
+			this.printer.writeBytes(new byte[] { AsciiConstants.FS, AsciiConstants.p, (byte)n, (byte)m });
+		} 
+		catch (SerialPortException e) 
+		{
+			sendEvent(e);
+		}
 	}
 	
 	@Override
 	public void print(String text, Salespoint salespoint) 
 	{
 		SalespointReceiptPrinterSettings settings = salespoint == null ? null : salespoint.getReceiptPrinterSettings();
-		if (printer == null)
-		{
-			this.openPrinter(settings == null ? this.getReceiptPrinterSettings().getPort() : settings.getPort());
-		}
 		if (printer != null)
 		{
 			if (this.isPrintLogo())
@@ -127,7 +111,6 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			final byte[] printable = converter.convert(text.getBytes());
 			println(printable);
 			this.cutPaper(settings == null ? this.getReceiptPrinterSettings().getLinesBeforeCut() : settings.getLinesBeforeCut());
-			closePrinter();
 		}
 	}
 
@@ -135,10 +118,11 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		try 
 		{
-			printer.write(bytes);
+			printer.writeBytes(bytes);
 		} 
-		catch (IOException e) 
+		catch (SerialPortException e) 
 		{
+			sendEvent(e);
 		}
 	}
 	
@@ -150,20 +134,19 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			{
 				if (bytes[i] == 64)
 				{
-					printer.write(new byte[] { 27, 82, 0 });
-					printer.flush();
+					printer.writeBytes(new byte[] { 27, 82, 0 });
 				}
-				printer.write(bytes[i]);
+				printer.writeBytes(new byte[] { bytes[i] });
 				if (bytes[i] == 64)
 				{
-					printer.write(new byte[] { 27, 82, 2 });
-					printer.flush();
+					printer.writeBytes(new byte[] { 27, 82, 2 });
 				}
 			}
-			printer.write(new byte[] { '\n' });
+			printer.writeBytes(new byte[] { '\n' });
 		} 
-		catch (IOException e) 
+		catch (SerialPortException e) 
 		{
+			sendEvent(e);
 		}
 	}
 	
@@ -171,20 +154,17 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		try 
 		{
-			printer.write(new byte[] { '\n' });
+			printer.writeBytes(new byte[] { '\n' });
 		} 
-		catch (IOException e) 
+		catch (SerialPortException e) 
 		{
+			sendEvent(e);
 		}
 	}
 	
 	@Override
 	public void print(String[] text) 
 	{
-		if (printer == null)
-		{
-			this.openPrinter(this.getPort());
-		}
 		if (printer != null)
 		{
 			if (this.isPrintLogo())
@@ -197,7 +177,6 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 				println(printable);
 			}
 			this.cutPaper(this.getLinesBeforeCut());
-			this.closePrinter();
 		}
 	}
 
@@ -207,10 +186,6 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		if (currency == null)
 		{
 			return;
-		}
-		if (printer == null)
-		{
-			this.openPrinter(this.getPort());
 		}
 		if (printer != null)
 		{
@@ -229,7 +204,6 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 					}
 				}
 			}
-			this.closePrinter();
 		}
 	}
 
@@ -265,21 +239,10 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	{
 		final Converter converter = new Converter(conversions);
 		final byte[] printable = converter.convert(text.getBytes());
-		try 
+		if (printer != null)
 		{
-			if (printer == null)
-			{
-				this.openPrinter(deviceName);
-			}
-			if (printer != null)
-			{
-				println(printable);
-				this.cutPaper(feed);
-			}
-		} 
-		finally
-		{
-			this.closePrinter();
+			println(printable);
+			this.cutPaper(feed);
 		}
 	}
 

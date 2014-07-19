@@ -213,16 +213,6 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 
 		this.eventHandlerServiceRegistration.unregister();
 
-		if (display != null)
-		{
-			String name = this.display.getCustomerDisplaySettings().getComponentName();
-			CustomerDisplayService service = this.getCustomerDisplayService(name);
-			if (service != null)
-			{
-				service.clearDisplay();
-			}
-		}
-
 		this.context = null;
 
 		if (this.logService != null)

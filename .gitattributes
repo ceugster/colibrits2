@@ -1229,7 +1229,7 @@ ch.eugster.colibri.periphery/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery/build.properties -text
-ch.eugster.colibri.periphery/lib/SerialComm.jar -text
+ch.eugster.colibri.periphery/lib/jssc.jar -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/Activator.java -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/constants/AsciiConstants.java -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/converters/Converter.java -text

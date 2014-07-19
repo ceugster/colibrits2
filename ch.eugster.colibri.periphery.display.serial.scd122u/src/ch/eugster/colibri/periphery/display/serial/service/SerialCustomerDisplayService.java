@@ -1,10 +1,9 @@
 package ch.eugster.colibri.periphery.display.serial.service;
 
-import j.extensions.comm.SerialComm;
-
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Properties;
+
+import jssc.SerialPort;
+import jssc.SerialPortException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -19,25 +18,35 @@ import ch.eugster.colibri.periphery.display.service.AbstractCustomerDisplayServi
 
 public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 {
-	private SerialComm serialComm;
+	private SerialPort serialPort;
 	
-	private PrintStream display;
+//	private PrintStream display;
 
 	@Override
 	public void clearDisplay()
 	{
-		this.openDisplay();
-		if (this.display != null)
+		byte[] print = new byte[] { AsciiConstants.ESC, AsciiConstants.AT };
+		try 
 		{
-			try 
-			{
-				this.display.write(new byte[] { 0x0c });
-			} 
-			catch (IOException e) 
-			{
-			}
+			this.serialPort.writeBytes(print);
 		}
-		this.closeDisplay();
+		catch (final Exception e)
+		{
+			sendEvent(e);
+		}
+//		this.openDisplay();
+//		if (this.display != null)
+//		{
+//			try 
+//			{
+//				this.display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+//				this.display.flush();
+//			} 
+//			catch (IOException e) 
+//			{
+//			}
+//		}
+//		this.closeDisplay();
 	}
 
 	@Override
@@ -54,7 +63,8 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
 				{
-					SerialCustomerDisplayService.this.displayText(text);
+					SerialCustomerDisplayService.this.clearDisplay();
+					SerialCustomerDisplayService.this.writeBytes(text);
 					return Status.OK_STATUS;
 				}
 				
@@ -66,96 +76,91 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	@Override
 	public void displayText(final String text)
 	{
-		this.clearDisplay();
-		this.openDisplay();
-		if (this.display != null)
-		{
-			byte[] print = this.correctText(text);
-			try 
-			{
-				this.display.write(print);
-			} 
-			catch (IOException e) 
-			{
-			}
-		}
-		this.closeDisplay();
+//		this.openDisplay();
+//		if (this.display != null)
+//		{
+//			try 
+//			{
+				this.clearDisplay();
+				this.writeBytes(text);
+//				this.display.flush();
+//			} 
+//			catch (IOException e) 
+//			{
+//			}
+//		}
+//		this.closeDisplay();
 	}
 	
+	private void writeBytes(String text)
+	{
+		if (this.serialPort!= null)
+		{
+			try
+			{
+				this.serialPort.writeString(text);
+			}
+			catch (final Exception e)
+			{
+				sendEvent(e);
+			}
+		}
+	}
+	
+	private void sendEvent(Exception e)
+	{
+		if (this.getEventAdmin() != null)
+		{
+			this.getEventAdmin().sendEvent(
+					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
+		}
+	}
+
 	@Override
 	public void displayText(final String converter, String text)
 	{
 		this.clearDisplay();
-		this.openDisplay();
-		if (this.display != null)
-		{
-			byte[] print = this.correctText(new Converter(converter), text);
-			try 
-			{
-				this.display.write(print);
-			} 
-			catch (IOException e) 
-			{
-			}
-		}
-		this.closeDisplay();
-	}
-
-	private void closeDisplay()
-	{
-		if (this.display != null)
-		{
-			this.display.flush();
-			this.display.close();
-			this.display = null;
-		}
+		this.writeBytes(text);
 	}
 
 	protected void activate(final ComponentContext context)
 	{
 		super.activate(context);
 		String portname = this.getPort();
-		String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
-		SerialComm[] serialComms = SerialComm.getCommPorts();
+		if (portname != null)
 		{
-			for (SerialComm serialComm : serialComms)
-			{
-				if (serialComm.getSystemPortName().equals(port)) 
-				{
-					this.serialComm = serialComm;
-					this.serialComm.openPort();
-				}
-			}
+			String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
+	        serialPort = new SerialPort(port);
+	        try {
+	            serialPort.openPort();//Open serial port
+	            serialPort.setParams(SerialPort.BAUDRATE_9600, 
+	                                 SerialPort.DATABITS_8,
+	                                 SerialPort.STOPBITS_1,
+	                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
+	        }
+	        catch (SerialPortException ex) 
+	        {
+	        }
 		}
 	}
 
 	protected void deactivate(final ComponentContext context)
 	{
-		if (this.serialComm != null)
+		if (this.serialPort != null)
 		{
 			this.clearDisplay();
-			this.serialComm.closePort();
+			try 
+			{
+	            serialPort.closePort();//Close serial port
+			}
+			catch (final Exception e)
+			{
+				sendEvent(e);
+			}
 		}
 		super.deactivate(context);
 	}
 
-	private void openDisplay()
-	{
-		try
-		{
-			this.display = new PrintStream(serialComm.getOutputStream());
-			this.display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-		}
-		catch (IOException e) 
-		{
-			if (this.getEventAdmin() != null)
-			{
-				this.getEventAdmin().sendEvent(
-						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Port " + getPort() + " wird bereits verwendet.")));
-			}
-		} 
-	}
-	
 	private int convert(String number)
 	{
 		try
@@ -171,8 +176,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	@Override
 	public IStatus testDisplay(Properties properties, String text) 
 	{
-		PrintStream myDisplay = null;
-		SerialComm mySerialComm = null;
+		SerialPort mySerialPort = null;
 		String port = null;
 		try
 		{
@@ -182,32 +186,24 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 			int cols = convert(properties.getProperty("cols"));
 			byte[] print = this.correctText(new Converter(converter), text, rows * cols);
 			port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
-			SerialComm[] serialComms = SerialComm.getCommPorts();
-			for (SerialComm serialComm : serialComms)
-			{
-				System.out.println(serialComm.getSystemPortName());
-				if (serialComm.getSystemPortName().equals(port)) 
-				{
-					mySerialComm = serialComm;
-					break;
-				}
-			}
-			if (mySerialComm == null)
-			{
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Der Port " + portname + " ist nicht vorhanden.");
-			}
-			if (!mySerialComm.openPort())
-			{
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Der Port " + portname + " konnte nicht geöffnet werden.");
-			}
-			myDisplay = new PrintStream(mySerialComm.getOutputStream());
-			myDisplay.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-			myDisplay.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-			myDisplay.write(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
-			myDisplay.write(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
-			myDisplay.write(print);
-			myDisplay.write("\n\n\n".getBytes());
-			myDisplay.flush();
+	        mySerialPort = new SerialPort(port);
+	        try {
+	            mySerialPort.openPort();//Open serial port
+	            mySerialPort.setParams(SerialPort.BAUDRATE_9600, 
+	                                 SerialPort.DATABITS_8,
+	                                 SerialPort.STOPBITS_1,
+	                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
+	        }
+	        catch (SerialPortException ex) 
+	        {
+				return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Fehler beim Testen des Ports " + port + ": " + ex.getLocalizedMessage());
+	        }
+			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
+			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
+			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
+			mySerialPort.writeBytes(print);
+			mySerialPort.writeBytes("\n\n\n".getBytes());
 		}
 		catch (final Exception e)
 		{
@@ -222,8 +218,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		{
 			try
 			{
-				if (myDisplay != null) myDisplay.close();
-				if (mySerialComm != null) mySerialComm.closePort();
+				if (mySerialPort != null) mySerialPort.closePort();
 			}
 			catch (Exception e)
 			{
