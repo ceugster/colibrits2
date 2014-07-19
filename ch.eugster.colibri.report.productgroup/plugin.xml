@@ -40,7 +40,7 @@
       </menuContribution>
       <menuContribution
             allPopups="false"
-            locationURI="toolbar:ch.eugster.colibri.report.toolbar.perspectives?after=additions">
+            locationURI="toolbar:ch.eugster.colibri.report.toolbar.perspectives?after=ch.eugster.colibri.report.separator.1">
          <command
                commandId="org.eclipse.ui.perspectives.showPerspective"
                label="Warengruppenstatistik"

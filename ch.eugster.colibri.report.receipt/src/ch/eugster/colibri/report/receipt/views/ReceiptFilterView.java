@@ -114,6 +114,8 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 	
 	private FormattedText amount;
 
+	private Button loadReceiptList;
+	
 	private Button printReceiptList;
 
 	private int receiptCount = 0;
@@ -165,9 +167,9 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				Calendar calendar = getStartDate(dateTime);
 				ReceiptFilterView.this.settings.put("date.selection", calendar.getTimeInMillis());
 				updateSettlementViewer();
-				StructuredSelection ssel = selectReceipts();
-				SelectionChangedEvent event = new SelectionChangedEvent(ReceiptFilterView.this, ssel);
-				ReceiptFilterView.this.fireSelectionChanged(event);
+//				StructuredSelection ssel = selectReceipts();
+//				SelectionChangedEvent event = new SelectionChangedEvent(ReceiptFilterView.this, ssel);
+//				ReceiptFilterView.this.fireSelectionChanged(event);
 			}
 		});
 
@@ -231,9 +233,6 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 				final String value = ((Text) e.getSource()).getText();
 				ReceiptFilterView.this.settings.put("number.selection", value);
 
-				StructuredSelection ssel = selectReceipts();
-				SelectionChangedEvent event = new SelectionChangedEvent(ReceiptFilterView.this, ssel);
-				ReceiptFilterView.this.fireSelectionChanged(event);
 				settlementViewer.getControl().setEnabled(number.getText().isEmpty());
 				stateViewer.getControl().setEnabled(number.getText().isEmpty());
 				userViewer.getControl().setEnabled(number.getText().isEmpty());
@@ -403,27 +402,48 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 			}
 		});
 
-		GridLayout gridLayout = new GridLayout();
+		GridLayout gridLayout = new GridLayout(2, true);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		
 		Composite filler = new Composite(composite, SWT.None);
-		filler.setLayoutData(new GridData(GridData.FILL_BOTH));
-		filler.setLayout(gridLayout);
-		
-		gridLayout = new GridLayout(2, false);
-		gridLayout.marginHeight = 0;
-		gridLayout.marginWidth = 0;
-		
-		filler = new Composite(composite, SWT.None);
 		filler.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		filler.setLayout(gridLayout);
 		
-		Composite filler2 = new Composite(filler, SWT.None);
-		filler2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		gridLayout = new GridLayout(2, false);
+//		gridLayout.marginHeight = 0;
+//		gridLayout.marginWidth = 0;
+//		
+//		filler = new Composite(composite, SWT.BORDER);
+//		filler.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+//		filler.setLayout(gridLayout);
+		
+//		Composite filler2 = new Composite(filler, SWT.BORDER);
+//		filler2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		loadReceiptList = new Button(filler, SWT.PUSH);
+		loadReceiptList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		loadReceiptList.setText("Belegliste laden");
+		loadReceiptList.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event)
+			{
+				widgetSelected(event);
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event)
+			{
+				loadReceiptList();
+			}
+		});
+
+//		filler2 = new Composite(filler, SWT.BORDER);
+//		filler2.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		printReceiptList = new Button(filler, SWT.PUSH);
-		printReceiptList.setLayoutData(new GridData());
+		printReceiptList.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		printReceiptList.setText("Belegliste drucken");
 		printReceiptList.addSelectionListener(new SelectionListener()
 		{
@@ -462,6 +482,13 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		this.getSite().setSelectionProvider(this);
 
 		this.setFocus();
+	}
+	
+	private void loadReceiptList()
+	{
+		StructuredSelection ssel = selectReceipts();
+		SelectionChangedEvent event = new SelectionChangedEvent(ReceiptFilterView.this, ssel);
+		ReceiptFilterView.this.fireSelectionChanged(event);
 	}
 	
 	private void printReceiptList()
