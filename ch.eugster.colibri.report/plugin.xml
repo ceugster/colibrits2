@@ -22,6 +22,29 @@
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
                id="ch.eugster.colibri.report.toolbar.perspectives">
+            <separator
+                  name="ch.eugster.colibri.report.separator.0"
+                  visible="false">
+            </separator>
+            <separator
+                  name="ch.eugster.colibri.report.separator.1"
+                  visible="false">
+            </separator>
+            <separator
+                  name="ch.eugster.colibri.report.separator.2"
+                  visible="false">
+            </separator>
+            <separator
+                  name="ch.eugster.colibri.report.separator.3"
+                  visible="false">
+            </separator>
+            <separator
+                  name="ch.eugster.colibri.report.separator.4"
+                  visible="false">
+            </separator>
+            <separator
+                  name="ch.eugster.colibri.report.separator.5">
+            </separator>
          </toolbar>
       </menuContribution>
    </extension>
