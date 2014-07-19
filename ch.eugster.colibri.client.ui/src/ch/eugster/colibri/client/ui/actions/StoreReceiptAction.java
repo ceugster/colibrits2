@@ -79,13 +79,9 @@ public class StoreReceiptAction extends ConfigurableAction implements PropertyCh
 		{
 			if (this.paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
 			{
-				final Collection<Payment> payments = this.userPanel.getReceiptWrapper().getReceipt().getPayments();
-				for (final Payment payment : payments)
+				if (!this.userPanel.getReceiptWrapper().getReceipt().hasVoucherPayment())
 				{
-					if (!payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 

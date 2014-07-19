@@ -100,16 +100,7 @@ public class StoreReceiptShorthandAction extends ConfigurableAction implements P
 		{
 			if (this.paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
 			{
-				final Receipt receipt = this.userPanel.getReceiptWrapper().getReceipt();
-				final Collection<Payment> payments = receipt.getPayments();
-				if (payments.isEmpty())
-				{
-					return false;
-				}
-				final double paymentAmount = receipt.getPaymentAmount(Receipt.QuotationType.DEFAULT_CURRENCY);
-				final double positionAmount = receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY,
-						Position.AmountType.NETTO);
-				if ((paymentAmount <= positionAmount) || !receipt.hasVoucherPayment())
+				if (!this.userPanel.getReceiptWrapper().getReceipt().hasVoucherPayment())
 				{
 					return false;
 				}

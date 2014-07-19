@@ -9,7 +9,6 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -91,20 +90,15 @@ public class StoreReceiptExpressAction extends ConfigurableAction implements Pro
 		{
 			if (this.paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
 			{
-				final Collection<Payment> payments = this.userPanel.getReceiptWrapper().getReceipt().getPayments();
-				for (final Payment payment : payments)
+				if (!this.userPanel.getReceiptWrapper().getReceipt().hasVoucherPayment())
 				{
-					if (!payment.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
-					{
-						return false;
-					}
+					return false;
 				}
 			}
 
 			final int positionSize = this.userPanel.getReceiptWrapper().getReceipt().getPositions().size();
 			final int paymentSize = this.userPanel.getReceiptWrapper().getReceipt().getPayments().size();
-			final double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
-			return ((positionSize > 0) || (paymentSize > 0)) && (difference <= 0d);
+			return (positionSize > 0) || (paymentSize > 0);
 		}
 		else
 		{
