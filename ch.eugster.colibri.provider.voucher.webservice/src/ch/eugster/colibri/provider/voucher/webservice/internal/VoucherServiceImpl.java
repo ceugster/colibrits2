@@ -28,7 +28,6 @@ import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
-import ch.eugster.colibri.persistence.model.ProviderState;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Receipt.QuotationType;
 import ch.eugster.colibri.persistence.model.Salespoint;
@@ -42,6 +41,7 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.IProperty.Section;
+import ch.eugster.colibri.provider.configuration.ProviderState;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
 import ch.eugster.colibri.provider.voucher.VoucherService;
 
@@ -341,11 +341,11 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		{
 			if (payment.isBookProvider() && !payment.isProviderBooked())
 			{
-				if (payment.getProviderState().equals(ProviderState.OPEN))
+				if ((payment.getProviderState() & ProviderState.OPEN) != 0)
 				{
 					result = VoucherServiceImpl.this.chargeAccount(payment.getProviderId(), payment.getAmount(QuotationType.DEFAULT_CURRENCY));
 				}
-				else if (payment.getProviderState().equals(ProviderState.RESERVED))
+				else if ((payment.getProviderState() | ProviderState.RESERVED) != 0)
 				{
 					result = VoucherServiceImpl.this.confirmReservedAmount(payment.getProviderId(), payment.getAmount(QuotationType.DEFAULT_CURRENCY));
 				}
@@ -360,11 +360,11 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		{
 			if (payment.isBookProvider() && payment.isProviderBooked())
 			{
-				if (payment.getProviderState().equals(ProviderState.BOOKED))
+				if ((payment.getProviderState() | ProviderState.BOOKED) != 0)
 				{
 					result = VoucherServiceImpl.this.creditAccount(payment.getProviderId(), payment.getAmount(QuotationType.DEFAULT_CURRENCY));
 				}
-				else if (payment.getProviderState().equals(ProviderState.RESERVED))
+				else if ((payment.getProviderState() | ProviderState.RESERVED) != 0)
 				{
 					result = VoucherServiceImpl.this.cancelReservedAmount(payment.getProviderId(), payment.getAmount(QuotationType.DEFAULT_CURRENCY));
 				}

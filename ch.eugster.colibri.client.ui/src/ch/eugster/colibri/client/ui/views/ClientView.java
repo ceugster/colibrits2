@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
@@ -921,7 +922,11 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				String text = builder.toString();
 //					ClientView.this.customerInformation.setText(text);
-				ClientView.this.getSite().getShell().setText(ClientView.this.mainTabbedPane.prepareTitle() + " :: " + text);
+				Shell shell = ClientView.this.getSite().getShell();
+				if (shell != null)
+				{
+					shell.setText(ClientView.this.mainTabbedPane.prepareTitle() + " :: " + text);
+				}
 				return Status.OK_STATUS;
 			}
 		};

@@ -1,9 +1,8 @@
 package ch.eugster.colibri.periphery.display.serial.service;
 
-import java.util.Properties;
-
 import jssc.SerialPort;
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -18,7 +17,7 @@ import ch.eugster.colibri.periphery.display.service.AbstractCustomerDisplayServi
 
 public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 {
-	private SerialPort serialPort;
+	private SerialPort display;
 	
 //	private PrintStream display;
 
@@ -28,7 +27,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		byte[] print = new byte[] { AsciiConstants.ESC, AsciiConstants.AT };
 		try 
 		{
-			this.serialPort.writeBytes(print);
+			this.display.writeBytes(print);
 		}
 		catch (final Exception e)
 		{
@@ -64,7 +63,8 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 				protected IStatus run(IProgressMonitor monitor)
 				{
 					SerialCustomerDisplayService.this.clearDisplay();
-					SerialCustomerDisplayService.this.writeBytes(text);
+					byte[] bytes = SerialCustomerDisplayService.this.correctText(text);
+					SerialCustomerDisplayService.this.writeBytes(bytes);
 					return Status.OK_STATUS;
 				}
 				
@@ -82,7 +82,8 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 //			try 
 //			{
 				this.clearDisplay();
-				this.writeBytes(text);
+				byte[] bytes = this.correctText(text);
+				this.writeBytes(bytes);
 //				this.display.flush();
 //			} 
 //			catch (IOException e) 
@@ -92,13 +93,13 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 //		this.closeDisplay();
 	}
 	
-	private void writeBytes(String text)
+	private void writeBytes(byte[] bytes)
 	{
-		if (this.serialPort!= null)
+		if (this.display!= null)
 		{
 			try
 			{
-				this.serialPort.writeString(text);
+				this.display.writeBytes(bytes);
 			}
 			catch (final Exception e)
 			{
@@ -120,7 +121,8 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	public void displayText(final String converter, String text)
 	{
 		this.clearDisplay();
-		this.writeBytes(text);
+		byte[] bytes = SerialCustomerDisplayService.this.correctText(text);
+		this.writeBytes(bytes);
 	}
 
 	protected void activate(final ComponentContext context)
@@ -129,29 +131,39 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		String portname = this.getPort();
 		if (portname != null)
 		{
-			String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
-	        serialPort = new SerialPort(port);
-	        try {
-	            serialPort.openPort();//Open serial port
-	            serialPort.setParams(SerialPort.BAUDRATE_9600, 
-	                                 SerialPort.DATABITS_8,
-	                                 SerialPort.STOPBITS_1,
-	                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-	        }
-	        catch (SerialPortException ex) 
-	        {
-	        }
+			portname = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
+			String[] ports = SerialPortList.getPortNames();
+			for (String port : ports)
+			{
+				if (port.equalsIgnoreCase(portname)) 
+				{
+			        display = new SerialPort(port);
+			        try {
+			            display.openPort();//Open serial port
+			            display.setParams(SerialPort.BAUDRATE_9600, 
+			                                 SerialPort.DATABITS_8,
+			                                 SerialPort.STOPBITS_1,
+			                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
+			        }
+			        catch (SerialPortException ex) 
+			        {
+			        	display = null;
+			        	sendEvent(ex);
+			        }
+			        break;
+				}
+			}
 		}
 	}
 
 	protected void deactivate(final ComponentContext context)
 	{
-		if (this.serialPort != null)
+		if (this.display != null)
 		{
 			this.clearDisplay();
 			try 
 			{
-	            serialPort.closePort();//Close serial port
+	            display.closePort();//Close serial port
 			}
 			catch (final Exception e)
 			{
@@ -161,71 +173,64 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		super.deactivate(context);
 	}
 
-	private int convert(String number)
+//	private int convert(String number)
+//	{
+//		try
+//		{
+//			return Integer.valueOf(number).intValue();
+//		}
+//		catch(NumberFormatException e)
+//		{
+//			return 0;
+//		}
+//	}
+
+	@Override
+	public void testDisplay(String deviceName, String conversions, String text) throws Exception
 	{
-		try
-		{
-			return Integer.valueOf(number).intValue();
-		}
-		catch(NumberFormatException e)
-		{
-			return 0;
-		}
+//		ComponentContext context = this.getContext();
+//		if (context != null)
+//		{
+//			Bundle bundle = context.getBundleContext().getBundle();
+//			bundle.stop();
+//			boolean open = false;
+//			try
+//			{
+//				String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+//				display = new SerialPort(port);
+//				open = display.openPort();
+//				if (open)
+//				{
+					display.writeBytes(new byte[] { 0x0c});
+					byte[] bytes = this.correctText(new Converter(conversions), text);
+					display.writeBytes(bytes);
+//				}
+//			}
+//			catch (Exception e)
+//			{
+//				e.printStackTrace();
+//				throw e;
+//			}
+//			finally
+//			{
+//				if (open)
+//				{
+//					display.closePort();
+//				}
+//				bundle.start();
+//			}
+//		}
 	}
 
 	@Override
-	public IStatus testDisplay(Properties properties, String text) 
+	public void testAscii(byte[] bytes) throws Exception
 	{
-		SerialPort mySerialPort = null;
-		String port = null;
-		try
+		if (display == null)
 		{
-			String portname = properties.getProperty("port");
-			String converter = properties.getProperty("converter");
-			int rows = convert(properties.getProperty("rows"));
-			int cols = convert(properties.getProperty("cols"));
-			byte[] print = this.correctText(new Converter(converter), text, rows * cols);
-			port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
-	        mySerialPort = new SerialPort(port);
-	        try {
-	            mySerialPort.openPort();//Open serial port
-	            mySerialPort.setParams(SerialPort.BAUDRATE_9600, 
-	                                 SerialPort.DATABITS_8,
-	                                 SerialPort.STOPBITS_1,
-	                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-	        }
-	        catch (SerialPortException ex) 
-	        {
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Fehler beim Testen des Ports " + port + ": " + ex.getLocalizedMessage());
-	        }
-			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.S });
-			mySerialPort.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.R, 2 });
-			mySerialPort.writeBytes(print);
-			mySerialPort.writeBytes("\n\n\n".getBytes());
+			throw new NullPointerException("Das Kundendisplay konnte nicht angesprochen werden.");
 		}
-		catch (final Exception e)
-		{
-			String msg = e.getLocalizedMessage();
-			if (msg == null)
-			{
-				msg = "Es ist ein unbekannter Fehler an Port " + port + " aufgetreten.";
-			}
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, msg, e);
-		}
-		finally
-		{
-			try
-			{
-				if (mySerialPort != null) mySerialPort.closePort();
-			}
-			catch (Exception e)
-			{
-				return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
-			}
-		}
-		return new Status(IStatus.OK, Activator.PLUGIN_ID, "OK");
+		display.writeBytes( new byte[] { 0x0c});
+		display.writeBytes(bytes);
 	}
 
 }

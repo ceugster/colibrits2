@@ -37,6 +37,11 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 	
 	private Converter converter;
 
+	public ComponentContext getContext()
+	{
+		return context;
+	}
+	
 	protected String getPort()
 	{
 		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
@@ -128,8 +133,15 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		{
 			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
 		}
-		SalespointQuery query = (SalespointQuery) this.persistenceService.getCacheService().getQuery(Salespoint.class);
-		salespoint = query.getCurrentSalespoint();
+		salespoint = getSalespoint();
+	}
+	
+	protected Salespoint getSalespoint()
+	{
+		String app = System.getProperty("eclipse.application");
+		ConnectionService service = app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService();
+		SalespointQuery query = (SalespointQuery) service.getQuery(Salespoint.class);
+		return query.getCurrentSalespoint();
 	}
 
 	protected void deactivate(final ComponentContext context)

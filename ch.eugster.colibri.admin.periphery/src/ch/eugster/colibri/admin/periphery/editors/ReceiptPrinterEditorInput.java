@@ -23,7 +23,7 @@ public class ReceiptPrinterEditorInput extends AbstractEntityEditorInput<Receipt
 		this.setServiceReference(reference);
 	}
 
-	private void setServiceReference(ServiceReference<ReceiptPrinterService> reference)
+	public void setServiceReference(ServiceReference<ReceiptPrinterService> reference)
 	{
 		this.reference = reference;
 	}

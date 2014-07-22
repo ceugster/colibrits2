@@ -1,7 +1,6 @@
 package ch.eugster.colibri.periphery.display.usb.service;
 
 import java.io.PrintStream;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -110,23 +109,20 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		} 
 	}
 	@Override
-	public IStatus testDisplay(Properties properties, String text) 
+	public void testDisplay(String deviceName, String conversions, String text) throws Exception
 	{
-		try
-		{
-			String port = properties.getProperty("port");
-			PrintStream display = new PrintStream(port);
+			PrintStream display = new PrintStream(deviceName);
 			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
 			display.write(text.getBytes());
 			display.write("\n\n\n".getBytes());
 			display.flush();
 			display.close();
-		}
-		catch (final Exception e)
-		{
-			return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getLocalizedMessage(), e);
-		} 
-		return new Status(IStatus.OK, Activator.PLUGIN_ID, "OK");
+	}
+
+	@Override
+	public void testAscii(byte[] ascii) throws Exception {
+		// TODO Auto-generated method stub
+		
 	}
 
 

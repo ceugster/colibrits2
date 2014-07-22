@@ -1,8 +1,6 @@
 package ch.eugster.colibri.periphery.display.service;
 
-import java.util.Properties;
-
-import org.eclipse.core.runtime.IStatus;
+import org.osgi.service.component.ComponentContext;
 
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
@@ -27,5 +25,9 @@ public interface CustomerDisplayService
 	
 	String convertToString(Object object);
 	
-	IStatus testDisplay(Properties properties, String text);
+	void testDisplay(String deviceName, String conversions, String text) throws Exception;
+
+	void testAscii(byte[] ascii) throws Exception;
+	
+	ComponentContext getContext();
 }

@@ -6,9 +6,17 @@
  */
 package ch.eugster.colibri.admin.periphery.editors;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
+import ch.eugster.colibri.admin.periphery.Activator;
+import ch.eugster.colibri.admin.periphery.views.PeripheryView;
 import ch.eugster.colibri.admin.ui.editors.AbstractEntityEditorInput;
 import ch.eugster.colibri.periphery.display.service.CustomerDisplayService;
 import ch.eugster.colibri.persistence.model.CustomerDisplaySettings;
@@ -23,7 +31,7 @@ public class CustomerDisplayEditorInput extends AbstractEntityEditorInput<Custom
 		this.setServiceReference(reference);
 	}
 
-	private void setServiceReference(ServiceReference<CustomerDisplayService> reference)
+	public void setServiceReference(ServiceReference<CustomerDisplayService> reference)
 	{
 		this.reference = reference;
 	}

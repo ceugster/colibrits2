@@ -8,9 +8,7 @@ package ch.eugster.colibri.admin.periphery.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Properties;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
@@ -30,6 +28,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ColumnLayoutData;
@@ -39,7 +38,10 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.admin.periphery.Activator;
 import ch.eugster.colibri.admin.ui.dialogs.Message;
@@ -68,6 +70,8 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 
 	private IDialogSettings settings;
 
+	private ServiceTracker<CustomerDisplayService, CustomerDisplayService> customerDisplayServiceTracker;
+	
 	public CustomerDisplayEditor()
 	{
 	}
@@ -75,6 +79,7 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 	@Override
 	public void dispose()
 	{
+		customerDisplayServiceTracker.close();
 		EntityMediator.removeListener(CustomerDisplaySettings.class, this);
 		super.dispose();
 	}
@@ -136,6 +141,63 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 		this.createPeripherySection(scrolledForm);
 		this.createTestSection(scrolledForm);
 		EntityMediator.addListener(Salespoint.class, this);
+		
+		this.customerDisplayServiceTracker = new ServiceTracker<CustomerDisplayService, CustomerDisplayService>(Activator.getDefault().getBundle().getBundleContext(),
+				CustomerDisplayService.class, null)
+		{
+			@Override
+			public CustomerDisplayService addingService(final ServiceReference<CustomerDisplayService> reference)
+			{
+				String oldComponentName = null;
+				ServiceReference<CustomerDisplayService> oldReference = ((CustomerDisplayEditorInput) getEditorInput()).getServiceReference();
+				if (oldReference != null)
+				{
+					oldComponentName = (String) oldReference.getProperty("component.name");
+				}
+				String newComponentName = (String) reference.getProperty("component.name");
+				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
+				{
+					((CustomerDisplayEditorInput) getEditorInput()).setServiceReference(reference);
+				}
+				return super.addingService(reference);
+			}
+
+			@Override
+			public void modifiedService(final ServiceReference<CustomerDisplayService> reference, final CustomerDisplayService service)
+			{
+				String oldComponentName = null;
+				ServiceReference<CustomerDisplayService> oldReference = ((CustomerDisplayEditorInput) getEditorInput()).getServiceReference();
+				if (oldReference != null)
+				{
+					oldComponentName = (String) oldReference.getProperty("component.name");
+				}
+				String newComponentName = (String) reference.getProperty("component.name");
+				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
+				{
+					((CustomerDisplayEditorInput) getEditorInput()).setServiceReference(reference);
+				}
+				super.modifiedService(reference, service);
+			}
+
+			@Override
+			public void removedService(final ServiceReference<CustomerDisplayService> reference, final CustomerDisplayService service)
+			{
+				String oldComponentName = null;
+				ServiceReference<CustomerDisplayService> oldReference = ((CustomerDisplayEditorInput) getEditorInput()).getServiceReference();
+				if (oldReference != null)
+				{
+					oldComponentName = (String) oldReference.getProperty("component.name");
+				}
+				String newComponentName = (String) reference.getProperty("component.name");
+				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
+				{
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeEditor(CustomerDisplayEditor.this, false);
+				}
+				super.removedService(reference, service);
+			}
+		};
+		this.customerDisplayServiceTracker.open();
+
 	}
 
 	@Override
@@ -255,6 +317,25 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 	protected void updateControls()
 	{
 		super.updateControls();
+		ServiceTracker<CustomerDisplayService, CustomerDisplayService> tracker = new ServiceTracker<CustomerDisplayService, CustomerDisplayService>(Activator.getDefault().getBundle().getBundleContext(), CustomerDisplayService.class, null);
+		tracker.open();
+		try
+		{
+			CustomerDisplayService service = tracker.getService(((CustomerDisplayEditorInput)this.getEditorInput()).getServiceReference());
+			if (service != null)
+			{
+				Bundle bundle = service.getContext().getBundleContext().getBundle();
+				bundle.stop();
+				bundle.start();
+			}
+		}
+		catch (BundleException e) 
+		{
+		}
+		finally
+		{
+			tracker.close();
+		}
 	}
 
 	@Override
@@ -534,17 +615,25 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 				final ServiceReference<CustomerDisplayService> reference = input.getServiceReference();
 				if (reference != null)
 				{
-					final CustomerDisplayService service = Activator.getDefault().getBundle().getBundleContext().getService(reference);
-					final CustomerDisplayService display = (CustomerDisplayService) service;
-					Properties props = new Properties();
-					props.setProperty("port", CustomerDisplayEditor.this.port.getText());
-					props.setProperty("converter", CustomerDisplayEditor.this.converter.getText());
-					props.setProperty("cols", CustomerDisplayEditor.this.cols.getText());
-					props.setProperty("rows", CustomerDisplayEditor.this.rows.getText());
-					IStatus status = display.testDisplay(props, CustomerDisplayEditor.this.test.getText());
-					if (status.getSeverity() == IStatus.ERROR)
+					ServiceTracker<CustomerDisplayService, CustomerDisplayService> tracker = new ServiceTracker<CustomerDisplayService, CustomerDisplayService>(Activator.getDefault().getBundle().getBundleContext(), CustomerDisplayService.class, null);
+					tracker.open();
+					try
 					{
-						MessageDialog.openInformation(getSite().getShell(), "Anzeige", status.getMessage());
+						CustomerDisplayService display = tracker.getService(reference);
+						if (display == null)
+						{
+							MessageDialog.openError(getSite().getShell(), "Kundendisplay", "Der Service für dieses Kundendisplay ist nicht aktiv.");
+							return;
+						}
+						display.testDisplay(CustomerDisplayEditor.this.port.getText(), CustomerDisplayEditor.this.converter.getText(), test.getText());
+					}
+					catch (Exception ex)
+					{
+						MessageDialog.openError(getSite().getShell(), "Kundendisplay", ex.getLocalizedMessage());
+					}
+					finally
+					{
+						tracker.close();
 					}
 				}
 			}

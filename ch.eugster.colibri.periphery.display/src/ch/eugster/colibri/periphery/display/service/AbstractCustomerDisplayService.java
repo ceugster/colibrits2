@@ -29,7 +29,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	private SalespointCustomerDisplaySettings salespointCustomerDisplaySettings;
 
-	private PersistenceService persistenceService;
+	protected PersistenceService persistenceService;
 
 	private LogService logService;
 
@@ -37,6 +37,11 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	private Converter converter;
 
+	public ComponentContext getContext()
+	{
+		return context;
+	}
+	
 	@Override
 	public CustomerDisplaySettings getCustomerDisplaySettings()
 	{
@@ -49,10 +54,16 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 	
 	protected String getPort()
 	{
+		String app = System.getProperty("eclipse.application");
+		return this.getPort(app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService());
+	}
+
+	private String getPort(ConnectionService connectionService)
+	{
 		String port = null;
 		if (this.salespointCustomerDisplaySettings == null)
 		{
-			this.salespointCustomerDisplaySettings = this.getSalespointCustomerDisplaySettings(persistenceService.getCacheService());
+			this.salespointCustomerDisplaySettings = this.getSalespointCustomerDisplaySettings(connectionService);
 		}
 		if (this.salespointCustomerDisplaySettings == null)
 		{

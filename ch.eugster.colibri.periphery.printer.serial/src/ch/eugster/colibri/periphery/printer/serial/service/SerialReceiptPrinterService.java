@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
+import jssc.SerialPortList;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -29,18 +30,27 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 		String portname = this.getPort();
 		if (portname != null)
 		{
-			String port = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
-	        printer = new SerialPort(port);
-	        try {
-	            printer.openPort();//Open serial port
-	            printer.setParams(SerialPort.BAUDRATE_9600, 
-	                                 SerialPort.DATABITS_8,
-	                                 SerialPort.STOPBITS_1,
-	                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
-	        }
-	        catch (SerialPortException ex) 
-	        {
-	        }
+			portname = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
+			String[] ports = SerialPortList.getPortNames();
+			for (String port : ports)
+			{
+				if (port.equalsIgnoreCase(portname)) 
+				{
+			        printer = new SerialPort(port);
+			        try {
+			            printer.openPort();//Open serial port
+			            printer.setParams(SerialPort.BAUDRATE_9600, 
+			                                 SerialPort.DATABITS_8,
+			                                 SerialPort.STOPBITS_1,
+			                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
+			        }
+			        catch (SerialPortException ex) 
+			        {
+			        	printer = null;
+			        	sendEvent(ex);
+			        }
+				}
+			}
 		}
 	}
 
@@ -235,15 +245,39 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	}
 
 	@Override
-	public void testPrint(String deviceName, String conversions, String text, int feed) 
+	public void testPrint(String deviceName, String conversions, String text, int feed) throws Exception 
 	{
-		final Converter converter = new Converter(conversions);
-		final byte[] printable = converter.convert(text.getBytes());
-		if (printer != null)
-		{
-			println(printable);
-			this.cutPaper(feed);
-		}
+//		ComponentContext context = this.getContext();
+//		if (context != null)
+//		{
+//			Bundle bundle = context.getBundleContext().getBundle();
+//			bundle.stop();
+//			boolean open = false;
+//			try
+//			{
+//				String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+//				printer = new SerialPort(port);
+//				open = printer.openPort();
+//				if (open)
+//				{
+					byte[] bytes = new Converter(conversions).convert(text.getBytes());
+					printer.writeBytes(bytes);
+					cutPaper(5);
+//				}
+//			}
+//			catch (Exception e)
+//			{
+//				e.printStackTrace();
+//			}
+//			finally
+//			{
+//				if (open)
+//				{
+//					printer.closePort();
+//				}
+//				bundle.start();
+//			}
+//		}
 	}
 
 	@Override

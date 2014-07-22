@@ -34,6 +34,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ColumnLayoutData;
@@ -44,6 +45,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.progress.UIJob;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
@@ -85,10 +88,10 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 
 	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;
 
-	private ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> receiptPrinterTracker;
-
 	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
+	private ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> receiptPrinterServiceTracker;
+	
 	public ReceiptPrinterEditor()
 	{
 	}
@@ -96,9 +99,9 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 	@Override
 	public void dispose()
 	{
+		this.receiptPrinterServiceTracker.close();
 		EntityMediator.removeListener(ReceiptPrinterSettings.class, this);
 		this.eventAdminTracker.close();
-		this.receiptPrinterTracker.close();
 		this.eventHandlerServiceRegistration.unregister();
 		super.dispose();
 	}
@@ -144,9 +147,6 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		this.eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(),
 				EventAdmin.class, null);
 		this.eventAdminTracker.open();
-		this.receiptPrinterTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(),
-				ReceiptPrinterService.class, null);
-		this.receiptPrinterTracker.open();
 
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.EVENT_TOPIC, ReceiptPrinterService.EVENT_ADMIN_TOPIC_ERROR);
@@ -194,6 +194,63 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		this.createPeripherySection(scrolledForm);
 		this.createTestSection(scrolledForm);
 		EntityMediator.addListener(Salespoint.class, this);
+
+		this.receiptPrinterServiceTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(),
+				ReceiptPrinterService.class, null)
+		{
+			@Override
+			public ReceiptPrinterService addingService(final ServiceReference<ReceiptPrinterService> reference)
+			{
+				String oldComponentName = null;
+				ServiceReference<ReceiptPrinterService> oldReference = ((ReceiptPrinterEditorInput) getEditorInput()).getServiceReference();
+				if (oldReference != null)
+				{
+					oldComponentName = (String) oldReference.getProperty("component.name");
+				}
+				String newComponentName = (String) reference.getProperty("component.name");
+				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
+				{
+					((ReceiptPrinterEditorInput) getEditorInput()).setServiceReference(reference);
+				}
+				return super.addingService(reference);
+			}
+
+			@Override
+			public void modifiedService(final ServiceReference<ReceiptPrinterService> reference, final ReceiptPrinterService service)
+			{
+				String oldComponentName = null;
+				ServiceReference<ReceiptPrinterService> oldReference = ((ReceiptPrinterEditorInput) getEditorInput()).getServiceReference();
+				if (oldReference != null)
+				{
+					oldComponentName = (String) oldReference.getProperty("component.name");
+				}
+				String newComponentName = (String) reference.getProperty("component.name");
+				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
+				{
+					((ReceiptPrinterEditorInput) getEditorInput()).setServiceReference(reference);
+				}
+				super.modifiedService(reference, service);
+			}
+
+			@Override
+			public void removedService(final ServiceReference<ReceiptPrinterService> reference, final ReceiptPrinterService service)
+			{
+				String oldComponentName = null;
+				ServiceReference<ReceiptPrinterService> oldReference = ((ReceiptPrinterEditorInput) getEditorInput()).getServiceReference();
+				if (oldReference != null)
+				{
+					oldComponentName = (String) oldReference.getProperty("component.name");
+				}
+				String newComponentName = (String) reference.getProperty("component.name");
+				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
+				{
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeEditor(ReceiptPrinterEditor.this, false);
+				}
+				super.removedService(reference, service);
+			}
+		};
+		this.receiptPrinterServiceTracker.open();
+
 	}
 
 	@Override
@@ -224,7 +281,7 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		final ReceiptPrinterSettings periphery = (ReceiptPrinterSettings) ((ReceiptPrinterEditorInput) this
 				.getEditorInput()).getAdapter(ReceiptPrinterSettings.class);
 
-		ServiceReference<ReceiptPrinterService> reference = receiptPrinterTracker.getServiceReference();
+		ServiceReference<ReceiptPrinterService> reference = receiptPrinterServiceTracker.getServiceReference();
 
 		String portName = periphery.getPort();
 		if ((portName == null) || portName.isEmpty())
@@ -292,6 +349,25 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 	protected void updateControls()
 	{
 		super.updateControls();
+		ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> tracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(), ReceiptPrinterService.class, null);
+		tracker.open();
+		try
+		{
+			ReceiptPrinterService service = tracker.getService(((ReceiptPrinterEditorInput)this.getEditorInput()).getServiceReference());
+			if (service != null)
+			{
+				Bundle bundle = service.getContext().getBundleContext().getBundle();
+				bundle.stop();
+				bundle.start();
+			}
+		}
+		catch (BundleException e) 
+		{
+		}
+		finally
+		{
+			tracker.close();
+		}
 	}
 
 	@Override
@@ -518,8 +594,26 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 				final ServiceReference<ReceiptPrinterService> reference = input.getServiceReference();
 				if (reference != null)
 				{
-					final ReceiptPrinterService printer = Activator.getDefault().getBundle().getBundleContext().getService(reference);
-					printer.testPrint(ReceiptPrinterEditor.this.port.getText(), ReceiptPrinterEditor.this.converter.getText(), test.getText(), linesBeforeCut.getSelection());
+					ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> tracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(), ReceiptPrinterService.class, null);
+					tracker.open();
+					try
+					{
+						ReceiptPrinterService printer = tracker.getService(reference);
+						if (printer == null)
+						{
+							MessageDialog.openError(getSite().getShell(), "Belegdrucker", "Der Service für diesen Belegdrucker ist nicht aktiv.");
+							return;
+						}
+						printer.testPrint(ReceiptPrinterEditor.this.port.getText(), ReceiptPrinterEditor.this.converter.getText(), test.getText(), linesBeforeCut.getSelection());
+					}
+					catch (Exception ex)
+					{
+						MessageDialog.openError(getSite().getShell(), "Belegdrucker", ex.getLocalizedMessage());
+					}
+					finally
+					{
+						tracker.close();
+					}
 				}
 			}
 		});

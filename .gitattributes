@@ -167,6 +167,7 @@ ch.eugster.colibri.admin.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.admin.periphery/build.properties -text
 ch.eugster.colibri.admin.periphery/icons/add_16.gif -text
 ch.eugster.colibri.admin.periphery/icons/add_grey_16.gif -text
+ch.eugster.colibri.admin.periphery/icons/ascii.png -text
 ch.eugster.colibri.admin.periphery/icons/delete_16.png -text
 ch.eugster.colibri.admin.periphery/icons/delete_grey_16.png -text
 ch.eugster.colibri.admin.periphery/icons/display.png -text
@@ -184,6 +185,7 @@ ch.eugster.colibri.admin.periphery/plugin.xml -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/Activator.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/AdminPeripheryPerspective.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/AsciiConstants.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/dialogs/AsciiTestDialog.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/CustomerDisplayEditor.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/CustomerDisplayEditorInput.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/DisplayEditor.java -text
@@ -194,6 +196,7 @@ ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editor
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/ReceiptPrinterEditor.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/editors/ReceiptPrinterEditorInput.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/handlers/EditPeripheryHandler.java -text
+ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/handlers/ShowAsciiTestDialogHandler.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/views/PeripheryContentProvider.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/views/PeripheryGroup.java -text
 ch.eugster.colibri.admin.periphery/src/ch/eugster/colibri/admin/periphery/views/PeripheryLabelProvider.java -text

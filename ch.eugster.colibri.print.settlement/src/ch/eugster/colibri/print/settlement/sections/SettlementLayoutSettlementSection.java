@@ -267,6 +267,10 @@ public class SettlementLayoutSettlementSection extends AbstractLayoutSection
 						{
 							return layoutArea.replaceMarker("", marker, true);
 						}
+						if (detail.getPart().equals(Part.BEGIN_STOCK))
+						{
+							return layoutArea.replaceMarker("", marker, true);
+						}
 						else
 						{
 							final java.util.Currency currency = detail.getPaymentType().getCurrency().getCurrency();

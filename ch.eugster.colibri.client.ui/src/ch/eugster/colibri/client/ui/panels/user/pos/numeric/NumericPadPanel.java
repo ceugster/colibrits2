@@ -265,7 +265,7 @@ public class NumericPadPanel extends JPanel implements PropertyChangeListener
 			{
 				label = label.append(label.length() > 0 ? " / Barcode" : "Barcode");
 			}
-			if (position.getQuantity() == 0)
+			if (position.getQuantity() == 0 || (position.isOrdered() && position.getOrderedQuantity() == 0))
 			{
 				label = label.append(label.length() > 0 ? " / Menge" : "Menge");
 			}

@@ -2,9 +2,13 @@ package ch.eugster.colibri.admin.periphery.views;
 
 import java.text.NumberFormat;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -16,6 +20,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.UIJob;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -46,6 +51,10 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 
 	private TreeViewer viewer;
 
+	private ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> receiptPrinterServiceTracker;
+
+	private ServiceTracker<CustomerDisplayService, CustomerDisplayService> customerDisplayServiceTracker;
+
 	/**
 	 * This is a callback that will allow us to create the viewer and initialize
 	 * it.
@@ -68,6 +77,145 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 		this.createContextMenu();
 
 		this.getSite().setSelectionProvider(this.viewer);
+
+		this.receiptPrinterServiceTracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(),
+				ReceiptPrinterService.class, null)
+		{
+			@Override
+			public ReceiptPrinterService addingService(final ServiceReference<ReceiptPrinterService> reference)
+			{
+				final UIJob job = new UIJob("")
+				{
+
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						ISelection sel = PeripheryView.this.viewer.getSelection();
+						PeripheryView.this.viewer.setInput(PeripheryView.this.viewer);
+						PeripheryView.this.viewer.setSelection(sel);
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setUser(true);
+				job.schedule();
+				return super.addingService(reference);
+			}
+
+			@Override
+			public void modifiedService(final ServiceReference<ReceiptPrinterService> reference, final ReceiptPrinterService service)
+			{
+				final UIJob job = new UIJob("")
+				{
+
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						ISelection sel = PeripheryView.this.viewer.getSelection();
+						PeripheryView.this.viewer.setInput(PeripheryView.this.viewer);
+						PeripheryView.this.viewer.setSelection(sel);
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setUser(true);
+				job.schedule();
+				super.modifiedService(reference, service);
+			}
+
+			@Override
+			public void removedService(final ServiceReference<ReceiptPrinterService> reference, final ReceiptPrinterService service)
+			{
+				final UIJob job = new UIJob("")
+				{
+
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						if (PeripheryView.this.viewer.getControl() != null && !PeripheryView.this.viewer.getControl().isDisposed())
+						{
+							PeripheryView.this.viewer.setInput(PeripheryView.this.viewer);
+						}
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setUser(true);
+				job.schedule();
+				super.removedService(reference, service);
+			}
+		};
+		this.receiptPrinterServiceTracker.open();
+
+		this.customerDisplayServiceTracker = new ServiceTracker<CustomerDisplayService, CustomerDisplayService>(Activator.getDefault().getBundle().getBundleContext(),
+				CustomerDisplayService.class, null)
+		{
+			@Override
+			public CustomerDisplayService addingService(final ServiceReference<CustomerDisplayService> reference)
+			{
+				final UIJob job = new UIJob("")
+				{
+
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						ISelection sel = PeripheryView.this.viewer.getSelection();
+						PeripheryView.this.viewer.setInput(PeripheryView.this.viewer);
+						PeripheryView.this.viewer.setSelection(sel);
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setUser(true);
+				job.schedule();
+				return super.addingService(reference);
+			}
+
+			@Override
+			public void modifiedService(final ServiceReference<CustomerDisplayService> reference, final CustomerDisplayService service)
+			{
+				final UIJob job = new UIJob("")
+				{
+
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						ISelection sel = PeripheryView.this.viewer.getSelection();
+						PeripheryView.this.viewer.setInput(PeripheryView.this.viewer);
+						PeripheryView.this.viewer.setSelection(sel);
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setUser(true);
+				job.schedule();
+				super.modifiedService(reference, service);
+			}
+
+			@Override
+			public void removedService(final ServiceReference<CustomerDisplayService> reference, final CustomerDisplayService service)
+			{
+				final UIJob job = new UIJob("")
+				{
+
+					@Override
+					public IStatus runInUIThread(final IProgressMonitor monitor)
+					{
+						if (PeripheryView.this.viewer.getControl() != null && !PeripheryView.this.viewer.getControl().isDisposed())
+						{
+							PeripheryView.this.viewer.setInput(PeripheryView.this.viewer);
+						}
+						return Status.OK_STATUS;
+					}
+
+				};
+				job.setUser(true);
+				job.schedule();
+				super.removedService(reference, service);
+			}
+		};
+		this.customerDisplayServiceTracker.open();
+
 		EntityMediator.addListener(CustomerDisplaySettings.class, this);
 		EntityMediator.addListener(ReceiptPrinterSettings.class, this);
 	}
@@ -75,6 +223,8 @@ public class PeripheryView extends AbstractEntityView implements IDoubleClickLis
 	@Override
 	public void dispose()
 	{
+		receiptPrinterServiceTracker.close();
+		customerDisplayServiceTracker.close();
 		EntityMediator.removeListener(CustomerDisplaySettings.class, this);
 		EntityMediator.removeListener(ReceiptPrinterSettings.class, this);
 		super.dispose();

@@ -40,6 +40,11 @@
             id="ch.eugster.colibri.admin.periphery.commands.editPeriphery"
             name="Bearbeiten">
       </command>
+      <command
+            defaultHandler="ch.eugster.colibri.admin.periphery.handlers.ShowAsciiTestDialogHandler"
+            id="ch.eugster.colibri.admin.periphery.openAsciiTestDialog"
+            name="ASCII Test Dialog öffnen">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -115,6 +120,13 @@
                label="Bearbeiten"
                style="push"
                tooltip="Ausgewählte Peripherie bearbeiten">
+         </command>
+         <command
+               commandId="ch.eugster.colibri.admin.periphery.openAsciiTestDialog"
+               icon="icons/ascii.png"
+               label="ASCII öffnen"
+               style="push"
+               tooltip="ASCII Test Dialog öffnen">
          </command>
       </menuContribution>
       <menuContribution

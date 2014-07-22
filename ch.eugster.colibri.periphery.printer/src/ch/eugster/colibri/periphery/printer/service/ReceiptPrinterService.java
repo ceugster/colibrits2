@@ -1,5 +1,7 @@
 package ch.eugster.colibri.periphery.printer.service;
 
+import org.osgi.service.component.ComponentContext;
+
 import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
@@ -12,6 +14,8 @@ public interface ReceiptPrinterService
 //	void cutPaper();
 
 //	void cutPaper(int linesBeforeCut);
+
+	ComponentContext getContext();
 
 	void openDrawer(Currency currency);
 	
@@ -27,7 +31,7 @@ public interface ReceiptPrinterService
 
 	void print(String[] text);
 	
-	void testPrint(String deviceName, String conversions, String text, int feed);
+	void testPrint(String deviceName, String conversions, String text, int feed) throws Exception;
 
 	public enum Drawer
 	{

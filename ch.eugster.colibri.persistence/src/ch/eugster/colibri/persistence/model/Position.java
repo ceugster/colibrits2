@@ -539,7 +539,6 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	public void setQuantity(int quantity)
 	{
 		this.propertyChangeSupport.firePropertyChange("quantity", this.quantity, this.quantity = quantity);
-//		this.setDiscount(this.getDiscount());
 	}
 
 	public void setReceipt(final Receipt receipt)
@@ -767,12 +766,12 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 
 	public int getOrderedQuantity() 
 	{
-		return orderedQuantity;
+		return orderedQuantity == 0 ? getQuantity() : orderedQuantity;
 	}
 
 	public void setOrderedQuantity(int orderedQuantity) 
 	{
-		this.orderedQuantity = orderedQuantity;
+		this.propertyChangeSupport.firePropertyChange("orderedQuantity", this.orderedQuantity, this.orderedQuantity = orderedQuantity);
 	}
 
 	public enum AmountType
