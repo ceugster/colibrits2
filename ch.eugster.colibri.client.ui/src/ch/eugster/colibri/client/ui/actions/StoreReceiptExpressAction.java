@@ -92,7 +92,10 @@ public class StoreReceiptExpressAction extends ConfigurableAction implements Pro
 			{
 				if (!this.userPanel.getReceiptWrapper().getReceipt().hasVoucherPayment())
 				{
-					return false;
+					if (!this.userPanel.getReceiptWrapper().getReceipt().hasRestitution())
+					{
+						return false;
+					}
 				}
 			}
 

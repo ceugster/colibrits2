@@ -274,10 +274,13 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				return false;
 			}
 		}
-		if (!this.position.isOrdered() && this.position.getPrice() == 0d)
+		if (this.position.getPrice() == 0d)
 		{
-			Activator.getDefault().log(LogService.LOG_WARNING, "Die Position hat keinen Preice");
-			return false;
+			if (!position.isOrdered() || this.userPanel.getMainTabbedPane().isFailOver())
+			{
+				Activator.getDefault().log(LogService.LOG_WARNING, "Die Position hat keinen Preis");
+				return false;
+			}
 		}
 		if (this.position.getQuantity() == 0 || (this.position.isOrdered() && this.position.getOrderedQuantity() == 0))
 		{

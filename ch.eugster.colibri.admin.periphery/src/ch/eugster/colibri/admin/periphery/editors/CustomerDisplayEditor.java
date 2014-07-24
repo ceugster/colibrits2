@@ -28,7 +28,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ColumnLayoutData;
@@ -177,23 +176,6 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 					((CustomerDisplayEditorInput) getEditorInput()).setServiceReference(reference);
 				}
 				super.modifiedService(reference, service);
-			}
-
-			@Override
-			public void removedService(final ServiceReference<CustomerDisplayService> reference, final CustomerDisplayService service)
-			{
-				String oldComponentName = null;
-				ServiceReference<CustomerDisplayService> oldReference = ((CustomerDisplayEditorInput) getEditorInput()).getServiceReference();
-				if (oldReference != null)
-				{
-					oldComponentName = (String) oldReference.getProperty("component.name");
-				}
-				String newComponentName = (String) reference.getProperty("component.name");
-				if (oldComponentName == null || oldComponentName.equals(newComponentName)) 
-				{
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().closeEditor(CustomerDisplayEditor.this, false);
-				}
-				super.removedService(reference, service);
 			}
 		};
 		this.customerDisplayServiceTracker.open();

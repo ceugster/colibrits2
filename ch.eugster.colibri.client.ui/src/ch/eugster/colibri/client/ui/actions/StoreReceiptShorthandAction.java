@@ -102,7 +102,10 @@ public class StoreReceiptShorthandAction extends ConfigurableAction implements P
 			{
 				if (!this.userPanel.getReceiptWrapper().getReceipt().hasVoucherPayment())
 				{
-					return false;
+					if (!this.userPanel.getReceiptWrapper().getReceipt().hasRestitution())
+					{
+						return false;
+					}
 				}
 			}
 

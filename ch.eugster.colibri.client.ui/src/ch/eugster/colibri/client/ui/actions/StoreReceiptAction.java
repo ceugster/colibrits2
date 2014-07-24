@@ -81,7 +81,10 @@ public class StoreReceiptAction extends ConfigurableAction implements PropertyCh
 			{
 				if (!this.userPanel.getReceiptWrapper().getReceipt().hasVoucherPayment())
 				{
-					return false;
+					if (!this.userPanel.getReceiptWrapper().getReceipt().hasRestitution())
+					{
+						return false;
+					}
 				}
 			}
 
