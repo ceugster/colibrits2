@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -60,7 +61,7 @@ public class CustomerDisplaySettings extends AbstractEntity implements IReplicat
 //	@Column(name = "cd_delay")
 //	private int delay;
 
-	@OneToMany(mappedBy = "customerDisplaySettings")
+	@OneToMany(mappedBy = "customerDisplaySettings", cascade=CascadeType.ALL)
 	@MapKey(name = "salespoint")
 	private Map<Salespoint, SalespointCustomerDisplaySettings> salespointPeripheries = new HashMap<Salespoint, SalespointCustomerDisplaySettings>();
 
@@ -76,7 +77,7 @@ public class CustomerDisplaySettings extends AbstractEntity implements IReplicat
 
 	public String getComponentName()
 	{
-		return this.componentName;
+		return valueOf(this.componentName);
 	}
 
 	public String getConverter()
@@ -97,12 +98,12 @@ public class CustomerDisplaySettings extends AbstractEntity implements IReplicat
 
 	public String getName()
 	{
-		return this.name;
+		return valueOf(this.name);
 	}
 
 	public String getPort()
 	{
-		return this.port;
+		return valueOf(this.port);
 	}
 
 	public int getRows()

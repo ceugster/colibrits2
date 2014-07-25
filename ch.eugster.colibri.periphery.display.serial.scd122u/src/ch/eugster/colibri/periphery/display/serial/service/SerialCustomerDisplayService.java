@@ -124,11 +124,10 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		byte[] bytes = SerialCustomerDisplayService.this.correctText(text);
 		this.writeBytes(bytes);
 	}
-
-	protected void activate(final ComponentContext context)
+	
+	private SerialPort openPort(String portname)
 	{
-		super.activate(context);
-		String portname = this.getPort();
+		SerialPort serialPort = null;
 		if (portname != null)
 		{
 			portname = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
@@ -137,28 +136,35 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 			{
 				if (port.equalsIgnoreCase(portname)) 
 				{
-			        display = new SerialPort(port);
+			        serialPort = new SerialPort(port);
 			        try {
-			            display.openPort();//Open serial port
-			            display.setParams(SerialPort.BAUDRATE_9600, 
+			            serialPort.openPort();//Open serial port
+			            serialPort.setParams(SerialPort.BAUDRATE_9600, 
 			                                 SerialPort.DATABITS_8,
 			                                 SerialPort.STOPBITS_1,
 			                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
 			        }
 			        catch (SerialPortException ex) 
 			        {
-			        	display = null;
+			        	serialPort = null;
 			        	sendEvent(ex);
 			        }
 			        break;
 				}
 			}
 		}
+		return serialPort;
 	}
 
-	protected void deactivate(final ComponentContext context)
+	protected void activate(final ComponentContext context)
 	{
-		if (this.display != null)
+		super.activate(context);
+		this.display = openPort(this.getPort());
+	}
+
+	private void closePort(SerialPort display)
+	{
+		if (display != null)
 		{
 			this.clearDisplay();
 			try 
@@ -170,6 +176,11 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 				sendEvent(e);
 			}
 		}
+	}
+	
+	protected void deactivate(final ComponentContext context)
+	{
+		closePort(this.display);
 		super.deactivate(context);
 	}
 
@@ -188,49 +199,74 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	@Override
 	public void testDisplay(String deviceName, String conversions, String text) throws Exception
 	{
-//		ComponentContext context = this.getContext();
-//		if (context != null)
-//		{
-//			Bundle bundle = context.getBundleContext().getBundle();
-//			bundle.stop();
-//			boolean open = false;
-//			try
-//			{
-//				String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
-//				display = new SerialPort(port);
-//				open = display.openPort();
-//				if (open)
-//				{
-					display.writeBytes(new byte[] { 0x0c});
-					byte[] bytes = this.correctText(new Converter(conversions), text);
-					display.writeBytes(bytes);
-//				}
-//			}
-//			catch (Exception e)
-//			{
-//				e.printStackTrace();
-//				throw e;
-//			}
-//			finally
-//			{
-//				if (open)
-//				{
-//					display.closePort();
-//				}
-//				bundle.start();
-//			}
-//		}
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
+		}
+		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+		String oldPort = null;
+
+		if (this.display == null)
+		{
+			this.display = this.openPort(port);
+		}
+		else
+		{
+			if (!port.equals(this.display.getPortName()))
+			{
+				oldPort = this.display.getPortName();
+				this.closePort(this.display);
+				this.display = this.openPort(port);
+			}
+		}
+		
+		this.display.writeBytes(new byte[] { 0x0c});
+		byte[] bytes = this.correctText(new Converter(conversions), text);
+		this.display.writeBytes(bytes);
+
+		if (oldPort != null)
+		{
+			this.closePort(this.display);
+			this.display = this.openPort(port);
+		}
 	}
 
 	@Override
-	public void testAscii(byte[] bytes) throws Exception
+	public void testAscii(String deviceName, byte[] bytes) throws Exception
 	{
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
+		}
+		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+		String oldPort = null;
+
+		if (this.display == null)
+		{
+			this.display = this.openPort(port);
+		}
+		else
+		{
+			if (!port.equals(this.display.getPortName()))
+			{
+				oldPort = this.display.getPortName();
+				this.closePort(this.display);
+				this.display = this.openPort(port);
+			}
+		}
+		
+		display.writeBytes( new byte[] { 0x0c});
+		display.writeBytes(bytes);
+
+		if (oldPort != null)
+		{
+			this.closePort(this.display);
+			this.display = this.openPort(port);
+		}
 		if (display == null)
 		{
 			throw new NullPointerException("Das Kundendisplay konnte nicht angesprochen werden.");
 		}
-		display.writeBytes( new byte[] { 0x0c});
-		display.writeBytes(bytes);
 	}
 
 }

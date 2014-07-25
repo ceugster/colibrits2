@@ -45,8 +45,13 @@ public class Activator extends AbstractUIPlugin
 	{
 	}
 
-	public void editSalespoint(final Salespoint salespoint)
+	public void editSalespoint(Salespoint salespoint)
 	{
+		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			salespoint = (Salespoint) persistenceService.getServerService().refresh(salespoint);
+		}
 		try
 		{
 			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()

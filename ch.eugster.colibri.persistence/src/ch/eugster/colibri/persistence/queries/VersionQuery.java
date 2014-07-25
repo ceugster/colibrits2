@@ -12,6 +12,10 @@ public class VersionQuery extends AbstractQuery<Version>
 		{
 			this.version = this.find(Long.valueOf(1L));
 		}
+		else
+		{
+			this.getConnectionService().refresh(this.version);
+		}
 		return this.version;
 	}
 

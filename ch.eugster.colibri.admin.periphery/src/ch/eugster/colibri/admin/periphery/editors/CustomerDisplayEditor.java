@@ -213,7 +213,7 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 		final ServiceReference<CustomerDisplayService> reference = input.getServiceReference();
 
 		String portName = periphery.getPort();
-		if ((portName == null) || portName.isEmpty())
+		if (periphery.getId() == null && portName.isEmpty())
 		{
 			final Object prop = reference.getProperty("custom.port");
 			if (prop instanceof String)
@@ -224,7 +224,7 @@ public class CustomerDisplayEditor extends AbstractEntityEditor<CustomerDisplayS
 		this.port.setText(portName);
 
 		String conversions = periphery.getConverter();
-		if ((conversions == null) || conversions.isEmpty())
+		if (periphery.getId() == null && conversions.isEmpty())
 		{
 			final Object prop = reference.getProperty("custom.convert");
 			if (prop instanceof String)

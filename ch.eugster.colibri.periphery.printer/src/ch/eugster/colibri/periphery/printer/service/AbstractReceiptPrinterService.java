@@ -16,6 +16,7 @@ import ch.eugster.colibri.periphery.printer.Activator;
 import ch.eugster.colibri.persistence.model.PrintMode;
 import ch.eugster.colibri.persistence.model.ReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Salespoint;
+import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.queries.ReceiptPrinterSettingsQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.ConnectionService;
@@ -27,7 +28,9 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	private ReceiptPrinterSettings receiptPrinterSettings;
 
-	private PersistenceService persistenceService;
+	private SalespointReceiptPrinterSettings salespointReceiptPrinterSettings;
+
+	private ConnectionService connectionService;
 
 	private LogService logService;
 
@@ -35,90 +38,113 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	protected Salespoint salespoint;
 	
-	private Converter converter;
-
 	public ComponentContext getContext()
 	{
 		return context;
 	}
 	
+	protected void setSalespointReceiptPrinterSettings()
+	{
+		this.salespointReceiptPrinterSettings = this.getSalespointReceiptPrinterSettings(connectionService);
+	}
+
+	private SalespointReceiptPrinterSettings getSalespointReceiptPrinterSettings(final ConnectionService service)
+	{
+		if (this.salespointReceiptPrinterSettings == null)
+		{
+			final SalespointQuery query = (SalespointQuery) service.getQuery(Salespoint.class);
+			Salespoint salespoint = query.getCurrentSalespoint();
+			this.salespointReceiptPrinterSettings = salespoint == null ? null : salespoint.getReceiptPrinterSettings();
+		}
+		return this.salespointReceiptPrinterSettings;
+	}
+
 	protected String getPort()
 	{
-		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
 		{
-			return receiptPrinterSettings.getPort();
+			return this.getSalespointReceiptPrinterSettings(connectionService).getPort();
 		}
-		return salespoint.getReceiptPrinterSettings().getPort();
+		return this.getReceiptPrinterSettings().getPort();
 	}
 
 	protected boolean isPrintLogo()
 	{
-		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
 		{
-			return receiptPrinterSettings.isPrintLogo();
+			return this.getSalespointReceiptPrinterSettings(connectionService).isPrintLogo();
 		}
-		return salespoint.getReceiptPrinterSettings().isPrintLogo();
+		return this.getReceiptPrinterSettings().isPrintLogo();
 	}
 
 	protected int getLogo()
 	{
-		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
 		{
-			return receiptPrinterSettings.getLogo();
+			return this.getSalespointReceiptPrinterSettings(connectionService).getLogo();
 		}
-		return salespoint.getReceiptPrinterSettings().getLogo();
+		return this.getReceiptPrinterSettings().getLogo();
 	}
 
 	protected PrintMode getPrintLogoMode()
 	{
-		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
 		{
-			return receiptPrinterSettings.getPrintLogoMode();
+			return this.getSalespointReceiptPrinterSettings(connectionService).getPrintLogoMode();
 		}
-		return salespoint.getReceiptPrinterSettings().getPrintLogoMode();
+		return this.getReceiptPrinterSettings().getPrintLogoMode();
 	}
 
 	protected int getLinesBeforeCut()
 	{
-		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
 		{
-			return receiptPrinterSettings.getLinesBeforeCut();
+			return this.getSalespointReceiptPrinterSettings(connectionService).getLinesBeforeCut();
 		}
-		return salespoint.getReceiptPrinterSettings().getLinesBeforeCut();
+		return this.getReceiptPrinterSettings().getLinesBeforeCut();
 	}
 	
-//	@Override
+	protected int getColumnCount()
+	{
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		{
+			return this.getSalespointReceiptPrinterSettings(connectionService).getCols();
+		}
+		return this.getReceiptPrinterSettings().getCols();
+	}
+
+	protected Converter getConverter()
+	{
+		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		{
+			return new Converter(this.getSalespointReceiptPrinterSettings(connectionService).getConverter());
+		}
+		return new Converter(this.getReceiptPrinterSettings().getConverter());
+	}
+
 	protected void cutPaper()
 	{
 		this.doCutPaper(this.getLinesBeforeCut());
 	}
 
-//	@Override
 	protected void cutPaper(int feed)
 	{
 		this.doCutPaper(feed);
 	}
 
-	@Override
-	public ReceiptPrinterSettings getReceiptPrinterSettings()
-	{
-		if (this.receiptPrinterSettings == null)
-		{
-			this.setReceiptPrinterSettings();
-		}
-		return this.receiptPrinterSettings;
-	}
-
-	public void setReceiptPrinterSettings()
-	{
-		this.receiptPrinterSettings = this.getReceiptPrinterSettings(this.persistenceService.getCacheService());
+//	@Override
+//	public ReceiptPrinterSettings getReceiptPrinterSettings()
+//	{
 //		if (this.receiptPrinterSettings == null)
 //		{
-//			if (this.persistenceService.getServerService().isConnected())
-//			{
-//				this.receiptPrinterSettings = this.getReceiptPrinterSettings(this.persistenceService.getServerService());
-//			}
+//			this.setReceiptPrinterSettings();
 //		}
+//		return this.receiptPrinterSettings;
+//	}
+//
+	public void setReceiptPrinterSettings()
+	{
+		this.receiptPrinterSettings = this.getReceiptPrinterSettings();
 		if (this.receiptPrinterSettings == null)
 		{
 			this.receiptPrinterSettings = this.createReceiptPrinterSettings();
@@ -138,9 +164,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 	
 	protected Salespoint getSalespoint()
 	{
-		String app = System.getProperty("eclipse.application");
-		ConnectionService service = app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService();
-		SalespointQuery query = (SalespointQuery) service.getQuery(Salespoint.class);
+		SalespointQuery query = (SalespointQuery) this.connectionService.getQuery(Salespoint.class);
 		return query.getCurrentSalespoint();
 	}
 
@@ -153,31 +177,6 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 	}
 
 	protected abstract void doCutPaper(int linesBeforeCut);
-
-	protected int getColumnCount()
-	{
-		if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
-		{
-			return this.getReceiptPrinterSettings().getCols();
-		}
-		return this.salespoint.getReceiptPrinterSettings().getCols();
-	}
-
-	protected Converter getConverter()
-	{
-		if (this.converter == null)
-		{
-			if (salespoint == null || salespoint.getReceiptPrinterSettings() == null)
-			{
-				this.converter = new Converter(this.receiptPrinterSettings.getConverter());
-			}
-			else
-			{
-				this.converter = new Converter(salespoint.getReceiptPrinterSettings().getConverter());
-			}
-		}
-		return this.converter;
-	}
 
 	protected Event getEvent(final IStatus status)
 	{
@@ -207,7 +206,8 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	protected void setPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = persistenceService;
+		String app = System.getProperty("eclipse.application");
+		this.connectionService = app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService();
 	}
 
 	protected void unsetEventAdmin(final EventAdmin eventAdmin)
@@ -222,7 +222,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	protected void unsetPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = null;
+		this.connectionService = null;
 	}
 
 	public String convertToString(Object object)
@@ -262,11 +262,13 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		return settings;
 	}
 
-	private ReceiptPrinterSettings getReceiptPrinterSettings(final ConnectionService service)
+	@Override
+	public ReceiptPrinterSettings getReceiptPrinterSettings()
 	{
 		final String componentName = (String) this.context.getProperties().get("component.name");
-		final ReceiptPrinterSettingsQuery query = (ReceiptPrinterSettingsQuery) service
+		final ReceiptPrinterSettingsQuery query = (ReceiptPrinterSettingsQuery) connectionService
 				.getQuery(ReceiptPrinterSettings.class);
 		return query.findByComponentName(componentName);
 	}
+
 }

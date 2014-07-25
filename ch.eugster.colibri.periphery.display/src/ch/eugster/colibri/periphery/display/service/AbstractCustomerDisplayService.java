@@ -29,83 +29,17 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	private SalespointCustomerDisplaySettings salespointCustomerDisplaySettings;
 
-	protected PersistenceService persistenceService;
+	protected ConnectionService connectionService;
 
 	private LogService logService;
 
 	private EventAdmin eventAdmin;
-
-	private Converter converter;
 
 	public ComponentContext getContext()
 	{
 		return context;
 	}
 	
-	@Override
-	public CustomerDisplaySettings getCustomerDisplaySettings()
-	{
-		if (this.customerDisplaySettings == null)
-		{
-			this.setCustomerDisplaySettings();
-		}
-		return this.customerDisplaySettings;
-	}
-	
-	protected String getPort()
-	{
-		String app = System.getProperty("eclipse.application");
-		return this.getPort(app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService());
-	}
-
-	private String getPort(ConnectionService connectionService)
-	{
-		String port = null;
-		if (this.salespointCustomerDisplaySettings == null)
-		{
-			this.salespointCustomerDisplaySettings = this.getSalespointCustomerDisplaySettings(connectionService);
-		}
-		if (this.salespointCustomerDisplaySettings == null)
-		{
-			port = this.customerDisplaySettings.getPort();
-		}
-		else
-		{
-			port = this.salespointCustomerDisplaySettings.getPort();
-		}
-		return port;
-	}
-
-	protected SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings()
-	{
-		return this.salespointCustomerDisplaySettings;
-	}
-
-	protected void setCustomerDisplaySettings()
-	{
-		this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getCacheService());
-//		if (this.customerDisplaySettings == null)
-//		{
-//			if (this.persistenceService.getServerService().isConnected())
-//			{
-//				this.customerDisplaySettings = this.getCustomerDisplaySettings(this.persistenceService.getServerService());
-//			}
-//		}
-		if (this.customerDisplaySettings == null)
-		{
-			this.customerDisplaySettings = this.createCustomerDisplaySettings();
-		}
-	}
-
-	protected void setSalespointCustomerDisplaySettings()
-	{
-		this.salespointCustomerDisplaySettings = this.getSalespointCustomerDisplaySettings(this.persistenceService.getCacheService());
-		if (this.salespointCustomerDisplaySettings == null)
-		{
-			this.salespointCustomerDisplaySettings = this.createSalespointCustomerDisplaySettings();
-		}
-	}
-
 	protected void activate(final ComponentContext context)
 	{
 		this.context = context;
@@ -153,25 +87,31 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		}
 	}
 
+	protected String getPort()
+	{
+		if (this.getSalespointCustomerDisplaySettings() != null)
+		{
+			return this.getSalespointCustomerDisplaySettings().getPort();
+		}
+		return this.getCustomerDisplaySettings().getPort();
+	}
+
 	protected int getColumnCount()
 	{
-		if (this.getSalespointCustomerDisplaySettings() == null)
-		{
-			return this.getCustomerDisplaySettings().getCols();
-		}
-		else
+		if (this.getSalespointCustomerDisplaySettings() != null)
 		{
 			return this.getSalespointCustomerDisplaySettings().getCols();
 		}
+		return this.getCustomerDisplaySettings().getCols();
 	}
 
 	protected Converter getConverter()
 	{
-		if (this.converter == null)
+		if (this.getSalespointCustomerDisplaySettings() != null)
 		{
-			this.converter = new Converter(this.customerDisplaySettings.getConverter());
+			return new Converter(this.getSalespointCustomerDisplaySettings().getConverter());
 		}
-		return this.converter;
+		return new Converter(this.getCustomerDisplaySettings().getConverter());
 	}
 
 	protected Event getEvent(final IStatus status)
@@ -191,14 +131,11 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	protected int getRowCount()
 	{
-		if (this.getSalespointCustomerDisplaySettings() == null)
-		{
-			return this.getCustomerDisplaySettings().getRows();
-		}
-		else
+		if (this.getSalespointCustomerDisplaySettings() != null)
 		{
 			return this.getSalespointCustomerDisplaySettings().getRows();
 		}
+		return this.getCustomerDisplaySettings().getRows();
 	}
 
 	protected void setEventAdmin(final EventAdmin eventAdmin)
@@ -213,7 +150,8 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	protected void setPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = persistenceService;
+		String app = System.getProperty("eclipse.application");
+		this.connectionService = app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService();
 	}
 
 	protected void unsetEventAdmin(final EventAdmin eventAdmin)
@@ -228,7 +166,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	protected void unsetPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = null;
+		this.connectionService = null;
 	}
 
 	@Override
@@ -254,19 +192,28 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		return settings;
 	}
 
-	private CustomerDisplaySettings getCustomerDisplaySettings(final ConnectionService service)
+	public CustomerDisplaySettings getCustomerDisplaySettings()
 	{
 		final String componentName = (String) this.context.getProperties().get("component.name");
-		final CustomerDisplaySettingsQuery query = (CustomerDisplaySettingsQuery) service
+		final CustomerDisplaySettingsQuery query = (CustomerDisplaySettingsQuery) connectionService
 				.getQuery(CustomerDisplaySettings.class);
-		return query.findByComponentName(componentName);
+		this.customerDisplaySettings = query.findByComponentName(componentName);
+		if (this.customerDisplaySettings == null)
+		{
+			this.customerDisplaySettings = this.createCustomerDisplaySettings();
+		}
+		return this.customerDisplaySettings;
 	}
 
-	private SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings(final ConnectionService service)
+	protected SalespointCustomerDisplaySettings getSalespointCustomerDisplaySettings()
 	{
-		final SalespointQuery query = (SalespointQuery) service.getQuery(Salespoint.class);
-		Salespoint salespoint = query.getCurrentSalespoint();
-		return salespoint.getCustomerDisplaySettings();
+		if (this.salespointCustomerDisplaySettings == null)
+		{
+			final SalespointQuery query = (SalespointQuery) connectionService.getQuery(Salespoint.class);
+			Salespoint salespoint = query.getCurrentSalespoint();
+			this.salespointCustomerDisplaySettings = salespoint == null ? null : salespoint.getCustomerDisplaySettings();
+		}
+		return this.salespointCustomerDisplaySettings;
 	}
 
 	private int getDefaultColumnCount()

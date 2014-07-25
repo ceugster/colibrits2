@@ -526,16 +526,16 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		if ((this.customerDisplayServiceTracker.getServices() != null)
 				&& (this.customerDisplayServiceTracker.getServices().length > 0))
 		{
-			final SalespointCustomerDisplaySettings customerDisplaySettings = salespoint.getCustomerDisplaySettings();
-			if (customerDisplaySettings != null && !customerDisplaySettings.isDeleted())
+			final SalespointCustomerDisplaySettings salespointDisplaySettings = salespoint.getCustomerDisplaySettings();
+			if (salespointDisplaySettings != null && !salespointDisplaySettings.isDeleted())
 			{
-				this.customerDisplayViewer.setSelection(new StructuredSelection(customerDisplaySettings
+				this.customerDisplayViewer.setSelection(new StructuredSelection(salespointDisplaySettings
 						.getCustomerDisplaySettings()));
-				this.customerDisplayCols.setSelection(customerDisplaySettings.getCols());
-				this.customerDisplayConverter.setText(customerDisplaySettings.getConverter() == null ? "" : customerDisplaySettings.getConverter());
+				this.customerDisplayCols.setSelection(salespointDisplaySettings.getCols());
+				this.customerDisplayConverter.setText(salespointDisplaySettings.getConverter() == null ? "" : salespointDisplaySettings.getConverter());
 //				this.customerDisplayDelay.setSelection(customerDisplaySettings.getDelay());
-				this.customerDisplayPort.setText(customerDisplaySettings.getPort() == null ? "" : customerDisplaySettings.getPort());
-				this.customerDisplayRows.setSelection(customerDisplaySettings.getRows());
+				this.customerDisplayPort.setText(salespointDisplaySettings.getPort() == null ? "" : salespointDisplaySettings.getPort());
+				this.customerDisplayRows.setSelection(salespointDisplaySettings.getRows());
 			}
 		}
 
@@ -652,85 +652,98 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		if ((this.receiptPrinterServiceTracker.getServices() != null)
 				&& (this.receiptPrinterServiceTracker.getServices().length > 0))
 		{
+			ReceiptPrinterSettings printerSettings = null;
 			ssel = (StructuredSelection) this.receiptPrinterViewer.getSelection();
-			if (ssel.isEmpty())
+			if (!ssel.isEmpty())
 			{
-				salespoint.setReceiptPrinterSettings(null);
+				printerSettings = (ReceiptPrinterSettings) ssel.getFirstElement();
+				if (printerSettings.getId() == null)
+				{
+					printerSettings = null;
+				}
+			}
+			SalespointReceiptPrinterSettings salespointPrinterSettings = salespoint.getReceiptPrinterSettings();
+			if (printerSettings == null)
+			{
+				if (salespointPrinterSettings != null)
+				{
+					salespointPrinterSettings.setDeleted(true);
+				}
 			}
 			else
 			{
-				final ReceiptPrinterSettings selectedPrinter = (ReceiptPrinterSettings) ssel.getFirstElement();
-				if (selectedPrinter.getId() == null)
+				if (salespointPrinterSettings == null)
 				{
-					salespoint.setReceiptPrinterSettings(null);
+					salespointPrinterSettings = SalespointReceiptPrinterSettings.newInstance(printerSettings, salespoint);
+					salespoint.setReceiptPrinterSettings(salespointPrinterSettings);
 				}
-				else
+				else if (!salespointPrinterSettings.getReceiptPrinterSettings().getId().equals(printerSettings.getId()))
 				{
-					SalespointReceiptPrinterSettings currentPrinterSettings = salespoint.getReceiptPrinterSettings();
-					if (currentPrinterSettings == null || !currentPrinterSettings.getReceiptPrinterSettings().getId().equals(selectedPrinter.getId()))
-					{
-						currentPrinterSettings = selectedPrinter.getSalespointReceiptPrinter(salespoint);
-					}
-					if (currentPrinterSettings == null)
-					{
-						currentPrinterSettings = SalespointReceiptPrinterSettings.newInstance(selectedPrinter, salespoint);
-					}
-					currentPrinterSettings.setDeleted(selectedPrinter.getId() == null ? true : false);
-					currentPrinterSettings.setCols(this.receiptPrinterCols.getSelection());
-					currentPrinterSettings.setConverter(this.receiptPrinterConverter.getText().isEmpty() ? null : this.receiptPrinterConverter.getText());
-					currentPrinterSettings.setLinesBeforeCut(this.receiptPrinterLinesBeforeCut.getSelection());
-					currentPrinterSettings.setPort(this.receiptPrinterPort.getText().isEmpty() ? null : receiptPrinterPort.getText());
-					salespoint.setReceiptPrinterSettings(currentPrinterSettings);
-					currentPrinterSettings.setPrintLogo(this.printLogo.getSelection());
-					ssel = (IStructuredSelection) this.logo.getSelection();
-					int logo = 0;
-					if (!ssel.isEmpty())
-					{
-						logo = ((Integer) ssel.getFirstElement()).intValue();
-					}
-					currentPrinterSettings.setLogo(logo);
-					PrintMode mode = PrintMode.NORMAL;
-					ssel = (IStructuredSelection) this.printLogoMode.getSelection();
-					if (!ssel.isEmpty())
-					{
-						mode = (PrintMode) ssel.getFirstElement();
-					}
-					currentPrinterSettings.setPrintLogoMode(mode);
+					salespointPrinterSettings.setDeleted(true);
+					salespointPrinterSettings = SalespointReceiptPrinterSettings.newInstance(printerSettings, salespoint);
+					salespoint.setReceiptPrinterSettings(salespointPrinterSettings);
 				}
+				salespointPrinterSettings.setCols(this.receiptPrinterCols.getSelection());
+				salespointPrinterSettings.setConverter(this.receiptPrinterConverter.getText().isEmpty() ? null : this.receiptPrinterConverter.getText());
+				salespointPrinterSettings.setLinesBeforeCut(this.receiptPrinterLinesBeforeCut.getSelection());
+				salespointPrinterSettings.setPort(this.receiptPrinterPort.getText().isEmpty() ? null : receiptPrinterPort.getText());
+				salespoint.setReceiptPrinterSettings(salespointPrinterSettings);
+				salespointPrinterSettings.setPrintLogo(this.printLogo.getSelection());
+				ssel = (IStructuredSelection) this.logo.getSelection();
+				int logo = 0;
+				if (!ssel.isEmpty())
+				{
+					logo = ((Integer) ssel.getFirstElement()).intValue();
+				}
+				salespointPrinterSettings.setLogo(logo);
+				PrintMode mode = PrintMode.NORMAL;
+				ssel = (IStructuredSelection) this.printLogoMode.getSelection();
+				if (!ssel.isEmpty())
+				{
+					mode = (PrintMode) ssel.getFirstElement();
+				}
+				salespointPrinterSettings.setPrintLogoMode(mode);
 			}
 		}
 
 		if ((this.customerDisplayServiceTracker.getServices() != null)
 				&& (this.customerDisplayServiceTracker.getServices().length > 0))
 		{
+			CustomerDisplaySettings displaySettings = null;
 			ssel = (StructuredSelection) this.customerDisplayViewer.getSelection();
-			if (ssel.isEmpty())
+			if (!ssel.isEmpty())
 			{
-				final SalespointCustomerDisplaySettings selectedDisplay = salespoint.getCustomerDisplaySettings();
-				if (selectedDisplay instanceof SalespointCustomerDisplaySettings)
+				displaySettings = (CustomerDisplaySettings) ssel.getFirstElement();
+				if (displaySettings.getId() == null)
 				{
-					selectedDisplay.setDeleted(true);
+					displaySettings = null;
+				}
+			}
+			SalespointCustomerDisplaySettings salespointDisplaySettings = salespoint.getCustomerDisplaySettings();
+			if (displaySettings == null)
+			{
+				if (salespointDisplaySettings != null)
+				{
+					salespointDisplaySettings.setDeleted(true);
 				}
 			}
 			else
 			{
-				final CustomerDisplaySettings selectedDisplay = (CustomerDisplaySettings) ssel.getFirstElement();
-				SalespointCustomerDisplaySettings currentDisplay = salespoint.getCustomerDisplaySettings();
-				if (currentDisplay == null)
+				if (salespointDisplaySettings == null)
 				{
-					currentDisplay = SalespointCustomerDisplaySettings.newInstance(selectedDisplay, salespoint);
-					salespoint.setCustomerDisplaySettings(currentDisplay);
+					salespointDisplaySettings = SalespointCustomerDisplaySettings.newInstance(displaySettings, salespoint);
+					salespoint.setCustomerDisplaySettings(salespointDisplaySettings);
 				}
-				else if (!currentDisplay.getCustomerDisplaySettings().getId().equals(selectedDisplay.getId()))
+				else if (!salespointDisplaySettings.getCustomerDisplaySettings().getId().equals(displaySettings.getId()))
 				{
-					currentDisplay = SalespointCustomerDisplaySettings.newInstance(selectedDisplay, salespoint);
-					salespoint.setCustomerDisplaySettings(currentDisplay);
+					salespointDisplaySettings.setDeleted(true);
+					salespointDisplaySettings = SalespointCustomerDisplaySettings.newInstance(displaySettings, salespoint);
+					salespoint.setCustomerDisplaySettings(salespointDisplaySettings);
 				}
-				currentDisplay.setCols(this.customerDisplayCols.getSelection());
-				currentDisplay.setConverter(this.customerDisplayConverter.getText().isEmpty() ? null : this.customerDisplayConverter.getText());
-//				currentDisplay.setDelay(this.customerDisplayDelay.getSelection());
-				currentDisplay.setPort(this.customerDisplayPort.getText().isEmpty() ? null : this.customerDisplayPort.getText());
-				currentDisplay.setRows(this.customerDisplayRows.getSelection());
+				salespointDisplaySettings.setConverter(this.customerDisplayConverter.getText().isEmpty() ? null : this.customerDisplayConverter.getText());
+				salespointDisplaySettings.setPort(this.customerDisplayPort.getText().isEmpty() ? null : this.customerDisplayPort.getText());
+				salespointDisplaySettings.setRows(this.customerDisplayRows.getSelection());
+				salespointDisplaySettings.setCols(this.customerDisplayCols.getSelection());
 			}
 		}
 	}
@@ -1060,8 +1073,6 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 						periphery.setCols(cols == null ? 0 : cols.intValue());
 						final Integer rows = (Integer) reference.getProperty("custom.rows");
 						periphery.setRows(rows == null ? 0 : rows.intValue());
-//						final Integer delay = (Integer) reference.getProperty("custom.delay");
-//						periphery.setDelay(delay == null ? 0 : delay.intValue());
 						periphery.setConverter(getCustomerDisplayConverter(tracker, reference));
 						periphery.setPort((String) reference.getProperty("custom.port"));
 						try
@@ -1103,28 +1114,24 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 							final CustomerDisplaySettings periphery = (CustomerDisplaySettings) ssel.getFirstElement();
 							final Salespoint salespoint = ((SalespointEditorInput) SalespointEditor.this.getEditorInput())
 									.getEntity();
-							SalespointCustomerDisplaySettings salespointPeriphery = salespoint.getCustomerDisplaySettings();
-							if (salespointPeriphery == null)
+							if (periphery.getId() == null)
 							{
-								salespointPeriphery = periphery.getSalespointPeriphery(salespoint);
-							}
-							if (salespointPeriphery == null)
-							{
-								SalespointEditor.this.customerDisplayPort.setText(periphery.getPort() == null ? ""
-										: periphery.getPort());
-								SalespointEditor.this.customerDisplayConverter.setText(periphery.getConverter() == null ? ""
-										: periphery.getConverter());
-								SalespointEditor.this.customerDisplayCols.setSelection(periphery.getCols());
-								SalespointEditor.this.customerDisplayRows.setSelection(periphery.getRows());
-//								SalespointEditor.this.customerDisplayDelay.setSelection(periphery.getDelay());
+								SalespointEditor.this.customerDisplayPort.setText("");
+								SalespointEditor.this.customerDisplayConverter.setText("");
+								SalespointEditor.this.customerDisplayCols.setSelection(0);
+								SalespointEditor.this.customerDisplayRows.setSelection(0);
 							}
 							else
 							{
-								SalespointEditor.this.customerDisplayPort.setText(salespointPeriphery.getPort() == null ? ""
-										: (periphery.getPort() == null ? "" : periphery.getPort()));
-								SalespointEditor.this.customerDisplayConverter
-										.setText(salespointPeriphery.getConverter() == null ? "" : periphery.getConverter());
-								SalespointEditor.this.customerDisplayCols.setSelection(salespointPeriphery.getCols());
+								SalespointCustomerDisplaySettings salespointPeriphery = salespoint.getCustomerDisplaySettings();
+								if (salespointPeriphery == null)
+								{
+									salespointPeriphery = periphery.getSalespointPeriphery(salespoint);
+								}
+								SalespointEditor.this.customerDisplayPort.setText(salespointPeriphery == null ? periphery.getPort(): salespointPeriphery.getPort());
+								SalespointEditor.this.customerDisplayConverter.setText(salespointPeriphery == null ? periphery.getConverter() : salespointPeriphery.getConverter());
+								SalespointEditor.this.customerDisplayCols.setSelection(salespointPeriphery == null ? periphery.getCols() : salespointPeriphery.getCols());
+								SalespointEditor.this.customerDisplayRows.setSelection(salespointPeriphery == null ? periphery.getRows() : salespointPeriphery.getRows());
 							}
 							SalespointEditor.this.setDirty(true);
 						}

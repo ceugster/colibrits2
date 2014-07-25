@@ -120,9 +120,9 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 	}
 
 	@Override
-	public void testAscii(byte[] ascii) throws Exception {
-		// TODO Auto-generated method stub
-		
+	public void testAscii(String deviceName, byte[] ascii) throws Exception 
+	{
+
 	}
 
 

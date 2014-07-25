@@ -17,17 +17,15 @@ import ch.eugster.colibri.periphery.printer.service.AsciiConstants;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Salespoint;
-import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.Stock;
 
 public class SerialReceiptPrinterService extends AbstractReceiptPrinterService 
 {
 	private SerialPort printer;
 
-	protected void activate(final ComponentContext context)
+	private SerialPort openPort(String portname)
 	{
-		super.activate(context);
-		String portname = this.getPort();
+		SerialPort serialPort = null;
 		if (portname != null)
 		{
 			portname = portname.endsWith(":") ? portname.substring(0, portname.length() - 1) : portname;
@@ -36,36 +34,35 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			{
 				if (port.equalsIgnoreCase(portname)) 
 				{
-			        printer = new SerialPort(port);
+			        serialPort = new SerialPort(port);
 			        try {
-			            printer.openPort();//Open serial port
-			            printer.setParams(SerialPort.BAUDRATE_9600, 
+			            serialPort.openPort();//Open serial port
+			            serialPort.setParams(SerialPort.BAUDRATE_9600, 
 			                                 SerialPort.DATABITS_8,
 			                                 SerialPort.STOPBITS_1,
 			                                 SerialPort.PARITY_NONE);//Set params. Also you can set params by this string: serialPort.setParams(9600, 8, 1, 0);
 			        }
 			        catch (SerialPortException ex) 
 			        {
-			        	printer = null;
+			        	serialPort = null;
 			        	sendEvent(ex);
 			        }
+			        break;
 				}
 			}
 		}
+		return serialPort;
 	}
 
-	private void sendEvent(Exception e)
+	protected void activate(final ComponentContext context)
 	{
-		if (this.getEventAdmin() != null)
-		{
-			this.getEventAdmin().sendEvent(
-					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
-		}
+		super.activate(context);
+		this.printer = openPort(this.getPort());
 	}
 
-	protected void deactivate(final ComponentContext context)
+	private void closePort(SerialPort printer)
 	{
-		if (this.printer != null)
+		if (printer != null)
 		{
 			try 
 			{
@@ -76,9 +73,22 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 				sendEvent(e);
 			}
 		}
+	}
+	
+	protected void deactivate(final ComponentContext context)
+	{
+		closePort(this.printer);
 		super.deactivate(context);
 	}
 
+	private void sendEvent(Exception e)
+	{
+		if (this.getEventAdmin() != null)
+		{
+			this.getEventAdmin().sendEvent(
+					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
+		}
+	}
 
 	@Override
 	public void print(String text) 
@@ -110,17 +120,15 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	@Override
 	public void print(String text, Salespoint salespoint) 
 	{
-		SalespointReceiptPrinterSettings settings = salespoint == null ? null : salespoint.getReceiptPrinterSettings();
 		if (printer != null)
 		{
 			if (this.isPrintLogo())
 			{
 				this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
 			}
-			Converter converter = new Converter(settings == null ? this.getReceiptPrinterSettings().getConverter() : settings.getConverter());
-			final byte[] printable = converter.convert(text.getBytes());
+			final byte[] printable = getConverter().convert(text.getBytes());
 			println(printable);
-			this.cutPaper(settings == null ? this.getReceiptPrinterSettings().getLinesBeforeCut() : settings.getLinesBeforeCut());
+			this.cutPaper(this.getLinesBeforeCut());
 		}
 	}
 
@@ -245,39 +253,76 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 	}
 
 	@Override
-	public void testPrint(String deviceName, String conversions, String text, int feed) throws Exception 
+	public void testPrint(String deviceName, String conversions, String text, int feed) throws Exception
 	{
-//		ComponentContext context = this.getContext();
-//		if (context != null)
-//		{
-//			Bundle bundle = context.getBundleContext().getBundle();
-//			bundle.stop();
-//			boolean open = false;
-//			try
-//			{
-//				String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
-//				printer = new SerialPort(port);
-//				open = printer.openPort();
-//				if (open)
-//				{
-					byte[] bytes = new Converter(conversions).convert(text.getBytes());
-					printer.writeBytes(bytes);
-					cutPaper(5);
-//				}
-//			}
-//			catch (Exception e)
-//			{
-//				e.printStackTrace();
-//			}
-//			finally
-//			{
-//				if (open)
-//				{
-//					printer.closePort();
-//				}
-//				bundle.start();
-//			}
-//		}
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
+		}
+		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+		String oldPort = null;
+
+		if (this.printer == null)
+		{
+			this.printer = this.openPort(port);
+		}
+		else
+		{
+			if (!port.equals(this.printer.getPortName()))
+			{
+				oldPort = this.printer.getPortName();
+				this.closePort(this.printer);
+				this.printer = this.openPort(port);
+			}
+		}
+		
+		this.printer.writeBytes(new byte[] { 0x0c});
+		byte[] bytes = new Converter(conversions).convert(text.getBytes());
+		this.printer.writeBytes(bytes);
+
+		if (oldPort != null)
+		{
+			this.closePort(this.printer);
+			this.printer = this.openPort(port);
+		}
+	}
+
+	@Override
+	public void testAscii(String deviceName, byte[] bytes) throws Exception
+	{
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
+		}
+		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
+		String oldPort = null;
+
+		if (this.printer == null)
+		{
+			this.printer = this.openPort(port);
+		}
+		else
+		{
+			if (!port.equals(this.printer.getPortName()))
+			{
+				oldPort = this.printer.getPortName();
+				this.closePort(this.printer);
+				this.printer = this.openPort(port);
+			}
+		}
+		
+		printer.writeBytes( new byte[] { 0x0c});
+		printer.writeBytes(bytes);
+
+		if (oldPort != null)
+		{
+			this.closePort(this.printer);
+			this.printer = this.openPort(port);
+		}
+		if (printer == null)
+		{
+			throw new NullPointerException("Das Kundendisplay konnte nicht angesprochen werden.");
+		}
 	}
 
 	@Override

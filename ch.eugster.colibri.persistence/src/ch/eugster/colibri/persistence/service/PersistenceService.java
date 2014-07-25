@@ -20,8 +20,6 @@ public interface PersistenceService
 
 	String decrypt(String encryptedMessage);
 
-//	ComponentContext getComponentContext();
-
 	EventAdmin getEventAdmin();
 
 	ServerService getServerService();
