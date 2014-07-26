@@ -89,27 +89,36 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	protected String getPort()
 	{
-		if (this.getSalespointCustomerDisplaySettings() != null)
+		if (isClientApp())
 		{
-			return this.getSalespointCustomerDisplaySettings().getPort();
+			if (this.getSalespointCustomerDisplaySettings() != null)
+			{
+				return this.getSalespointCustomerDisplaySettings().getPort();
+			}
 		}
 		return this.getCustomerDisplaySettings().getPort();
 	}
 
 	protected int getColumnCount()
 	{
-		if (this.getSalespointCustomerDisplaySettings() != null)
+		if (isClientApp())
 		{
-			return this.getSalespointCustomerDisplaySettings().getCols();
+			if (this.getSalespointCustomerDisplaySettings() != null)
+			{
+				return this.getSalespointCustomerDisplaySettings().getCols();
+			}
 		}
 		return this.getCustomerDisplaySettings().getCols();
 	}
 
 	protected Converter getConverter()
 	{
-		if (this.getSalespointCustomerDisplaySettings() != null)
+		if (isClientApp())
 		{
-			return new Converter(this.getSalespointCustomerDisplaySettings().getConverter());
+			if (this.getSalespointCustomerDisplaySettings() != null)
+			{
+				return new Converter(this.getSalespointCustomerDisplaySettings().getConverter());
+			}
 		}
 		return new Converter(this.getCustomerDisplaySettings().getConverter());
 	}
@@ -150,8 +159,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 
 	protected void setPersistenceService(final PersistenceService persistenceService)
 	{
-		String app = System.getProperty("eclipse.application");
-		this.connectionService = app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService();
+		this.connectionService = isClientApp() ? persistenceService.getCacheService() : persistenceService.getServerService();
 	}
 
 	protected void unsetEventAdmin(final EventAdmin eventAdmin)
@@ -257,5 +265,11 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 	{
 		final Integer rows = (Integer) this.context.getProperties().get("custom.rows");
 		return rows == null ? 1 : rows.intValue();
+	}
+	
+	private boolean isClientApp()
+	{
+		String app = System.getProperty("eclipse.application");
+		return app.contains("client");
 	}
 }

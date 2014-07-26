@@ -17,6 +17,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/epsonupos.T82II.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/epsonupos.T88V.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/epsonupos.trace.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jpos113-controls.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jpos113.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pos.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/pos.v3.0001.jar"/>

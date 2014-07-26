@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import ch.eugster.colibri.barcode.code128.code.Code128;
+import ch.eugster.colibri.barcode.code128.code.Code128.Code128Type;
 
 public class Activator implements BundleActivator
 {
@@ -53,7 +53,12 @@ public class Activator implements BundleActivator
 
 	public static String getDescription()
 	{
-		return "Code128 Barcode Typen A (" + Code128.CODE128_A_LENGTH + " Zeichen) und B (" + Code128.CODE128_B_LENGTH + " Zeichen)";
+		StringBuilder builder = new StringBuilder("Code128 Barcode Typen");
+		for (Code128Type code128Type : Code128Type.values())
+		{
+			builder = builder.append(" " + code128Type.type() + " (" + code128Type.length() + " Zeichen)");
+		}
+		return builder.toString();
 	}
 
 }

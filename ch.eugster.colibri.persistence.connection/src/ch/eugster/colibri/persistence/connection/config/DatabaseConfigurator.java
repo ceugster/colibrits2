@@ -126,7 +126,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 		{
 			try
 			{
-				this.log(LogService.LOG_INFO, "Währungen werden eingefügt...");
+				log(LogService.LOG_INFO, "Währungen werden eingefügt...");
 				status = this.createCurrencies(new SubProgressMonitor(monitor, 1));
 				monitor.worked(1);
 			}
@@ -134,11 +134,11 @@ public class DatabaseConfigurator extends AbstractConfigurator
 			{
 				final String msg = "Beim Auslesen der Währungen aus der lokalen Datenbank (currency.csv) ist ein Fehler aufgetreten.";
 				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg, e);
-				this.log(status);
+				log(status);
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Allgemeine Einstellungen werden eingefügt...");
+			log(LogService.LOG_INFO, "Allgemeine Einstellungen werden eingefügt...");
 			status = this.createCommonSettings(new SubProgressMonitor(monitor, 1), currencyId);
 			if (monitor.isCanceled())
 			{
@@ -149,7 +149,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Voreingestellte Zahlungsarten werden eingefügt...");
+			log(LogService.LOG_INFO, "Voreingestellte Zahlungsarten werden eingefügt...");
 			status = this.createPaymentTypeCash(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -160,7 +160,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Mehrwertsteuern werden eingefügt...");
+			log(LogService.LOG_INFO, "Mehrwertsteuern werden eingefügt...");
 			status = this.createTaxes(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -171,7 +171,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Voreingestellte Warengruppe wird eingefügt...");
+			log(LogService.LOG_INFO, "Voreingestellte Warengruppe wird eingefügt...");
 			status = this.createDefaultProductGroup(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -182,7 +182,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Warengruppe Bezahlte Rechnungen wird eingefügt...");
+			log(LogService.LOG_INFO, "Warengruppe Bezahlte Rechnungen wird eingefügt...");
 			status = this.createPayedInvoiceProductGroup(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -193,7 +193,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Warengruppe Kreditkartengebühr wird eingefügt...");
+			log(LogService.LOG_INFO, "Warengruppe Kreditkartengebühr wird eingefügt...");
 			status = this.createChargeProductGroup(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -204,7 +204,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Voreingestelltes Kassenprofil wird eingefügt...");
+			log(LogService.LOG_INFO, "Voreingestelltes Kassenprofil wird eingefügt...");
 			status = this.createDefaultProfile(new SubProgressMonitor(monitor, 1), payedInvoiceProductGroupId);
 			if (monitor.isCanceled())
 			{
@@ -215,7 +215,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Die Administratorenrolle wird eingefügt...");
+			log(LogService.LOG_INFO, "Die Administratorenrolle wird eingefügt...");
 			status = this.createRole(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -226,7 +226,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Benutzer Administrator wird eingefügt...");
+			log(LogService.LOG_INFO, "Benutzer Administrator wird eingefügt...");
 			status = this.createUser(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -237,7 +237,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Erste Kasse wird eingefügt...");
+			log(LogService.LOG_INFO, "Erste Kasse wird eingefügt...");
 			status = this.createSalespoint(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{
@@ -248,7 +248,7 @@ public class DatabaseConfigurator extends AbstractConfigurator
 				return status;
 			}
 
-			this.log(LogService.LOG_INFO, "Die Version wird eingefügt...");
+			log(LogService.LOG_INFO, "Die Version wird eingefügt...");
 			status = this.createVersion(new SubProgressMonitor(monitor, 1));
 			if (monitor.isCanceled())
 			{

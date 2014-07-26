@@ -8,50 +8,58 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
 
+import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.printer.service.AbstractReceiptPrinterService;
 import ch.eugster.colibri.periphery.printer.service.ReceiptPrinterService;
 import ch.eugster.colibri.periphery.printer.usb.Activator;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Salespoint;
 
-public class UsbReceiptPrinterService extends AbstractReceiptPrinterService {
+public class UsbReceiptPrinterService extends AbstractReceiptPrinterService 
+{
 	private POSPrinterControl113 printer;
 
-	protected void activate(ComponentContext context) {
+	protected void activate(ComponentContext context) 
+	{
 		super.activate(context);
 		this.printer = (POSPrinterControl113) new POSPrinter();
 		this.openPrinter("POSPrinter");
 	}
 
-	protected void deactivate(ComponentContext context) {
+	protected void deactivate(ComponentContext context) 
+	{
 		this.closePrinter();
 		this.printer = null;
 		super.deactivate(context);
 	}
 
-	private void closePrinter() {
-		try {
-			if (this.printer.getDeviceEnabled()) {
+	private void closePrinter() 
+	{
+		try 
+		{
+			if (this.printer.getDeviceEnabled()) 
+			{
 				this.printer.setDeviceEnabled(false);
 				this.printer.close();
 			}
-		} catch (Exception e) {
-			if (this.getEventAdmin() != null) {
-				this.getEventAdmin()
-						.sendEvent(
-								this.getEvent(new Status(IStatus.CANCEL,
-										Activator.PLUGIN_ID,
-										"Der Belegdrucker kann nicht angesprochen werden.")));
-			}
+		} 
+		catch (Exception e) 
+		{
+			System.out.println();
 		}
 	}
 
-	private void openPrinter(String deviceName) {
-		try {
+	private boolean openPrinter(String deviceName) 
+	{
+		try 
+		{
 			printer.open(deviceName);
 			printer.claim(1000);
 			printer.setDeviceEnabled(true);
-		} catch (Throwable e) {
+			return true;
+		} 
+		catch (Throwable e) 
+		{
 			if (this.getEventAdmin() != null) {
 				this.getEventAdmin()
 						.sendEvent(
@@ -60,6 +68,7 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService {
 										"Der Belegdrucker kann nicht angesprochen werden.")));
 			}
 		}
+		return false;
 	}
 
 	@Override
@@ -259,22 +268,20 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService {
 	}
 
 	@Override
-	public void testPrint(String deviceName, String conversions, String text,
-			int feed) {
-		try {
-			this.printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, text);
-			for (int i = 0; i < feed; i++) {
-				this.printer.printNormal(POSPrinterConst.PTR_S_RECEIPT, "\n");
-			}
-		} catch (Exception e) {
-			if (this.getEventAdmin() != null) {
-				this.getEventAdmin()
-						.sendEvent(
-								this.getEvent(new Status(IStatus.CANCEL,
-										Activator.PLUGIN_ID,
-										"Der Belegdrucker kann nicht angesprochen werden.")));
-			}
+	public void testPrint(String deviceName, String conversions, String text, int feed) throws Exception
+	{
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
 		}
+		
+		byte[] bytes = new Converter(conversions).convert(text.getBytes());
+		this.print(new String(bytes));
+	}
+
+	@Override
+	public void testAscii(String deviceName, byte[] bytes) throws Exception
+	{
 	}
 
 	@Override
@@ -294,11 +301,4 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService {
 			}
 		}
 	}
-
-	@Override
-	public void testAscii(String deviceName, byte[] bytes) throws Exception 
-	{
-
-	}
-
 }

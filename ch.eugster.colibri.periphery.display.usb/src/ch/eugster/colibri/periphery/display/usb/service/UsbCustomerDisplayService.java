@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.osgi.service.component.ComponentContext;
 
 import ch.eugster.colibri.periphery.constants.AsciiConstants;
 import ch.eugster.colibri.periphery.converters.Converter;
@@ -15,16 +16,11 @@ import ch.eugster.colibri.periphery.display.usb.Activator;
 public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 {
 	private PrintStream display;
-
+	
 	@Override
 	public void clearDisplay()
 	{
-		this.openDisplay();
-		if (this.display != null)
-		{
-			this.display.write((byte) 0x0c);
-		}
-		this.closeDisplay();
+		this.writeBytes(new byte[] { 0x0c });
 	}
 
 	@Override
@@ -41,7 +37,9 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 				@Override
 				protected IStatus run(IProgressMonitor monitor)
 				{
-					UsbCustomerDisplayService.this.displayText(text);
+					UsbCustomerDisplayService.this.clearDisplay();
+					byte[] bytes = UsbCustomerDisplayService.this.correctText(text);
+					UsbCustomerDisplayService.this.writeBytes(bytes);
 					return Status.OK_STATUS;
 				}
 				
@@ -54,76 +52,167 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 	public void displayText(final String text)
 	{
 		this.clearDisplay();
-		this.openDisplay();
-		if (this.display != null)
+		byte[] bytes = this.correctText(text);
+		this.writeBytes(bytes);
+	}
+	
+	private void writeBytes(byte[] bytes)
+	{
+		if (this.display!= null)
 		{
-			byte[] print = this.correctText(text);
-			System.out.println(print);
-			for (int i = 0; i < print.length; i++)
+			try
 			{
-				this.display.write(print[i]);
+				this.display.write(new byte[] { 0x0c});
+				this.display.flush();
+				this.display.write(bytes);
+				this.display.flush();
+			}
+			catch (final Exception e)
+			{
+				sendEvent(e);
 			}
 		}
-		this.closeDisplay();
+	}
+	
+	private void sendEvent(Exception e)
+	{
+		if (this.getEventAdmin() != null)
+		{
+			this.getEventAdmin().sendEvent(
+					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
+		}
 	}
 
 	@Override
 	public void displayText(final String converter, String text)
 	{
 		this.clearDisplay();
-		this.openDisplay();
-		if (this.display != null)
+		byte[] bytes = this.correctText(text);
+		this.writeBytes(bytes);
+	}
+	
+	private PrintStream openPort(String deviceName)
+	{
+		if (deviceName != null)
 		{
-			byte[] print = this.correctText(new Converter(converter), text);
-			System.out.println(print);
-			for (int i = 0; i < print.length; i++)
+			try
 			{
-				this.display.write(print[i]);
+		        display = new PrintStream(deviceName);
+			}
+			catch (Exception e)
+			{
+				
 			}
 		}
-		this.closeDisplay();
+		return display;
 	}
 
-	private void closeDisplay()
+	protected void activate(final ComponentContext context)
 	{
-		if (this.display != null)
-		{
-			this.display.close();
-		}
+		super.activate(context);
+		this.display = openPort(this.getPort());
 	}
 
-	private void openDisplay()
+	private void closePort(PrintStream display)
 	{
-		try
+		if (display != null)
 		{
-			this.display = new PrintStream(this.getPort());
-			this.display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-		}
-		catch (final Exception e)
-		{
-			if (this.getEventAdmin() != null)
+			try 
 			{
-				this.getEventAdmin().sendEvent(
-						this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Das Kundendisplay kann nicht angesprochen werden.")));
+	            display.close();
+	            display = null;
 			}
-		} 
+			catch (final Exception e)
+			{
+				sendEvent(e);
+			}
+		}
 	}
+	
+	protected void deactivate(final ComponentContext context)
+	{
+		this.clearDisplay();
+		this.closePort(this.display);
+		super.deactivate(context);
+	}
+
+//	private int convert(String number)
+//	{
+//		try
+//		{
+//			return Integer.valueOf(number).intValue();
+//		}
+//		catch(NumberFormatException e)
+//		{
+//			return 0;
+//		}
+//	}
+
 	@Override
 	public void testDisplay(String deviceName, String conversions, String text) throws Exception
 	{
-			PrintStream display = new PrintStream(deviceName);
-			display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-			display.write(text.getBytes());
-			display.write("\n\n\n".getBytes());
-			display.flush();
-			display.close();
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
+		}
+		String oldPort = null;
+
+		if (this.display == null)
+		{
+			this.display = this.openPort(deviceName);
+		}
+		else
+		{
+			if (!deviceName.equals(this.getPort()))
+			{
+				oldPort = this.getPort();
+				this.closePort(this.display);
+				this.display = this.openPort(deviceName);
+			}
+		}
+		
+		this.writeBytes(new byte[] { 0x0c});
+		byte[] bytes = this.correctText(new Converter(conversions), text);
+		this.writeBytes(bytes);
+
+		if (oldPort != null)
+		{
+			this.closePort(this.display);
+			this.display = this.openPort(oldPort);
+		}
 	}
 
 	@Override
-	public void testAscii(String deviceName, byte[] ascii) throws Exception 
+	public void testAscii(String deviceName, byte[] bytes) throws Exception
 	{
+		if (deviceName == null || deviceName.isEmpty())
+		{
+			throw new NullPointerException("Keinen Port übergeben.");
+		}
+		String oldPort = null;
 
+		if (this.display == null)
+		{
+			this.display = this.openPort(deviceName);
+		}
+		else
+		{
+			if (!deviceName.equals(this.getPort()))
+			{
+				oldPort = this.getPort();
+				this.closePort(this.display);
+				this.display = this.openPort(deviceName);
+			}
+		}
+		
+		writeBytes( new byte[] { 0x0c});
+		writeBytes(bytes);
+
+		if (oldPort != null)
+		{
+			this.closePort(this.display);
+			this.display = this.openPort(oldPort);
+		}
 	}
-
 
 }

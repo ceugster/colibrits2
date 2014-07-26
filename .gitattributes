@@ -1188,6 +1188,8 @@ ch.eugster.colibri.periphery.printer.usb/.settings/org.eclipse.pde.core.prefs -t
 ch.eugster.colibri.periphery.printer.usb/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery.printer.usb/OSGI-INF/service-component.xml -text
 ch.eugster.colibri.periphery.printer.usb/build.properties -text
+ch.eugster.colibri.periphery.printer.usb/jpos.properties -text
+ch.eugster.colibri.periphery.printer.usb/jpos.xml -text
 ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.H2000.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.H6000IV.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.L90.jar -text
@@ -1205,6 +1207,7 @@ ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.core.v1.13.0001.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.core.v1.13.0002.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/epsonupos.trace.jar -text
+ch.eugster.colibri.periphery.printer.usb/lib/jpos113-controls.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/jpos113.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/pos.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/pos.v3.0001.jar -text
@@ -1214,7 +1217,6 @@ ch.eugster.colibri.periphery.printer.usb/lib/uposcommon.core.v1.13.0002.jar -tex
 ch.eugster.colibri.periphery.printer.usb/lib/uposcommon.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/xercesImpl.jar -text
 ch.eugster.colibri.periphery.printer.usb/lib/xml-apis.jar -text
-ch.eugster.colibri.periphery.printer.usb/posprinter.xml -text
 ch.eugster.colibri.periphery.printer.usb/src/ch/eugster/colibri/periphery/printer/usb/Activator.java -text
 ch.eugster.colibri.periphery.printer.usb/src/ch/eugster/colibri/periphery/printer/usb/service/UsbReceiptPrinterService.java -text
 ch.eugster.colibri.periphery.printer/.classpath -text
@@ -1232,6 +1234,7 @@ ch.eugster.colibri.periphery/.settings/org.eclipse.jdt.core.prefs -text
 ch.eugster.colibri.periphery/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.periphery/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.periphery/build.properties -text
+ch.eugster.colibri.periphery/jpos.xml -text
 ch.eugster.colibri.periphery/lib/jssc.jar -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/Activator.java -text
 ch.eugster.colibri.periphery/src/ch/eugster/colibri/periphery/constants/AsciiConstants.java -text

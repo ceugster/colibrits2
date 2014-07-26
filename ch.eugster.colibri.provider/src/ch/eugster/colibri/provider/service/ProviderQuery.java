@@ -23,6 +23,8 @@ public interface ProviderQuery extends ProviderService
 	 * 
 	 * @throws IOException
 	 */
+	boolean checkBarcode(Barcode barcode);
+	
 	IStatus findAndRead(Barcode barcode, Position position);
 
 	IStatus selectCustomer(Position position, ProductGroup productGroup);

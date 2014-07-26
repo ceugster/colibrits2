@@ -29,6 +29,14 @@ public class PersistenceServiceImpl implements PersistenceService
 		activate();
 	}
 	
+	protected void log(int level, String message)
+	{
+		if (Activator.getDefault() != null)
+		{
+			Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManager()");
+		}
+	}
+	
 	@Override
 	public String encrypt(String message)
 	{
@@ -46,7 +54,7 @@ public class PersistenceServiceImpl implements PersistenceService
 	{
 		if (this.cacheService == null)
 		{
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Instantiiere Cache Service.");
+			log(LogService.LOG_DEBUG, "Instantiiere Cache Service.");
 			this.cacheService = new CacheServiceImpl(this);
 		}
 		return this.cacheService;
@@ -69,7 +77,7 @@ public class PersistenceServiceImpl implements PersistenceService
 	{
 		if (this.serverService == null)
 		{
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Instantiiere Service für Server Datenbank...");
+			log(LogService.LOG_DEBUG, "Instantiiere Service für Server Datenbank...");
 			this.serverService = new ServerServiceImpl(this);
 		}
 		return this.serverService;
@@ -107,7 +115,7 @@ public class PersistenceServiceImpl implements PersistenceService
 
 	private void activate()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Aktiviere Service " + this.getClass().getName() + ".");
+		log(LogService.LOG_DEBUG, "Aktiviere Service " + this.getClass().getName() + ".");
 		String[] args = Platform.getApplicationArgs();
 		for (int i = 0; i < args.length; i++)
 		{
@@ -124,17 +132,17 @@ public class PersistenceServiceImpl implements PersistenceService
 				break;
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_INFO, "Starte Cache Service.");
+		log(LogService.LOG_INFO, "Starte Cache Service.");
 		this.getCacheService().start();
-		Activator.getDefault().log(LogService.LOG_INFO, "Cache Service gestartet.");
-		Activator.getDefault().log(LogService.LOG_INFO, "Starte Server Service.");
+		log(LogService.LOG_INFO, "Cache Service gestartet.");
+		log(LogService.LOG_INFO, "Starte Server Service.");
 		this.getServerService().start();
-		Activator.getDefault().log(LogService.LOG_INFO, "Server Service gestartet.");
+		log(LogService.LOG_INFO, "Server Service gestartet.");
 	}
 	
 //	protected void deactivate(final ComponentContext componentContext)
 //	{
-//		Activator.getDefault().log(
+//		log(
 //				"Service " + componentContext.getProperties().get("component.name") + " deaktiviert.");
 //	}
 

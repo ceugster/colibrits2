@@ -22,7 +22,7 @@ public abstract class AbstractInitializer
 
 	protected Connection createConnection()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractInitializer.createConnection()");
+		log(LogService.LOG_DEBUG, "Enter AbstractInitializer.createConnection()");
 		try
 		{
 			final String driverName = this.properties.getProperty(PersistenceUnitProperties.JDBC_DRIVER);
@@ -31,24 +31,27 @@ public abstract class AbstractInitializer
 			String password = this.properties.getProperty(PersistenceUnitProperties.JDBC_PASSWORD);
 			password = Activator.getDefault().decrypt(password);
 			Class.forName(driverName);
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractInitializer.createConnection()");
+			log(LogService.LOG_DEBUG, "Exit AbstractInitializer.createConnection()");
 			return DriverManager.getConnection(url, username, password);
 		}
 		catch (final Exception e)
 		{
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractInitializer.createConnection()");
+			log(LogService.LOG_DEBUG, "Exit AbstractInitializer.createConnection()");
 			return null;
 		}
 	}
 
 	protected void log(final IStatus status)
 	{
-		this.log(Activator.getDefault().getLogLevel(status.getSeverity()), status.getMessage());
+		log(Activator.getDefault().getLogLevel(status.getSeverity()), status.getMessage());
 	}
 
-	protected void log(int level, final String message)
+	protected static void log(int level, final String message)
 	{
-		Activator.getDefault().log(level, message);
+		if (Activator.getDefault() != null)
+		{
+			Activator.getDefault().log(level, message);
+		}
 	}
 
 	protected void releaseConnection(final Connection connection)
@@ -65,7 +68,7 @@ public abstract class AbstractInitializer
 				// do nothing
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractInitializer.releaseConnection()");
+		log(LogService.LOG_DEBUG, "Exit AbstractInitializer.releaseConnection()");
 	}
 
 }

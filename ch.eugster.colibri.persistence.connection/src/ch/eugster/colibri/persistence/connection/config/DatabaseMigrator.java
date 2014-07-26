@@ -106,12 +106,12 @@ public class DatabaseMigrator extends AbstractConfigurator
 	{
 		try
 		{
-			Activator.getDefault().log(LogService.LOG_INFO, "Start Migration.");
+			log(LogService.LOG_INFO, "Start Migration.");
 			monitor.beginTask("Die Daten aus der Vorgängerversion werden importiert...", 3);
 			monitor.worked(1);
 			if (this.getEntityManager() != null)
 			{
-				Activator.getDefault().log(LogService.LOG_INFO, "Verbindung zur Datenbank herstellen.");
+				log(LogService.LOG_INFO, "Verbindung zur Datenbank herstellen.");
 				final PersistenceBroker broker = DatabaseMigrator
 						.createOjbPersistenceBroker(DatabaseMigrator.this.oldDocument);
 				monitor.worked(1);
@@ -1632,7 +1632,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 			final File file = FileLocator.getBundleFile(Activator.getDefault().getBundle());
 			path = file.getAbsolutePath() + "/META-INF/OJB.properties";
 			ojbProperties = new File(path);
-			Activator.getDefault().log(LogService.LOG_INFO, "Pfad zur Datei mit Datenbankeigenschaften: " + path + ".");
+			log(LogService.LOG_INFO, "Pfad zur Datei mit Datenbankeigenschaften: " + path + ".");
 		}
 		catch (final IOException e)
 		{
@@ -1649,19 +1649,19 @@ public class DatabaseMigrator extends AbstractConfigurator
 			final Element element = colibri.getRootElement().getChild("database").getChild("standard")
 					.getChild("connection");
 			final String driver = element.getAttributeValue("driver");
-			Activator.getDefault().log(LogService.LOG_INFO, "Treiber: " + driver + ".");
+			log(LogService.LOG_INFO, "Treiber: " + driver + ".");
 			final String protocol = element.getAttributeValue("protocol");
 			final String subprotocol = element.getAttributeValue("subprotocol");
 			final String host = element.getAttributeValue("host");
 			final String port = element.getAttributeValue("port");
 			final String database = element.getAttributeValue("database");
 			final String url = protocol + ":" + subprotocol + "://" + host + ":" + port + "/" + database;
-			Activator.getDefault().log(LogService.LOG_INFO, "URL: " + url + ".");
+			log(LogService.LOG_INFO, "URL: " + url + ".");
 
 			final String username = element.getAttributeValue("username");
-			Activator.getDefault().log(LogService.LOG_INFO, "Benutzername: " + username + ".");
+			log(LogService.LOG_INFO, "Benutzername: " + username + ".");
 			final String password = element.getAttributeValue("password");
-			Activator.getDefault().log(LogService.LOG_INFO, "Passwort: " + password + ".");
+			log(LogService.LOG_INFO, "Passwort: " + password + ".");
 
 			final ConnectionRepository cr = MetadataManager.getInstance().connectionRepository();
 			final PBKey key = new PBKey("standard", username, password);
@@ -1674,7 +1674,7 @@ public class DatabaseMigrator extends AbstractConfigurator
 			}
 
 			broker = PersistenceBrokerFactory.createPersistenceBroker(key);
-			Activator.getDefault().log(LogService.LOG_INFO, "Verbindung hergestellt: " + (broker == null ? "FEHLER" : "OK") + ".");
+			log(LogService.LOG_INFO, "Verbindung hergestellt: " + (broker == null ? "FEHLER" : "OK") + ".");
 		}
 		return broker;
 	}

@@ -124,6 +124,14 @@ public abstract class AbstractConnectionService implements ConnectionService
 		return persistenceService.getTimeout();
 	}
 	
+	protected void log(int level, String message)
+	{
+		if (Activator.getDefault() != null)
+		{
+			Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManager()");
+		}
+	}
+	
 	public void clearCache()
 	{
 		if (this.entityManager != null)
@@ -308,17 +316,17 @@ public abstract class AbstractConnectionService implements ConnectionService
 	
 	public EntityManagerFactory getEntityManagerFactory()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManagerFactory()");
+		log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManagerFactory()");
 		if (entityManagerFactory == null || !entityManagerFactory.isOpen())
 		{
 			final Properties properties = this.getProperties();
-			Activator.getDefault().log(LogService.LOG_INFO, "Aktualisiere Datenbankversion...");
+			log(LogService.LOG_INFO, "Aktualisiere Datenbankversion...");
 			IStatus status = this.updateDatabase(properties);
 			if (status.isOK() || status.getSeverity() == IStatus.CANCEL)
 			{
-				Activator.getDefault().log(LogService.LOG_DEBUG, "Kreiere EntityManagerFactory für Datenbank " + properties.getProperty(PersistenceUnitProperties.JDBC_URL) + ".");
+				log(LogService.LOG_DEBUG, "Kreiere EntityManagerFactory für Datenbank " + properties.getProperty(PersistenceUnitProperties.JDBC_URL) + ".");
 				entityManagerFactory = createEntityManagerFactory(status, properties);
-				Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManagerFactory für Datenbank kreiert.");
+				log(LogService.LOG_DEBUG, "EntityManagerFactory für Datenbank kreiert.");
 			}
 			else
 			{
@@ -349,7 +357,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				this.persistenceService.getEventAdmin().sendEvent(event);
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.getEntityManagerFactory()");
+		log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.getEntityManagerFactory()");
 		return entityManagerFactory;
 	}
 	
@@ -397,7 +405,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 
 	public EntityManager createEntityManager()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.createEntityManager()");
+		log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.createEntityManager()");
 		if (persistenceService.getPersistenceProvider() != null)
 		{
 			if (getEntityManagerFactory() != null)
@@ -405,7 +413,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				connect();
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.createEntityManager()");
+		log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.createEntityManager()");
 		return entityManager;
 	}
 
@@ -419,9 +427,9 @@ public abstract class AbstractConnectionService implements ConnectionService
 			}
 			else
 			{
-				Activator.getDefault().log(LogService.LOG_DEBUG, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
+				log(LogService.LOG_DEBUG, "Kreiere EntityManager für Datenbank " + getEntityManagerFactory().getProperties().get(PersistenceUnitProperties.JDBC_URL) + ".");
 				this.entityManager = getEntityManagerFactory().createEntityManager(getEntityManagerFactory().getProperties());
-				Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManager kreiert.");
+				log(LogService.LOG_DEBUG, "EntityManager kreiert.");
 				this.entityManager.setFlushMode(FlushModeType.COMMIT);
 				CommonSettingsQuery query = (CommonSettingsQuery) this.getQuery(CommonSettings.class);
 				query.findDefault();
@@ -429,7 +437,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		}
 		catch (Exception e)
 		{
-			Activator.getDefault().log(LogService.LOG_DEBUG, "EntityManager konnte nicht kreiert werden.");
+			log(LogService.LOG_DEBUG, "EntityManager konnte nicht kreiert werden.");
 			String app = System.getProperty("eclipse.application");
 			if (app.equals("ch.eugster.colibri.client.application"))
 			{
@@ -446,9 +454,12 @@ public abstract class AbstractConnectionService implements ConnectionService
 	protected Event getEvent(final IStatus status)
 	{
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
-		properties.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
-		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
+		if (Activator.getDefault() != null)
+		{
+			properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle());
+			properties.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
+			properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
+		}
 		properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		properties.put("status", status);
@@ -517,13 +528,13 @@ public abstract class AbstractConnectionService implements ConnectionService
 
 	private IStatus getStatus(Exception exception)
 	{
-		return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), getTopic(), exception);
+		return new Status(IStatus.ERROR, Activator.PLUGIN_ID, getTopic(), exception);
 	}
 	
 	@Override
 	public AbstractEntity find(final Class<? extends AbstractEntity> clazz, final Long id)
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.find()");
+		log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.find()");
 		AbstractEntity entity = null;
 		EntityManager entityManager = null;
 		try
@@ -545,7 +556,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				closeEntityManager(entityManager);
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.find()");
+		log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.find()");
 		return entity;
 	}
 	
@@ -722,7 +733,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 	@Override
 	public EntityManager getEntityManager()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManager()");
+		log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManager()");
 		if (entityManager == null || !entityManager.isOpen())
 		{
 			if (getEntityManagerFactory() == null)
@@ -752,7 +763,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 		{
 			login();
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.getEntityManager()");
+		log(LogService.LOG_DEBUG, "Exit AbstractConnectionService.getEntityManager()");
 		return entityManager;
 	}
 

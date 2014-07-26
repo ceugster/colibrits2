@@ -51,6 +51,11 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 	{
 	}
 	
+	public boolean checkBarcode(Barcode barcode)
+	{
+		return !barcode.getCode().startsWith(Barcode.PREFIX_VOUCHER);
+	}
+	
 	public void updateCustomer(Receipt receipt)
 	{
 		String code = receipt.getCustomerCode();

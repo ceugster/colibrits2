@@ -11,8 +11,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -107,8 +105,6 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 
 	private UserPanel userPanel;
 
-	private NumberFormat currencyFormatter;
-	
 	public PositionWrapper(final UserPanel userPanel, final ValueDisplay valueDisplay)
 	{
 		this.valueDisplay = valueDisplay;
@@ -125,8 +121,6 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				}
 			}
 		});
-
-		currencyFormatter = DecimalFormat.getCurrencyInstance();
 
 		new ReceiptChangeMediator(userPanel, this, this.propertyNames);
 
@@ -183,27 +177,12 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 	public void dispose()
 	{
 		this.persistenceServiceTracker.close();
-//		this.providerIdServiceTracker.close();
 		this.providerQueryTracker.close();
 		this.logServiceTracker.close();
 	}
 
-//	public boolean isFreeCopy()
-//	{
-//		return freeCopy;
-//	}
-//	
-//	public void setFreeCopy(boolean freeCopy)
-//	{
-//		this.freeCopy = freeCopy;
-//	}
-	
 	public boolean doesPositionNeedPrice()
 	{
-//		if (this.freeCopy)
-//		{
-//			return false;
-//		}
 		return this.position.getPrice() == 0d ? true : false;
 	}
 	
@@ -666,26 +645,29 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
 		if (providerQuery!= null && providerQuery.isConnect())
 		{
-			log(LogService.LOG_INFO, "Providerservice wird aufgerufen.");
-			final IStatus status = providerQuery.findAndRead(barcode, this.position);
-			if (status.getSeverity() == IStatus.CANCEL)
+			if (providerQuery.checkBarcode(barcode)) 
 			{
-				if (this.position.isOrdered())
+				log(LogService.LOG_INFO, "Providerservice wird aufgerufen.");
+				final IStatus status = providerQuery.findAndRead(barcode, this.position);
+				if (status.getSeverity() == IStatus.CANCEL)
 				{
-					log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
-					MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
-							.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
-							MessageDialog.BUTTON_OK);
-					this.replacePosition(Position.newInstance(this.position.getReceipt()));
-				}
-				else
-				{
-					if (!this.isPositionComplete())
+					if (this.position.isOrdered())
 					{
 						log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
 						MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
 								.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
 								MessageDialog.BUTTON_OK);
+						this.replacePosition(Position.newInstance(this.position.getReceipt()));
+					}
+					else
+					{
+						if (!this.isPositionComplete())
+						{
+							log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
+							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
+									.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
+									MessageDialog.BUTTON_OK);
+						}
 					}
 				}
 			}
@@ -733,15 +715,11 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 		{
 			for (final Object barcodeVerifier : barcodeVerifiers)
 			{
-				synchronized (barcodeVerifier)
+				barcode = ((BarcodeVerifier) barcodeVerifier).verify(code);
+				if (barcode != null)
 				{
-					barcode = ((BarcodeVerifier) barcodeVerifier).verify(code);
-					if (barcode != null)
-					{
-						barcode.updatePosition(position);
-//						position.setSearchValue(barcode.getCode());
-						break;
-					}
+					barcode.updatePosition(position);
+					break;
 				}
 			}
 		}

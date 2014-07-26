@@ -12,7 +12,8 @@ Require-Bundle: ch.eugster.colibri.periphery;bundle-version="1.0.0",
  org.eclipse.osgi.util;bundle-version="3.2.200",
  ch.eugster.colibri.persistence;bundle-version="1.0.0",
  ch.eugster.colibri.periphery.printer;bundle-version="1.0.0"
-Bundle-ClassPath: lib/epsonupos.admin.jar,
+Bundle-ClassPath: .,
+ lib/epsonupos.admin.jar,
  lib/epsonupos.core.v1.13.0001.jar,
  lib/epsonupos.core.v1.13.0002.jar,
  lib/epsonupos.H2000.jar,
@@ -29,6 +30,7 @@ Bundle-ClassPath: lib/epsonupos.admin.jar,
  lib/epsonupos.T82II.jar,
  lib/epsonupos.T88V.jar,
  lib/epsonupos.trace.jar,
+ lib/jpos113-controls.jar,
  lib/jpos113.jar,
  lib/pos.jar,
  lib/pos.v3.0001.jar,
@@ -37,7 +39,6 @@ Bundle-ClassPath: lib/epsonupos.admin.jar,
  lib/uposcommon.core.v1.13.0002.jar,
  lib/uposcommon.jar,
  lib/xercesImpl.jar,
- lib/xml-apis.jar,
- .
+ lib/xml-apis.jar
 Bundle-ActivationPolicy: lazy
 Service-Component: OSGI-INF/service-component.xml

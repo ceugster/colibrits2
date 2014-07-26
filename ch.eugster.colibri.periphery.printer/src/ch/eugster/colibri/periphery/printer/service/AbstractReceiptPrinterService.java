@@ -61,63 +61,84 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	protected String getPort()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return this.getSalespointReceiptPrinterSettings(connectionService).getPort();
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return this.getSalespointReceiptPrinterSettings(connectionService).getPort();
+			}
 		}
 		return this.getReceiptPrinterSettings().getPort();
 	}
 
 	protected boolean isPrintLogo()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return this.getSalespointReceiptPrinterSettings(connectionService).isPrintLogo();
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return this.getSalespointReceiptPrinterSettings(connectionService).isPrintLogo();
+			}
 		}
 		return this.getReceiptPrinterSettings().isPrintLogo();
 	}
 
 	protected int getLogo()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return this.getSalespointReceiptPrinterSettings(connectionService).getLogo();
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return this.getSalespointReceiptPrinterSettings(connectionService).getLogo();
+			}
 		}
 		return this.getReceiptPrinterSettings().getLogo();
 	}
 
 	protected PrintMode getPrintLogoMode()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return this.getSalespointReceiptPrinterSettings(connectionService).getPrintLogoMode();
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return this.getSalespointReceiptPrinterSettings(connectionService).getPrintLogoMode();
+			}
 		}
 		return this.getReceiptPrinterSettings().getPrintLogoMode();
 	}
 
 	protected int getLinesBeforeCut()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return this.getSalespointReceiptPrinterSettings(connectionService).getLinesBeforeCut();
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return this.getSalespointReceiptPrinterSettings(connectionService).getLinesBeforeCut();
+			}
 		}
 		return this.getReceiptPrinterSettings().getLinesBeforeCut();
 	}
 	
 	protected int getColumnCount()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return this.getSalespointReceiptPrinterSettings(connectionService).getCols();
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return this.getSalespointReceiptPrinterSettings(connectionService).getCols();
+			}
 		}
 		return this.getReceiptPrinterSettings().getCols();
 	}
 
 	protected Converter getConverter()
 	{
-		if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+		if (isClientApp())
 		{
-			return new Converter(this.getSalespointReceiptPrinterSettings(connectionService).getConverter());
+			if (this.getSalespointReceiptPrinterSettings(connectionService) != null)
+			{
+				return new Converter(this.getSalespointReceiptPrinterSettings(connectionService).getConverter());
+			}
 		}
 		return new Converter(this.getReceiptPrinterSettings().getConverter());
 	}
@@ -206,8 +227,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	protected void setPersistenceService(final PersistenceService persistenceService)
 	{
-		String app = System.getProperty("eclipse.application");
-		this.connectionService = app.contains("client") ? persistenceService.getCacheService() : persistenceService.getServerService();
+		this.connectionService = isClientApp() ? persistenceService.getCacheService() : persistenceService.getServerService();
 	}
 
 	protected void unsetEventAdmin(final EventAdmin eventAdmin)
@@ -271,4 +291,9 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		return query.findByComponentName(componentName);
 	}
 
+	private boolean isClientApp()
+	{
+		String app = System.getProperty("eclipse.application");
+		return app.contains("client");
+	}
 }

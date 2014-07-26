@@ -49,6 +49,8 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
  */
 public class Activator extends AbstractUIPlugin
 {
+	public static final String PLUGIN_ID = "ch.eugster.colibri.persistence.connection";
+
 	private static Activator plugin;
 
 	private ServiceTracker<EncryptionService, EncryptionService> encryptionServiceTracker;

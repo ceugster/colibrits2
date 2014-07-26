@@ -38,20 +38,18 @@ public class Code128 extends AbstractBarcode
 {
 	public static final String PROVIDER = "code128";
 
-	public static final int CODE128_A_LENGTH = 34;
-
-	public static final int CODE128_B_LENGTH = 38;
-
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
 	private ServiceTracker<ProviderQuery, ProviderQuery> providerQueryTracker;
 
+	private Code128Type code128Type = null;
 	/**
 	 * 
 	 */
 	protected Code128(final String code128)
 	{
 		super(code128);
+		this.code128Type = Code128Type.getType(code128.length());
 	}
 
 	public long getDate()
@@ -70,13 +68,17 @@ public class Code128 extends AbstractBarcode
 
 	public String getDescription()
 	{
-		return "Code128 Barcode Typ " + (this.getCode().length() == Code128.CODE128_A_LENGTH ? "A" : "B") + " (" + this.getCode().length()
+		Code128Type type = Code128.Code128Type.getType(this.getCode().length());
+		String strType =  type == null ? "unbekannt" : type.type();
+		return "Code128 Barcode Typ " + strType + " (" + this.getCode().length()
 				+ " Stellen)";
 	}
 
 	public String getName()
 	{
-		return "Code128" + (this.getCode().length() == Code128.CODE128_A_LENGTH ? "A" : "B");
+		Code128Type type = Code128.Code128Type.getType(this.getCode().length());
+		String strType =  type == null ? "?" : type.type();
+		return "Code128" + strType;
 	}
 
 	public double getNetPrice()
@@ -224,72 +226,134 @@ public class Code128 extends AbstractBarcode
 	@Override
 	public void updatePosition(final Position position)
 	{
-		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().context, PersistenceService.class, null);
-		this.persistenceServiceTracker.open();
-
-		this.providerQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().context, ProviderQuery.class, null);
-		this.providerQueryTracker.open();
-
-		position.setSearchValue(this.getCode());
-		Product product = position.getProduct();
-		if (product == null)
+		if (!this.code128Type.equals(Code128Type.CODE128_C))
 		{
-			product = Product.newInstance(position);
-			position.setProduct(product);
-		}
-		product.setCode(this.getProductCode());
+			this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().context, PersistenceService.class, null);
+			this.persistenceServiceTracker.open();
 
-		position.setPrice(this.getOrdinalPrice());
+			this.providerQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().context, ProviderQuery.class, null);
+			this.providerQueryTracker.open();
 
-		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
-		if ((persistenceService != null))
-		{
-			final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
-			if (providerQuery!= null)
+			position.setSearchValue(this.getCode());
+			Product product = position.getProduct();
+			if (product == null)
 			{
-				final ExternalProductGroupQuery epgQuery = (ExternalProductGroupQuery) persistenceService.getCacheService().getQuery(
-						ExternalProductGroup.class);
-				final ExternalProductGroup externalProductGroup = epgQuery.selectByProviderAndCode(providerQuery.getProviderId(),
-						this.getProductGroupCode());
-				if (externalProductGroup != null)
-				{
-					product.setExternalProductGroup(externalProductGroup);
-				}
+				product = Product.newInstance(position);
+				position.setProduct(product);
+			}
+			product.setCode(this.getProductCode());
 
-				final TaxCodeMappingQuery tcmQuery = (TaxCodeMappingQuery) persistenceService.getCacheService().getQuery(TaxCodeMapping.class);
-				final TaxCodeMapping taxCodeMapping = tcmQuery.selectTaxCodeMappingByProviderAndCode(providerQuery.getProviderId(), this.getTaxCode());
-				if (taxCodeMapping != null)
+			position.setPrice(this.getOrdinalPrice());
+
+			final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+			if ((persistenceService != null))
+			{
+				final ProviderQuery providerQuery = (ProviderQuery) this.providerQueryTracker.getService();
+				if (providerQuery!= null)
 				{
-					position.setCurrentTax(taxCodeMapping.getTax().getCurrentTax());
+					final ExternalProductGroupQuery epgQuery = (ExternalProductGroupQuery) persistenceService.getCacheService().getQuery(
+							ExternalProductGroup.class);
+					final ExternalProductGroup externalProductGroup = epgQuery.selectByProviderAndCode(providerQuery.getProviderId(),
+							this.getProductGroupCode());
+					if (externalProductGroup != null)
+					{
+						product.setExternalProductGroup(externalProductGroup);
+					}
+
+					final TaxCodeMappingQuery tcmQuery = (TaxCodeMappingQuery) persistenceService.getCacheService().getQuery(TaxCodeMapping.class);
+					final TaxCodeMapping taxCodeMapping = tcmQuery.selectTaxCodeMappingByProviderAndCode(providerQuery.getProviderId(), this.getTaxCode());
+					if (taxCodeMapping != null)
+					{
+						position.setCurrentTax(taxCodeMapping.getTax().getCurrentTax());
+					}
 				}
 			}
-		}
 
-		this.persistenceServiceTracker.close();
+			this.persistenceServiceTracker.close();
+		}
 	}
 
 	public static Code128 verify(final String code)
 	{
-		if (code == null)
+		Code128 code128 = null;
+		if (code != null)
 		{
-			return null;
+			if (Code128.Code128Type.getType(code.length()) instanceof Code128Type)
+			{
+				try
+				{
+					new BigInteger(code);
+					code128 = new Code128(code);
+				}
+				catch (final NumberFormatException e)
+				{
+				}
+			}
 		}
-
-		if ((code.length() != Code128.CODE128_A_LENGTH) && (code.length() != Code128.CODE128_B_LENGTH))
-		{
-			return null;
-		}
-
-		try
-		{
-			new BigInteger(code);
-		}
-		catch (final NumberFormatException e)
-		{
-			return null;
-		}
-
-		return new Code128(code);
+		return code128;
 	}
 
+	public enum Code128Type
+	{
+		CODE128_A, CODE128_B, CODE128_C;
+		
+		public static Code128Type getType(int length)
+		{
+			for (Code128Type type : Code128Type.values())
+			{
+				if (type.length() == length)
+				{
+					return type;
+				}
+			}
+			return null;
+		}
+		
+		public int length()
+		{
+			switch (this)
+			{
+			case CODE128_A:
+			{
+				return 34;
+			}
+			case CODE128_B:
+			{
+				return 38;
+			}
+			case CODE128_C:
+			{
+				return 16;
+			}
+			default:
+			{
+				throw new RuntimeException("Invalid code128 selected");
+			}
+			}
+		}
+		
+		public String type()
+		{
+			switch (this)
+			{
+			case CODE128_A:
+			{
+				return "A";
+			}
+			case CODE128_B:
+			{
+				return "B";
+			}
+			case CODE128_C:
+			{
+				return "C";
+			}
+			default:
+			{
+				throw new RuntimeException("Invalid code128 selected");
+			}
+			}
+		}
+		
+	}
 }

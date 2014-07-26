@@ -146,7 +146,6 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 			        }
 			        catch (SerialPortException ex) 
 			        {
-			        	serialPort = null;
 			        	sendEvent(ex);
 			        }
 			        break;
@@ -166,7 +165,6 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	{
 		if (display != null)
 		{
-			this.clearDisplay();
 			try 
 			{
 	            display.closePort();//Close serial port
@@ -180,6 +178,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 	
 	protected void deactivate(final ComponentContext context)
 	{
+		this.clearDisplay();
 		closePort(this.display);
 		super.deactivate(context);
 	}
@@ -203,20 +202,19 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		{
 			throw new NullPointerException("Keinen Port übergeben.");
 		}
-		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
 		String oldPort = null;
 
 		if (this.display == null)
 		{
-			this.display = this.openPort(port);
+			this.display = this.openPort(deviceName);
 		}
 		else
 		{
-			if (!port.equals(this.display.getPortName()))
+			if (!deviceName.equals(this.display.getPortName()))
 			{
 				oldPort = this.display.getPortName();
 				this.closePort(this.display);
-				this.display = this.openPort(port);
+				this.display = this.openPort(deviceName);
 			}
 		}
 		
@@ -227,7 +225,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (oldPort != null)
 		{
 			this.closePort(this.display);
-			this.display = this.openPort(port);
+			this.display = this.openPort(deviceName);
 		}
 	}
 
@@ -238,20 +236,19 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		{
 			throw new NullPointerException("Keinen Port übergeben.");
 		}
-		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
 		String oldPort = null;
 
 		if (this.display == null)
 		{
-			this.display = this.openPort(port);
+			this.display = this.openPort(deviceName);
 		}
 		else
 		{
-			if (!port.equals(this.display.getPortName()))
+			if (!deviceName.equals(this.display.getPortName()))
 			{
 				oldPort = this.display.getPortName();
 				this.closePort(this.display);
-				this.display = this.openPort(port);
+				this.display = this.openPort(deviceName);
 			}
 		}
 		
@@ -261,7 +258,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (oldPort != null)
 		{
 			this.closePort(this.display);
-			this.display = this.openPort(port);
+			this.display = this.openPort(deviceName);
 		}
 		if (display == null)
 		{

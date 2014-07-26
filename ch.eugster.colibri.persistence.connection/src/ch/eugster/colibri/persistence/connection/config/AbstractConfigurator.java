@@ -75,12 +75,18 @@ public abstract class AbstractConfigurator
 
 	protected void log(final IStatus status)
 	{
-		Activator.getDefault().log(Activator.getDefault().getLogLevel(status.getSeverity()), status.getMessage());
+		if (Activator.getDefault() != null)
+		{
+			Activator.getDefault().log(Activator.getDefault().getLogLevel(status.getSeverity()), status.getMessage());
+		}
 	}
 
-	protected void log(int level, final String message)
+	protected static void log(int level, final String message)
 	{
-		Activator.getDefault().log(level, message);
+		if (Activator.getDefault() != null)
+		{
+			Activator.getDefault().log(level, message);
+		}
 	}
 
 	protected void releaseEntityManager(final EntityManager entityManager)
