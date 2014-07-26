@@ -98,6 +98,7 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 			try
 			{
 		        display = new PrintStream(deviceName);
+		        this.writeBytes(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
 			}
 			catch (Exception e)
 			{

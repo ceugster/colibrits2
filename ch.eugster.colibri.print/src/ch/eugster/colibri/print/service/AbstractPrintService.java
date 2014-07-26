@@ -43,7 +43,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 
 	private LogService logService;
 
-	private PersistenceService persistenceService;
+	protected ConnectionService connectionService;
 
 	private EventAdmin eventAdmin;
 
@@ -261,7 +261,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 
 	public void setPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = persistenceService;
+		this.connectionService = isClientApp() ? persistenceService.getCacheService() : persistenceService.getServerService();
 	}
 
 	@Override
@@ -330,11 +330,6 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 		return this.logService;
 	}
 
-	protected PersistenceService getPersistenceService()
-	{
-		return this.persistenceService;
-	}
-
 	protected ReceiptPrinterService getReceiptPrinterService(final String componentName)
 	{
 		return componentName == null ? null : this.receiptPrinterServices.get(componentName);
@@ -372,7 +367,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 
 	protected void unsetPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = null;
+		this.connectionService = null;
 	}
 
 	private Printout getPrintout(final ConnectionService connectionService)
@@ -463,8 +458,8 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 
 	private boolean setPrintingContext()
 	{
-		this.salespoint = this.getSalespoint(this.persistenceService.getCacheService());
-		this.printout = this.getPrintout(this.persistenceService.getCacheService());
+		this.salespoint = this.getSalespoint(this.connectionService);
+		this.printout = this.getPrintout(this.connectionService);
 
 //		if (this.salespoint == null)
 //		{
@@ -497,5 +492,11 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 		{
 			logService.log(level, message);
 		}
+	}
+
+	private boolean isClientApp()
+	{
+		String app = System.getProperty("eclipse.application");
+		return app.contains("client");
 	}
 }
