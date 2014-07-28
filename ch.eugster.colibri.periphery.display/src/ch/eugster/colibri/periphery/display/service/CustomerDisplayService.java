@@ -27,7 +27,5 @@ public interface CustomerDisplayService
 	
 	void testDisplay(String deviceName, String conversions, String text) throws Exception;
 	
-	void testAscii(String deviceName, byte[] bytes) throws Exception;
-	
 	ComponentContext getContext();
 }

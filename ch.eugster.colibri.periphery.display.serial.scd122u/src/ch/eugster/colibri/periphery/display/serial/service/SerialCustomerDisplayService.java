@@ -33,19 +33,6 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		{
 			sendEvent(e);
 		}
-//		this.openDisplay();
-//		if (this.display != null)
-//		{
-//			try 
-//			{
-//				this.display.write(new byte[] { AsciiConstants.ESC, AsciiConstants.AT });
-//				this.display.flush();
-//			} 
-//			catch (IOException e) 
-//			{
-//			}
-//		}
-//		this.closeDisplay();
 	}
 
 	@Override
@@ -219,50 +206,13 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		}
 		
 		this.display.writeBytes(new byte[] { 0x0c});
-		byte[] bytes = this.correctText(new Converter(conversions), text);
+		byte[] bytes = conversions == null || conversions.isEmpty() ? this.correctText(new Converter(conversions), text) : text.getBytes();
 		this.display.writeBytes(bytes);
 
 		if (oldPort != null)
 		{
 			this.closePort(this.display);
 			this.display = this.openPort(deviceName);
-		}
-	}
-
-	@Override
-	public void testAscii(String deviceName, byte[] bytes) throws Exception
-	{
-		if (deviceName == null || deviceName.isEmpty())
-		{
-			throw new NullPointerException("Keinen Port übergeben.");
-		}
-		String oldPort = null;
-
-		if (this.display == null)
-		{
-			this.display = this.openPort(deviceName);
-		}
-		else
-		{
-			if (!deviceName.equals(this.display.getPortName()))
-			{
-				oldPort = this.display.getPortName();
-				this.closePort(this.display);
-				this.display = this.openPort(deviceName);
-			}
-		}
-		
-		display.writeBytes( new byte[] { 0x0c});
-		display.writeBytes(bytes);
-
-		if (oldPort != null)
-		{
-			this.closePort(this.display);
-			this.display = this.openPort(deviceName);
-		}
-		if (display == null)
-		{
-			throw new NullPointerException("Das Kundendisplay konnte nicht angesprochen werden.");
 		}
 	}
 

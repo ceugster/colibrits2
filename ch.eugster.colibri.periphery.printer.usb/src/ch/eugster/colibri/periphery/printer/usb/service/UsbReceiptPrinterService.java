@@ -274,14 +274,10 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 		{
 			throw new NullPointerException("Keinen Port übergeben.");
 		}
-		
-		byte[] bytes = new Converter(conversions).convert(text.getBytes());
-		this.print(new String(bytes));
-	}
 
-	@Override
-	public void testAscii(String deviceName, byte[] bytes) throws Exception
-	{
+		byte[] bytes = conversions == null || conversions.isEmpty() ? new Converter(conversions).convert(text.getBytes()) : text.getBytes();
+		this.print(new String(bytes));
+		this.doCutPaper(5);
 	}
 
 	@Override

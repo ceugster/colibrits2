@@ -173,41 +173,8 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		}
 		
 		this.writeBytes(new byte[] { 0x0c});
-		byte[] bytes = this.correctText(new Converter(conversions), text);
+		byte[] bytes = conversions == null || conversions.isEmpty() ? this.correctText(new Converter(conversions), text) : text.getBytes();
 		this.writeBytes(bytes);
-
-		if (oldPort != null)
-		{
-			this.closePort(this.display);
-			this.display = this.openPort(oldPort);
-		}
-	}
-
-	@Override
-	public void testAscii(String deviceName, byte[] bytes) throws Exception
-	{
-		if (deviceName == null || deviceName.isEmpty())
-		{
-			throw new NullPointerException("Keinen Port übergeben.");
-		}
-		String oldPort = null;
-
-		if (this.display == null)
-		{
-			this.display = this.openPort(deviceName);
-		}
-		else
-		{
-			if (!deviceName.equals(this.getPort()))
-			{
-				oldPort = this.getPort();
-				this.closePort(this.display);
-				this.display = this.openPort(deviceName);
-			}
-		}
-		
-		writeBytes( new byte[] { 0x0c});
-		writeBytes(bytes);
 
 		if (oldPort != null)
 		{

@@ -59,11 +59,6 @@ public class DummyReceiptPrinterService extends AbstractReceiptPrinterService
 	}
 
 	@Override
-	public void testAscii(String deviceName, byte[] bytes) throws Exception 
-	{
-	}
-
-	@Override
 	protected void doCutPaper(int linesBeforeCut) 
 	{
 	}

@@ -276,52 +276,14 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 		}
 		
-		this.printer.writeBytes(new byte[] { 0x0c});
-		byte[] bytes = new Converter(conversions).convert(text.getBytes());
+		byte[] bytes = conversions == null || conversions.isEmpty() ? new Converter(conversions).convert(text.getBytes()) : text.getBytes();
 		this.printer.writeBytes(bytes);
+		this.doCutPaper(5);
 
 		if (oldPort != null)
 		{
 			this.closePort(this.printer);
 			this.printer = this.openPort(port);
-		}
-	}
-
-	@Override
-	public void testAscii(String deviceName, byte[] bytes) throws Exception
-	{
-		if (deviceName == null || deviceName.isEmpty())
-		{
-			throw new NullPointerException("Keinen Port übergeben.");
-		}
-		String port = deviceName.endsWith(":") ? deviceName.substring(0, deviceName.length() - 1) : deviceName;
-		String oldPort = null;
-
-		if (this.printer == null)
-		{
-			this.printer = this.openPort(port);
-		}
-		else
-		{
-			if (!port.equals(this.printer.getPortName()))
-			{
-				oldPort = this.printer.getPortName();
-				this.closePort(this.printer);
-				this.printer = this.openPort(port);
-			}
-		}
-		
-		printer.writeBytes( new byte[] { 0x0c});
-		printer.writeBytes(bytes);
-
-		if (oldPort != null)
-		{
-			this.closePort(this.printer);
-			this.printer = this.openPort(port);
-		}
-		if (printer == null)
-		{
-			throw new NullPointerException("Das Kundendisplay konnte nicht angesprochen werden.");
 		}
 	}
 

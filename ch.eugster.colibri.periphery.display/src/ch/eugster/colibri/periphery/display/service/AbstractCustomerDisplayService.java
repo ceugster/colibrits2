@@ -61,7 +61,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 		{
 			text.substring(0, width);
 		}
-		byte[] chars = converter.convert(text.getBytes());
+		byte[] bytes = converter.convert(text.getBytes());
 		if (text.length() < width)
 		{
 			StringBuilder builder = new StringBuilder(text);
@@ -71,7 +71,7 @@ public abstract class AbstractCustomerDisplayService implements CustomerDisplayS
 			}
 			text = builder.toString();
 		}
-		return chars;
+		return bytes;
 	}
 
 	protected byte[] correctText(final String text)

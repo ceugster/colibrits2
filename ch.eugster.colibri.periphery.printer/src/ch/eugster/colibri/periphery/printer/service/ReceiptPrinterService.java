@@ -33,8 +33,6 @@ public interface ReceiptPrinterService
 	
 	void testPrint(String deviceName, String conversions, String text, int feed) throws Exception;
 
-	void testAscii(String deviceName, byte[] bytes) throws Exception;
-
 	public enum Drawer
 	{
 		DRAWER1, DRAWER2;
