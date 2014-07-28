@@ -2081,6 +2081,9 @@ ch.eugster.colibri.report/icons/zoomminus.gif -text
 ch.eugster.colibri.report/icons/zoomminusd.gif -text
 ch.eugster.colibri.report/icons/zoomplus.gif -text
 ch.eugster.colibri.report/icons/zoomplusd.gif -text
+ch.eugster.colibri.report/lib/jasperreports-4.8.0.jar -text
+ch.eugster.colibri.report/lib/jdt-compiler-3.1.1-LICENSE.html -text
+ch.eugster.colibri.report/lib/jdt-compiler-3.1.1.jar -text
 ch.eugster.colibri.report/plugin.xml -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/Activator.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ApplicationInstanceListener.java -text
