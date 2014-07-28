@@ -30,7 +30,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 
 	private SalespointReceiptPrinterSettings salespointReceiptPrinterSettings;
 
-	private ConnectionService connectionService;
+	protected ConnectionService connectionService;
 
 	private LogService logService;
 
@@ -43,20 +43,22 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		return context;
 	}
 	
-	protected void setSalespointReceiptPrinterSettings()
+	protected void activate(final ComponentContext context)
 	{
-		this.salespointReceiptPrinterSettings = this.getSalespointReceiptPrinterSettings(connectionService);
+		this.context = context;
+
+		if (this.logService != null)
+		{
+			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
+		}
 	}
 
-	private SalespointReceiptPrinterSettings getSalespointReceiptPrinterSettings(final ConnectionService service)
+	protected void deactivate(final ComponentContext context)
 	{
-		if (this.salespointReceiptPrinterSettings == null)
+		if (this.logService != null)
 		{
-			final SalespointQuery query = (SalespointQuery) service.getQuery(Salespoint.class);
-			Salespoint salespoint = query.getCurrentSalespoint();
-			this.salespointReceiptPrinterSettings = salespoint == null ? null : salespoint.getReceiptPrinterSettings();
+			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
 		}
-		return this.salespointReceiptPrinterSettings;
 	}
 
 	protected String getPort()
@@ -153,56 +155,11 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		this.doCutPaper(feed);
 	}
 
-//	@Override
-//	public ReceiptPrinterSettings getReceiptPrinterSettings()
-//	{
-//		if (this.receiptPrinterSettings == null)
-//		{
-//			this.setReceiptPrinterSettings();
-//		}
-//		return this.receiptPrinterSettings;
-//	}
-//
-	public void setReceiptPrinterSettings()
-	{
-		this.receiptPrinterSettings = this.getReceiptPrinterSettings();
-		if (this.receiptPrinterSettings == null)
-		{
-			this.receiptPrinterSettings = this.createReceiptPrinterSettings();
-		}
-	}
-
-	protected void activate(final ComponentContext context)
-	{
-		this.context = context;
-
-		if (this.logService != null)
-		{
-			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
-		}
-		salespoint = getSalespoint();
-	}
-	
-	protected Salespoint getSalespoint()
-	{
-		SalespointQuery query = (SalespointQuery) this.connectionService.getQuery(Salespoint.class);
-		return query.getCurrentSalespoint();
-	}
-
-	protected void deactivate(final ComponentContext context)
-	{
-		if (this.logService != null)
-		{
-			this.logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
-		}
-	}
-
 	protected abstract void doCutPaper(int linesBeforeCut);
 
 	protected Event getEvent(final IStatus status)
 	{
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.EVENT_TOPIC, ReceiptPrinterService.EVENT_ADMIN_TOPIC_ERROR);
 		properties.put(EventConstants.BUNDLE_ID, Activator.PLUGIN_ID);
 		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
 		properties.put("status", status);
@@ -245,6 +202,68 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		this.connectionService = null;
 	}
 
+	@Override
+	public ReceiptPrinterSettings createReceiptPrinterSettings()
+	{
+		final Object device = this.context.getProperties().get("custom.device");
+		final Object cols = this.context.getProperties().get("custom.cols");
+		final Object linesBeforeCut = this.context.getProperties().get("custom.lines.before.cut");
+		final Object port = this.context.getProperties().get("custom.port");
+		final String converter = convertToString(this.context.getProperties().get("custom.convert"));
+		final ReceiptPrinterSettings settings = ReceiptPrinterSettings.newInstance();
+		settings.setCols(cols instanceof Integer ? ((Integer) cols).intValue() : 0);
+		settings.setComponentName((String) this.context.getProperties().get("component.name"));
+		settings.setConverter(converter instanceof String ? (String) converter : "");
+		settings.setName(device instanceof String ? (String) device : "???");
+		settings.setPort(port instanceof String ? (String) port : "");
+		settings.setPrintLogoMode(PrintMode.NORMAL);
+		settings.setLinesBeforeCut(linesBeforeCut instanceof Integer ? ((Integer) linesBeforeCut).intValue() : 0);
+		return settings;
+	}
+
+	protected SalespointReceiptPrinterSettings createSalespointCustomerDisplaySettings()
+	{
+		final Object linesBeforeCut = this.context.getProperties().get("custom.lines.before.cut");
+		final SalespointReceiptPrinterSettings settings = SalespointReceiptPrinterSettings.newInstance();
+		settings.setCols(this.getDefaultColumnCount());
+		settings.setConverter(this.getDefaultConverter());
+		settings.setPort(this.getDefaultPort());
+		settings.setPrintLogoMode(PrintMode.NORMAL);
+		settings.setLinesBeforeCut(linesBeforeCut instanceof Integer ? ((Integer) linesBeforeCut).intValue() : 0);
+		return settings;
+	}
+
+	public ReceiptPrinterSettings getReceiptPrinterSettings()
+	{
+		final String componentName = (String) this.context.getProperties().get("component.name");
+		final ReceiptPrinterSettingsQuery query = (ReceiptPrinterSettingsQuery) connectionService
+				.getQuery(ReceiptPrinterSettings.class);
+		this.receiptPrinterSettings = query.findByComponentName(componentName);
+		if (this.receiptPrinterSettings == null)
+		{
+			this.receiptPrinterSettings = this.createReceiptPrinterSettings();
+		}
+		return this.receiptPrinterSettings;
+	}
+
+	protected SalespointReceiptPrinterSettings getSalespointReceiptPrinterSettings(ConnectionService connectionService)
+	{
+		if (this.salespointReceiptPrinterSettings == null)
+		{
+			final SalespointQuery query = (SalespointQuery) connectionService.getQuery(Salespoint.class);
+			this.salespoint = query.getCurrentSalespoint();
+			this.salespointReceiptPrinterSettings = salespoint == null ? null : salespoint.getReceiptPrinterSettings();
+		}
+		return this.salespointReceiptPrinterSettings;
+	}
+
+	private int getDefaultColumnCount()
+	{
+		final Integer cols = (Integer) this.context.getProperties().get("custom.cols");
+		return cols == null ? 1 : cols.intValue();
+	}
+	
+	@Override
 	public String convertToString(Object object)
 	{
 		if (object instanceof String)
@@ -264,31 +283,15 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 		return null;
 	}
 
-	public ReceiptPrinterSettings createReceiptPrinterSettings()
+	private String getDefaultConverter()
 	{
-		final Object device = this.context.getProperties().get("custom.device");
-		final Object cols = this.context.getProperties().get("custom.cols");
-		final Object linesBeforeCut = this.context.getProperties().get("custom.lines.before.cut");
-		final Object port = this.context.getProperties().get("custom.port");
-		final String converter = convertToString(this.context.getProperties().get("custom.convert"));
-		final ReceiptPrinterSettings settings = ReceiptPrinterSettings.newInstance();
-		settings.setCols(cols instanceof Integer ? ((Integer) cols).intValue() : 0);
-		settings.setComponentName((String) this.context.getProperties().get("component.name"));
-		settings.setConverter(converter instanceof String ? (String) converter : "");
-		settings.setName(device instanceof String ? (String) device : "???");
-		settings.setPort(port instanceof String ? (String) port : "");
-		settings.setPrintLogoMode(PrintMode.NORMAL);
-		settings.setLinesBeforeCut(linesBeforeCut instanceof Integer ? ((Integer) linesBeforeCut).intValue() : 0);
-		return settings;
+		return convertToString(this.context.getProperties().get("custom.convert"));
 	}
 
-	@Override
-	public ReceiptPrinterSettings getReceiptPrinterSettings()
+	private String getDefaultPort()
 	{
-		final String componentName = (String) this.context.getProperties().get("component.name");
-		final ReceiptPrinterSettingsQuery query = (ReceiptPrinterSettingsQuery) connectionService
-				.getQuery(ReceiptPrinterSettings.class);
-		return query.findByComponentName(componentName);
+		final String port = (String) this.context.getProperties().get("custom.port");
+		return port == null ? "" : port;
 	}
 
 	private boolean isClientApp()
