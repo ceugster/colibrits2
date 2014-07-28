@@ -159,7 +159,7 @@ public class AsciiTestDialog extends TitleAreaDialog
 						
 						try 
 						{
-							service.testAscii(service.getCustomerDisplaySettings().getPort(), new byte[] { (byte) ascii });
+							service.testDisplay(service.getCustomerDisplaySettings().getPort(), null, new String(new byte[] { (byte) ascii }));
 						} 
 						catch (Exception e) 
 						{
