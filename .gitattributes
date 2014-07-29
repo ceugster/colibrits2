@@ -2188,6 +2188,7 @@ ch.eugster.log.console/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.log.console/META-INF/MANIFEST.MF -text
 ch.eugster.log.console/OSGI-INF/console-logger-component.xml -text
 ch.eugster.log.console/build.properties -text
+ch.eugster.log.console/src/ch/eugster/log/console/Activator.java -text
 ch.eugster.log.console/src/ch/eugster/log/console/ConsoleLoggerComponent.java -text
 ch.eugster.log.feature/.project -text
 ch.eugster.log.feature/build.properties -text

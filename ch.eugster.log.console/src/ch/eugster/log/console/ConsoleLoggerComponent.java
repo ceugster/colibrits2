@@ -1,29 +1,55 @@
 package ch.eugster.log.console;
 
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.log.LogService;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 
-public class ConsoleLoggerComponent 
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.log.LogEntry;
+import org.osgi.service.log.LogListener;
+import org.osgi.service.log.LogReaderService;
+
+public class ConsoleLoggerComponent implements LogListener
 {
-	private LogService logService;
+	private LogReaderService logReaderService;
 	
-	protected void setLogService(LogService logService)
+	private int logLevel;
+	
+	protected void setLogReaderService(LogReaderService logReaderService)
 	{
-		this.logService = logService;
+		this.logReaderService = logReaderService;
 	}
 
-	protected void unsetLogService(LogService logService)
+	protected void unsetLogReaderService(LogReaderService logReaderService)
 	{
-		this.logService = null;
+		this.logReaderService.removeLogListener(this);
+		this.logReaderService = null;
 	}
 
 	protected void activate(ComponentContext context)
 	{
-		logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
 	}
 
 	protected void deactivate(ComponentContext context)
 	{
-		logService.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
+	}
+
+	@Override
+	public void logged(LogEntry entry)
+	{
+		if (this.logLevel == 0)
+		{
+			this.logLevel = Activator.getDefault().getCurrentLogLevel();
+		}
+
+		if (entry.getLevel() <= this.logLevel)
+		{
+			String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", Activator.getDefault().getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
+			System.out.println(log);
+			Throwable exception = entry.getException();
+			if (exception != null)
+			{
+				exception.printStackTrace();
+			}
+		}
 	}
 }
