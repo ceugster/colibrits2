@@ -37,7 +37,7 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 
 	private LogService logService;
 
-	private PersistenceService persistenceService;
+	protected ConnectionService connectionService;
 
 	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 
@@ -169,7 +169,7 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 
 	public void setPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = persistenceService;
+		this.connectionService = isClientApp() ? persistenceService.getCacheService() : persistenceService.getServerService();
 	}
 
 	public void unsetLogService(final LogService logService)
@@ -179,7 +179,7 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 
 	public void unsetPersistenceService(final PersistenceService persistenceService)
 	{
-		this.persistenceService = null;
+		this.connectionService = null;
 	}
 
 	protected void activate(final ComponentContext context)
@@ -231,19 +231,9 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 		return this.logService;
 	}
 
-	protected PersistenceService getPersistenceService()
-	{
-		return this.persistenceService;
-	}
-
 	protected Salespoint getSalespoint()
 	{
 		return this.salespoint;
-	}
-
-	protected PersistenceService getServerService()
-	{
-		return this.persistenceService;
 	}
 
 	protected boolean isReady()
@@ -330,8 +320,8 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 
 	private boolean setDisplayContext()
 	{
-		this.salespoint = this.getSalespoint(this.persistenceService.getCacheService());
-		this.display = this.getDisplay(this.persistenceService.getCacheService());
+		this.salespoint = this.getSalespoint(this.connectionService);
+		this.display = this.getDisplay(this.connectionService);
 
 //		if (this.salespoint == null)
 //		{
@@ -353,5 +343,11 @@ public abstract class AbstractDisplayService implements DisplayService, EventHan
 	public static String padRight(final String s, final int n)
 	{
 		return String.format("%1$-" + n + "s", s);
+	}
+
+	private boolean isClientApp()
+	{
+		String app = System.getProperty("eclipse.application");
+		return app.contains("client");
 	}
 }
