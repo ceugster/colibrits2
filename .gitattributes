@@ -1831,6 +1831,14 @@ ch.eugster.colibri.report.commons/.classpath -text
 ch.eugster.colibri.report.commons/.project -text
 ch.eugster.colibri.report.commons/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.commons/build.properties -text
+ch.eugster.colibri.report.commons/lib/commons-LICENSE.txt -text svneol=unset#text/plain
+ch.eugster.colibri.report.commons/lib/commons-NOTICE.txt -text svneol=unset#text/plain
+ch.eugster.colibri.report.commons/lib/commons-beanutils-1.8.0.jar -text
+ch.eugster.colibri.report.commons/lib/commons-collections-2.1.1.jar -text
+ch.eugster.colibri.report.commons/lib/commons-digester-2.1.jar -text
+ch.eugster.colibri.report.commons/lib/commons-javaflow-20060411.jar -text
+ch.eugster.colibri.report.commons/lib/commons-logging-1.1.1.jar -text
+ch.eugster.colibri.report.commons/lib/iText-2.1.7.js1.jar -text
 ch.eugster.colibri.report.daterange/.classpath -text
 ch.eugster.colibri.report.daterange/.project -text
 ch.eugster.colibri.report.daterange/.settings/org.eclipse.pde.core.prefs -text
