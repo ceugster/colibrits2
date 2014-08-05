@@ -1789,6 +1789,13 @@ ch.eugster.colibri.provider.voucher.webservice/.settings/org.eclipse.pde.core.pr
 ch.eugster.colibri.provider.voucher.webservice/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.provider.voucher.webservice/OSGI-INF/component.xml -text
 ch.eugster.colibri.provider.voucher.webservice/build.properties -text
+ch.eugster.colibri.provider.voucher.webservice/lib/axis.jar -text
+ch.eugster.colibri.provider.voucher.webservice/lib/commons-discovery-0.2.jar -text
+ch.eugster.colibri.provider.voucher.webservice/lib/commons-logging.jar -text
+ch.eugster.colibri.provider.voucher.webservice/lib/jaxrpc.jar -text
+ch.eugster.colibri.provider.voucher.webservice/lib/saaj.jar -text
+ch.eugster.colibri.provider.voucher.webservice/lib/webserviceutils.jar -text
+ch.eugster.colibri.provider.voucher.webservice/lib/wsdl4j.jar -text
 ch.eugster.colibri.provider.voucher.webservice/src/ch/eugster/colibri/provider/voucher/webservice/internal/Activator.java -text
 ch.eugster.colibri.provider.voucher.webservice/src/ch/eugster/colibri/provider/voucher/webservice/internal/VoucherServiceImpl.java -text
 ch.eugster.colibri.provider.voucher.webservice/src/org/datacontract/schemas/_2004/_07/GCDService/CFaultEx.java -text
