@@ -68,7 +68,9 @@ public class PositionQuery extends AbstractQuery<Position>
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
 		if (updateServer)
 		{
-			provider = provider.and(update.or(new ExpressionBuilder().get("serverUpdated").equal(false)));
+			Expression server = new ExpressionBuilder().get("serverUpdated").equal(false);
+			server = server.and(new ExpressionBuilder().get("otherId").notNull());
+			provider = provider.and(update.or(server));
 		}
 		else
 		{
