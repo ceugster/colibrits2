@@ -37,19 +37,22 @@ public class ConsoleLoggerComponent implements LogListener
 	@Override
 	public void logged(LogEntry entry)
 	{
-		if (this.logLevel == 0)
+		if (Activator.getDefault() != null)
 		{
-			this.logLevel = Activator.getDefault().getCurrentLogLevel();
-		}
-
-		if (entry.getLevel() <= this.logLevel)
-		{
-			String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", Activator.getDefault().getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
-			System.out.println(log);
-			Throwable exception = entry.getException();
-			if (exception != null)
+			if (this.logLevel == 0)
 			{
-				exception.printStackTrace();
+				this.logLevel = Activator.getDefault().getCurrentLogLevel();
+			}
+
+			if (entry.getLevel() <= this.logLevel)
+			{
+				String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", Activator.getDefault().getLevelAsString(entry.getLevel()), entry.getBundle().getSymbolicName(), entry.getMessage());
+				System.out.println(log);
+				Throwable exception = entry.getException();
+				if (exception != null)
+				{
+					exception.printStackTrace();
+				}
 			}
 		}
 	}

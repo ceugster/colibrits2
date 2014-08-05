@@ -109,7 +109,7 @@ public class FileLoggerComponent implements LogListener
 	@Override
 	public void logged(LogEntry entry)
 	{
-		if (out != null)
+		if (out != null || Activator.getDefault() != null)
 		{
 			if (this.logLevel == 0)
 			{
