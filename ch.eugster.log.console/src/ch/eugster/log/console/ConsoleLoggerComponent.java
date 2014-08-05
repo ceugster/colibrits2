@@ -21,16 +21,17 @@ public class ConsoleLoggerComponent implements LogListener
 
 	protected void unsetLogReaderService(LogReaderService logReaderService)
 	{
-		this.logReaderService.removeLogListener(this);
 		this.logReaderService = null;
 	}
 
 	protected void activate(ComponentContext context)
 	{
+		logReaderService.addLogListener(this);
 	}
 
 	protected void deactivate(ComponentContext context)
 	{
+		this.logReaderService.removeLogListener(this);
 	}
 
 	@Override

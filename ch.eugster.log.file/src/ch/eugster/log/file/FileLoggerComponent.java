@@ -29,7 +29,6 @@ public class FileLoggerComponent implements LogListener
 
 	protected void unsetLogReaderService(LogReaderService logReaderService)
 	{
-		this.logReaderService.removeLogListener(this);
 		this.logReaderService = null;
 	}
 
@@ -95,6 +94,7 @@ public class FileLoggerComponent implements LogListener
 
 	protected void deactivate(ComponentContext context)
 	{
+		this.logReaderService.removeLogListener(this);
 		try
 		{
 			out.close();

@@ -2201,7 +2201,7 @@ ch.eugster.log.console/.classpath -text
 ch.eugster.log.console/.project -text
 ch.eugster.log.console/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.log.console/META-INF/MANIFEST.MF -text
-ch.eugster.log.console/OSGI-INF/console-logger-component.xml -text
+ch.eugster.log.console/OSGI-INF/component.xml -text svneol=unset#text/plain
 ch.eugster.log.console/build.properties -text
 ch.eugster.log.console/src/ch/eugster/log/console/Activator.java -text
 ch.eugster.log.console/src/ch/eugster/log/console/ConsoleLoggerComponent.java -text

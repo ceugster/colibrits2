@@ -16,7 +16,7 @@ import org.osgi.service.log.LogService;
 
 public class Activator extends AbstractUIPlugin
 {
-	public static final String KEY_MAX_LOG_LEVEL = "max.log.level";
+	public static final String KEY_MAX_LOG_LEVEL = "max.log.level.file";
 
 	private static Activator activator;
 
