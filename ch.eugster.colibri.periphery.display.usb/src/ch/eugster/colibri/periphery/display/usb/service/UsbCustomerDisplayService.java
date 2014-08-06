@@ -173,7 +173,7 @@ public class UsbCustomerDisplayService extends AbstractCustomerDisplayService
 		}
 		
 		this.writeBytes(new byte[] { 0x0c});
-		byte[] bytes = conversions == null || conversions.isEmpty() ? this.correctText(new Converter(conversions), text) : text.getBytes();
+		byte[] bytes = conversions == null || conversions.isEmpty() ? text.getBytes() : this.correctText(new Converter(conversions), text);
 		this.writeBytes(bytes);
 
 		if (oldPort != null)

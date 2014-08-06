@@ -276,7 +276,7 @@ public class SerialReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 		}
 		
-		byte[] bytes = conversions == null || conversions.isEmpty() ? new Converter(conversions).convert(text.getBytes()) : text.getBytes();
+		byte[] bytes = conversions == null || conversions.isEmpty() ? text.getBytes() : new Converter(conversions).convert(text.getBytes());
 		this.printer.writeBytes(bytes);
 		this.doCutPaper(5);
 

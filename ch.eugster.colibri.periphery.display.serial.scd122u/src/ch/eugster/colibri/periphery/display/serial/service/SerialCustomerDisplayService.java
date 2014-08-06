@@ -206,7 +206,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		}
 		
 		this.display.writeBytes(new byte[] { 0x0c});
-		byte[] bytes = conversions == null || conversions.isEmpty() ? this.correctText(new Converter(conversions), text) : text.getBytes();
+		byte[] bytes = conversions == null || conversions.isEmpty() ? text.getBytes() : this.correctText(new Converter(conversions), text);
 		this.display.writeBytes(bytes);
 
 		if (oldPort != null)
