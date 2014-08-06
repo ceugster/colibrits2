@@ -16,8 +16,8 @@ import org.osgi.service.log.LogService;
 
 public class Activator extends AbstractUIPlugin
 {
-	public static final String KEY_MAX_LOG_LEVEL = "max.log.level.console";
-
+	public static final String KEY_LOG_LEVEL_CONSOLE = "log.level.console";
+	
 	private static Activator activator;
 
 	private Properties properties;
@@ -50,7 +50,7 @@ public class Activator extends AbstractUIPlugin
 	
 	public int getCurrentLogLevel()
 	{
-		return this.getLevelAsInt(this.properties.getProperty(KEY_MAX_LOG_LEVEL));
+		return this.getLevelAsInt(this.properties.getProperty(KEY_LOG_LEVEL_CONSOLE));
 	}
 	
 	public File getPropertyFile()
@@ -77,7 +77,7 @@ public class Activator extends AbstractUIPlugin
 	private Properties loadProperties()
 	{
 		properties = new Properties();
-		properties.setProperty(KEY_MAX_LOG_LEVEL, this.getLevelAsString(LogService.LOG_DEBUG));
+		properties.setProperty(KEY_LOG_LEVEL_CONSOLE, this.getLevelAsString(LogService.LOG_DEBUG));
 		File propertyFile = getPropertyFile();
 		if (propertyFile.isFile())
 		{

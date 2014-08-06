@@ -16,7 +16,11 @@ import org.osgi.service.log.LogService;
 
 public class Activator extends AbstractUIPlugin
 {
-	public static final String KEY_MAX_LOG_LEVEL = "max.log.level.file";
+	public static final String KEY_LOG_LEVEL_FILE = "log.level.file";
+	
+	public static final String KEY_LOG_LEVEL_CONSOLE = "log.level.console";
+	
+	public static final String KEY_DEL_LOGS_OLDER_THAN = "delete.logs.older.than.days";
 
 	private static Activator activator;
 
@@ -48,9 +52,35 @@ public class Activator extends AbstractUIPlugin
 		return this.properties;
 	}
 	
-	public int getCurrentLogLevel()
+	public int getCurrentFileLogLevel()
 	{
-		return this.getLevelAsInt(this.properties.getProperty(KEY_MAX_LOG_LEVEL));
+		return this.getLevelAsInt(this.properties.getProperty(KEY_LOG_LEVEL_FILE));
+	}
+	
+	public int getCurrentConsoleLogLevel()
+	{
+		return this.getLevelAsInt(this.properties.getProperty(KEY_LOG_LEVEL_CONSOLE));
+	}
+	
+	private int convertToDays(String days)
+	{
+		if (days == null || days.isEmpty())
+		{
+			return 0;
+		}
+		try
+		{
+			return Integer.valueOf(days);
+		}
+		catch (NumberFormatException e)
+		{
+			return 0;
+		}
+	}
+	
+	public int getDeleteLogsAfterDays()
+	{
+		return convertToDays(this.properties.getProperty(KEY_DEL_LOGS_OLDER_THAN));
 	}
 	
 	public File getPropertyFile()
@@ -77,7 +107,9 @@ public class Activator extends AbstractUIPlugin
 	private Properties loadProperties()
 	{
 		properties = new Properties();
-		properties.setProperty(KEY_MAX_LOG_LEVEL, this.getLevelAsString(LogService.LOG_DEBUG));
+		properties.setProperty(KEY_LOG_LEVEL_FILE, this.getLevelAsString(LogService.LOG_DEBUG));
+		properties.setProperty(KEY_LOG_LEVEL_CONSOLE, this.getLevelAsString(LogService.LOG_DEBUG));
+		properties.setProperty(KEY_DEL_LOGS_OLDER_THAN, "360");
 		File propertyFile = getPropertyFile();
 		if (propertyFile.isFile())
 		{

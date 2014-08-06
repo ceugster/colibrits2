@@ -1,6 +1,7 @@
 package ch.eugster.log.file;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -61,7 +62,7 @@ public class FileLoggerComponent implements LogListener
 						final Calendar calendar = Calendar.getInstance();
 						StringBuilder dateBuilder = new StringBuilder(new DecimalFormat("0000").format(calendar
 								.get(Calendar.YEAR)));
-						dateBuilder = dateBuilder.append(new DecimalFormat("00").format(calendar.get(Calendar.MONTH)));
+						dateBuilder = dateBuilder.append(new DecimalFormat("00").format(calendar.get(Calendar.MONTH + 1)));
 						dateBuilder = dateBuilder.append(new DecimalFormat("00").format(calendar.get(Calendar.DATE)));
 						dateBuilder = dateBuilder.append(new DecimalFormat("00").format(calendar
 								.get(Calendar.HOUR_OF_DAY)));
@@ -84,11 +85,57 @@ public class FileLoggerComponent implements LogListener
 					out = new PrintStream(currentLogfile);
 					logReaderService.addLogListener(this);
 				}
+				File history = new File(logFolder.getAbsolutePath() + File.separator + "history");
+				if (history.isDirectory())
+				{
+					final int days = Activator.getDefault().getDeleteLogsAfterDays();
+					if (days != 0)
+					{
+						File[] oldLogFiles = history.listFiles(new FileFilter() 
+						{
+							@Override
+							public boolean accept(File file) 
+							{
+								if (file.getName().startsWith("log_") && file.getName().length() >= 12)
+								{
+									int year = getInt(file.getName().substring(4, 8));
+									int month = getInt(file.getName().substring(8, 10));
+									int day = getInt(file.getName().substring(10, 12));
+									Calendar todayMinusDays = GregorianCalendar.getInstance();
+									todayMinusDays.add(Calendar.DATE, -days);
+									Calendar fileDate = GregorianCalendar.getInstance();
+									fileDate.set(Calendar.DATE, day);
+									fileDate.set(Calendar.MONTH, month);
+									fileDate.set(Calendar.YEAR, year);
+									boolean ret = fileDate.getTimeInMillis() < todayMinusDays.getTimeInMillis();
+									return ret;
+								}
+								return false;
+							}
+						});
+						for (File oldLogFile : oldLogFiles)
+						{
+							oldLogFile.delete();
+						}
+					}
+				}
 			}
 		}
 		catch (final Exception e)
 		{
 			e.printStackTrace();
+		}
+	}
+	
+	private int getInt(String value)
+	{
+		try
+		{
+			return Integer.valueOf(value);
+		}
+		catch (Exception e)
+		{
+			return 0;
 		}
 	}
 
@@ -113,7 +160,7 @@ public class FileLoggerComponent implements LogListener
 		{
 			if (this.logLevel == 0)
 			{
-				this.logLevel = Activator.getDefault().getCurrentLogLevel();
+				this.logLevel = Activator.getDefault().getCurrentConsoleLogLevel();
 			}
 
 			if (entry.getLevel() <= this.logLevel)

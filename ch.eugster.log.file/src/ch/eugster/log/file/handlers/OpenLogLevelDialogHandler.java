@@ -19,11 +19,20 @@ public class OpenLogLevelDialogHandler extends AbstractHandler implements IHandl
 		final LogLevelComboViewerDialog dialog = new LogLevelComboViewerDialog(Display.getCurrent().getActiveShell());
 		if (dialog.open() == Window.OK)
 		{
-			if (dialog.getSelection() != null)
+			if (dialog.getFileSelection() != null)
 			{
-				Activator.getDefault().getProperties().setProperty(Activator.KEY_MAX_LOG_LEVEL, dialog.getSelection());
+				Activator.getDefault().getProperties().setProperty(Activator.KEY_LOG_LEVEL_FILE, dialog.getFileSelection());
+			}
+			if (dialog.getConsoleSelection() != null)
+			{
+				Activator.getDefault().getProperties().setProperty(Activator.KEY_LOG_LEVEL_CONSOLE, dialog.getConsoleSelection());
+			}
+			if (dialog.getFileSelection() != null)
+			{
+				Activator.getDefault().getProperties().setProperty(Activator.KEY_DEL_LOGS_OLDER_THAN, dialog.getDays());
 				Activator.getDefault().storeProperties();
 			}
+			Activator.getDefault().storeProperties();
 		}
 		return Status.OK_STATUS;
 	}
