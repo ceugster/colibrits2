@@ -98,10 +98,7 @@ public class StoreReceiptExpressAction extends ConfigurableAction implements Pro
 					}
 				}
 			}
-
-			final int positionSize = this.userPanel.getReceiptWrapper().getReceipt().getPositions().size();
-			final int paymentSize = this.userPanel.getReceiptWrapper().getReceipt().getPayments().size();
-			return (positionSize > 0) || (paymentSize > 0);
+			return this.userPanel.getReceiptWrapper().getReceipt().getPositions().size() > 0;
 		}
 		else
 		{

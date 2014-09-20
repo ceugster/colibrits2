@@ -9,7 +9,6 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -21,7 +20,6 @@ import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.PaymentType;
-import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -108,10 +106,7 @@ public class StoreReceiptShorthandAction extends ConfigurableAction implements P
 					}
 				}
 			}
-
-			final int positionSize = this.userPanel.getReceiptWrapper().getReceipt().getPositions().size();
-			final int paymentSize = this.userPanel.getReceiptWrapper().getReceipt().getPayments().size();
-			return (positionSize > 0) || (paymentSize > 0);
+			return this.userPanel.getReceiptWrapper().getReceipt().getPositions().size() > 0;
 		}
 		else
 		{
