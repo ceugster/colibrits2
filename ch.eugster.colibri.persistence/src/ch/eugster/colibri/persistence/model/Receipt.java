@@ -739,11 +739,13 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public void removePayment(final Payment payment)
 	{
 		this.propertyChangeSupport.firePropertyChange("payments", this.payments, this.payments.remove(payment));
+		payment.setDeleted(true);
 	}
 
 	public void removePosition(final Position position)
 	{
 		this.propertyChangeSupport.firePropertyChange("positions", this.positions, this.positions.remove(position));
+		position.setDeleted(true);
 	}
 
 	public void setBookkeepingTransaction(final long bookkeepingTransaction)
