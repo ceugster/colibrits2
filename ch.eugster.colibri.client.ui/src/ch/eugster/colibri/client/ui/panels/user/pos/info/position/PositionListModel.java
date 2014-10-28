@@ -88,20 +88,28 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		});
 	}
 	
+	private void log(int level, String message)
+	{
+		if (Activator.getDefault() != null)
+		{
+			Activator.getDefault().log(level, message);
+		}
+	}
+	
 	private Position[] getModelData()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionListModel.getModelData()");
+		log(LogService.LOG_DEBUG, "Enter PositionListModel.getModelData()");
 		Receipt receipt = this.userPanel.getReceiptWrapper().getReceipt();
 		if (receipt == null)
 		{
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.getModelData()");
+			log(LogService.LOG_DEBUG, "Exit PositionListModel.getModelData()");
 			return new Position[0];
 		}
 		else
 		{
 			Position[] positions = receipt.getPositions().toArray(new Position[0]);
 			Arrays.sort(positions);
-			Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.getModelData()");
+			log(LogService.LOG_DEBUG, "Exit PositionListModel.getModelData()");
 			return positions;
 		}
 	}
@@ -109,7 +117,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionListModel.actionPerformed()");
+		log(LogService.LOG_DEBUG, "Enter PositionListModel.actionPerformed()");
 		if (this.userPanel.getCurrentState().equals(UserPanel.State.POSITION_INPUT))
 		{
 			if (event.getSource() instanceof HTMLButton)
@@ -138,7 +146,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 				}
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.actionPerformed()");
+		log(LogService.LOG_DEBUG, "Exit PositionListModel.actionPerformed()");
 	}
 
 	@Override
@@ -383,9 +391,9 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 
 	private void displayPosition(Position position)
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionListModel.displayPosition()");
+		log(LogService.LOG_DEBUG, "Enter PositionListModel.displayPosition()");
 		sendEvent(position);
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.displayPosition()");
+		log(LogService.LOG_DEBUG, "Exit PositionListModel.displayPosition()");
 	}
 	
 	private Event getEvent(ServiceReference<EventAdmin> reference, final String topics, final Position position)
@@ -405,7 +413,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 
 	private void sendEvent(final Position position)
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionListModel.sendEvent()");
+		log(LogService.LOG_DEBUG, "Enter PositionListModel.sendEvent()");
 		ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
 		try
 		{
@@ -420,7 +428,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		{
 			tracker.close();
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.sendEvent()");
+		log(LogService.LOG_DEBUG, "Exit PositionListModel.sendEvent()");
 	}
 
 	private void createTableColumns()
@@ -504,7 +512,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 
 	private void replacePosition(final Position updatedPosition)
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionListModel.replacePosition()");
+		log(LogService.LOG_DEBUG, "Enter PositionListModel.replacePosition()");
 		final int index = this.selectionListModel.getMinSelectionIndex();
 		final Position[] livingPositions = this.getModelData();
 		livingPositions[index] = updatedPosition;
@@ -538,7 +546,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		this.selectionListModel.clearSelection();
 		displayPosition(updatedPosition);
 		this.userPanel.getPositionWrapper().preparePosition(this.userPanel.getReceiptWrapper().getReceipt());
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.replacePosition()");
+		log(LogService.LOG_DEBUG, "Exit PositionListModel.replacePosition()");
 	}
 
 	private String shortenAuthorName(final String oldAuthorName)
@@ -553,7 +561,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 
 	private void testForTableUpdate()
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter PositionListModel.testForTableUpdate()");
+		log(LogService.LOG_DEBUG, "Enter PositionListModel.testForTableUpdate()");
 		if (this.userPanel.getPositionWrapper().isPositionComplete())
 		{
 			final Position newPosition = this.userPanel.getPositionWrapper().getPosition();
@@ -566,7 +574,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 				this.addPosition(newPosition);
 			}
 		}
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Exit PositionListModel.testForTableUpdate()");
+		log(LogService.LOG_DEBUG, "Exit PositionListModel.testForTableUpdate()");
 	}
 
 	public enum Column

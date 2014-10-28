@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -246,7 +247,8 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 
 	public void loadReceipts()
 	{
-		this.setReceipts(this.getParkedReceipts(this.userPanel.getUser()));
+		Receipt[] receipts = this.getParkedReceipts(this.userPanel.getUser());
+		this.setReceipts(receipts);
 	}
 
 	public void setSelectionListModel(final ParkedReceiptListSelectionModel selectionListModel)
@@ -282,8 +284,25 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
+			Receipt currentReceipt = null;
+			Long id = this.userPanel.getReceiptWrapper().getReceipt() == null ? null : this.userPanel.getReceiptWrapper().getReceipt().getId();
 			final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
-			return query.selectParked(user).toArray(new Receipt[0]);
+			List<Receipt> receipts = query.selectParked(user);
+			if (id != null)
+			{
+				for (Receipt receipt : receipts)
+				{
+					if (receipt.getId().equals(id))
+					{
+						currentReceipt = receipt;
+					}
+				}
+				if (currentReceipt != null)
+				{
+					receipts.remove(currentReceipt);
+				}
+			}
+			return receipts.toArray(new Receipt[0]);
 		}
 		return new Receipt[0];
 	}

@@ -280,6 +280,21 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		this.receipt.removePropertyChangeListener("customer", this);
 		this.fireReceiptChangeEvent(new ReceiptChangeEvent(this.receipt, receipt));
 		this.receipt = receipt;
+//		if (this.receipt.getState().equals(Receipt.State.PARKED))
+//		{
+//			this.receipt.setState(Receipt.State.NEW);
+//			final PersistenceService persistenceService = (PersistenceService) ReceiptWrapper.this.persistenceServiceTracker.getService();
+//			if (persistenceService != null)
+//			{
+//				try 
+//				{
+//					persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
+//				} 
+//				catch (Exception e) 
+//				{
+//				}
+//			}
+//		}
 		this.receipt.addPropertyChangeListener("customer", this);
 		return this.receipt;
 	}
@@ -310,54 +325,36 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 
 	public void storeReceipt(final boolean deleted)
 	{
-//		Job job = new Job("Storing Receipt...")
-//		{
-//			@Override
-//			public IStatus run(IProgressMonitor monitor) 
-//			{
-//				
-				ReceiptWrapper.this.receipt.setDeleted(deleted);
-				ReceiptWrapper.this.receipt.setState(Receipt.State.SAVED);
-				ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getSalespoint().getNextReceiptNumber());
+		ReceiptWrapper.this.receipt.setDeleted(deleted);
+		ReceiptWrapper.this.receipt.setState(Receipt.State.SAVED);
+		ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getSalespoint().getNextReceiptNumber());
 
-				final PersistenceService persistenceService = (PersistenceService) ReceiptWrapper.this.persistenceServiceTracker.getService();
-				if (persistenceService != null)
+		final PersistenceService persistenceService = (PersistenceService) ReceiptWrapper.this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			try
+			{
+				persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
+				
+				if (!ReceiptWrapper.this.receipt.isDeleted())
 				{
-////					Long receiptId = ReceiptWrapper.this.receipt.getId();
-					try
-					{
-						persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
-						
-						if (!ReceiptWrapper.this.receipt.isDeleted())
-						{
-							ReceiptWrapper.this.updateCustomerForReceiptPrint();
-							ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
-						}
-						userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
-						ReceiptWrapper.this.prepareReceipt();
-//						ReceiptWrapper.this.receipt = ReceiptWrapper.this.prepareReceipt();
-						ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
-						ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
-						ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
-								UserPanel.State.POSITION_INPUT));
-					} 
-					catch (Exception e) 
-					{
-						e.printStackTrace();
-						ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, e);
-						MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR);
-					}
-					finally
-					{
-//						persistenceService.getCacheService().clearCache();
-					}
+					ReceiptWrapper.this.updateCustomerForReceiptPrint();
+					ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
 				}
-//				return Status.OK_STATUS;
-//			}
-//		};
-//		job.setRule(LocalDatabaseRule.getRule());
-//		job.setPriority(Job.INTERACTIVE);
-//		job.schedule();
+				userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
+				ReceiptWrapper.this.prepareReceipt();
+				ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
+				ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
+				ReceiptWrapper.this.userPanel.fireStateChange(new StateChangeEvent(ReceiptWrapper.this.userPanel.getCurrentState(),
+						UserPanel.State.POSITION_INPUT));
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+				ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, e);
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR);
+			}
+		}
 	}
 
 	private void updateCustomerForReceiptPrint()

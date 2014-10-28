@@ -8,6 +8,7 @@ package ch.eugster.colibri.client.ui.buttons;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -68,9 +69,25 @@ public class ReceiptParkingButton extends ConfigurableButton implements Property
 			final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 			if (persistenceService != null)
 			{
+				Receipt currentReceipt = null;
+				Long id = this.userPanel.getReceiptWrapper().getReceipt() == null ? null : this.userPanel.getReceiptWrapper().getReceipt().getId();
 				final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
-				final long size = query.countParked(this.userPanel.getUser());
-				this.setText("Parkliste (" + size + ")");
+				List<Receipt> receipts = query.selectParked(this.userPanel.getUser());
+				if (id != null)
+				{
+					for (Receipt receipt : receipts)
+					{
+						if (receipt.getId().equals(id))
+						{
+							currentReceipt = receipt;
+						}
+					}
+					if (currentReceipt != null)
+					{
+						receipts.remove(currentReceipt);
+					}
+				}
+				this.setText("Parkliste (" + receipts.size() + ")");
 			}
 		}
 		else
