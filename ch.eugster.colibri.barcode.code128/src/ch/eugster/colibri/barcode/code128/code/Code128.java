@@ -224,6 +224,12 @@ public class Code128 extends AbstractBarcode
 	}
 
 	@Override
+	public Type getType()
+	{
+		return this.getProductBarcode().getType();
+	}
+
+	@Override
 	public void updatePosition(final Position position)
 	{
 		if (!this.code128Type.equals(Code128Type.CODE128_C))
@@ -239,10 +245,9 @@ public class Code128 extends AbstractBarcode
 			if (product == null)
 			{
 				product = Product.newInstance(position);
+				product.setCode(this.getProductCode());
 				position.setProduct(product);
 			}
-			product.setCode(this.getProductCode());
-
 			position.setPrice(this.getOrdinalPrice());
 
 			final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
