@@ -103,7 +103,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 	@Override
 	public IStatus findAndRead(final Barcode barcode, final Position position)
 	{
-		IStatus status = this.status;
+		IStatus status = Status.OK_STATUS;
 		if (status.getException() == null)
 		{
 			log(LogService.LOG_INFO, "Verbindung checken.");

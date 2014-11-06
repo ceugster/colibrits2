@@ -174,14 +174,14 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 		position.setEbook(barcode.isEbook());
 		position.setProduct(this.getProduct(barcode, position));
 		position.setFromStock(((Boolean)this.galserve.lagerabholfach()).booleanValue());
-		if (barcode.getType().equals(Barcode.Type.ORDER))
-		{
-			position.setOrder(barcode.getCode());
-		}
-		else
-		{
-			position.setOrder(null);
-		}
+//		if (barcode.getType().equals(Barcode.Type.ORDER))
+//		{
+//			position.setOrder(barcode.getProductCode());
+//		}
+//		else
+//		{
+//			position.setOrder(null);
+//		}
 		position.setProvider(Activator.getDefault().getConfiguration().getProviderId());
 		position.setBookProvider(!((Boolean)this.galserve.nichtbuchen()).booleanValue());
 		position.setProviderBooked(false);
@@ -230,7 +230,7 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 		position.setOrdered(((Boolean)this.galserve.bestellt()).booleanValue());
 		if (position.isOrdered())
 		{
-			position.setOrder(this.galserve.bestnummer().toString());
+//			position.setOrder(this.galserve..bestnummer().toString());
 			position.setOrderedQuantity(((Integer)this.galserve.menge()).intValue());
 			if (position.getQuantity() > position.getOrderedQuantity())
 			{
@@ -253,11 +253,12 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 		if (barcode.getType().equals(Barcode.Type.ORDER))
 		{
 			product.setCode(this.galserve.bestnummer().toString());
-			position.setOrder(barcode.getCode());
+			position.setOrder(barcode.getProductCode());
 		}
 		else
 		{
 			product.setCode(barcode.getProductCode());
+			position.setOrder(null);
 		}
 		product.setAuthor(this.galserve.autor().toString());
 		product.setPublisher(this.galserve.verlag().toString());

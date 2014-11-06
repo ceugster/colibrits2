@@ -90,17 +90,17 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 							}
 						}
 					}
+					BarcodeVerifier[] verifiers = this.getBarcodeVerifiers();
+					for (BarcodeVerifier verifier : verifiers)
+					{
+						barcode = verifier.verify(position.getSearchValue());
+						if (barcode != null)
+						{
+							break;
+						}
+					}
 					if (position.getSearchValue() != null && position.getProduct() == null)
 					{
-						BarcodeVerifier[] verifiers = this.getBarcodeVerifiers();
-						for (BarcodeVerifier verifier : verifiers)
-						{
-							barcode = verifier.verify(position.getSearchValue());
-							if (barcode != null)
-							{
-								break;
-							}
-						}
 						if (barcode != null)
 						{
 							barcode.updatePosition(position);
