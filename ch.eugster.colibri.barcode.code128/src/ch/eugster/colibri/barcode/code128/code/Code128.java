@@ -96,8 +96,6 @@ public class Code128 extends AbstractBarcode
 	@Override
 	public Barcode getProductBarcode()
 	{
-		Barcode barcode = null;
-
 		String productCode = null;
 		try
 		{
@@ -108,6 +106,8 @@ public class Code128 extends AbstractBarcode
 			// do nothing
 		}
 
+		Barcode barcode = null;
+		
 		switch (this.getQualifier())
 		{
 			case 0:
@@ -226,6 +226,10 @@ public class Code128 extends AbstractBarcode
 	@Override
 	public Type getType()
 	{
+		if (this.getProductCode().startsWith(Barcode.PREFIX_ORDER))
+		{
+			return Barcode.Type.ORDER;
+		}
 		return this.getProductBarcode().getType();
 	}
 

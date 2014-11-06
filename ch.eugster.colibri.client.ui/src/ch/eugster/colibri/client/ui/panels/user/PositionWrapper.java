@@ -653,11 +653,11 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				{
 					if (this.position.isOrdered())
 					{
+						this.replacePosition(Position.newInstance(this.position.getReceipt()));
 						log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
 						MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
 								.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
 								MessageDialog.BUTTON_OK);
-						this.replacePosition(Position.newInstance(this.position.getReceipt()));
 					}
 					else
 					{
