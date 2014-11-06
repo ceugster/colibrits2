@@ -1894,6 +1894,14 @@ ch.eugster.colibri.report.list/build.properties -text
 ch.eugster.colibri.report.list/src/ch/eugster/colibri/report/list/Activator.java -text
 ch.eugster.colibri.report.list/src/ch/eugster/colibri/report/list/views/ListView.java -text
 ch.eugster.colibri.report.list/src/ch/eugster/colibri/report/list/views/ReportLabelProvider.java -text
+ch.eugster.colibri.report.pdf/.classpath -text
+ch.eugster.colibri.report.pdf/.project -text
+ch.eugster.colibri.report.pdf/.settings/org.eclipse.jdt.core.prefs -text
+ch.eugster.colibri.report.pdf/.settings/org.eclipse.pde.core.prefs -text
+ch.eugster.colibri.report.pdf/META-INF/MANIFEST.MF -text
+ch.eugster.colibri.report.pdf/build.properties -text
+ch.eugster.colibri.report.pdf/lib/iText-2.1.7-LICENSE.txt -text
+ch.eugster.colibri.report.pdf/lib/iText-2.1.7.js1.jar -text
 ch.eugster.colibri.report.productgroup.feature/.project -text
 ch.eugster.colibri.report.productgroup.feature/build.properties -text
 ch.eugster.colibri.report.productgroup.feature/feature.xml -text
