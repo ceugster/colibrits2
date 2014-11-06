@@ -350,14 +350,17 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		}
 		
 		ServiceReference<ProviderUpdater>[] references = providerUpdaterTracker.getServiceReferences();
-		for (ServiceReference<ProviderUpdater> reference : references)
+		if (references != null)
 		{
-			ProviderUpdater providerUpdater = providerUpdaterTracker.getService(reference);
-			if (providerUpdater!= null)
+			for (ServiceReference<ProviderUpdater> reference : references)
 			{
-				for (IProperty.Section section : providerUpdater.getSections())
+				ProviderUpdater providerUpdater = providerUpdaterTracker.getService(reference);
+				if (providerUpdater!= null)
 				{
-					this.createProviderSection(scrolledForm, section, providerUpdater);
+					for (IProperty.Section section : providerUpdater.getSections())
+					{
+						this.createProviderSection(scrolledForm, section, providerUpdater);
+					}
 				}
 			}
 		}
