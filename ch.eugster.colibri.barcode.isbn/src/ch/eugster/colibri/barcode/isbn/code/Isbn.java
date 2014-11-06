@@ -47,6 +47,8 @@ public class Isbn extends AbstractBarcode
 
 	public static Isbn verify(String code)
 	{
+		if (code == null) return null;
+		
 		code = Isbn.removeHyphens(code);
 
 		if ((code.length() < 9) || (code.length() > 10))
