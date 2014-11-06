@@ -27,7 +27,7 @@ public class BookCenterCode extends AbstractBarcode
 
 	public static Barcode verify(final String code)
 	{
-		if (code.length() < BookCenterCode.MIN_BOOKCENTER_CODE_LENGTH || code.length() > MAX_BOOKCENTER_CODE_LENGTH)
+		if (code == null || (code.length() < BookCenterCode.MIN_BOOKCENTER_CODE_LENGTH || code.length() > MAX_BOOKCENTER_CODE_LENGTH))
 		{
 			return null;
 		}
