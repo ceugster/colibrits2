@@ -289,6 +289,10 @@ public class Code128 extends AbstractBarcode
 				{
 					new BigInteger(code);
 					code128 = new Code128(code);
+					if (code128.getType().equals(Barcode.Type.ORDER))
+					{
+						code128 = null;
+					}
 				}
 				catch (final NumberFormatException e)
 				{

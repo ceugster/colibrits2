@@ -174,7 +174,14 @@ public class Ean13 extends AbstractBarcode
 
 		if ((code.length() < Ean13.EAN13_LENGTH - 1) || code.length() > Ean13.EAN13_EBOOK_LENGTH)
 		{
-			return null;
+			if (code.length() >= Ean13.EAN13_LENGTH && code.substring(code.length() - Ean13.EAN13_LENGTH).startsWith(Ean13.PREFIX_ORDER))
+			{
+				code = code.substring(code.length() - Ean13.EAN13_LENGTH);
+			}
+			else
+			{
+				return null;
+			}
 		}
 
 		String prefix = null;
