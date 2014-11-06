@@ -426,6 +426,10 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	public void setOrdered(final boolean ordered)
 	{
 		this.propertyChangeSupport.firePropertyChange("ordered", this.ordered, this.ordered = ordered);
+		if (this.ordered)
+		{
+			this.setOption(Option.ORDERED);
+		}
 	}
 
 	public void setPrice(double price)
@@ -491,6 +495,10 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 			if ((this.getOption() == null))
 			{
 				this.setOption(productGroup.getProposalOption());
+			}
+			else if (this.isOrdered())
+			{
+				this.setOption(Option.ORDERED);
 			}
 			else
 			{
