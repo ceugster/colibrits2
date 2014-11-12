@@ -84,7 +84,7 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 							{
 								final Position position = model.getPosition(table.convertRowIndexToModel(table.getSelectedRow()));
 								userPanel.getReceiptWrapper().getReceipt().removePosition(position);
-								model.fireTableRowsDeleted(table.convertRowIndexToModel(table.getSelectedRow()), table.convertRowIndexToModel(table.getSelectedRow()));
+								model.fireTableDataChanged();
 
 							}
 							else

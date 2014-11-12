@@ -38,6 +38,10 @@ import ch.eugster.colibri.scheduler.service.UpdateScheduler;
 
 public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 {
+	private boolean locked = false;
+
+	private boolean running = false;
+	
 	private PersistenceService persistenceService;
 
 	private List<ProviderUpdater> providerUpdaters = new Vector<ProviderUpdater>();
@@ -53,6 +57,11 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 	private UpdateSchedulerJob updateScheduler;
 
 	private Map<String, IProperty> schedulerProperties;
+	
+	private void setRunning(boolean _running)
+	{
+		this.running = _running;
+	}
 	
 	public void setEventAdmin(final EventAdmin eventAdmin)
 	{
@@ -108,7 +117,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 	{
 		this.context = componentContext;
 	
-		String topics[] = new String[] {"ch/eugster/colibri/persistence/replication/completed" };
+		String topics[] = new String[] {"ch/eugster/colibri/persistence/replication/completed", Topic.LOCK.topic(), Topic.UNLOCK.topic() };
 		Hashtable<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		Activator.getDefault().getBundleContext().registerService(EventHandler.class, this, properties);
@@ -117,33 +126,48 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 	
 	public void handleEvent(Event event)
 	{
-		schedulerProperties = UpdateScheduler.SchedulerProperty.asMap();
-		ProviderPropertyQuery providerPropertyQuery = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
-		Collection<ProviderProperty> providerProperties = providerPropertyQuery.selectByProvider(this.context.getBundleContext().getBundle().getSymbolicName());
-		for (ProviderProperty providerProperty : providerProperties)
+		if (event.getTopic().equals("ch/eugster/colibri/persistence/replication/completed"))
 		{
-			IProperty property = schedulerProperties.get(providerProperty.getKey());
-			if (property != null)
+			schedulerProperties = UpdateScheduler.SchedulerProperty.asMap();
+			ProviderPropertyQuery providerPropertyQuery = (ProviderPropertyQuery) persistenceService.getCacheService().getQuery(ProviderProperty.class);
+			Collection<ProviderProperty> providerProperties = providerPropertyQuery.selectByProvider(this.context.getBundleContext().getBundle().getSymbolicName());
+			for (ProviderProperty providerProperty : providerProperties)
 			{
-				property.setPersistedProperty(providerProperty);
-			}
-		}
-		this.updateScheduler = new UpdateSchedulerJob("Updating...");
-		this.updateScheduler.setRule(ServerDatabaseRule.getRule());
-		this.updateScheduler.setPriority(Job.LONG);
-		this.updateScheduler.addJobChangeListener(new JobChangeAdapter()
-		{
-			@Override
-			public void done(IJobChangeEvent event) 
-			{
-				if (event.getResult().getSeverity() != IStatus.CANCEL)
+				IProperty property = schedulerProperties.get(providerProperty.getKey());
+				if (property != null)
 				{
-					UpdateSchedulerComponent.this.updateScheduler.schedule(getRepeatDelay());
+					property.setPersistedProperty(providerProperty);
 				}
 			}
-		});
-		this.updateScheduler.schedule(getDelay());
-		this.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
+			this.updateScheduler = new UpdateSchedulerJob("Updating...");
+			this.updateScheduler.setRule(ServerDatabaseRule.getRule());
+			this.updateScheduler.setPriority(Job.LONG);
+			this.updateScheduler.addJobChangeListener(new JobChangeAdapter()
+			{
+				@Override
+				public void done(IJobChangeEvent event) 
+				{
+					if (event.getResult().getSeverity() != IStatus.CANCEL)
+					{
+						UpdateSchedulerComponent.this.updateScheduler.schedule(getRepeatDelay());
+					}
+				}
+			});
+			this.updateScheduler.schedule(getDelay());
+			this.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " aktiviert.");
+		}
+		else if (event.getTopic().equals(Topic.LOCK.topic()))
+		{
+			while (this.running)
+			{
+				
+			}
+			this.locked = true;
+		}
+		else if (event.getTopic().equals(Topic.UNLOCK.topic()))
+		{
+			this.locked = false;
+		}
 	}
 
 	private void log(int level, String message)
@@ -176,36 +200,41 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 
 		protected IStatus run(final IProgressMonitor monitor)
 		{
-			IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_TRANSFER.topic());
-			try
+			if (!UpdateSchedulerComponent.this.locked)
 			{
-				monitor.beginTask("Aktualisiere...", 2);
-				ProviderUpdater[] providerUpdaters = UpdateSchedulerComponent.this.providerUpdaters.toArray(new ProviderUpdater[0]);
-				Arrays.sort(providerUpdaters);
-				if (persistenceService.getCacheService() != null)
+				IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_TRANSFER.topic());
+				try
 				{
-					IStatus providerStatus = update(new SubProgressMonitor(monitor, providerUpdaters.length), providerUpdaters, persistenceService);
-					sendUpdateEvent(Topic.SCHEDULED_PROVIDER_UPDATE, providerStatus);
-					monitor.worked(1);
-					IStatus transferStatus = transfer(new SubProgressMonitor(monitor, getSchedulerCount()));
-					sendUpdateEvent(Topic.SCHEDULED_TRANSFER, transferStatus);
-					monitor.worked(1);
-					if (transferStatus.getSeverity() == IStatus.ERROR || transferStatus.getSeverity() == IStatus.WARNING)
+					UpdateSchedulerComponent.this.setRunning(true);
+					monitor.beginTask("Aktualisiere...", 2);
+					ProviderUpdater[] providerUpdaters = UpdateSchedulerComponent.this.providerUpdaters.toArray(new ProviderUpdater[0]);
+					Arrays.sort(providerUpdaters);
+					if (persistenceService.getCacheService() != null)
 					{
-						status = transferStatus;
+						IStatus providerStatus = update(new SubProgressMonitor(monitor, providerUpdaters.length), providerUpdaters, persistenceService);
+						sendUpdateEvent(Topic.SCHEDULED_PROVIDER_UPDATE, providerStatus);
+						monitor.worked(1);
+						IStatus transferStatus = transfer(new SubProgressMonitor(monitor, getSchedulerCount()));
+						sendUpdateEvent(Topic.SCHEDULED_TRANSFER, transferStatus);
+						monitor.worked(1);
+						if (transferStatus.getSeverity() == IStatus.ERROR || transferStatus.getSeverity() == IStatus.WARNING)
+						{
+							status = transferStatus;
+						}
+						if (providerStatus.getSeverity() == IStatus.ERROR || transferStatus.getSeverity() == IStatus.WARNING)
+						{
+							status = providerStatus;
+						}
+//						persistenceService.getCacheService().clearCache();
+//						persistenceService.getServerService().clearCache();
 					}
-					if (providerStatus.getSeverity() == IStatus.ERROR || transferStatus.getSeverity() == IStatus.WARNING)
-					{
-						status = providerStatus;
-					}
-//					persistenceService.getCacheService().clearCache();
-//					persistenceService.getServerService().clearCache();
 				}
-			}
-			finally
-			{
-				sendUpdateEvent(Topic.SCHEDULED, status);
-				monitor.done();
+				finally
+				{
+					UpdateSchedulerComponent.this.setRunning(false);
+					sendUpdateEvent(Topic.SCHEDULED, status);
+					monitor.done();
+				}
 			}
 			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED.topic());
 		}

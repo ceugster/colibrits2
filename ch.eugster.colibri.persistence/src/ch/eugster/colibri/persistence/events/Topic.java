@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IStatus;
 
 public enum Topic 
 {
-	SCHEDULED, SCHEDULED_PROVIDER_UPDATE, SCHEDULED_TRANSFER, CUSTOMER_UPDATE, STORE_RECEIPT, PRINT_SETTLEMENT, PRINT_RECEIPT, PRINT_VOUCHER, SETTLE_PERFORMED, LOCAL_DATABASE, DISPLAY_ERROR, PRINT_ERROR, USER_LOGGED_IN, SALESPOINT_CLOSED, PAYMENT_ADDED, POSITION_ADDED, CLIENT_STARTED, PROVIDER_QUERY, DATABASE_COMPATIBILITY_ERROR;
+	SCHEDULED, SCHEDULED_PROVIDER_UPDATE, SCHEDULED_TRANSFER, CUSTOMER_UPDATE, STORE_RECEIPT, PRINT_SETTLEMENT, PRINT_RECEIPT, PRINT_VOUCHER, SETTLE_PERFORMED, LOCAL_DATABASE, DISPLAY_ERROR, PRINT_ERROR, USER_LOGGED_IN, SALESPOINT_CLOSED, PAYMENT_ADDED, POSITION_ADDED, CLIENT_STARTED, PROVIDER_QUERY, DATABASE_COMPATIBILITY_ERROR, LOCK, UNLOCK;
 	
 	public static String[] topics()
 	{
@@ -97,6 +97,14 @@ public enum Topic
 		{
 			return "ch/eugster/colibri/persistence/connection/compatibility/error";
 		}
+		case LOCK:
+		{
+			return "ch/eugster/colibri/local/database/lock";
+		}
+		case UNLOCK:
+		{
+			return "ch/eugster/colibri/local/database/unlock";
+		}
 		default:
 		{
 			return "";
@@ -184,6 +192,14 @@ public enum Topic
 		{
 			return "Die Version der Datenbank ist aktueller als die Version der Anwendung. Bitte installieren Sie ein Programm, das kompatibel mit der aktuellen Datenbankstruktur ist. Um Inkonsistenzen in der Datenbank zu vermeiden, wird die Anwendung beendet.";
 		}
+		case LOCK:
+		{
+			return "Beleg wird gespeichert.";
+		}
+		case UNLOCK:
+		{
+			return "Beleg wurde gespeichert.";
+		}
 		default:
 		{
 			return "";
@@ -270,6 +286,14 @@ public enum Topic
 		case DATABASE_COMPATIBILITY_ERROR:
 		{
 			return "Die Version der Datenbank ist aktueller als die Version der Anwendung. Bitte installieren Sie ein Programm, das kompatibel mit der aktuellen Datenbankstruktur ist. Um Inkonsistenzen in der Datenbank zu vermeiden, wird die Anwendung beendet.";
+		}
+		case LOCK:
+		{
+			return "Beleg wird gespeichert.";
+		}
+		case UNLOCK:
+		{
+			return "Beleg wurde gespeichert.";
 		}
 		default:
 		{

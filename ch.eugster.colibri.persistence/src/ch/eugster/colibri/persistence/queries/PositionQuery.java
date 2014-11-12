@@ -54,7 +54,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	{
 		final Expression parked = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.PARKED);
 		final Expression value = new ExpressionBuilder().get("searchValue").equal(searchValue);
-		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		Expression deleted = new ExpressionBuilder(Position.class).get("deleted").equal(false);
 		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
 		return this.select(deleted.and(parked.and(value)));
 	}

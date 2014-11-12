@@ -932,7 +932,6 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
-
 							else if (structureVersion == 25)
 							{
 								log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
@@ -947,6 +946,22 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
 								}
 								columnName = "pr_top_percent";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = getAddColumnStatement(tableName, columnName, "INTEGER", "0", false);
+									log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 26)
+							{
+								log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_position";
+								String columnName = "po_ordered_quantity";
 								status = this.columnExists(connection, tableName, columnName);
 								if (status.getSeverity() == IStatus.CANCEL)
 								{

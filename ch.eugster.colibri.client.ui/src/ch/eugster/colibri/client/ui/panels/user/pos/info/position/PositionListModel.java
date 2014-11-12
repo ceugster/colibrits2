@@ -381,9 +381,10 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		if (!this.mergePosition(positions, newPosition))
 		{
 			this.userPanel.getReceiptWrapper().getReceipt().getAllPositions().add(newPosition);
+			System.out.println(this.userPanel.getReceiptWrapper().getReceipt().getPositions().size());
 //			Position[] data = this.getModelData();
 //			final int row = data.length - 1;
-			this.fireTableRowsInserted(0,0);
+			this.fireTableDataChanged();
 			this.userPanel.getPositionWrapper().preparePosition(this.userPanel.getReceiptWrapper().getReceipt());
 		}
 		displayPosition(newPosition);

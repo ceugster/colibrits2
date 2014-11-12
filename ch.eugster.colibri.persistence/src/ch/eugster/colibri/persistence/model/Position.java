@@ -56,7 +56,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
-import javax.persistence.Transient;
 
 import org.eclipse.persistence.annotations.Convert;
 import org.eclipse.persistence.annotations.Index;
@@ -197,7 +196,8 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Convert("booleanConverter")
 	private boolean serverUpdated;
 
-	@Transient
+	@Basic
+	@Column(name = "po_ordered_quantity")
 	private int orderedQuantity;
 	
 	protected Position()

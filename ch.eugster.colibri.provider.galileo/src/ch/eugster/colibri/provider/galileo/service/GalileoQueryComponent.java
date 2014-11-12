@@ -232,7 +232,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 		{
 			if (t.topic().equals(status.getMessage()))
 			{
-				properties.put("topic", t);
+				properties.put("topic", t.topic());
 				break;
 			}
 		}

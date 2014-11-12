@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IWorkspace;
@@ -57,7 +58,22 @@ public class Activator extends AbstractUIPlugin
 	{
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		File root = workspace.getRoot().getRawLocation().toFile();
-		return new File(root.getAbsolutePath() + File.separator + "configuration" + File.separator + "logging.ini");
+		File propertyFile = new File(root.getAbsolutePath() + File.separator + "configuration" + File.separator + "logging.ini");
+		if (!propertyFile.exists())
+		{
+			try 
+			{
+				PrintWriter pw = new PrintWriter(new FileOutputStream(propertyFile));
+				pw.println(KEY_LOG_LEVEL_CONSOLE + "=WARNING");
+				pw.println("log.level.file=WARNING");
+				pw.println("delete.logs.older.than.days=30");
+				pw.close();
+			} 
+			catch (FileNotFoundException e) 
+			{
+			}
+		}
+		return propertyFile;
 	}
 	
 	public void storeProperties()
@@ -77,7 +93,7 @@ public class Activator extends AbstractUIPlugin
 	private Properties loadProperties()
 	{
 		properties = new Properties();
-		properties.setProperty(KEY_LOG_LEVEL_CONSOLE, this.getLevelAsString(LogService.LOG_DEBUG));
+		properties.setProperty(KEY_LOG_LEVEL_CONSOLE, this.getLevelAsString(LogService.LOG_WARNING));
 		File propertyFile = getPropertyFile();
 		if (propertyFile.isFile())
 		{

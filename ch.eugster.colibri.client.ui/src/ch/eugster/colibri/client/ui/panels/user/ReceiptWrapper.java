@@ -334,12 +334,13 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		{
 			try
 			{
+				this.sendEvent(receipt, Topic.LOCK);
 				persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
 				
 				if (!ReceiptWrapper.this.receipt.isDeleted())
 				{
 					ReceiptWrapper.this.updateCustomerForReceiptPrint();
-					ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt);
+					ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, Topic.STORE_RECEIPT);
 				}
 				userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
 				ReceiptWrapper.this.prepareReceipt();
@@ -350,9 +351,14 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 			} 
 			catch (Exception e) 
 			{
+				this.sendEvent(receipt, Topic.UNLOCK);
 				e.printStackTrace();
-				ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, e);
+				ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, Topic.STORE_RECEIPT, e);
 				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR);
+			}
+			finally
+			{
+				this.sendEvent(receipt, Topic.UNLOCK);
 			}
 		}
 	}
@@ -419,17 +425,17 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		return new Event(topics, properties);
 	}
 
-	private void sendEvent(final Receipt receipt)
+	private void sendEvent(final Receipt receipt, Topic topic)
 	{
-		sendEvent(receipt, null);
+		sendEvent(receipt, topic, null);
 	}
 
-	private void sendEvent(final Receipt receipt, Exception e)
+	private void sendEvent(final Receipt receipt, Topic topic, Exception e)
 	{
 		final EventAdmin eventAdmin = (EventAdmin) this.eventServiceTracker.getService();
 		if (eventAdmin != null)
 		{
-			eventAdmin.sendEvent(this.getEvent(Topic.STORE_RECEIPT.topic(), receipt, e));
+			eventAdmin.sendEvent(this.getEvent(topic.topic(), receipt, e));
 		}
 	}
 

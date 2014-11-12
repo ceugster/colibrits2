@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
@@ -765,11 +766,31 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				{
 					return true;
 				}
-
-				final Position position = positions.iterator().next();
+				int quantity = 0;
+				int orderedQuantity = 0;
+				Iterator<Position> iter = positions.iterator();
+				Long number = Long.valueOf(0L);
+				while (iter.hasNext())
+				{
+					Position p = iter.next();
+					if (p.isDeleted())
+					{
+						continue;
+					}
+					else
+					{
+						quantity += p.getQuantity();
+						orderedQuantity = p.getOrderedQuantity() > orderedQuantity ? p.getOrderedQuantity() : orderedQuantity;
+						number = p.getReceipt().getNumber();
+					}
+				}
+				if (quantity == 0)
+				{
+					return true;
+				}
 				MessageDialog.showInformation(Activator.getDefault().getFrame(), this.position.getReceipt()
 						.getSettlement().getSalespoint().getProfile(), "Bereits erfasst", "Der Abholfachbeleg "
-						+ barcode.getCode() + " wurde bereits im geparkten Beleg " + position.getReceipt().getNumber()
+						+ barcode.getCode() + " wurde bereits im geparkten Beleg " + number
 						+ " erfasst.", MessageDialog.TYPE_WARN);
 				return false;
 			}
