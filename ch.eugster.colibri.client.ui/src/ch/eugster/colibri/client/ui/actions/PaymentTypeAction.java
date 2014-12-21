@@ -197,6 +197,10 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 				{
 					this.setEnabled(this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D);
 				}
+				else if (this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.CASH))
+				{
+					this.setEnabled(Math.abs(this.userPanel.getReceiptWrapper().getReceiptDifference()) > 0D);
+				}
 				else
 				{
 					this.setEnabled(this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D);

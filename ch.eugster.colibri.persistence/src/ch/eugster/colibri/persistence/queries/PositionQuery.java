@@ -368,7 +368,7 @@ public class PositionQuery extends AbstractQuery<Position>
 
 			final SettlementInternal detail = SettlementInternal.newInstance(settlement, productGroup, defaultCurrency);
 			detail.setProductGroupType(productGroup.getProductGroupType());
-
+			detail.setDate(settlement.getTimestamp().getTime());
 			final Integer quantity = (Integer) result.get("quantity");
 			detail.setQuantity(quantity == null ? 0 : quantity);
 

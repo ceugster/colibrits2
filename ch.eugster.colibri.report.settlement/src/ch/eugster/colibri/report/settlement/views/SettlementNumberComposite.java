@@ -185,6 +185,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 										eventAdmin.sendEvent(getEvent(tracker,
 												Topic.PRINT_SETTLEMENT.topic(), settlement));
 									}
+									monitor.worked(1);
 								}
 								finally
 								{

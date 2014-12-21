@@ -160,7 +160,13 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 		{
 			while (this.running)
 			{
-				
+				try 
+				{
+					wait(200L);
+				} 
+				catch (InterruptedException e) 
+				{
+				}
 			}
 			this.locked = true;
 		}

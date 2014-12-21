@@ -113,7 +113,6 @@ public class Code128 extends AbstractBarcode
 			case 0:
 				// Artikelnummer ist eine ISBN ohne Prüfziffer
 				barcode = Isbn.verify(productCode);
-
 				if (barcode == null)
 				{
 					barcode = Ean13.verify(productCode);
@@ -125,7 +124,7 @@ public class Code128 extends AbstractBarcode
 				break;
 			case 2:
 				// Artikelnummer ist eine lieferanteneigene Artikelnummer
-				// barcode = new Other(articleCode);
+				barcode = Ean13.verify(productCode);
 				break;
 			default:
 				/*

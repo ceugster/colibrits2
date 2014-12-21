@@ -177,14 +177,14 @@ public class SettlementLayoutInternalSection extends AbstractLayoutSection
 					case D:
 					{
 						Calendar calendar = GregorianCalendar.getInstance();
-						calendar.setTime(internal.getDate());
+						calendar.setTime(internal.getDate() == null ? calendar.getTime() : internal.getDate());
 						return layoutArea.replaceMarker(SimpleDateFormat.getDateInstance().format(calendar.getTime()),
 								marker, true);
 					}
 					case T:
 					{
 						Calendar calendar = GregorianCalendar.getInstance();
-						calendar.setTime(internal.getDate());
+						calendar.setTime(internal.getDate() == null ? calendar.getTime() : internal.getDate());
 						return layoutArea.replaceMarker(SimpleDateFormat.getTimeInstance().format(calendar.getTime()),
 								marker, true);
 					}

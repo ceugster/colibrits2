@@ -467,7 +467,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		}
 		enabled = enabled && startTime.getSelection() < endTime.getSelection();
 		enabled = enabled && this.selectedDestination != null;
-		enabled = enabled && this.selectedSalespoints != null;
+		enabled = enabled && this.selectedSalespoints != null && this.selectedSalespoints.length > 0;
 		enabled = enabled && this.selectedDateRange != null;
 		this.start.setEnabled(enabled);
 	}
