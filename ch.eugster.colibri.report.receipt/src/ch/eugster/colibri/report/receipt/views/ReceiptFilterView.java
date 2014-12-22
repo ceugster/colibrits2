@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 
@@ -613,7 +614,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		final String header = "Header";
 		parameters.put("header", header);
 		parameters.put("printTime",
-				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()));
 		parameters.put("salespoint", getSalespoint().getName());
 		parameters.put("date", SimpleDateFormat.getDateInstance().format(getStartDate(date).getTime()));
 		parameters.put("receiptCount", nf.format(receiptCount));
@@ -826,7 +827,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 
 	private Calendar getStartDate(DateTime dateTime)
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.set(Calendar.YEAR, dateTime.getYear());
 		calendar.set(Calendar.MONTH, dateTime.getMonth());
 		calendar.set(Calendar.DATE, dateTime.getDay());
@@ -839,7 +840,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 
 	private Calendar getEndDate(Calendar startDate)
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(startDate.getTimeInMillis());
 		calendar.add(Calendar.DATE, 1);
 		calendar.add(Calendar.SECOND, -1);
@@ -1023,7 +1024,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		}
 		catch (final NumberFormatException e)
 		{
-			this.settings.put("date.selection", GregorianCalendar.getInstance().getTimeInMillis());
+			this.settings.put("date.selection", GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis());
 		}
 		try
 		{
@@ -1035,7 +1036,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 		}
 		if (this.settings.get("number.selection") == null)
 		{
-			this.settings.put("number.selection", GregorianCalendar.getInstance().getTimeInMillis());
+			this.settings.put("number.selection", GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis());
 		}
 		try
 		{
@@ -1109,7 +1110,7 @@ public class ReceiptFilterView extends ViewPart implements ISelectionProvider, I
 	private void initializeSelection(final PersistenceService persistenceService)
 	{
 		final long timeInMillis = this.settings.getLong("date.selection");
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(timeInMillis);
 		this.setDate(calendar);
 

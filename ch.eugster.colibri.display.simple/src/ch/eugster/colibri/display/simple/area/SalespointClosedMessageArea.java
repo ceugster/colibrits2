@@ -3,8 +3,9 @@ package ch.eugster.colibri.display.simple.area;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import ch.eugster.colibri.display.area.AbstractLayoutArea;
 import ch.eugster.colibri.display.area.IKey;
@@ -88,12 +89,12 @@ public class SalespointClosedMessageArea extends AbstractLayoutArea implements I
 			{
 				case D:
 				{
-					return layoutArea.replaceMarker(SalespointClosedMessageArea.dateFormatter.format(Calendar.getInstance().getTime()), marker,
+					return layoutArea.replaceMarker(SalespointClosedMessageArea.dateFormatter.format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()), marker,
 							true);
 				}
 				case T:
 				{
-					return layoutArea.replaceMarker(SalespointClosedMessageArea.timeFormatter.format(Calendar.getInstance().getTime()), marker,
+					return layoutArea.replaceMarker(SalespointClosedMessageArea.timeFormatter.format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()), marker,
 							true);
 				}
 				default:

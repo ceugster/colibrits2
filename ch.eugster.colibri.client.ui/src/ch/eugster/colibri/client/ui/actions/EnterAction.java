@@ -9,6 +9,7 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.panels.user.PaymentWrapper;
@@ -152,6 +153,6 @@ public class EnterAction extends UserPanelProfileAction
 
 	private void updateBarcode()
 	{
-		userPanel.getPositionWrapper().keyPressed(new KeyEvent(this.userPanel, KeyEvent.VK_ENTER, GregorianCalendar.getInstance().getTimeInMillis(), 0, KeyEvent.VK_ENTER, (char)0xd));
+		userPanel.getPositionWrapper().keyPressed(new KeyEvent(this.userPanel, KeyEvent.VK_ENTER, GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis(), 0, KeyEvent.VK_ENTER, (char)0xd));
 	}
 }

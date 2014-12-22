@@ -1,6 +1,13 @@
 package ch.eugster.colibri.provider.galileo.wgserve.sql  ;
 
-import com4j.*;
+import com4j.Com4jObject;
+import com4j.DISPID;
+import com4j.DefaultMethod;
+import com4j.IID;
+import com4j.MarshalAs;
+import com4j.NativeType;
+import com4j.ReturnValue;
+import com4j.VTID;
 
 /**
  * wgserve2g.wgserve2G

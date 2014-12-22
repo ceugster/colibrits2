@@ -14,9 +14,10 @@ import java.awt.dnd.DropTarget;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Constructor;
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.JPanel;
@@ -422,7 +423,7 @@ public class TabEditor extends AbstractEntityEditor<Tab> implements PropertyChan
 		 * Panels
 		 */
 		final Tab tab = (Tab) ((TabEditorInput) this.getEditorInput()).getAdapter(Tab.class);
-		tab.setTimestamp(Calendar.getInstance());
+		tab.setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 		tab.setName(this.name.getText());
 		/**
 		 * Tabbed Pane

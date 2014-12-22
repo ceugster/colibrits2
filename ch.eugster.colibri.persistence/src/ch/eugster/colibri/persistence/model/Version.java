@@ -1,6 +1,7 @@
 package ch.eugster.colibri.persistence.model;
 
-import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -116,7 +117,7 @@ public class Version extends AbstractEntity
 		final StringBuilder sql = new StringBuilder("INSERT INTO colibri_version (");
 		sql.append("v_id, v_timestamp, v_version, v_update, v_deleted, v_data, v_structure");
 		sql.append(") VALUES (");
-		sql.append("1, " + Calendar.getInstance().getTimeInMillis() + ", 0, 0, 0, 0, 1");
+		sql.append("1, " + GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis() + ", 0, 0, 0, 0, 1");
 		sql.append(")");
 		return sql.toString();
 	}

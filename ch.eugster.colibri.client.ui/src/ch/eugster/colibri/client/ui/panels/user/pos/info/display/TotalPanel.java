@@ -7,10 +7,9 @@
 package ch.eugster.colibri.client.ui.panels.user.pos.info.display;
 
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
-import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
-import ch.eugster.colibri.persistence.model.Position.AmountType;
 
 public class TotalPanel extends DisplayPanel
 {

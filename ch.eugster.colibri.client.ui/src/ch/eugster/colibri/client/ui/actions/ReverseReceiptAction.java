@@ -10,7 +10,9 @@ import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -122,7 +124,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 		properties.put(EventConstants.SERVICE, this.tracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.tracker.getServiceReference().getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.STORE_RECEIPT.topic());
 		properties.put(IPrintable.class.getName(), receipt);
 		properties.put("status", status);

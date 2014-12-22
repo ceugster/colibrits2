@@ -14,11 +14,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
 
 import javax.swing.SwingConstants;
@@ -406,7 +407,7 @@ public class PositionListModel extends AbstractTableModel implements PropertyCha
 		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, reference);
 		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), position);
 		properties.put("status", Status.OK_STATUS);
 		return new Event(topics, properties);

@@ -7,9 +7,10 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -92,7 +93,7 @@ public class PrintReceiptAction extends UserPanelProfileAction implements ListSe
 		eventProps.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
 		eventProps.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		eventProps.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		eventProps.put(IPrintable.class.getName(), receipt);
 		eventProps.put("force", true);
 		return new Event(Topic.PRINT_RECEIPT.topic(), eventProps);

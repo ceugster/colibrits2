@@ -8,8 +8,9 @@ package ch.eugster.pos.db;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * @author administrator
@@ -30,7 +31,7 @@ public class Salespoint extends Table
 
 	public Long currentReceiptId = null;
 
-	public Timestamp currentDate = new Timestamp(Calendar.getInstance().getTimeInMillis());
+	public Timestamp currentDate = new Timestamp(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis());
 
 	public boolean active = false;
 

@@ -7,10 +7,11 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.event.Event;
@@ -66,7 +67,7 @@ public class SettleAction extends ProfileAction
 				settlement.setReceiptCount(service.countReceipts(settlement));
 				settlement.setReversedReceipts(service.getReversedReceipts(settlement));
 
-				if (settlement.getReceiptCount() == 0L && settlement.getMoneys().size() == 0 && settlement.getReversedReceipts().size() == 0)
+				if (settlement.getReceiptCount() == 0L)
 				{
 					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.profile,
 							"Keine Vorgänge", "Es stehen keine Vorgänge zur Durchführung an.",
@@ -151,7 +152,7 @@ public class SettleAction extends ProfileAction
 		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, tracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID, tracker.getServiceReference().getProperty("component.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), settlement);
 		properties.put("force", true);
 		properties.put("state", state);

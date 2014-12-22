@@ -17,6 +17,7 @@ import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -43,7 +44,6 @@ import ch.eugster.colibri.client.ui.events.ShutdownListener;
 import ch.eugster.colibri.client.ui.panels.login.ILoginListener;
 import ch.eugster.colibri.client.ui.panels.login.LoginEvent;
 import ch.eugster.colibri.client.ui.panels.login.LoginPanel;
-import ch.eugster.colibri.client.ui.panels.status.StatusPanel;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
 import ch.eugster.colibri.client.ui.views.ClientView;
 import ch.eugster.colibri.display.service.DisplayService;
@@ -245,7 +245,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 	
 	public boolean settlementIsBeforeToday(Settlement settlement)
 	{
-		Calendar today = GregorianCalendar.getInstance();
+		Calendar today = GregorianCalendar.getInstance(Locale.getDefault());
 		today.set(Calendar.HOUR_OF_DAY, 0);
 		today.set(Calendar.MINUTE, 0);
 		today.set(Calendar.SECOND, 0);
@@ -264,7 +264,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			}
 			else
 			{
-				getSalespoint().getSettlement().setTimestamp(GregorianCalendar.getInstance());
+				getSalespoint().getSettlement().setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 			}
 			clientView.updateSalespoint((Salespoint) service.getCacheService().merge(getSalespoint()));
 		}
@@ -589,7 +589,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 //		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
 //		properties.put(EventConstants.SERVICE, reference);
 //		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
-//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 //		return new Event(topics, properties);
 //	}
 

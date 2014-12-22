@@ -1,9 +1,10 @@
 package ch.eugster.colibri.persistence.connection.service;
 
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -335,12 +336,12 @@ public abstract class AbstractConnectionService implements ConnectionService
 				props.put(EventConstants.BUNDLE_ID, Long.valueOf(Activator.getDefault().getBundle().getBundleId()));
 				props.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 				props.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-				props.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+				props.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 				props.put("status", status);
 				props.put("show.failover.message", Boolean.valueOf(true));
 				props.put(EventConstants.EVENT_TOPIC, status.getMessage());
 				props.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
-				props.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+				props.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 				if (status.getException() != null)
 				{
 					props.put(EventConstants.EXCEPTION, status.getException());
@@ -461,12 +462,12 @@ public abstract class AbstractConnectionService implements ConnectionService
 			properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		}
 		properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put("status", status);
 		properties.put("show.failover.message", Boolean.valueOf(true));
 		properties.put(EventConstants.EVENT_TOPIC, status.getMessage());
 		properties.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		if (status.getException() != null)
 		{
 			properties.put(EventConstants.EXCEPTION, status.getException());
@@ -487,7 +488,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 //		properties.put("show.failover.message", Boolean.valueOf(true));
 //		properties.put(EventConstants.EVENT_TOPIC, topic);
 //		properties.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
-//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 //		if (e != null)
 //		{
 //			properties.put(EventConstants.EXCEPTION, e);
@@ -591,7 +592,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				tx.begin();
 				if (updateTimestamp)
 				{
-					entity.setTimestamp(Calendar.getInstance());
+					entity.setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 				}
 
 				try
@@ -666,7 +667,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 			}
 			if (updateTimestamp)
 			{
-				entity.setTimestamp(Calendar.getInstance());
+				entity.setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 			}
 
 			try

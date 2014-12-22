@@ -13,11 +13,12 @@ import java.awt.GridLayout;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.JPanel;
@@ -419,7 +420,7 @@ public abstract class ConfigurablePanel extends JPanel implements IConfigurable,
 		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, reference);
 		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), position);
 		properties.put("status", Status.OK_STATUS);
 		return new Event(topics, properties);

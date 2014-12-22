@@ -1,8 +1,9 @@
 package ch.eugster.colibri.periphery.printer.service;
 
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IStatus;
 import org.osgi.service.component.ComponentContext;
@@ -161,7 +162,7 @@ public abstract class AbstractReceiptPrinterService implements ReceiptPrinterSer
 	{
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		properties.put(EventConstants.BUNDLE_ID, Activator.PLUGIN_ID);
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put("status", status);
 		final Event event = new Event(ReceiptPrinterService.EVENT_ADMIN_TOPIC_ERROR, properties);
 		return event;

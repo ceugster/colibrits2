@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -321,9 +322,9 @@ public class NewCurrentTaxWizardPage extends AbstractEntityWizardPage
 				currentTax.setPercentage(newPercentage);
 				currentTax.setValidFrom(Long.valueOf(newCurrentTaxValidFrom.getDate().getTimeInMillis()));
 				currentTax.getTax().addCurrentTax(currentTax);
-				Calendar calendar = GregorianCalendar.getInstance();
+				Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 				calendar.setTimeInMillis(currentTax.getValidFrom().longValue());
-				if (calendar.getTime().before(GregorianCalendar.getInstance().getTime()))
+				if (calendar.getTime().before(GregorianCalendar.getInstance(Locale.getDefault()).getTime()))
 				{
 					currentTax.getTax().setCurrentTax(currentTax);
 				}

@@ -1,10 +1,11 @@
 package ch.eugster.colibri.provider.galileo.service;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -219,7 +220,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 
 		properties.put(EventConstants.EVENT_TOPIC, topic);
 		properties.put(EventConstants.BUNDLE_ID, Activator.getDefault().getBundle().getSymbolicName());
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		if (status.getException() != null)
 		{
 			properties.put(EventConstants.EXCEPTION, status.getException());

@@ -3,6 +3,7 @@ package ch.eugster.colibri.insert.receipt.app;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.osgi.service.component.ComponentContext;
@@ -53,7 +54,7 @@ public class InsertReceiptService
 	{
 		if (date == null)
 		{
-			date = GregorianCalendar.getInstance();
+			date = GregorianCalendar.getInstance(Locale.getDefault());
 		}
 		prepare();
 

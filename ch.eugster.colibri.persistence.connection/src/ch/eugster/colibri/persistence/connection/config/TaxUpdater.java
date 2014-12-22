@@ -3,6 +3,7 @@ package ch.eugster.colibri.persistence.connection.config;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.persistence.EntityManager;
 
@@ -16,7 +17,7 @@ public class TaxUpdater
 {
 	public static void updateTaxes(ConnectionService service)
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		TaxQuery taxQuery = (TaxQuery) service.getQuery(Tax.class);
 		Collection<Tax> taxes = taxQuery.selectAll(true);
 		for (Tax tax : taxes)
@@ -45,7 +46,7 @@ public class TaxUpdater
 
 	public static void updateTaxes(EntityManager entityManager, Tax tax)
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		for (CurrentTax currentTax : tax.getCurrentTaxes())
 		{
 			if ((tax.getCurrentTax() == null || tax.getCurrentTax().getValidFrom().longValue() < currentTax.getValidFrom().longValue())

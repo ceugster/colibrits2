@@ -11,7 +11,9 @@ import java.awt.event.ActionListener;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -60,7 +62,7 @@ public class ParkedReceiptListModel extends AbstractTableModel implements Action
 
 	private NumberFormat numberFormatter = NumberFormat.getNumberInstance();
 
-	private Calendar calendar = Calendar.getInstance();
+	private Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 
 	private final DateFormat dateFormatter = DateFormat.getDateInstance();
 

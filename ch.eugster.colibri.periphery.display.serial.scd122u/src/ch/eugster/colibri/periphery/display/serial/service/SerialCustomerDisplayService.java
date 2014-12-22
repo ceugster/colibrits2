@@ -100,7 +100,7 @@ public class SerialCustomerDisplayService extends AbstractCustomerDisplayService
 		if (this.getEventAdmin() != null)
 		{
 			this.getEventAdmin().sendEvent(
-					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Der Belegdrucker kann nicht angesprochen werden.")));
+					this.getEvent(new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Das Kundendisplay kann nicht angesprochen werden.")));
 		}
 	}
 

@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -251,7 +253,7 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 					}
 					else
 					{
-						Calendar calendar = Calendar.getInstance();
+						Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 						calendar = settlement.getSettled();
 						cell.setText(ReceiptListView.this.df.format(calendar.getTime()));
 					}

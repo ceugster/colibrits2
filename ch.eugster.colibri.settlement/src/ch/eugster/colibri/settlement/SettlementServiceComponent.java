@@ -1,10 +1,10 @@
 package ch.eugster.colibri.settlement;
 
-import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
@@ -106,7 +106,7 @@ public class SettlementServiceComponent implements SettlementService
 			try
 			{
 				settlement.setReceiptCount(SettlementServiceComponent.this.countReceipts(settlement));
-				settlement.setTimestamp(GregorianCalendar.getInstance());
+				settlement.setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 				settlement.setPositions(SettlementServiceComponent.this.getPositions(persistenceService.getCacheService(), settlement));
 				settlement.setPayments(SettlementServiceComponent.this.getPayments(persistenceService.getCacheService(), settlement));
 				settlement.setTaxes(SettlementServiceComponent.this.getTaxes(persistenceService.getCacheService(), settlement));
@@ -118,7 +118,7 @@ public class SettlementServiceComponent implements SettlementService
 
 				if (state.equals(State.DEFINITIVE))
 				{
-					settlement.setSettled(GregorianCalendar.getInstance());
+					settlement.setSettled(GregorianCalendar.getInstance(Locale.getDefault()));
 					settlement.setTimestamp(settlement.getSettled());
 					settlement.setUser(settlement.getUser());
 					updateStocks(settlement);
@@ -155,7 +155,7 @@ public class SettlementServiceComponent implements SettlementService
 		properties.put(EventConstants.SERVICE_ID, context.getProperties().get("component.id"));
 		properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
 		properties.put(EventConstants.SERVICE_PID, context.getProperties().get("component.name"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put("status", Status.OK_STATUS);
 		Event event = new Event(Topic.SETTLE_PERFORMED.topic(), properties);
 		return event;

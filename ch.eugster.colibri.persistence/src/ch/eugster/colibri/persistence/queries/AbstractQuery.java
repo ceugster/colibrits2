@@ -256,7 +256,7 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 					readAllQuery.setOrderByExpressions(order);
 				}
 				final Query query = createQuery(entityManager, readAllQuery, maxResults);
-//				Calendar calendar = GregorianCalendar.getInstance();
+//				Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 //				String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
 				result = query.getResultList();
 			}

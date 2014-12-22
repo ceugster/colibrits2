@@ -11,10 +11,11 @@ import java.beans.PropertyChangeListener;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -405,7 +406,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		IStatus status = null;
 		if (e != null)
 		{

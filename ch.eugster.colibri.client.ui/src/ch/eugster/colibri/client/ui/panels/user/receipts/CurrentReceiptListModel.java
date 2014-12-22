@@ -13,6 +13,8 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -61,7 +63,7 @@ public class CurrentReceiptListModel extends AbstractTableModel implements Actio
 	
 	private NumberFormat numberFormatter = NumberFormat.getNumberInstance();
 
-	private Calendar calendar = Calendar.getInstance();
+	private Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 
 	private final DateFormat dateFormatter = DateFormat.getDateInstance();
 

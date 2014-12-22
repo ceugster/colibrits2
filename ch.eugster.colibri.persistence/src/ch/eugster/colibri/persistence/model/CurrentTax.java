@@ -12,7 +12,9 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
@@ -81,7 +83,7 @@ public class CurrentTax extends AbstractEntity implements IReplicatable
 
 	public String format()
 	{
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(this.getValidFrom().longValue());
 		CurrentTax.nf.setMaximumFractionDigits(3);
 		CurrentTax.nf.setMinimumFractionDigits(0);
@@ -175,7 +177,7 @@ public class CurrentTax extends AbstractEntity implements IReplicatable
 
 	public static String format(final CurrentTax currentTax)
 	{
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(currentTax.getValidFrom().longValue());
 		CurrentTax.nf.setMaximumFractionDigits(3);
 		CurrentTax.nf.setMinimumFractionDigits(0);

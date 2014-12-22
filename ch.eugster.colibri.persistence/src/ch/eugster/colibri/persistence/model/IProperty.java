@@ -2,8 +2,6 @@ package ch.eugster.colibri.persistence.model;
 
 import java.util.Properties;
 
-import ch.eugster.colibri.persistence.model.ProviderProperty;
-
 public interface IProperty
 {
 	String defaultValue();

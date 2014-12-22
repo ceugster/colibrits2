@@ -203,7 +203,7 @@ public class LoginDialog extends TitleAreaDialog implements EventHandler
 //		properties.put(EventConstants.SERVICE, this.eventAdminTracker.getServiceReference());
 //		properties.put(EventConstants.SERVICE_ID, this.eventAdminTracker.getServiceReference()
 //				.getProperty("service.id"));
-//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 //		properties.put("property.key", "login.admin");
 //		properties.put("username", username);
 //		properties.put("password", password);

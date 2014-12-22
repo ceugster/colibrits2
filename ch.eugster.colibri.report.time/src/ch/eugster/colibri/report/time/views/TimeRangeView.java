@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 import java.util.UUID;
@@ -78,6 +79,8 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 {
 	public static final String ID = "ch.eugster.colibri.report.timerange.view";
 
+	private static final String[] keys = { "", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
+
 	private static final NumberFormat hourFormatter = new DecimalFormat("00");
 	
 	private IDialogSettings settings;
@@ -102,6 +105,35 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 	public void init(IViewSite site) throws PartInitException
 	{
 		super.init(site);
+
+		settings = Activator.getDefault().getDialogSettings().getSection(this.getClass().getName());
+		if (settings == null)
+		{
+			settings = Activator.getDefault().getDialogSettings().addNewSection(this.getClass().getName());
+		}
+		setSetting("start.hour", 9);
+		setSetting("end.hour", 18);
+		boolean isSet = false;
+		for (String key : keys)
+		{
+			if (key != null)
+			{
+				if (!isSet)
+					isSet = this.settings.getBoolean(key);
+				else
+					break;
+			}
+		}
+		if (!isSet)
+		{
+			for (String key : keys)
+			{
+				if (key != null)
+				{
+					this.settings.put(key, true);
+				}
+			}
+		}
 
 		ISelection sel = getSite().getWorkbenchWindow().getSelectionService().getSelection(SalespointView.ID);
 		if (sel instanceof IStructuredSelection)
@@ -131,22 +163,12 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			IStructuredSelection ssel = (IStructuredSelection) sel;
 			selectedDestination = (ReportService.Destination) ssel.getFirstElement();
 		}
-		initializeSettings();
 
 		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(SalespointView.ID, this);
 		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DateView.ID, this);
 		getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(DestinationView.ID, this);
 	}
 	
-	private void setSetting()
-	{
-		settings = Activator.getDefault().getDialogSettings().getSection(this.getClass().getName());
-		if (settings == null)
-		{
-			settings = Activator.getDefault().getDialogSettings().addNewSection(this.getClass().getName());
-		}
-	}
-
 	private void setSetting(String key, int value)
 	{
 		try
@@ -159,32 +181,6 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		}
 	}
 
-	private void setSetting(String key, boolean value)
-	{
-		try
-		{
-			settings.getBoolean(key);
-		}
-		catch (NumberFormatException e)
-		{
-			settings.put(key, value);
-		}
-	}
-
-	private void initializeSettings()
-	{
-		setSetting();
-		setSetting("start.hour", 9);
-		setSetting("end.hour", 18);
-		setSetting("monday", true);
-		setSetting("tuesday", true);
-		setSetting("wednesday", true);
-		setSetting("thursday", true);
-		setSetting("friday", true);
-		setSetting("saturday", true);
-		setSetting("sunday", true);
-	}
-	
 	@Override
 	public void createPartControl(final Composite parent)
 	{
@@ -249,10 +245,6 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			}
 		});
 
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.setFirstDayOfWeek(Calendar.MONDAY);
-		String[] names = DateFormatSymbols.getInstance().getWeekdays();
-		
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		
@@ -261,21 +253,22 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		group.setLayout(new GridLayout());
 		group.setText("Wochentage");
 		
-		weekdays = new Button[names.length - 1];
-		for (int i = 0; i < weekdays.length; i++)
+		weekdays = new Button[keys.length];
+		for (int i = 1; i < keys.length; i++)
 		{
-			int weekdayNumber = i + calendar.getFirstDayOfWeek();
-			weekdayNumber = weekdayNumber <= 7 ? weekdayNumber : weekdayNumber -7;
-//			String name = names[weekdayNumber];
 			weekdays[i] = new Button(group, SWT.CHECK);
 			weekdays[i].setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			weekdays[i].setText(names[weekdayNumber]);
-			weekdays[i].setSelection(settings.getBoolean(names[i]));
+			weekdays[i].setText(DateFormatSymbols.getInstance().getWeekdays()[i]);
+			weekdays[i].setSelection(settings.getBoolean(keys[i]));
+			weekdays[i].setData("weekday", i);
 			weekdays[i].addSelectionListener(new SelectionListener() 
 			{
 				@Override
 				public void widgetSelected(SelectionEvent e) 
 				{
+					Button dayButton = (Button) e.getSource();
+					Integer weekday = (Integer) dayButton.getData("weekday");
+					TimeRangeView.this.settings.put(keys[weekday.intValue()], weekdays[weekday.intValue()].getSelection());
 					updateStartButton();
 				}
 
@@ -285,6 +278,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 					widgetSelected(e);
 				}
 			});
+			weekdays[i].setSelection(this.settings.getBoolean(keys[i]));
 		}
 
 		Button selectAll = new Button(group, SWT.PUSH);
@@ -297,7 +291,10 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			{
 				for (Button weekday : weekdays)
 				{
-					weekday.setSelection(true);
+					if (weekday != null)
+					{
+						weekday.setSelection(true);
+					}
 				}
 			}
 
@@ -318,7 +315,10 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			{
 				for (Button weekday : weekdays)
 				{
-					weekday.setSelection(false);
+					if (weekday != null)
+					{
+						weekday.setSelection(false);
+					}
 				}
 			}
 
@@ -339,7 +339,10 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			{
 				for (Button weekday : weekdays)
 				{
-					weekday.setSelection(!weekday.getSelection());
+					if (weekday != null)
+					{
+						weekday.setSelection(!weekday.getSelection());
+					}
 				}
 			}
 
@@ -459,7 +462,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		boolean enabled = false;
 		for (Button weekday : weekdays)
 		{
-			if (weekday.getSelection())
+			if (weekday != null && weekday.getSelection())
 			{
 				enabled = true;
 				break;
@@ -568,11 +571,11 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 	private int[] getSelectedWeekdays()
 	{
 		List<Integer> selectedDays = new ArrayList<Integer>();
-		for (int i = 0; i < weekdays.length; i++)
+		for (int i = 1; i < weekdays.length; i++)
 		{
-			if (weekdays[i].getSelection())
+			if (weekdays[i] != null && weekdays[i].getSelection())
 			{
-				selectedDays.add(new Integer(i));
+				selectedDays.add(Integer.valueOf((int)weekdays[i].getData("weekday")));
 			}
 		}
 		int[] days = new int[selectedDays.size()];
@@ -734,7 +737,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		Hashtable<String, Object> parameters = new Hashtable<String, Object>();
 		parameters.put("header", this.selectedSalespoints[0].getCommonSettings().getAddress());
 		parameters.put("printTime",
-				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()));
 		StringBuilder salespointNames = new StringBuilder();
 		for (Salespoint salespoint : selectedSalespoints)
 		{
@@ -757,7 +760,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		StringBuilder days = new StringBuilder("Gewählte Wochentage: ");
 		for (int i = 0; i < weekdays.length; i++)
 		{
-			if (weekdays[i].getSelection())
+			if (weekdays[i] != null && weekdays[i].getSelection())
 			{
 				days = days.append(weekdays[i].getText());
 				if (i < weekdays.length - 1)

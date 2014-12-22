@@ -10,6 +10,7 @@ package ch.eugster.colibri.barcode.code128.code;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -58,7 +59,7 @@ public class Code128 extends AbstractBarcode
 		final int month = Integer.parseInt(this.getCode().substring(2, 4));
 		int year = Integer.parseInt(this.getCode().substring(4, 6));
 
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		final int centuryYear = calendar.get(Calendar.YEAR);
 		final GregorianCalendar now = new GregorianCalendar();
 		year = centuryYear - now.get(Calendar.YEAR) + year;

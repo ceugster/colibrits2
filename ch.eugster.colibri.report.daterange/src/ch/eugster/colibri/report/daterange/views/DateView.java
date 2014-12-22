@@ -3,6 +3,7 @@ package ch.eugster.colibri.report.daterange.views;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -97,7 +98,7 @@ public class DateView extends ViewPart implements ISelectionProvider
 
 	private void initDates()
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(settings.getLong("date.start"));
 		setStartDate(calendar);
 		calendar.setTimeInMillis(settings.getLong("date.end"));
@@ -145,7 +146,7 @@ public class DateView extends ViewPart implements ISelectionProvider
 		}
 		catch (final NumberFormatException e)
 		{
-			final Calendar calendar = Calendar.getInstance();
+			final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 			calendar.set(Calendar.HOUR_OF_DAY, 0);
 			calendar.set(Calendar.MINUTE, 0);
 			calendar.set(Calendar.SECOND, 0);
@@ -158,12 +159,12 @@ public class DateView extends ViewPart implements ISelectionProvider
 		}
 		catch (final NumberFormatException e)
 		{
-			final Calendar calendar = Calendar.getInstance();
+			final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 			calendar.set(Calendar.HOUR_OF_DAY, 23);
 			calendar.set(Calendar.MINUTE, 59);
 			calendar.set(Calendar.SECOND, 59);
 			calendar.set(Calendar.MILLISECOND, 999);
-			this.settings.put("date.end", Calendar.getInstance().getTimeInMillis());
+			this.settings.put("date.end", GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis());
 		}
 	}
 
@@ -191,7 +192,7 @@ public class DateView extends ViewPart implements ISelectionProvider
 
 	private Calendar getStartDate()
 	{
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.set(Calendar.YEAR, DateView.this.start.getYear());
 		calendar.set(Calendar.MONTH, DateView.this.start.getMonth());
 		calendar.set(Calendar.DATE, DateView.this.start.getDay());
@@ -204,7 +205,7 @@ public class DateView extends ViewPart implements ISelectionProvider
 
 	private Calendar getEndDate()
 	{
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.set(Calendar.YEAR, DateView.this.end.getYear());
 		calendar.set(Calendar.MONTH, DateView.this.end.getMonth());
 		calendar.set(Calendar.DATE, DateView.this.end.getDay());
@@ -303,5 +304,4 @@ public class DateView extends ViewPart implements ISelectionProvider
 			}
 		}
 	}
-
 }

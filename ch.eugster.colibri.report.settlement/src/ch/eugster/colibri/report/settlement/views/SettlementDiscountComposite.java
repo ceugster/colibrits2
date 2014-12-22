@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.PropertyResourceBundle;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -177,7 +178,7 @@ public class SettlementDiscountComposite extends AbstractSettlementCompositeChil
 		final String header = "Header";
 		parameters.put("header", header);
 		parameters.put("printTime",
-				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()));
 		parameters.put("salespoints", getSalespointList());
 		parameters.put("dateRange", getDateRangeList());
 		URL entry = Activator.getDefault().getBundle().getEntry("/reports/" + getReportName() + ".properties");

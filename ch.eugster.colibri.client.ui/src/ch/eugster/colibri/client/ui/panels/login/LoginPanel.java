@@ -42,7 +42,6 @@ import ch.eugster.colibri.client.ui.dialogs.MessageDialog;
 import ch.eugster.colibri.client.ui.panels.MainPanel;
 import ch.eugster.colibri.client.ui.panels.TitleProvider;
 import ch.eugster.colibri.persistence.model.Profile;
-import ch.eugster.colibri.persistence.model.Role;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.queries.UserQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;

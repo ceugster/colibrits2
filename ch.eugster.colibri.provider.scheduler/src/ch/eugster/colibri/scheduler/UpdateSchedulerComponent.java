@@ -1,11 +1,12 @@
 package ch.eugster.colibri.scheduler;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -262,7 +263,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 				properties.put(EventConstants.SERVICE_PID, UpdateSchedulerComponent.this.context
 						.getProperties().get("component.name"));
 				properties
-						.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+						.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 				if (status.getSeverity() == IStatus.WARNING)
 				{
 					if (status.getException() != null)

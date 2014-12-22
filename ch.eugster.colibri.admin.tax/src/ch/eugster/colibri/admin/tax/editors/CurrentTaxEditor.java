@@ -10,7 +10,9 @@ import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.swt.SWT;
@@ -164,7 +166,7 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 	protected String getText()
 	{
 		final CurrentTax currentTax = (CurrentTax) this.getEditorInput().getAdapter(CurrentTax.class);
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(currentTax.getValidFrom().longValue());
 		return "Aktuelle Mwst: " + currentTax.getTax().getCode() + " " + DateFormat.getDateInstance().format(calendar.getTime());
 	}
@@ -173,7 +175,7 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 	protected void loadValues()
 	{
 		final CurrentTax currentTax = (CurrentTax) this.getEditorInput().getAdapter(CurrentTax.class);
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(currentTax.getValidFrom().longValue());
 		this.validFrom.setYear(calendar.get(Calendar.YEAR));
 		this.validFrom.setMonth(calendar.get(Calendar.MONTH));
@@ -195,7 +197,7 @@ public class CurrentTaxEditor extends AbstractEntityEditor<CurrentTax>
 	protected void saveValues()
 	{
 		final CurrentTax currentTax = (CurrentTax) this.getEditorInput().getAdapter(CurrentTax.class);
-		final Calendar calendar = Calendar.getInstance();
+		final Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.set(Calendar.MILLISECOND, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MINUTE, 0);

@@ -7,6 +7,8 @@
 package ch.eugster.colibri.admin.tax.wizards;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.nebula.widgets.calendarcombo.CalendarCombo;
@@ -133,7 +135,7 @@ public class TaxRateEditWizardPage extends EditWizardPage<TaxRate>
 		label.setText("Gültig ab");
 		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		final Calendar startDate = Calendar.getInstance();
+		final Calendar startDate = GregorianCalendar.getInstance(Locale.getDefault());
 		startDate.set(Calendar.HOUR, 0);
 		startDate.set(Calendar.MINUTE, 0);
 		startDate.set(Calendar.SECOND, 0);

@@ -14,11 +14,11 @@ import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -333,7 +333,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			}
 			Boolean force = (Boolean) event.getProperty("force");
 			boolean doForce = force == null ? false : force.booleanValue();
-			long now = GregorianCalendar.getInstance().getTimeInMillis();
+			long now = GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis();
 			long diff = now - this.lastFailoverMessage;
 			if (doForce || diff > frequency)
 			{
@@ -379,7 +379,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			}
 			Boolean force = (Boolean) event.getProperty("force");
 			boolean doForce = force == null ? false : force.booleanValue();
-			long now = GregorianCalendar.getInstance().getTimeInMillis();
+			long now = GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis();
 			long diff = now - this.lastWarnMessage;
 			if (doForce || diff > frequency)
 			{
@@ -783,7 +783,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					@Override
 					public void run() 
 					{
-						timeInformation.setText(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+						timeInformation.setText(SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()));
 					}
 				});
 			}
@@ -1020,7 +1020,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put("status", Status.OK_STATUS);
 		return new Event(topics, properties);
 	}

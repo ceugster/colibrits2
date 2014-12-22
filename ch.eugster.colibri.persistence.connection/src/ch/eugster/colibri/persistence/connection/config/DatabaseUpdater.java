@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.persistence.Table;
@@ -194,7 +195,7 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 					rst.updateInt("v_version", 0);
 					rst.updateInt("v_update", 0);
 					rst.updateInt("v_deleted", 0);
-					rst.updateDate("v_timestamp", new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
+					rst.updateDate("v_timestamp", new java.sql.Date(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 					rst.insertRow();
 					rst = stm.executeQuery("SELECT * FROM " + tableName);
 					rst.next();

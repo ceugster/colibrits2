@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -869,7 +870,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 								log(printer, "Warnung: Abschluss hat keine Abschlussdatum ist nicht vorhanden.");
 								continue;
 							}
-							Calendar calendar = GregorianCalendar.getInstance();
+							Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 							calendar.setTimeInMillis(settled.longValue());
 							if (settlement == null || !settlement.getSettled().equals(calendar))
 							{
@@ -1033,7 +1034,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		Collection<Settlement> settlements = settlementQuery.selectBySalespointsAndSettled(new Salespoint[] { salespoint }, date, date);
 		if (settlements.isEmpty())
 		{
-			Calendar calendar = GregorianCalendar.getInstance();
+			Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 			calendar.setTimeInMillis(date);
 			settlement = Settlement.newInstance(salespoint);
 			settlement.setSettled(calendar);
@@ -1478,7 +1479,7 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 	
 	private Calendar getTimestamp(Element element)
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(Long.valueOf(element.getAttributeValue("timestamp")).longValue());
 		return calendar;
 	}

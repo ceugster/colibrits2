@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
@@ -165,9 +166,9 @@ public class SettlementDetailQuery extends AbstractQuery<Settlement>
 			}
 			else
 			{
-				Calendar calendar = GregorianCalendar.getInstance();
+				Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 				calendar.setTimeInMillis(settledFrom.longValue());
-				calendar = GregorianCalendar.getInstance();
+				calendar = GregorianCalendar.getInstance(Locale.getDefault());
 				calendar.setTimeInMillis(settledTo.longValue());
 				settled = new ExpressionBuilder().get("settled")
 						.between(settledFrom.longValue(), settledTo.longValue());

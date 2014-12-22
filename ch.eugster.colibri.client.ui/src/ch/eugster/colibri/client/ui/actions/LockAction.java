@@ -7,9 +7,10 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
@@ -92,7 +93,7 @@ public class LockAction extends ConfigurableAction implements DisposeListener
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		return new Event(topics, properties);
 	}
 	

@@ -7,9 +7,10 @@
 package ch.eugster.colibri.client.ui.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.event.Event;
@@ -107,7 +108,7 @@ public class PrintLastReceiptAction extends ConfigurableAction implements Dispos
 		properties.put(EventConstants.SERVICE, this.eventServiceTracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID,
 				this.eventServiceTracker.getServiceReference().getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), receipt);
 		properties.put("status", Status.OK_STATUS);
 		properties.put("force", true);

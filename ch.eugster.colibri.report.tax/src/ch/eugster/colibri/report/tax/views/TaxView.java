@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.PropertyResourceBundle;
 
@@ -323,7 +324,7 @@ public class TaxView extends ViewPart implements IViewPart, ISelectionListener, 
 		final String header = "Header";
 		parameters.put("header", header);
 		parameters.put("printTime",
-				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()));
 		parameters.put("salespoints", getSalespointList());
 		parameters.put("dateRange", getDateRangeList());
 		URL entry = Activator.getDefault().getBundle().getEntry("/reports/TaxAccounting.properties");

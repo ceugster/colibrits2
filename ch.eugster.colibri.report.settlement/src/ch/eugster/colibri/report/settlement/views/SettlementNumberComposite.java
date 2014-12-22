@@ -22,6 +22,7 @@ import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.PropertyResourceBundle;
 
 import net.sf.jasperreports.engine.JRDataSource;
@@ -235,7 +236,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
 		properties.put(EventConstants.SERVICE, tracker.getServiceReference());
 		properties.put(EventConstants.SERVICE_ID, tracker.getServiceReference().getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), settlement);
 		properties.put("force", true);
 		properties.put("status", Status.OK_STATUS);
@@ -383,9 +384,9 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 		NumberFormat formatter = DecimalFormat.getInstance();
 		parameters.put("receiptCount", formatter.format(this.getSelectedSettlement().getReceiptCount()));
 		parameters.put("printTime",
-				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()));
+				SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()));
 		parameters.put("salespoints", this.getSelectedSettlement().getSalespoint().getName());
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar = this.getSelectedSettlement().getSettled();
 		parameters.put("settlementDate", SimpleDateFormat.getDateTimeInstance().format(calendar.getTime()));
 		formatter.setGroupingUsed(false);

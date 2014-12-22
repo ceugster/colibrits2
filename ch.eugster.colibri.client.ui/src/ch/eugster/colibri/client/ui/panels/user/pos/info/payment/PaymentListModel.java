@@ -9,9 +9,10 @@ package ch.eugster.colibri.client.ui.panels.user.pos.info.payment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.util.Calendar;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
@@ -196,7 +197,7 @@ public class PaymentListModel extends AbstractTableModel implements ActionListen
 		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundle().getSymbolicName());
 		properties.put(EventConstants.SERVICE, reference);
 		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
-		properties.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		properties.put(IPrintable.class.getName(), payment);
 		properties.put("status", Status.OK_STATUS);
 		return new Event(topics, properties);

@@ -1480,6 +1480,11 @@ public class PositionQuery extends AbstractQuery<Position>
 	public Collection<DayTimeRow> selectDayHourStatisticsRange(final Salespoint[] salespoints,
 			Calendar[] dateRange, int[] weekdays, int[] hourRange)
 	{
+		if (weekdays == null || weekdays.length == 0)
+		{
+			return new ArrayList<DayTimeRow>();
+		}
+		
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED));
 
@@ -1516,14 +1521,14 @@ public class PositionQuery extends AbstractQuery<Position>
 			expression = expression.and(dateRangeExpression);
 		}
 
-		if (weekdays.length > 0)
+		if (weekdays.length < 7)
 		{
-			Expression weekdayExpression = new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[0]);
+			Expression weekdayExpression = new ExpressionBuilder().get("receipt").get("dayOfWeek").equal(weekdays[0]);
 			for (int i = 1; i < weekdays.length; i++)
 			{
-				weekdayExpression = weekdayExpression.or(new ExpressionBuilder().get("receipt").get("timestamp").datePart("weekday").equal(weekdays[i]));
+				weekdayExpression = weekdayExpression.or(new ExpressionBuilder().get("receipt").get("dayOfWeek").equal(weekdays[i]));
 			}
-			expression.and(weekdayExpression);
+			expression = expression.and(weekdayExpression);
 		}
 
 		expression.and(new ExpressionBuilder().get("receipt").get("hour").between(hourRange[0], hourRange[1]));

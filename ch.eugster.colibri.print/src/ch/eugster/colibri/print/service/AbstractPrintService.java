@@ -1,10 +1,11 @@
 package ch.eugster.colibri.print.service;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -315,7 +316,7 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 			}
 		}
 		eventProps.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(Calendar.getInstance().getTimeInMillis()));
+		eventProps.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
 		eventProps.put("status", status);
 		return new Event(Topic.PRINT_ERROR.topic(), eventProps);
 	}

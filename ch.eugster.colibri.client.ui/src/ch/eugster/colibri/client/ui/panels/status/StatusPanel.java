@@ -1,16 +1,13 @@
 package ch.eugster.colibri.client.ui.panels.status;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
+import java.util.Locale;
 
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
@@ -129,7 +126,7 @@ public class StatusPanel extends MainPanel implements LogListener, EventHandler
 	@Override
 	public void logged(LogEntry entry) 
 	{
-		Calendar calendar = GregorianCalendar.getInstance();
+		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		calendar.setTimeInMillis(entry.getTime());
 		String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
 		String level = getLevelAsString(entry.getLevel());

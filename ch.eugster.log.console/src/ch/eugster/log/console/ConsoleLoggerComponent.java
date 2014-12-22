@@ -1,7 +1,9 @@
 package ch.eugster.log.console;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogEntry;
@@ -50,7 +52,7 @@ public class ConsoleLoggerComponent implements LogListener
 
 			if (entry.getLevel() <= this.logLevel)
 			{
-				String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance().getTime()) + " " + String.format("[%s] <%s> %s", level, symbolicName, message);
+				String log = SimpleDateFormat.getDateTimeInstance().format(GregorianCalendar.getInstance(Locale.getDefault()).getTime()) + " " + String.format("[%s] <%s> %s", level, symbolicName, message);
 				System.out.println(log);
 				Throwable exception = entry.getException();
 				if (exception != null)

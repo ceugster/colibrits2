@@ -3,6 +3,8 @@ package ch.eugster.colibri.persistence.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import javax.persistence.Basic;
 import javax.persistence.EntityListeners;
@@ -146,7 +148,7 @@ public abstract class AbstractEntity implements Entity
 	{
 		return value == null ? "" : value;
 	}
-
+	
 	protected AbstractEntity copy(final AbstractEntity target)
 	{
 		target.setDeleted(this.isDeleted());
@@ -160,7 +162,7 @@ public abstract class AbstractEntity implements Entity
 	protected static AbstractEntity newInstance(final AbstractEntity entity)
 	{
 		entity.setId(null);
-		entity.setTimestamp(Calendar.getInstance());
+		entity.setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 		entity.setVersion(0);
 		entity.setDeleted(false);
 		entity.setUpdate(0);

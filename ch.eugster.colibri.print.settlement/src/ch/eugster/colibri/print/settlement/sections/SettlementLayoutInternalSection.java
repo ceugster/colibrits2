@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -176,14 +177,14 @@ public class SettlementLayoutInternalSection extends AbstractLayoutSection
 					}
 					case D:
 					{
-						Calendar calendar = GregorianCalendar.getInstance();
+						Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 						calendar.setTime(internal.getDate() == null ? calendar.getTime() : internal.getDate());
 						return layoutArea.replaceMarker(SimpleDateFormat.getDateInstance().format(calendar.getTime()),
 								marker, true);
 					}
 					case T:
 					{
-						Calendar calendar = GregorianCalendar.getInstance();
+						Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 						calendar.setTime(internal.getDate() == null ? calendar.getTime() : internal.getDate());
 						return layoutArea.replaceMarker(SimpleDateFormat.getTimeInstance().format(calendar.getTime()),
 								marker, true);
