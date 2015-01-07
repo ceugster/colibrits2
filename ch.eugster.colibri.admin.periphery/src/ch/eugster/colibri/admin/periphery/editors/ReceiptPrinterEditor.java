@@ -277,7 +277,7 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		this.port.setText(portName);
 
 		String conversions = periphery.getConverter();
-		if ((conversions == null) || conversions.isEmpty())
+		if (conversions == null)
 		{
 			final Object prop = reference.getProperty("custom.convert");
 			if (prop instanceof String)
@@ -333,18 +333,13 @@ public class ReceiptPrinterEditor extends AbstractEntityEditor<ReceiptPrinterSet
 		super.updateControls();
 		ServiceTracker<ReceiptPrinterService, ReceiptPrinterService> tracker = new ServiceTracker<ReceiptPrinterService, ReceiptPrinterService>(Activator.getDefault().getBundle().getBundleContext(), ReceiptPrinterService.class, null);
 		tracker.open();
+		ReceiptPrinterService service = tracker.getService(((ReceiptPrinterEditorInput)this.getEditorInput()).getServiceReference());
 		try
 		{
-			ReceiptPrinterService service = tracker.getService(((ReceiptPrinterEditorInput)this.getEditorInput()).getServiceReference());
 			if (service != null)
 			{
-				Bundle bundle = service.getContext().getBundleContext().getBundle();
-				bundle.stop();
-				bundle.start();
+				service.getReceiptPrinterSettings();
 			}
-		}
-		catch (BundleException e) 
-		{
 		}
 		finally
 		{
