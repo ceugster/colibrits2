@@ -1,6 +1,12 @@
 package ch.eugster.colibri.periphery.printer.usb.service;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 
 import jpos.POSPrinter;
 import jpos.POSPrinterConst;
@@ -24,16 +30,10 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 {
 	private POSPrinterControl113 printer;
 
-	public static final String CONFIGURATION_DIR = "configuration";
-
 	protected void activate(ComponentContext context) 
 	{
 		super.activate(context);
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final File root = workspace.getRoot().getRawLocation().toFile();
-		File configDir = new File(root.getAbsolutePath() + File.separator
-				+ CONFIGURATION_DIR);
-		System.setProperty(JposPropertiesConst.JPOS_POPULATOR_FILE_PROP_NAME, configDir + File.separator + "jpos.xml");
+		copyJposConfigFile();
 		this.printer = (POSPrinterControl113) new POSPrinter();
 		this.openPrinter("POSPrinter");
 	}
@@ -45,6 +45,61 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 		super.deactivate(context);
 	}
 
+	private void copyJposConfigFile()
+	{
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final File root = workspace.getRoot().getRawLocation().toFile();
+		File jpos = new File(root.getAbsolutePath() + "/configuration/jpos.xml");
+		if (!jpos.isFile())
+		{
+			jpos.getParentFile().mkdirs();
+			BufferedReader reader = null;
+			BufferedWriter writer = null;
+			try
+			{
+				URL url = Activator.getContext().getBundle().getResource("/jpos.xml");
+				reader = new BufferedReader(new InputStreamReader(url.openStream()));
+				writer = new BufferedWriter(new FileWriter(jpos));
+				String line = reader.readLine();
+				while (line != null)
+				{
+					line = reader.readLine();
+					writer.write(line);
+					writer.newLine();
+				}
+			}
+			catch (Exception e)
+			{
+				
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try 
+					{
+						reader.close();
+					} 
+					catch (IOException e) 
+					{
+					}
+				}
+				if (writer != null)
+				{
+					try 
+					{
+						writer.flush();
+						writer.close();
+					} 
+					catch (IOException e) 
+					{
+					}
+				}
+			}
+		}
+		System.setProperty(JposPropertiesConst.JPOS_POPULATOR_FILE_PROP_NAME, jpos.getAbsolutePath());
+	}
+	
 	private void closePrinter() 
 	{
 		try 
