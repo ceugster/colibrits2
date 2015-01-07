@@ -241,14 +241,17 @@ public class SettlementTransfer extends AbstractTransfer
 		List<SettlementRestitutedPosition> serverRestituteds = new ArrayList<SettlementRestitutedPosition>();
 		for (SettlementRestitutedPosition restituted : restituteds)
 		{
-			Position position = (Position) serverService.find(Position.class, restituted.getPosition().getOtherId());
-			SettlementRestitutedPosition serverRestituted = SettlementRestitutedPosition.newInstance(serverSettlement,
-					position);
-			serverRestituted.setDeleted(restituted.isDeleted());
-			serverRestituted.setTimestamp(restituted.getTimestamp());
-			serverRestituted.setUpdate(0);
-			serverRestituted.setVersion(0);
-			serverRestituteds.add(serverRestituted);
+			if (restituted.getPosition().getOtherId() != null)
+			{
+				Position position = (Position) serverService.find(Position.class, restituted.getPosition().getOtherId());
+				SettlementRestitutedPosition serverRestituted = SettlementRestitutedPosition.newInstance(serverSettlement,
+						position);
+				serverRestituted.setDeleted(restituted.isDeleted());
+				serverRestituted.setTimestamp(restituted.getTimestamp());
+				serverRestituted.setUpdate(0);
+				serverRestituted.setVersion(0);
+				serverRestituteds.add(serverRestituted);
+			}
 		}
 		return serverRestituteds;
 	}
@@ -260,18 +263,21 @@ public class SettlementTransfer extends AbstractTransfer
 		List<SettlementPayedInvoice> serverPayedInvoices = new ArrayList<SettlementPayedInvoice>();
 		for (SettlementPayedInvoice payedInvoice : payedInvoices)
 		{
-			Position position = (Position) serverService.find(Position.class, payedInvoice.getPosition().getOtherId());
-			SettlementPayedInvoice serverPayedInvoice = SettlementPayedInvoice.newInstance(serverSettlement, position);
-			serverPayedInvoice.setDate(payedInvoice.getDate());
-			serverPayedInvoice.setNumber(payedInvoice.getNumber());
-			serverPayedInvoice.setDefaultCurrency(payedInvoice.getDefaultCurrency());
-			serverPayedInvoice.setDefaultCurrencyAmount(payedInvoice.getDefaultCurrencyAmount());
-			serverPayedInvoice.setQuantity(payedInvoice.getQuantity());
-			serverPayedInvoice.setDeleted(payedInvoice.isDeleted());
-			serverPayedInvoice.setTimestamp(payedInvoice.getTimestamp());
-			serverPayedInvoice.setUpdate(0);
-			serverPayedInvoice.setVersion(0);
-			serverPayedInvoices.add(serverPayedInvoice);
+			if (payedInvoice.getPosition().getOtherId() != null)
+			{
+				Position position = (Position) serverService.find(Position.class, payedInvoice.getPosition().getOtherId());
+				SettlementPayedInvoice serverPayedInvoice = SettlementPayedInvoice.newInstance(serverSettlement, position);
+				serverPayedInvoice.setDate(payedInvoice.getDate());
+				serverPayedInvoice.setNumber(payedInvoice.getNumber());
+				serverPayedInvoice.setDefaultCurrency(payedInvoice.getDefaultCurrency());
+				serverPayedInvoice.setDefaultCurrencyAmount(payedInvoice.getDefaultCurrencyAmount());
+				serverPayedInvoice.setQuantity(payedInvoice.getQuantity());
+				serverPayedInvoice.setDeleted(payedInvoice.isDeleted());
+				serverPayedInvoice.setTimestamp(payedInvoice.getTimestamp());
+				serverPayedInvoice.setUpdate(0);
+				serverPayedInvoice.setVersion(0);
+				serverPayedInvoices.add(serverPayedInvoice);
+			}
 		}
 		return serverPayedInvoices;
 	}

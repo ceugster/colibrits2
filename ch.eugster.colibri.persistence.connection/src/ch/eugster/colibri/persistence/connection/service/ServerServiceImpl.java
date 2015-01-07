@@ -15,6 +15,7 @@ import org.eclipse.persistence.config.PersistenceUnitProperties;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jdom.Element;
+import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.connection.config.DatabaseUpdater;
@@ -191,6 +192,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 			Map<String, Object> map = getEntityManagerProperties(status, properties);
 			factory = this.getPersistenceService().getPersistenceProvider()
 					.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_SERVER, map);
+			log(LogService.LOG_INFO, "EntityManagerFactory for " + ConnectionService.PERSISTENCE_UNIT_SERVER + " created.");
 		}
 		return factory;
 	}

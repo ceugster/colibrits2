@@ -163,7 +163,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 			{
 				try 
 				{
-					wait(200L);
+					Thread.sleep(200L);
 				} 
 				catch (InterruptedException e) 
 				{

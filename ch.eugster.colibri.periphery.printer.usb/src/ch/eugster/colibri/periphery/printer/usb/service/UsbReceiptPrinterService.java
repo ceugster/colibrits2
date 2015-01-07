@@ -1,9 +1,14 @@
 package ch.eugster.colibri.periphery.printer.usb.service;
 
+import java.io.File;
+
 import jpos.POSPrinter;
 import jpos.POSPrinterConst;
 import jpos.POSPrinterControl113;
+import jpos.util.JposPropertiesConst;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.component.ComponentContext;
@@ -19,9 +24,16 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 {
 	private POSPrinterControl113 printer;
 
+	public static final String CONFIGURATION_DIR = "configuration";
+
 	protected void activate(ComponentContext context) 
 	{
 		super.activate(context);
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final File root = workspace.getRoot().getRawLocation().toFile();
+		File configDir = new File(root.getAbsolutePath() + File.separator
+				+ CONFIGURATION_DIR);
+		System.setProperty(JposPropertiesConst.JPOS_POPULATOR_FILE_PROP_NAME, configDir + File.separator + "jpos.xml");
 		this.printer = (POSPrinterControl113) new POSPrinter();
 		this.openPrinter("POSPrinter");
 	}
@@ -74,7 +86,7 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 	@Override
 	public void print(String text) {
 		try {
-			if (printer != null) {
+			if (this.printer != null) {
 				boolean deviceEnabled = printer.getDeviceEnabled();
 				if (!deviceEnabled) {
 					printer.setDeviceEnabled(true);

@@ -22,7 +22,6 @@ public abstract class AbstractInitializer
 
 	protected Connection createConnection()
 	{
-		log(LogService.LOG_DEBUG, "Enter AbstractInitializer.createConnection()");
 		try
 		{
 			final String driverName = this.properties.getProperty(PersistenceUnitProperties.JDBC_DRIVER);
@@ -31,12 +30,10 @@ public abstract class AbstractInitializer
 			String password = this.properties.getProperty(PersistenceUnitProperties.JDBC_PASSWORD);
 			password = Activator.getDefault().decrypt(password);
 			Class.forName(driverName);
-			log(LogService.LOG_DEBUG, "Exit AbstractInitializer.createConnection()");
 			return DriverManager.getConnection(url, username, password);
 		}
 		catch (final Exception e)
 		{
-			log(LogService.LOG_DEBUG, "Exit AbstractInitializer.createConnection()");
 			return null;
 		}
 	}
@@ -56,7 +53,6 @@ public abstract class AbstractInitializer
 
 	protected void releaseConnection(final Connection connection)
 	{
-		Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractInitializer.releaseConnection()");
 		if (connection != null)
 		{
 			try
@@ -68,7 +64,6 @@ public abstract class AbstractInitializer
 				// do nothing
 			}
 		}
-		log(LogService.LOG_DEBUG, "Exit AbstractInitializer.releaseConnection()");
 	}
 
 }

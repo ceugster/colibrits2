@@ -766,13 +766,21 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 	
 	protected Barcode createCustomerBarcode(String code)
 	{
-		int currentSize = code.length() + Barcode.PREFIX_CUSTOMER.length();
-		StringBuilder builder = new StringBuilder();
-		for (int i = currentSize; i < 12; i++)
+		String customerCode = null;
+		if (code.startsWith(Barcode.PREFIX_CUSTOMER) && (code.length() == Barcode.EAN13_LENGTH || code.length() == Barcode.EAN13_LENGTH - 1))
 		{
-			builder = builder.append("0");
+			customerCode = code;
 		}
-		String customerCode = Barcode.PREFIX_CUSTOMER + builder.toString() + code;
+		else
+		{
+			int currentSize = code.length() + Barcode.PREFIX_CUSTOMER.length();
+			StringBuilder builder = new StringBuilder();
+			for (int i = currentSize; i < 12; i++)
+			{
+				builder = builder.append("0");
+			}
+			customerCode = Barcode.PREFIX_CUSTOMER + builder.toString() + code;
+		}
 		BarcodeVerifier[] verifiers = this.getBarcodeVerifiers();
 		Barcode barcode = null;
 		for (BarcodeVerifier verifier : verifiers)

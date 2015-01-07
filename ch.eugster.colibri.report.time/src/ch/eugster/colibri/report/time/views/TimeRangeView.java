@@ -101,6 +101,8 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 	
 	private Button[] weekdays;
 	
+	private Button selectNonSalesToo;
+	
 	@Override
 	public void init(IViewSite site) throws PartInitException
 	{
@@ -359,7 +361,26 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		group = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		group.setLayoutData(gridData);
 		group.setLayout(new GridLayout());
-		group.setText("Tagesstatistik");
+		group.setText("Optionen");
+
+		this.selectNonSalesToo = new Button(group, SWT.CHECK);
+		this.selectNonSalesToo.setText("Nicht umssatzrelevanten Warengruppen berücksichtigen");
+		this.selectNonSalesToo.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				Button button = (Button) e.getSource();
+				TimeRangeView.this.settings.put("non.sales.too", button.getSelection());
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+				widgetSelected(e);
+			}
+		});
+		this.selectNonSalesToo.setSelection(this.settings.getBoolean("non.sales.too"));
 		
 		label = new Label(group, SWT.MULTI | SWT.WRAP);
 		label.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -606,7 +627,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			if (service != null)
 			{
 				final PositionQuery query = (PositionQuery) service.getServerService().getQuery(Position.class);
-				result = query.selectDayHourStatisticsRange(this.selectedSalespoints, this.selectedDateRange, this.getSelectedWeekdays(), this.getSelectedHours());
+				result = query.selectDayHourStatisticsRange(this.selectedSalespoints, this.selectedDateRange, this.getSelectedWeekdays(), this.getSelectedHours(), this.selectNonSalesToo.getSelection(), true);
 			}
 		}
 		finally

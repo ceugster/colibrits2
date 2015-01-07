@@ -12,6 +12,7 @@ import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementReceipt;
 import ch.eugster.colibri.persistence.model.User;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
 public class ReceiptQuery extends AbstractQuery<Receipt>
 {
@@ -418,6 +419,71 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 			expression = expression.and(new ExpressionBuilder().get("timestamp").lessThanEqual(dateRange[1]));
 		}
 		return this.select(expression);
+	}
+
+	public long countDayHourStatisticsRange(final Salespoint[] salespoints,
+			Calendar[] dateRange, int[] weekdays, int[] hourRange, boolean nonSalesToo)
+	{
+		if (weekdays == null || weekdays.length == 0)
+		{
+			return 0;
+		}
+		
+		Expression expression = new ExpressionBuilder(this.getEntityClass());
+		expression = expression.and(new ExpressionBuilder().anyOfAllowingNone("positions").get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED));
+		if (nonSalesToo)
+		{
+			expression = expression.or(new ExpressionBuilder().anyOf("positions").get("productGroup").get("productGroupType").equal(ProductGroupType.NON_SALES_RELATED));
+		}
+		
+		if (salespoints != null && salespoints.length > 0)
+		{
+			Expression sps = new ExpressionBuilder().get("settlement").get("salespoint")
+					.equal(salespoints[0]);
+			for (int i = 1; i < salespoints.length; i++)
+			{
+				sps = sps.or(new ExpressionBuilder().get("settlement").get("salespoint")
+						.equal(salespoints[1]));
+			}
+			expression.and(sps);
+		}
+
+		Expression dateRangeExpression = null;
+		if (dateRange[0] != null && dateRange[1] != null)
+		{
+			dateRangeExpression = new ExpressionBuilder().get("timestamp")
+					.between(dateRange[0], dateRange[1]);
+		}
+		else if (dateRange[0] != null)
+		{
+			dateRangeExpression = new ExpressionBuilder().get("timestamp")
+					.greaterThanEqual(dateRange[0]);
+		}
+		else if (dateRange[1] != null)
+		{
+			dateRangeExpression = new ExpressionBuilder().get("timestamp")
+					.lessThanEqual(dateRange[1]);
+		}
+		if (dateRangeExpression != null)
+		{
+			expression = expression.and(dateRangeExpression);
+		}
+
+		if (weekdays.length < 7)
+		{
+			Expression weekdayExpression = new ExpressionBuilder().get("dayOfWeek").equal(weekdays[0]);
+			for (int i = 1; i < weekdays.length; i++)
+			{
+				weekdayExpression = weekdayExpression.or(new ExpressionBuilder().get("dayOfWeek").equal(weekdays[i]));
+			}
+			expression = expression.and(weekdayExpression);
+		}
+
+		expression.and(new ExpressionBuilder().get("hour").between(hourRange[0], hourRange[1]));
+
+		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
+		expression = expression.and(deleted);
+		return super.count(expression);
 	}
 
 }

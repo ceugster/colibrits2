@@ -90,10 +90,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 			 * Diese folgende Abfrage wurde auskommentiert, weil sie im Fall, dass eine Posiiton nicht gefunden werden kann,
 			 * die Verbuchung abbricht und so die gleiche Position immer wieder versucht wird zu aktualisieren.
 			 */
-//			if (status.isOK())
-//			{
-				status = this.updateProviderServer.updateProvider(position);
-//			}
+			status = this.updateProviderServer.updateProvider(position);
 			log(LogService.LOG_INFO, (status.getSeverity() == IStatus.OK ? "Warenbewirtschaftung erfolgreich aktualisiert." : "Aktualisierung fehlgeschlagen."));
 		}
 		return status;

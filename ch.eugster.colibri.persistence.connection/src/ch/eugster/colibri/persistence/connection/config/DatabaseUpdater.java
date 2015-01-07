@@ -26,7 +26,6 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 {
 	public static DatabaseUpdater newInstance(Properties properties)
 	{
-		log(LogService.LOG_DEBUG, "Enter DatabaseUpdater.newInstance()");
 		String driverName = properties.getProperty(PersistenceUnitProperties.JDBC_DRIVER);
 		if (SQLServerDriver.class.getName().equals(driverName)) 
 		{
@@ -48,7 +47,6 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 		{
 			return new PostgresqlDatabaseUpdater(properties);
 		}
-		log(LogService.LOG_DEBUG, "Exit DatabaseUpdater.newInstance()");
 		return null;
 	}
 	

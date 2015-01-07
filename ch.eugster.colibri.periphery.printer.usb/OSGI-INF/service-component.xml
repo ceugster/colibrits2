@@ -12,17 +12,5 @@
    <property name="custom.port" type="String" value="COM2:"/>
    <property name="custom.cols" type="Integer" value="42"/>
    <property name="custom.lines.before.cut" type="Integer" value="5"/>
-   <property name="custom.convert" type="String">#Ä
-196=91
-#Ö
-214=92
-#Ü
-220=93
-#ä
-228=123
-#ö
-246=124
-#ü
-252=125
-   </property>
+   <property name="custom.convert" type="String" value=""/>
 </scr:component>

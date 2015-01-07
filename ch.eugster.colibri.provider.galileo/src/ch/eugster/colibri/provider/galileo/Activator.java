@@ -1,11 +1,18 @@
 package ch.eugster.colibri.provider.galileo;
 
+import java.util.Hashtable;
+
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
+import ch.eugster.colibri.provider.galileo.service.GalileoConfiguratorComponent;
+import ch.eugster.colibri.provider.galileo.service.GalileoIdService;
+import ch.eugster.colibri.provider.service.ProviderConfigurator;
+import ch.eugster.colibri.provider.service.ProviderIdService;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -19,6 +26,7 @@ public class Activator extends AbstractUIPlugin
 
 	private GalileoConfiguration configuration;
 
+	private ServiceRegistration<ProviderIdService> providerIdRegistration;
 	/**
 	 * The constructor
 	 */
@@ -49,6 +57,7 @@ public class Activator extends AbstractUIPlugin
 			logService.log(LogService.LOG_DEBUG, "Plugin " + context.getBundle().getSymbolicName() + " gestartet.");
 		}
 		
+		providerIdRegistration = this.getBundle().getBundleContext().registerService(ProviderIdService.class, new GalileoIdService(), new Hashtable<String, Object>());
 		
 	}
 
@@ -62,6 +71,7 @@ public class Activator extends AbstractUIPlugin
 	@Override
 	public void stop(final BundleContext context) throws Exception
 	{
+		providerIdRegistration.unregister();
 		final LogService logService = (LogService) logServiceTracker.getService();
 		if (logService != null)
 		{

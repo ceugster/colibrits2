@@ -61,8 +61,7 @@ public class PositionQuery extends AbstractQuery<Position>
 
 	private Expression createProviderUpdatesExpression(Salespoint salespoint, String providerId, boolean updateServer)
 	{
-		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
-		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
+		Expression deleted = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
 
 		Expression provider = new ExpressionBuilder().get("provider").equal(providerId);
 		Expression update = new ExpressionBuilder().get("bookProvider").equal(true);
@@ -89,7 +88,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	public long countProviderUpdates(Salespoint salespoint, String providerId, boolean updateServer)
 	{
 		final Expression select = createProviderUpdatesExpression(salespoint, providerId, updateServer);
-		final long value = this.count(select);
+		long value = this.count(select);
 		return value;
 	}
 
@@ -1478,7 +1477,7 @@ public class PositionQuery extends AbstractQuery<Position>
 	}
 
 	public Collection<DayTimeRow> selectDayHourStatisticsRange(final Salespoint[] salespoints,
-			Calendar[] dateRange, int[] weekdays, int[] hourRange)
+			Calendar[] dateRange, int[] weekdays, int[] hourRange, boolean nonSalesToo, boolean showReceiptsCount)
 	{
 		if (weekdays == null || weekdays.length == 0)
 		{
@@ -1487,7 +1486,11 @@ public class PositionQuery extends AbstractQuery<Position>
 		
 		Expression expression = new ExpressionBuilder(this.getEntityClass());
 		expression = expression.and(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.SALES_RELATED));
-
+		if (nonSalesToo)
+		{
+			expression = expression.or(new ExpressionBuilder().get("productGroup").get("productGroupType").equal(ProductGroupType.NON_SALES_RELATED));
+		}
+		
 		if (salespoints != null && salespoints.length > 0)
 		{
 			Expression sps = new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
@@ -1553,6 +1556,12 @@ public class PositionQuery extends AbstractQuery<Position>
 		{
 			for (ReportQueryResult result : results)
 			{
+				long receipts =0L;
+				if (showReceiptsCount)
+				{
+					ReceiptQuery query = (ReceiptQuery) this.getConnectionService().getQuery(Receipt.class);
+					receipts = query.countDayHourStatisticsRange(salespoints, dateRange, weekdays, hourRange, nonSalesToo);
+				}
 				Long id = (Long) result.get("id");
 				String name = (String) result.get("name");
 				Integer hour = (Integer) result.get("hour");
@@ -1560,7 +1569,7 @@ public class PositionQuery extends AbstractQuery<Position>
 				DayTimeRow row = rows.get(id);
 				if (row == null)
 				{
-					row = new DayTimeRow(id, name, hour, amount);
+					row = new DayTimeRow(id, name, hour, amount, Long.valueOf(receipts).intValue());
 					for (int i = hourRange[0]; i <= hourRange[1]; i++)
 					{
 						String key = "h" + new Integer(i).toString();

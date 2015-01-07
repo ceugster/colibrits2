@@ -1695,7 +1695,6 @@ ch.eugster.colibri.provider.galileo/.project -text
 ch.eugster.colibri.provider.galileo/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.provider.galileo/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/configurator-component.xml -text
-ch.eugster.colibri.provider.galileo/OSGI-INF/id-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/interface-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/provider-property-selector-component.xml -text
 ch.eugster.colibri.provider.galileo/OSGI-INF/query-component.xml -text
@@ -1716,7 +1715,6 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/gals
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IFindArticleServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/IUpdateProviderServer.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/Igdserve.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/FindArticleServerOldCom4j.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/galserve/old/Igdserve.java -text
