@@ -320,6 +320,12 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()) ||
 				event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
 		{
+			Object ex = event.getProperty(EventConstants.EXCEPTION);
+			if (ex instanceof Exception)
+			{
+				Exception e = (Exception) ex;
+				Activator.getDefault().log(LogService.LOG_ERROR, "Failover occurred: " + e.getLocalizedMessage());
+			}
 			if (frequency == null)
 			{
 				try
@@ -366,6 +372,9 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
 				event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 		{
+			IStatus status = (IStatus) event.getProperty("status");
+			Activator.getDefault().log(LogService.LOG_WARNING, "Failover occurred: " + status.getMessage());
+
 			if (frequency == null)
 			{
 				try

@@ -491,7 +491,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 							if (barcode.getCode().startsWith(Barcode.PREFIX_CUSTOMER))
 							{
 								log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
-								this.position.getReceipt().setCustomerCode(barcode.getCode());
+								this.position.getReceipt().setCustomerCode(barcode.getDetail());
 								this.findAndRead(barcode);
 							}
 							else if (barcode.isEbook())
