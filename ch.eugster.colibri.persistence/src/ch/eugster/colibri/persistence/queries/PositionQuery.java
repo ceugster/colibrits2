@@ -1498,7 +1498,7 @@ public class PositionQuery extends AbstractQuery<Position>
 			for (int i = 1; i < salespoints.length; i++)
 			{
 				sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
-						.equal(salespoints[1]));
+						.equal(salespoints[i]));
 			}
 			expression.and(sps);
 		}
@@ -1543,6 +1543,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		Map<Long, DayTimeRow> rows = new HashMap<Long, DayTimeRow>();
 
 		final ReportQuery reportQuery = new ReportQuery(this.getEntityClass(), expression);
+		reportQuery.addAttribute("id", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"), String.class);
 		reportQuery.addAttribute("name", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"), String.class);
 		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("hour"), Integer.class);
 //		reportQuery.addSum("quantity", Integer.class);
@@ -1559,8 +1560,10 @@ public class PositionQuery extends AbstractQuery<Position>
 				long receipts =0L;
 				if (showReceiptsCount)
 				{
+					Long salespointId = (Long) result.get("id");
+					int hour = ((Integer) result.get("hour")).intValue();
 					ReceiptQuery query = (ReceiptQuery) this.getConnectionService().getQuery(Receipt.class);
-					receipts = query.countDayHourStatisticsRange(salespoints, dateRange, weekdays, hourRange, nonSalesToo);
+					receipts = query.countDayHourStatisticsRange(salespointId, dateRange, weekdays, hour, nonSalesToo);
 				}
 				Long id = (Long) result.get("id");
 				String name = (String) result.get("name");

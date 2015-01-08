@@ -421,8 +421,8 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		return this.select(expression);
 	}
 
-	public long countDayHourStatisticsRange(final Salespoint[] salespoints,
-			Calendar[] dateRange, int[] weekdays, int[] hourRange, boolean nonSalesToo)
+	public long countDayHourStatisticsRange(final Long salespointId,
+			Calendar[] dateRange, int[] weekdays, int hourRange, boolean nonSalesToo)
 	{
 		if (weekdays == null || weekdays.length == 0)
 		{
@@ -436,17 +436,8 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 			expression = expression.or(new ExpressionBuilder().anyOf("positions").get("productGroup").get("productGroupType").equal(ProductGroupType.NON_SALES_RELATED));
 		}
 		
-		if (salespoints != null && salespoints.length > 0)
-		{
-			Expression sps = new ExpressionBuilder().get("settlement").get("salespoint")
-					.equal(salespoints[0]);
-			for (int i = 1; i < salespoints.length; i++)
-			{
-				sps = sps.or(new ExpressionBuilder().get("settlement").get("salespoint")
-						.equal(salespoints[1]));
-			}
-			expression.and(sps);
-		}
+		Expression sps = new ExpressionBuilder().get("settlement").get("salespoint").get("id").equal(salespointId);
+		expression.and(sps);
 
 		Expression dateRangeExpression = null;
 		if (dateRange[0] != null && dateRange[1] != null)
@@ -479,7 +470,7 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 			expression = expression.and(weekdayExpression);
 		}
 
-		expression.and(new ExpressionBuilder().get("hour").between(hourRange[0], hourRange[1]));
+		expression.and(new ExpressionBuilder().get("hour").equal(hourRange));
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(deleted);

@@ -611,7 +611,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 	{
 		int[] hourRange = new int[2];
 		hourRange[0] = this.startTime.getSelection();
-		hourRange[1] = this.endTime.getSelection();
+		hourRange[1] = this.endTime.getSelection() - 1;
 		return hourRange;
 	}
 

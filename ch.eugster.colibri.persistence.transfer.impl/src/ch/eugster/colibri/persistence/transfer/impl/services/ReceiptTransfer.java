@@ -294,6 +294,7 @@ public class ReceiptTransfer extends AbstractTransfer
 		target.setProviderUpdated(source.isProviderUpdated());
 		target.setReferenceCurrency(referenceCurrency);
 		target.setState(source.getState());
+//		target.setDayOfWeek(source.getDayOfWeek());
 		target.setTimestamp(source.getTimestamp());
 		target.setTransaction(source.getTransaction());
 		target.setTransferred(true);
