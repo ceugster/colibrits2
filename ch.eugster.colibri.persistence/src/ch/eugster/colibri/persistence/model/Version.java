@@ -30,11 +30,11 @@ public class Version extends AbstractEntity
 	 * Achtung, falls eine neue Tabelle eingeführt wird, muss diese in der
 	 * statischen Methode getTableNames aufgeführt werden.
 	 */
-	public static final int STRUCTURE = 27;
+	public static final int STRUCTURE = 28;
 
 	public static final int DATA = 0;
 
-	public static final String DATE = "27.03.2014";
+	public static final String DATE = "08.01.2015";
 
 	@Basic
 	@Column(name = "v_data")

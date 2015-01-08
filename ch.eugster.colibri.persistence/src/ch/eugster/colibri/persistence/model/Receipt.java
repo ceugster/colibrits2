@@ -138,10 +138,10 @@ public class Receipt extends AbstractEntity implements IPrintable
 	@Column(name = "re_hour")
 	private int hour;
 
-//	@Basic
-//	@Index
-//	@Column(name = "re_day_of_week")
-//	private int dayOfWeek;
+	@Basic
+	@Index
+	@Column(name = "re_day_of_week")
+	private int dayOfWeek;
 
 	@Basic
 	@Column(name = "re_rc_quotation")
@@ -216,7 +216,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		super.setTimestamp(timestamp);
 		this.hour = timestamp.get(Calendar.HOUR_OF_DAY);
-//		this.dayOfWeek = timestamp.get(Calendar.DAY_OF_WEEK);
+		this.dayOfWeek = timestamp.get(Calendar.DAY_OF_WEEK);
 	}
 
 	public void addPayment(final Payment payment)
@@ -953,15 +953,15 @@ public class Receipt extends AbstractEntity implements IPrintable
 		this.propertyChangeSupport.firePropertyChange("hour", this.hour, this.hour = hour);
 	}
 
-//	public int getDayOfWeek() 
-//	{
-//		return dayOfWeek;
-//	}
-//
-//	public void setDayOfWeek(int dayOfWeek) 
-//	{
-//		this.propertyChangeSupport.firePropertyChange("dayOfWeek", this.dayOfWeek, this.dayOfWeek = dayOfWeek);
-//	}
+	public int getDayOfWeek() 
+	{
+		return dayOfWeek;
+	}
+
+	public void setDayOfWeek(int dayOfWeek) 
+	{
+		this.propertyChangeSupport.firePropertyChange("dayOfWeek", this.dayOfWeek, this.dayOfWeek = dayOfWeek);
+	}
 
 	public boolean isInternal() 
 	{
