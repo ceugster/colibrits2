@@ -1534,7 +1534,7 @@ public class PositionQuery extends AbstractQuery<Position>
 			expression = expression.and(weekdayExpression);
 		}
 
-		expression.and(new ExpressionBuilder().get("receipt").get("hour").between(hourRange[0], hourRange[1]));
+		expression = expression.and(new ExpressionBuilder().get("receipt").get("hour").between(hourRange[0], hourRange[1]));
 
 		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
 		deleted = deleted.or(new ExpressionBuilder().get("receipt").get("deleted").equal(false));
@@ -1549,8 +1549,10 @@ public class PositionQuery extends AbstractQuery<Position>
 //		reportQuery.addSum("quantity", Integer.class);
 		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
 		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name").ascending());
+		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id").ascending());
 		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("hour").ascending());
 		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"));
+		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"));
 		reportQuery.addGrouping(new ExpressionBuilder().get("receipt").get("hour"));
 		Collection<ReportQueryResult> results =  super.selectReportQueryResults(reportQuery);
 		if (results != null && results.size() > 0)
