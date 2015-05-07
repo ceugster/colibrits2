@@ -246,6 +246,13 @@ public class Ean13 extends AbstractBarcode
 		return (10 - mod);
 	}
 
+	public static void main(String[] args)
+	{
+		String code = "9920000090393";
+		Ean13 result = validate("992", code);
+		System.out.println(result);
+	}
+	
 	private static Ean13 validate(final String prefix, final String code)
 	{
 		if (Ean13.computeChecksum(code.substring(0, code.length() - 1)) == Integer.parseInt(code.substring(code.length() - 1)))
