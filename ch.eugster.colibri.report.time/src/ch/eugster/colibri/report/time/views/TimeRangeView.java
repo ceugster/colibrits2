@@ -232,7 +232,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		endTime = new Spinner(group, SWT.BORDER);
 		endTime.setLayoutData(gridData);
 		endTime.setValues(settings.getInt("end.hour"), 1, 24, 0, 1, 6);
-		startTime.addSelectionListener(new SelectionListener() {
+		endTime.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) 
@@ -409,6 +409,10 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			{
 				try
 				{
+					if (!validSelection())
+					{
+						MessageDialog.openInformation(TimeRangeView.this.getViewSite().getShell(), "Ungültiger Zeitraum", "Die Endstunde muss grösser sein als die Anfangsstunde.");
+					}
 					final JRDataSource dataSource = createDataSource();
 					if (dataSource == null)
 					{
@@ -489,7 +493,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 				break;
 			}
 		}
-		enabled = enabled && startTime.getSelection() < endTime.getSelection();
+		enabled = enabled && validSelection();
 		enabled = enabled && this.selectedDestination != null;
 		enabled = enabled && this.selectedSalespoints != null && this.selectedSalespoints.length > 0;
 		enabled = enabled && this.selectedDateRange != null;
@@ -645,21 +649,9 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 
 	public boolean validSelection()
 	{
-		return startTime.getSelection() < endTime.getSelection();
+		return startTime.getSelection() < (endTime.getSelection());
 	}
 
-//	public String getReportName()
-//	{
-//		String reportName = "DayHourStatistics.jrxml";
-//		IStructuredSelection ssel = (IStructuredSelection) viewer.getSelection();
-//		if (ssel.isEmpty())
-//		{
-//			return null;
-//		}
-//		TimeRangeSelection selection = (TimeRangeSelection) ssel.getFirstElement();
-//		return selection.report();
-//	}
-	
 	private Element createTextField(Namespace ns, int x, int width, int y, int height, String cdata, String textAlignment)
 	{
 		Element textField = new Element("textField", ns);
@@ -701,10 +693,8 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			is.close();
 			
 			Namespace ns = Namespace.getNamespace("http://jasperreports.sourceforge.net/jasperreports");
+			// The pageheader section
 			Element band = document.getRootElement().getChild("pageHeader", ns).getChild("band", ns);
-//			band.removeChildren("textField");
-//			band.addContent(createTextField(0, 80, 4, 12, "$P{name}", "Left"));
-//			band.addContent(createTextField(708, 36, 4, 12, "$P{total}", "Right"));
 			int count = getHours();
 			int width = (708 - 80) / count;
 			for (int i = 0; i < count; i++)
@@ -714,10 +704,8 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 				band.addContent(createTextField(ns, pos, width, 4, 12, "$P{h" + no + "}", "Right"));
 			}
 
+			// The detail section
 			band = document.getRootElement().getChild("detail", ns).getChild("band", ns);
-//			band.removeChildren("textField");
-//			band.addContent(createTextField(0, 80, 4, 12, "$F{name}", "Left"));
-//			band.addContent(createTextField(708, 36, 4, 12, "$V{total}", "Right"));
 			for (int i = 0; i < count; i++)
 			{
 				int pos = 80 + i * width;
@@ -726,9 +714,6 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			}
 
 			band = document.getRootElement().getChild("summary", ns).getChild("band", ns);
-//			band.removeChildren("textField");
-//			band.addContent(createTextField(0, 80, 4, 12, "Total", "Left"));
-//			band.addContent(createTextField(708, 36, 4, 12, "$V{alltotal}", "Right"));
 			for (int i = 0; i < count; i++)
 			{
 				int pos = 80 + i * width;
