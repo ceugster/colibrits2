@@ -984,11 +984,45 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 									log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+
 								}
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
+							else if (structureVersion == 28)
+							{
+								log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_receipt";
+								String columnName = "re_day_of_week";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = "UPDATE " + tableName + " SET " + columnName + " = " + getDatePart(DatePart.WEEKDAY, "re_timestamp");
+									log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
 
+								}
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 29)
+							{
+								log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
+								tableName = "colibri_receipt";
+								String columnName = "re_day_of_week";
+								status = this.columnExists(connection, tableName, columnName);
+								if (status.getSeverity() == IStatus.CANCEL)
+								{
+									sql = "CREATE INDEX idx_re_day_of_week ON colibri_receipt (re_day_of_week ASC)";
+									log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+								}
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							
 							log(LogService.LOG_INFO, "Aktualisiere die Version der Datenbankstruktur auf Version " + structureVersion
 									+ ".");
 							sql = "UPDATE colibri_version SET v_structure = " + structureVersion;
@@ -1085,6 +1119,6 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 
 	public enum DatePart
 	{
-		SECOND, MINUTE, HOUR, DAY, MONTH, YEAR;
+		SECOND, MINUTE, HOUR, DAY, MONTH, YEAR, WEEKDAY;
 	}
 }

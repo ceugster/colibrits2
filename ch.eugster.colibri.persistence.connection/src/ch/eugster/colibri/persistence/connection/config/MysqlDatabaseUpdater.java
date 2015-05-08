@@ -53,6 +53,10 @@ public class MysqlDatabaseUpdater extends DatabaseUpdater
 		{
 			return "YEAR(DATE(" + dateField + "))";
 		}
+		case WEEKDAY:
+		{
+			return "DAYOFWEEK(" + dateField + ")";
+		}
 		default:
 		{
 			throw new IllegalArgumentException("Invalid Datepart: " + datePart.toString());

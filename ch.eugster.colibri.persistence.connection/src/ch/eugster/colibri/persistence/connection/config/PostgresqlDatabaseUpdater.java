@@ -48,6 +48,10 @@ public class PostgresqlDatabaseUpdater extends DatabaseUpdater
 		{
 			return "EXTRACT(YEAR FROM TIMESTAMP " + dateField + ")";
 		}
+		case WEEKDAY:
+		{
+			return "EXTRACT(DOW FROM TIMESTAMP " + dateField + ")";
+		}
 		default:
 		{
 			throw new IllegalArgumentException("Invalid Datepart: " + datePart.toString());

@@ -58,6 +58,10 @@ public class SqlserverDatabaseUpdater extends DatabaseUpdater
 		{
 			return "DATEPART(yyyy, " + dateField + ")";
 		}
+		case WEEKDAY:
+		{
+			return "DATEPART(dw, DATEADD(day, 1, " + dateField + "))";
+		}
 		default:
 		{
 			throw new IllegalArgumentException("Invalid Datepart: " + datePart.toString());

@@ -64,10 +64,15 @@ public class DerbyDatabaseUpdater extends DatabaseUpdater
 		{
 			return "YEAR(" + dateField + ")";
 		}
+		case WEEKDAY:
+		{
+			return "0";
+		}
 		default:
 		{
 			throw new IllegalArgumentException("Invalid Datepart: " + datePart.toString());
 		}
 		}
 	}
+	
 }
