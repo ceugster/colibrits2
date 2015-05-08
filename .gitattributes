@@ -757,6 +757,7 @@ ch.eugster.colibri.client.ui.feature/build.properties -text
 ch.eugster.colibri.client.ui.feature/feature.xml -text
 ch.eugster.colibri.client.ui/.classpath -text
 ch.eugster.colibri.client.ui/.project -text
+ch.eugster.colibri.client.ui/.settings/org.eclipse.jdt.core.prefs -text svneol=unset#text/plain
 ch.eugster.colibri.client.ui/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.client.ui/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.client.ui/build.properties -text
