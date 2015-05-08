@@ -139,6 +139,11 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Column(name = "po_ebook")
 	private boolean ebook;
 
+	@Basic
+	@Convert("booleanConverter")
+	@Column(name = "po_discount_prohibited")
+	private boolean discountProhibited;
+
 	// @Basic
 	// @Column(name = "po_dc_amount", columnDefinition = "DECIMAL(18, 6)")
 	// private double defaultCurrencyAmount;
@@ -345,10 +350,23 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 		this.setTaxPercents(currentTax == null ? 0d : this.getCurrentTax().getPercentage());
 	}
 
+	public boolean applyDiscount()
+	{
+		if (this.isDiscountProhibited())
+		{
+			this.propertyChangeSupport.firePropertyChange("discount", this.discount, this.discount = 0D);
+			return false;
+		}
+		return this.getQuantity() > 0 && (this.getProductGroup() == null || this.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED));
+	}
+	
 	public void setDiscount(double discount)
 	{
-		discount = -Math.abs(discount);
-		this.propertyChangeSupport.firePropertyChange("discount", this.discount, this.discount = discount);
+		if (this.applyDiscount())
+		{
+			discount = -Math.abs(discount);
+			this.propertyChangeSupport.firePropertyChange("discount", this.discount, this.discount = discount);
+		}
 	}
 
 	// public void setExternalProductGroup(final ExternalProductGroup
@@ -780,6 +798,16 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	public void setOrderedQuantity(int orderedQuantity) 
 	{
 		this.propertyChangeSupport.firePropertyChange("orderedQuantity", this.orderedQuantity, this.orderedQuantity = orderedQuantity);
+	}
+
+	public boolean isDiscountProhibited() 
+	{
+		return discountProhibited;
+	}
+
+	public void setDiscountProhibited(boolean discountProhibited) 
+	{
+		this.propertyChangeSupport.firePropertyChange("discountProhibited", this.discountProhibited, this.discountProhibited = discountProhibited);
 	}
 
 	public enum AmountType

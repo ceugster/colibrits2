@@ -106,6 +106,7 @@ public class ProfileReplicator extends AbstractEntityReplicator<Profile>
 		target.setInputNameLabelFg(source.getInputNameLabelFg());
 		target.setInputNameLabelFontSize(source.getInputNameLabelFontSize());
 		target.setInputNameLabelFontStyle(source.getInputNameLabelFontStyle());
+		target.setLeftPercent(source.getLeftPercent());
 		target.setListBg(source.getListBg());
 		target.setListFg(source.getListFg());
 		target.setListFontSize(source.getListFontSize());
@@ -121,14 +122,13 @@ public class ProfileReplicator extends AbstractEntityReplicator<Profile>
 		target.setTabbedPaneFontSize(source.getTabbedPaneFontSize());
 		target.setTabbedPaneFontStyle(source.getTabbedPaneFontStyle());
 		target.setTopLeft(source.getTopLeft());
+		target.setTopPercent(source.getTopPercent());
 		target.setTopRight(source.getTopRight());
 		target.setValueLabelBg(source.getValueLabelBg());
 		target.setValueLabelBgSelected(source.getValueLabelBgSelected());
 		target.setValueLabelFg(source.getValueLabelFg());
 		target.setValueLabelFontSize(source.getValueLabelFontSize());
 		target.setValueLabelFontStyle(source.getValueLabelFontStyle());
-		target.setLeftPercent(source.getLeftPercent());
-		target.setTopPercent(source.getTopPercent());
 		for (Configurable sourceConfigurable : source.getConfigurables())
 		{
 			boolean found = false;

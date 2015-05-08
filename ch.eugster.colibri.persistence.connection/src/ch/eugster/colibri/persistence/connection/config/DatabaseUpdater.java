@@ -985,36 +985,28 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 									result = stm.executeUpdate(sql);
 									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
 
+									sql = "CREATE INDEX idx_re_day_of_week ON colibri_receipt (re_day_of_week ASC)";
+									log(LogService.LOG_INFO, "SQL: " + sql);
+									result = stm.executeUpdate(sql);
+									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
 								}
+								sql = "UPDATE " + tableName + " SET " + columnName + " = " + getDatePart(DatePart.WEEKDAY, "re_timestamp");
+								log(LogService.LOG_INFO, "SQL: " + sql);
+								result = stm.executeUpdate(sql);
+								log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
+
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}
 							else if (structureVersion == 28)
 							{
 								log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
-								tableName = "colibri_receipt";
-								String columnName = "re_day_of_week";
+								tableName = "colibri_position";
+								String columnName = "po_discount_prohibited";
 								status = this.columnExists(connection, tableName, columnName);
 								if (status.getSeverity() == IStatus.CANCEL)
 								{
-									sql = "UPDATE " + tableName + " SET " + columnName + " = " + getDatePart(DatePart.WEEKDAY, "re_timestamp");
-									log(LogService.LOG_INFO, "SQL: " + sql);
-									result = stm.executeUpdate(sql);
-									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
-
-								}
-								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
-										: structureVersion;
-							}
-							else if (structureVersion == 29)
-							{
-								log(LogService.LOG_INFO, "Aktualisiere Datenbank auf Version " + (structureVersion + 1) + "...");
-								tableName = "colibri_receipt";
-								String columnName = "re_day_of_week";
-								status = this.columnExists(connection, tableName, columnName);
-								if (status.getSeverity() == IStatus.CANCEL)
-								{
-									sql = "CREATE INDEX idx_re_day_of_week ON colibri_receipt (re_day_of_week ASC)";
+									sql = getAddColumnStatement(tableName, columnName, "SMALLINT", "0", false);
 									log(LogService.LOG_INFO, "SQL: " + sql);
 									result = stm.executeUpdate(sql);
 									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");

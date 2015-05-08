@@ -198,6 +198,11 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 			final int quantity = ((Integer)this.galserve.menge()).intValue();
 			position.setQuantity(quantity == 0 ? 1 : quantity);
 		}
+		position.setDiscountProhibited(((Boolean)this.galserve.keinrabatt()).booleanValue());
+		if (position.isDiscountProhibited())
+		{
+			position.setDiscount(0D);
+		}
 
 		setExternalProductGroup(position);
 		setTax(position);

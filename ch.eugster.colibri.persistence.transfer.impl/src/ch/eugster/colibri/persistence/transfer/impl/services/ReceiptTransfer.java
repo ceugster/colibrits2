@@ -1,5 +1,7 @@
 package ch.eugster.colibri.persistence.transfer.impl.services;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
@@ -294,8 +296,8 @@ public class ReceiptTransfer extends AbstractTransfer
 		target.setProviderUpdated(source.isProviderUpdated());
 		target.setReferenceCurrency(referenceCurrency);
 		target.setState(source.getState());
-//		target.setDayOfWeek(source.getDayOfWeek());
 		target.setTimestamp(source.getTimestamp());
+		target.setDayOfWeek(target.getTimestamp().get(Calendar.DAY_OF_WEEK));
 		target.setTransaction(source.getTransaction());
 		target.setTransferred(true);
 		target.setUpdate(source.getUpdate());
@@ -361,10 +363,12 @@ public class ReceiptTransfer extends AbstractTransfer
 		target.setCurrentTax(currentTax);
 		target.setDeleted(source.isDeleted());
 		target.setDiscount(source.getDiscount());
+		target.setDiscountProhibited(source.isDiscountProhibited());
 		target.setForeignCurrency(foreignCurrency);
 		target.setOption(source.getOption());
 		target.setOrder(source.getOrder());
 		target.setOrdered(source.isOrdered());
+		target.setOrderedQuantity(source.getOrderedQuantity());
 		target.setPrice(source.getPrice());
 		target.setQuantity(source.getQuantity());
 		target.setSearchValue(source.getSearchValue());

@@ -305,18 +305,9 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		Collection<Position> positions = this.receipt.getPositions();
 		for (final Position position : positions)
 		{
-			if (position.getQuantity() > 0 && position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
-			{
-				position.setDiscount(discount);
-			}
+			position.setDiscount(discount);
 		}
-//		this.userPanel.getPositionWrapper().preparePosition(this.receipt);
 		this.fireReceiptChangeEvent(new ReceiptChangeEvent(null, this.receipt));
-//		final EventAdmin eventAdmin = (EventAdmin) this.eventServiceTracker.getService();
-//		if (eventAdmin != null)
-//		{
-//			eventAdmin.sendEvent(this.getEvent(Topic.POSITION_ADDED.topic(), positions[positions.length - 1]));
-//		}
 	}
 	
 	public void storeReceipt()

@@ -975,6 +975,19 @@ public class Receipt extends AbstractEntity implements IPrintable
 	{
 		this.propertyChangeSupport.firePropertyChange("dayOfWeek", this.dayOfWeek, this.dayOfWeek = dayOfWeek);
 	}
+	
+	public boolean applyDiscount()
+	{
+		List<Position> positions = this.getPositions();
+		for (Position position : positions)
+		{
+			if (position.applyDiscount())
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public boolean isInternal() 
 	{
