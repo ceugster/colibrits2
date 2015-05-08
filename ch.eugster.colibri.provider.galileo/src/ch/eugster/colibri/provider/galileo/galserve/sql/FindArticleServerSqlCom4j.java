@@ -198,6 +198,11 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 			final int quantity = ((Integer)this.galserve.menge()).intValue();
 			position.setQuantity(quantity == 0 ? 1 : quantity);
 		}
+		position.setDiscountProhibited(((Boolean)this.galserve.keinrabatt()).booleanValue());
+		if (position.isDiscountProhibited())
+		{
+			position.setDiscount(0D);
+		}
 
 		setExternalProductGroup(position);
 		setTax(position);
@@ -325,7 +330,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		{
 			CommonSettingsQuery commonSettingsQuery = (CommonSettingsQuery) persistenceService.getCacheService().getQuery(CommonSettings.class);
 			CommonSettings commonSettings = commonSettingsQuery.findDefault();
-			ProductGroup productGroup = commonSettings.getDefaultProductGroup();
+			ProductGroup productGroup = commonSettings.getEBooks();
 			position.setProductGroup(productGroup);
 			Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(Activator.getDefault().getConfiguration().getProviderId());
 			if (!mappings.isEmpty())
