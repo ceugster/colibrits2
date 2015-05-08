@@ -15,12 +15,13 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.osgi.framework.Bundle;
 
 import ch.eugster.colibri.report.Activator;
 
 public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor
 {
-	public static final String TITLE = "ColibriTS II";
+	public static final String TITLE = "ColibriTS II Auswertungen";
 
 	private IDialogSettings settings;
 
@@ -52,7 +53,7 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 	{
 		super.postWindowOpen();
 
-		this.getWindowConfigurer().setTitle(TITLE);
+		this.getWindowConfigurer().setTitle(prepareTitle());
 
 		IActionBarConfigurer configurer = getWindowConfigurer().getActionBarConfigurer();
 		/* deletes unwanted Contribution from Toolbar */
@@ -211,4 +212,19 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 		configurer.setShowPerspectiveBar(false);
 		configurer.setShowProgressIndicator(true);
 	}
+
+	public String prepareTitle()
+	{
+		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
+		for (Bundle bundle : bundles)
+		{
+			if (bundle.getSymbolicName().equals("ch.eugster.colibri.product"))
+			{
+				String version = bundle.getHeaders().get("Bundle-Version");
+				return TITLE + " v" + version == null ? "???" : version;
+			}
+		}
+		return TITLE;
+	}
+
 }
