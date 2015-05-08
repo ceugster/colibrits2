@@ -215,16 +215,18 @@ public class ReportApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvi
 
 	public String prepareTitle()
 	{
+		String title = TITLE;
 		Bundle[] bundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
 		for (Bundle bundle : bundles)
 		{
 			if (bundle.getSymbolicName().equals("ch.eugster.colibri.product"))
 			{
 				String version = bundle.getHeaders().get("Bundle-Version");
-				return TITLE + " v" + version == null ? "???" : version;
+				title = TITLE + " v" + (version == null ? "???" : version);
+				break;
 			}
 		}
-		return TITLE;
+		return title;
 	}
 
 }
