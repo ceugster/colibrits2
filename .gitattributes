@@ -1896,6 +1896,7 @@ ch.eugster.colibri.report.feature/build.properties -text
 ch.eugster.colibri.report.feature/feature.xml -text
 ch.eugster.colibri.report.list/.classpath -text
 ch.eugster.colibri.report.list/.project -text
+ch.eugster.colibri.report.list/.settings/org.eclipse.jdt.core.prefs -text svneol=unset#text/plain
 ch.eugster.colibri.report.list/.settings/org.eclipse.pde.core.prefs -text
 ch.eugster.colibri.report.list/META-INF/MANIFEST.MF -text
 ch.eugster.colibri.report.list/build.properties -text
