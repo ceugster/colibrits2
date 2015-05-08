@@ -250,7 +250,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	
 	public void clearPayments()
 	{
-		final Payment[] payments = this.payments.toArray(new Payment[0]);
+		final List<Payment> payments = this.getAllPayments();
 		for (final Payment payment : payments)
 		{
 			this.removePayment(payment);
@@ -323,7 +323,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public List<Payment> getDeletedPayments()
 	{
 		final List<Payment> payments = new Vector<Payment>();
-		for (final Payment payment : this.payments)
+		for (final Payment payment : this.getAllPayments())
 		{
 			if (payment.isDeleted())
 			{
@@ -373,12 +373,28 @@ public class Receipt extends AbstractEntity implements IPrintable
 
 	public List<Payment> getPayments()
 	{
-		return this.payments;
+		List<Payment> activePayments = new Vector<Payment>();
+		for (Payment payment : this.getAllPayments())
+		{
+			if (!payment.isDeleted())
+			{
+				activePayments.add(payment);
+			}
+		}
+		return activePayments;
 	}
 
 	public List<Position> getPositions()
 	{
-		return positions;
+		List<Position> activePositions = new Vector<Position>();
+		for (Position position : this.positions)
+		{
+			if (!position.isDeleted())
+			{
+				activePositions.add(position);
+			}
+		}
+		return activePositions;
 	}
 
 	public Long getNumber()
@@ -461,13 +477,10 @@ public class Receipt extends AbstractEntity implements IPrintable
 	public double getPositionAmount(final Receipt.QuotationType quotationType, final AmountType amountType)
 	{
 		double amount = 0d;
-		final List<Position> positions = this.getPositions();
+		List<Position> positions = this.getPositions();
 		for (final Position position : positions)
 		{
-			if (!position.isDeleted())
-			{
-				amount += position.getAmount(quotationType, amountType);
-			}
+			amount += position.getAmount(quotationType, amountType);
 		}
 		return amount;
 	}
@@ -481,7 +494,7 @@ public class Receipt extends AbstractEntity implements IPrintable
 		{
 			for (final Option option : options)
 			{
-				if (!position.isDeleted() && position.getOption().equals(option))
+				if (position.getOption().equals(option))
 				{
 					amount += position.getAmount(quotationType, amountType);
 				}
