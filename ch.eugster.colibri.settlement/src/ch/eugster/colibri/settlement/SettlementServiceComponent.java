@@ -186,8 +186,7 @@ public class SettlementServiceComponent implements SettlementService
 	private List<SettlementPosition> getPositions(final ConnectionService service, final Settlement settlement)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		List<SettlementPosition> positions = query.selectPositions(settlement);
-		return positions;
+		return query.selectPositions(settlement);
 	}
 
 	private List<SettlementPayedInvoice> getPayedInvoices(final ConnectionService service,
