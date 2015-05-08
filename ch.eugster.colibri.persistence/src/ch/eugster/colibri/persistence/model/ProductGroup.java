@@ -200,9 +200,23 @@ public class ProductGroup extends AbstractEntity implements IReplicatable
 		return mappings;
 	}
 
-	public List<ProductGroupMapping> getProductGroupMappings()
+	public List<ProductGroupMapping> getAllProductGroupMappings()
 	{
 		return this.productGroupMappings;
+	}
+
+	public List<ProductGroupMapping> getProductGroupMappings()
+	{
+		List<ProductGroupMapping> activeMappings = new Vector<ProductGroupMapping>();
+		List<ProductGroupMapping> mappings = getAllProductGroupMappings();
+		for (ProductGroupMapping mapping : mappings)
+		{
+			if (!mapping.isDeleted() && !mapping.getExternalProductGroup().isDeleted())
+			{
+				activeMappings.add(mapping);
+			}
+		}
+		return activeMappings;
 	}
 
 	/*

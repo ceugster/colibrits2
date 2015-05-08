@@ -68,6 +68,7 @@ public class SetEBookHandler extends AbstractPersistenceClientHandler
 	@Override
 	public void setEnabled(final Object evaluationContext)
 	{
+		boolean enabled = false;
 		if (evaluationContext instanceof EvaluationContext)
 		{
 			final EvaluationContext ctx = (EvaluationContext) evaluationContext;
@@ -81,13 +82,16 @@ public class SetEBookHandler extends AbstractPersistenceClientHandler
 					final ProductGroup productGroup = (ProductGroup) ssel.getFirstElement();
 					if (productGroup.getProductGroupType().equals(ProductGroupType.SALES_RELATED))
 					{
-						ProductGroup eBooks = getEBooks();
-						boolean enabled = eBooks == null || !eBooks.getId().equals(productGroup.getId());
-						this.setBaseEnabled(enabled);
+						if (!productGroup.getProductGroupMappings().isEmpty())
+						{
+							ProductGroup eBooks = getEBooks();
+							enabled = eBooks == null || !eBooks.getId().equals(productGroup.getId());
+						}
 					}
 				}
 			}
 		}
+		this.setBaseEnabled(enabled);
 	}
 	
 	private ProductGroup getEBooks()

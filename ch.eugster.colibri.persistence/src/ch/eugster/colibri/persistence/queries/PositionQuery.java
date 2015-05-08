@@ -1500,7 +1500,7 @@ public class PositionQuery extends AbstractQuery<Position>
 				sps = sps.or(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint")
 						.equal(salespoints[i]));
 			}
-			expression.and(sps);
+			expression = expression.and(sps);
 		}
 
 		Expression dateRangeExpression = null;

@@ -325,7 +325,7 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 		{
 			CommonSettingsQuery commonSettingsQuery = (CommonSettingsQuery) persistenceService.getCacheService().getQuery(CommonSettings.class);
 			CommonSettings commonSettings = commonSettingsQuery.findDefault();
-			ProductGroup productGroup = commonSettings.getDefaultProductGroup();
+			ProductGroup productGroup = commonSettings.getEBooks();
 			position.setProductGroup(productGroup);
 			Collection<ProductGroupMapping> mappings = productGroup.getProductGroupMappings(Activator.getDefault().getConfiguration().getProviderId());
 			if (!mappings.isEmpty())

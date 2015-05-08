@@ -503,14 +503,41 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 			}
 			else
 			{
-				value = this.convert(receipt.getCustomerCode());
+				value = this.convert(extractCustomerCodeFromEAN(receipt.getCustomerCode()));
 			}
 		}
 		else
 		{
-			value = this.convert(receipt.getCustomerCode());
+			value = this.convert(extractCustomerCodeFromEAN(receipt.getCustomerCode()));
 		}
 		return value == null ? Integer.valueOf(0) : value;
+	}
+	
+	protected String extractCustomerCodeFromEAN(String code)
+	{
+		String customerCode = code;
+		if (customerCode.startsWith(Barcode.PREFIX_CUSTOMER) || (customerCode.length() == Barcode.EAN13_LENGTH || customerCode.length() == Barcode.EAN13_LENGTH - 1))
+		{
+			customerCode = customerCode.substring(Barcode.PREFIX_CUSTOMER.length());
+			while (customerCode.startsWith("0"))
+			{
+				customerCode = customerCode.substring(1);
+			}
+		}
+		return customerCode;
+	}
+
+	protected String buildEANFromCustomerCode(String code)
+	{
+		String eanCode = code;
+		int currentSize = eanCode.length() + Barcode.PREFIX_CUSTOMER.length();
+		StringBuilder builder = new StringBuilder();
+		for (int i = currentSize; i < 12; i++)
+		{
+			builder = builder.append("0");
+		}
+		eanCode = Barcode.PREFIX_CUSTOMER + builder.toString() + code;
+		return eanCode;
 	}
 
 	protected String getTaxCode(Position position)
@@ -773,13 +800,7 @@ public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
 		}
 		else
 		{
-			int currentSize = code.length() + Barcode.PREFIX_CUSTOMER.length();
-			StringBuilder builder = new StringBuilder();
-			for (int i = currentSize; i < 12; i++)
-			{
-				builder = builder.append("0");
-			}
-			customerCode = Barcode.PREFIX_CUSTOMER + builder.toString() + code;
+			customerCode = buildEANFromCustomerCode(code);
 		}
 		BarcodeVerifier[] verifiers = this.getBarcodeVerifiers();
 		Barcode barcode = null;
