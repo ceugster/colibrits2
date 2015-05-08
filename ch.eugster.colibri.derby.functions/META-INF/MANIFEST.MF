@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Functions Library for Derby
+Bundle-SymbolicName: ch.eugster.colibri.derby.functions
+Bundle-Version: 1.0.0
+Bundle-Vendor: Christian Eugster
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: ch.eugster.colibri.derby.functions

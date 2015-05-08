@@ -979,6 +979,15 @@ ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplication.ja
 ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplicationActionBarAdvisor.java -text
 ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplicationWorkbenchAdvisor.java -text
 ch.eugster.colibri.client/src/ch/eugster/colibri/client/app/ClientApplicationWorkbenchWindowAdvisor.java -text
+ch.eugster.colibri.derby.functions/.classpath -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/.project -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/.settings/org.eclipse.jdt.core.prefs -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/.settings/org.eclipse.pde.core.prefs -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/META-INF/MANIFEST.MF -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/build.properties -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/readme.jardesc -text svneol=unset#text/plain
+ch.eugster.colibri.derby.functions/scripts/create_date_part_function.sql -text
+ch.eugster.colibri.derby.functions/src/ch/eugster/colibri/derby/functions/Timestamp.java -text svneol=unset#text/plain
 ch.eugster.colibri.display.feature/.project -text
 ch.eugster.colibri.display.feature/build.properties -text
 ch.eugster.colibri.display.feature/feature.xml -text

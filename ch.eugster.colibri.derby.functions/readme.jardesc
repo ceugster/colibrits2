@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="WINDOWS-1252" standalone="no"?>
+<jardesc>
+    <jar path="C:/Projekte/Colibrits2/Product/plugins/ch.eugster.colibri.derby.functions_1.0.0.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/ch.eugster.colibri.derby.functions/readme.jardesc" exportErrors="false" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
+    <manifest generateManifest="false" manifestLocation="/ch.eugster.colibri.derby.functions/META-INF/MANIFEST.MF" manifestVersion="1.0" reuseManifest="false" saveManifest="false" usesManifest="true">
+        <sealing sealJar="false">
+            <packagesToSeal/>
+            <packagesToUnSeal/>
+        </sealing>
+    </manifest>
+    <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
+        <folder path="/ch.eugster.colibri.derby.functions/scripts"/>
+        <javaElement handleIdentifier="=ch.eugster.colibri.derby.functions/src"/>
+        <folder path="/ch.eugster.colibri.derby.functions/META-INF"/>
+    </selectedElements>
+</jardesc>
