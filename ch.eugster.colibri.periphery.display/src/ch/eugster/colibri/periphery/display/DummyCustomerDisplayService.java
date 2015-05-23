@@ -1,6 +1,5 @@
 package ch.eugster.colibri.periphery.display;
 
-import ch.eugster.colibri.periphery.converters.Converter;
 import ch.eugster.colibri.periphery.display.service.AbstractCustomerDisplayService;
 
 public class DummyCustomerDisplayService extends AbstractCustomerDisplayService {
