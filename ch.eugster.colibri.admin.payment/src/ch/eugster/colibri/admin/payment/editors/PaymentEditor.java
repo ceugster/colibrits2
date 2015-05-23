@@ -229,7 +229,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 			this.percentualCharge.setValue(paymentType.getPercentualCharge());
 			this.fixCharge.setValue(paymentType.getFixCharge());
 			this.percentualCharge.getControl().setEnabled(chargeType.equals(ChargeType.PERCENTUAL));
-			this.fixCharge.getControl().setEnabled(chargeType.equals(ChargeType.AMOUNT));
+			this.fixCharge.getControl().setEnabled(chargeType.equals(ChargeType.AMOUNT) || chargeType.equals(ChargeType.PERCENTUAL));
 		}
 		this.setDirty(false);
 	}
@@ -615,7 +615,7 @@ public class PaymentEditor extends AbstractEntityEditor<PaymentType>
 				{
 					ChargeType chargeType = (ChargeType) event.widget.getData("charge.type");
 					percentualCharge.getControl().setEnabled(chargeType.equals(ChargeType.PERCENTUAL));
-					fixCharge.getControl().setEnabled(chargeType.equals(ChargeType.AMOUNT));
+					fixCharge.getControl().setEnabled(chargeType.equals(ChargeType.AMOUNT) || chargeType.equals(ChargeType.PERCENTUAL));
 					PaymentEditor.this.setDirty(true);
 				}
 			});
