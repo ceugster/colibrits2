@@ -2126,7 +2126,6 @@ ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplication.ja
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationActionBarAdvisor.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationWorkbenchAdvisor.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationWorkbenchWindowAdvisor.java -text
-ch.eugster.colibri.report/src/ch/eugster/colibri/report/app/ReportApplicationWorkbenchWindowAdvisor_old.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/engine/ReportService.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/engine/ReportServiceComponent.java -text
 ch.eugster.colibri.report/src/ch/eugster/colibri/report/internal/viewer/DefaultHyperlinkHandler.java -text
