@@ -12,6 +12,7 @@ import ch.eugster.colibri.display.area.ILayoutAreaType;
 import ch.eugster.colibri.persistence.model.Currency;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
+import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
@@ -147,9 +148,24 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 		@Override
 		public String replace(final ILayoutArea layoutArea, final IPrintable printable, final String marker)
 		{
+			NumberFormat defaultCurrencyFormat = NumberFormat.getNumberInstance();
+			NumberFormat foreignCurrencyFormat = NumberFormat.getNumberInstance();
+
 			if (printable instanceof Payment)
 			{
 				final Payment payment = (Payment) printable;
+
+				Currency defaultCurrency = payment.getReceipt().getDefaultCurrency();
+				Currency foreignCurrency = payment.getReceipt().getForeignCurrency();
+
+				double defaultCurrencyAmount = payment.getReceipt().getPaymentDefaultCurrencyBackAmount();
+				double foreignCurrencyAmount = payment.getReceipt().getPaymentDefaultForeignCurrencyBackAmount();
+
+				String defaultCurrencyLabel = "";
+				String defaultCurrencyAmountLabel = "";
+
+				String foreignCurrencyLabel = "";
+				String foreignCurrencyAmountLabel = "";
 
 				switch (this)
 				{
@@ -224,20 +240,50 @@ public class PaymentAddedMessageArea extends AbstractLayoutArea implements ILayo
 					}
 					case Y:
 					{
-						amountFormatter.setCurrency(payment.getPaymentType().getCurrency().getCurrency());
-						amountFormatter.setMaximumFractionDigits(payment.getPaymentType().getCurrency().getCurrency().getDefaultFractionDigits());
-						amountFormatter.setMinimumFractionDigits(payment.getPaymentType().getCurrency().getCurrency().getDefaultFractionDigits());
-						double amount = payment.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY);
-						String amountText = amountFormatter.format(amount);
-						if (!payment.getPaymentType().getCurrency().getId().equals(payment.getReceipt().getDefaultCurrency().getId()))
+						if (payment.getReceipt().getPositionAmount(Receipt.QuotationType.REFERENCE_CURRENCY, Position.AmountType.NETTO) != 0D)
 						{
-							amountText = payment.getPaymentType().getCurrency().getCode() + " " + amountText;
+							if (payment.getReceipt().getPaymentDefaultCurrencyBackAmount() == payment.getReceipt().getPositionDefaultCurrencyAmount(AmountType.NETTO))
+							{
+								defaultCurrencyAmount = payment.getReceipt().getPaymentDefaultCurrencyBackAmount();
+								foreignCurrencyAmount = payment.getReceipt().getPaymentDefaultForeignCurrencyBackAmount();
+							}
+							else
+							{
+								defaultCurrencyAmount = payment.getReceipt().getPaymentDefaultCurrencyAmount() - payment.getReceipt().getPaymentDefaultCurrencyBackAmount();
+								foreignCurrencyAmount = payment.getReceipt().getPaymentDefaultForeignCurrencyAmount() - payment.getReceipt().getPaymentDefaultForeignCurrencyBackAmount();
+							}
 						}
-						int articleTextLen = marker.length() - amountText.length();
-						String articleText = getText(payment, articleTextLen);
-						String value = articleText + amountText;
-						value = layoutArea.replaceMarker(value, marker, true);
-						return value;
+
+						if (foreignCurrency == null || !defaultCurrency.getId().equals(foreignCurrency.getId()))
+						{
+							final java.util.Currency fc = java.util.Currency.getInstance(foreignCurrency.getCode());
+							foreignCurrencyFormat.setMaximumFractionDigits(fc.getDefaultFractionDigits());
+							foreignCurrencyFormat.setMinimumFractionDigits(fc.getDefaultFractionDigits());
+							foreignCurrencyLabel = foreignCurrency.getCode();
+							foreignCurrencyAmountLabel = foreignCurrencyFormat.format(foreignCurrencyAmount);
+						}
+
+						final java.util.Currency dc = java.util.Currency.getInstance(defaultCurrency.getCode());
+						if (defaultCurrencyFormat.getMaximumFractionDigits() != dc.getDefaultFractionDigits())
+						{
+							defaultCurrencyFormat.setMaximumFractionDigits(dc.getDefaultFractionDigits());
+						}
+						if (defaultCurrencyFormat.getMinimumFractionDigits() != dc.getDefaultFractionDigits())
+						{
+							defaultCurrencyFormat.setMinimumFractionDigits(dc.getDefaultFractionDigits());
+						}
+						if (!defaultCurrencyLabel.equals(defaultCurrency.getCode()))
+						{
+							defaultCurrencyLabel = defaultCurrency.getCode();
+						}
+						defaultCurrencyAmountLabel = defaultCurrencyFormat.format(defaultCurrencyAmount);
+
+						String amount = foreignCurrencyLabel.isEmpty() 
+								? defaultCurrencyLabel + " " + defaultCurrencyFormat.format(defaultCurrencyAmount)
+								: foreignCurrencyLabel + " " + foreignCurrencyFormat.format(foreignCurrencyAmount);
+						int articleTextLen = marker.length() - amount.length();
+						String received = pad("Erhalten", articleTextLen);
+						return layoutArea.replaceMarker(received + amount, marker, false);
 					}
 					case Z:
 					{
