@@ -381,13 +381,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		{
 			userPanel.getReceiptWrapper().parkReceipt();
 		}
-		for (int i = 0; i < this.getTabCount(); i++)
-		{
-			if (this.getComponent(i) == userPanel)
-			{
-				this.remove(userPanel);
-			}
-		}
+		this.remove(userPanel);
 		userPanel.dispose();
 		UIJob job = new UIJob("")
 		{
