@@ -191,7 +191,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 					if (this.getReceiptWrapper().getReceipt().applyDiscount())
 					{
 						final String title = "Rabattvergabe";
-						final String message = "<html>Soll der gewählte Rabatt auf alle vorhandenen Positionen angewendet werden?<br>Positionen, die keinen Rabatt erlauben, werden nicht berücksichtigt!</html>";
+						final String message = "Soll der gewählte Rabatt auf alle vorhandenen Positionen angewendet werden? Positionen, die keinen Rabatt erlauben, werden nicht berücksichtigt!";
 						final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_QUESTION;
 						if (MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.profile, title, message,
 								messageType) == MessageDialog.BUTTON_YES)
