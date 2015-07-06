@@ -217,7 +217,8 @@ public class ProductGroupView extends ViewPart implements IViewPart, ISelectionL
 				@Override
 				public String getText(Object element) 
 				{
-					return ((Type) element).label();
+					String[] values = (String[]) element;
+					return values[0];
 				}
 			});
 			providerViewer.setInput(providers);
