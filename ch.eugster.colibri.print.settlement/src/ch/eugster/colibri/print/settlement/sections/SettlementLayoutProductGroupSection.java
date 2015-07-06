@@ -4,7 +4,10 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Currency;
+import java.util.List;
 
 import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.SettlementPosition;
@@ -62,7 +65,8 @@ public class SettlementLayoutProductGroupSection extends AbstractLayoutSection
 			if (printable instanceof Settlement)
 			{
 				final Settlement settlement = (Settlement) printable;
-				final Collection<SettlementPosition> positions = settlement.getPositions();
+				final List<SettlementPosition> positions = settlement.getPositions();
+				Collections.sort(positions);
 				for (final SettlementPosition position : positions)
 				{
 					if (position.getProductGroupType().equals(ProductGroupType.SALES_RELATED))
