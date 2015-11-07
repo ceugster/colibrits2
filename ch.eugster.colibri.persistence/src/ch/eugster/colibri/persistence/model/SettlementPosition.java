@@ -50,20 +50,35 @@ public class SettlementPosition extends SettlementAbstractPosition implements Co
 	}
 
 	@Override
-	public int compareTo(final SettlementPosition other)
+	public int compareTo(SettlementPosition other)
 	{
-		int result = this.compareTypes(this.getProductGroup().getProductGroupType(), other.getProductGroup()
-				.getProductGroupType());
-		if (result == 0)
+		int comparison = compareTypes(this.getProductGroup().getProductGroupType(), other.getProductGroup().getProductGroupType());
+		if (comparison == 0)
 		{
-			result = this.compareCodes(this.getProductGroup().getCode(), other.getProductGroup().getCode());
-			if (result == 0)
+			comparison = compareCodes(this.getCode(), other.getCode());
+			if (comparison == 0)
 			{
-				result = this.compareNames(this.getProductGroup().getName(), other.getProductGroup().getName());
+				comparison = compareNames(this.getName(), other.getName());
 			}
 		}
-		return result;
+		return comparison;
 	}
+
+//	@Override
+//	public int compareTo(final SettlementPosition other)
+//	{
+//		int result = this.compareTypes(this.getProductGroup().getProductGroupType(), other.getProductGroup()
+//				.getProductGroupType());
+//		if (result == 0)
+//		{
+//			result = this.compareCodes(this.getProductGroup().getCode(), other.getProductGroup().getCode());
+//			if (result == 0)
+//			{
+//				result = this.compareNames(this.getProductGroup().getName(), other.getProductGroup().getName());
+//			}
+//		}
+//		return result;
+//	}
 
 	public int getQuantity()
 	{
@@ -93,22 +108,15 @@ public class SettlementPosition extends SettlementAbstractPosition implements Co
 		}
 		if (thisCode == null)
 		{
-			return -1;
+			return 1;
 		}
 		else if (otherCode == null)
 		{
-			return 1;
+			return -1;
 		}
 		else
 		{
-			if (thisCode.equals(otherCode))
-			{
-				return 0;
-			}
-			else
-			{
-				return thisCode.compareTo(otherCode);
-			}
+			return thisCode.compareTo(otherCode);
 		}
 	}
 
