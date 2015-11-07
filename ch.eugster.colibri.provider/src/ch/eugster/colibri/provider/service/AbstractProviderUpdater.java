@@ -62,6 +62,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 									{
 										serverPosition.setServerUpdated(true);
 										serverPosition.setProviderBooked(position.isProviderBooked());
+										serverPosition.setProviderState(position.getProviderState());
 										persistenceService.getServerService().merge(serverPosition);
 									}
 									position.setServerUpdated(true);
@@ -133,6 +134,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 									Payment serverPayment = (Payment) persistenceService.getServerService().find(Payment.class, payment.getOtherId());
 									serverPayment.setServerUpdated(true);
 									serverPayment.setProviderBooked(payment.isProviderBooked());
+									serverPayment.setProviderState(payment.getProviderState());
 									persistenceService.getServerService().merge(serverPayment);
 								}
 								catch (Exception e)
