@@ -747,7 +747,31 @@ public class Receipt extends AbstractEntity implements IPrintable
 
 	public boolean isProviderUpdated()
 	{
-		return this.providerUpdated;
+		if (this.state.equals(Receipt.State.REVERSED))
+		{
+			List<Position> positions = this.getPositions();
+			for (Position position : positions)
+			{
+				if (position.isBookProvider() && position.isProviderBooked())
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		else if (this.state.equals(Receipt.State.SAVED))
+		{
+			List<Position> positions = this.getPositions();
+			for (Position position : positions)
+			{
+				if (position.isBookProvider() && !position.isProviderBooked())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		return true;
 	}
 
 	public boolean isTransferred()
