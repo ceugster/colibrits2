@@ -15,13 +15,14 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 
@@ -264,7 +265,7 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 		{
 			return null;
 		}
-		Collection<SettlementEntry> entries = new ArrayList<SettlementEntry>();
+		List<SettlementEntry> entries = new ArrayList<SettlementEntry>();
 		entries.addAll(createPositionSection(new HashMap<Long, SettlementEntry>(), settlement.getPositions()).values());
 		entries.addAll(createPaymentSection(new HashMap<Long, SettlementEntry>(), settlement.getPayments(),
 				settlement.getSalespoint().getCommonSettings().getReferenceCurrency()).values());
@@ -278,10 +279,8 @@ public class SettlementNumberComposite extends AbstractSettlementCompositeChild 
 				.values());
 		entries.addAll(createDetailSection(new HashMap<Long, SettlementEntry>(), settlement.getDetails()).values());
 		entries.addAll(createMoneySection(new HashMap<Long, SettlementEntry>(), settlement.getMoneys()).values());
-
+		Collections.sort(entries);
 		SettlementEntry[] allEntries = entries.toArray(new SettlementEntry[0]);
-		Arrays.sort(allEntries);
-
 		return allEntries.length == 0 ? null : new JRMapArrayDataSource(allEntries);
 	}
 
