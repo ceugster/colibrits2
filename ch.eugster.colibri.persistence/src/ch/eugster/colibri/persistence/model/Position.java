@@ -171,6 +171,19 @@ public class Position extends AbstractEntity implements IPrintable, Comparator<P
 	@Column(name = "po_provider")
 	private String provider;
 
+	/*
+	 * ProviderStates (see <code>ch.eugster.colibri.provider.configuration.ProviderState</code>:
+	 * 0 	= OPEN
+	 * 1 	= RESERVED (only for voucher provider)
+	 * 2 	= BOOKED
+	 * 4 	= ORDER_DELETED
+	 * 8 	= INVOICE_PAYED
+	 * 16 	= TRANSACTION_WRITTEN
+	 * 32	= BOOK_ERROR
+	 * 64 	= DELETE_ORDER_ERROR
+	 * 128 	= PAY_INVOICE_ERROR
+	 * 256 	= WRITE_TRANSACTION_ERROR
+	 */
 	@Basic
 	@Column(name = "po_provider_state")
 	private int providerState = 0;
