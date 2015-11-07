@@ -31,6 +31,7 @@ import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.SalespointReceiptPrinterSettings;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
+import ch.eugster.colibri.provider.service.ProviderQuery;
 
 public class PrintReceiptAction extends UserPanelProfileAction implements ListSelectionListener, TableModelListener
 {
@@ -60,13 +61,38 @@ public class PrintReceiptAction extends UserPanelProfileAction implements ListSe
 				.getReceiptPrinterSettings();
 		if (settings != null)
 		{
+			final ServiceTracker<ProviderQuery, ProviderQuery> ProviderQueryTracker = new ServiceTracker<ProviderQuery, ProviderQuery>(Activator.getDefault().getBundle().getBundleContext(),
+					ProviderQuery.class, null);
+			ProviderQueryTracker.open();
+			try
+			{
+				final ProviderQuery providerQuery = (ProviderQuery) ProviderQueryTracker.getService();
+				if (providerQuery != null)
+				{
+					if (receipt.getCustomer() == null && receipt.getCustomerCode() != null && !receipt.getCustomerCode().isEmpty())
+					{
+						providerQuery.updateCustomer(receipt);
+					}
+				}
+			}
+			finally
+			{
+				ProviderQueryTracker.close();
+			}
 			final ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle()
 					.getBundleContext(), EventAdmin.class, null);
 			eventAdminTracker.open();
-			final EventAdmin eventAdmin = (EventAdmin) eventAdminTracker.getService();
-			if (eventAdmin != null)
+			try
 			{
-				eventAdmin.sendEvent(this.getEvent(receipt));
+				final EventAdmin eventAdmin = (EventAdmin) eventAdminTracker.getService();
+				if (eventAdmin != null)
+				{
+					eventAdmin.sendEvent(this.getEvent(receipt));
+				}
+			}
+			finally
+			{
+				eventAdminTracker.close();
 			}
 		}
 	}

@@ -89,8 +89,8 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 				}
 				try
 				{
-					this.tableModel.setReceipt((Receipt) persistenceService.getCacheService().merge(receipt, false),
-							this.selectionModel.getMinSelectionIndex());
+					receipt = (Receipt) persistenceService.getCacheService().merge(receipt, false);
+					this.tableModel.setReceipt(receipt, this.selectionModel.getMinSelectionIndex());
 				} 
 				catch (Exception ex) 
 				{
