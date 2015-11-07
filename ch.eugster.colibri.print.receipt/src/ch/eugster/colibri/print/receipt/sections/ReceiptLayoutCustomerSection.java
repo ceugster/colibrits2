@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import ch.eugster.colibri.persistence.model.PrintoutArea.PrintOption;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.print.section.AbstractLayoutSection;
@@ -153,7 +154,7 @@ public class ReceiptLayoutCustomerSection extends AbstractLayoutSection
 						}
 						case S:
 						{
-							double account = receipt.getCustomer().getAccount();
+							double account = computeAmount(receipt.getCustomer().getAccount(), receipt);
 							amountFormatter.setMaximumFractionDigits(receipt.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
 							amountFormatter.setMinimumFractionDigits(receipt.getDefaultCurrency().getCurrency().getDefaultFractionDigits());
 							return layoutSection.replaceMarker(amountFormatter.format(account), marker, false);
@@ -167,7 +168,20 @@ public class ReceiptLayoutCustomerSection extends AbstractLayoutSection
 			}
 			return marker;
 		}
-	}
+		
+		private double computeAmount(double account, Receipt receipt)
+		{
+			if (receipt.getState().equals(Receipt.State.REVERSED) && receipt.isProviderUpdated())
+			{
+				return account - receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+			}
+			else if (receipt.getState().equals(Receipt.State.SAVED) && !receipt.isProviderUpdated())
+			{
+				return account + receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+			}
+			return account;
+		}
+}
 
 	public enum TitleKey implements IKey
 	{
