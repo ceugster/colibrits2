@@ -112,7 +112,6 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 		} 
 		catch (Exception e) 
 		{
-			System.out.println();
 		}
 	}
 
@@ -127,13 +126,6 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 		} 
 		catch (Throwable e) 
 		{
-			if (this.getEventAdmin() != null) {
-				this.getEventAdmin()
-						.sendEvent(
-								this.getEvent(new Status(IStatus.CANCEL,
-										Activator.PLUGIN_ID,
-										"Der Belegdrucker kann nicht angesprochen werden.")));
-			}
 		}
 		return false;
 	}
@@ -167,134 +159,6 @@ public class UsbReceiptPrinterService extends AbstractReceiptPrinterService
 			}
 		}
 	}
-
-	// private void printNVBitImage(int n, int m)
-	// {
-	// this.printer.write(AsciiConstants.FS);
-	// this.printer.write(AsciiConstants.p);
-	// this.printer.write(n);
-	// this.printer.write(m);
-	// this.printer.flush();
-	// }
-
-	// @Override
-	// public void print(String text, Salespoint salespoint)
-	// {
-	// SalespointReceiptPrinterSettings settings = salespoint == null ? null :
-	// salespoint.getReceiptPrinterSettings();
-	// if (printer == null)
-	// {
-	// this.openPrinter(settings == null ?
-	// this.getReceiptPrinterSettings().getPort() : settings.getPort());
-	// }
-	// if (printer != null)
-	// {
-	// if (this.isPrintLogo())
-	// {
-	// this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
-	// }
-	// Converter converter = new Converter(settings == null ?
-	// this.getReceiptPrinterSettings().getConverter() :
-	// settings.getConverter());
-	// final String printable = converter.convert(text);
-	// println(printable.getBytes());
-	// this.cutPaper(settings == null ?
-	// this.getReceiptPrinterSettings().getLinesBeforeCut() :
-	// settings.getLinesBeforeCut());
-	// closePrinter();
-	// }
-	// }
-
-	// private void print(byte[] bytes)
-	// {
-	// try
-	// {
-	// printer.write(bytes);
-	// }
-	// catch (IOException e)
-	// {
-	// }
-	// }
-
-	// private void println(byte[] bytes)
-	// {
-	// try
-	// {
-	// printer.write(bytes);
-	// printer.write(new byte[] { '\n' });
-	// }
-	// catch (IOException e)
-	// {
-	// }
-	// }
-
-	// private void println()
-	// {
-	// try
-	// {
-	// printer.write(new byte[] { '\n' });
-	// }
-	// catch (IOException e)
-	// {
-	// }
-	// }
-
-	// @Override
-	// public void print(String[] text)
-	// {
-	// if (printer == null)
-	// {
-	// this.openPrinter(this.getPort());
-	// }
-	// if (printer != null)
-	// {
-	// if (this.isPrintLogo())
-	// {
-	// this.printNVBitImage(this.getLogo(), this.getPrintLogoMode().mode());
-	// }
-	// for (String line : text)
-	// {
-	// final String printable = this.getConverter().convert(line);
-	// println(printable.getBytes());
-	// }
-	// this.cutPaper(this.getLinesBeforeCut());
-	// this.closePrinter();
-	// }
-	// }
-
-	// @Override
-	// public void openDrawer(Currency currency)
-	// {
-	// if (currency == null)
-	// {
-	// return;
-	// }
-	// if (printer == null)
-	// {
-	// this.openPrinter(this.getPort());
-	// }
-	// if (printer != null)
-	// {
-	// Collection<Stock> stocks = salespoint.getStocks();
-	// for (Stock stock : stocks)
-	// {
-	// if
-	// (stock.getPaymentType().getCurrency().getId().equals(currency.getId()))
-	// {
-	// if
-	// (salespoint.getPaymentType().getCurrency().getId().equals(stock.getPaymentType().getCurrency().getId()))
-	// {
-	// this.print(new byte[] { 16, 20, 1, 0, 4});
-	// }
-	// else
-	// {
-	// this.print(new byte[] { 16, 20, 1, 1, 4});
-	// }
-	// }
-	// }
-	// this.closePrinter();
-	// }
-	// }
 
 	public char[] getFontSize(ReceiptPrinterService.Size size) {
 		switch (size) {
