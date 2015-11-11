@@ -103,6 +103,10 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 	
 	private Button selectNonSalesToo;
 	
+	private Button showReceiptCount;
+	
+	private Button showReceiptStats;
+	
 	@Override
 	public void init(IViewSite site) throws PartInitException
 	{
@@ -190,7 +194,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		
 		Composite composite = new Composite(parent, SWT.None);
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-		composite.setLayout(new GridLayout(2, false));
+		composite.setLayout(new GridLayout());
 
 		Group group = new Group(composite, SWT.SHADOW_ETCHED_IN);
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -247,18 +251,19 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			}
 		});
 
-		gridData = new GridData(GridData.FILL_HORIZONTAL);
-		gridData.horizontalSpan = 2;
-		
 		group = new Group(composite, SWT.SHADOW_ETCHED_IN);
-		group.setLayoutData(gridData);
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		group.setLayout(new GridLayout());
 		group.setText("Wochentage");
+		
+		Composite dayComposite = new Composite(group, SWT.None);
+		dayComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		dayComposite.setLayout(new GridLayout(keys.length - 1, true));
 		
 		weekdays = new Button[keys.length];
 		for (int i = 1; i < keys.length; i++)
 		{
-			weekdays[i] = new Button(group, SWT.CHECK);
+			weekdays[i] = new Button(dayComposite, SWT.CHECK);
 			weekdays[i].setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			weekdays[i].setText(DateFormatSymbols.getInstance().getWeekdays()[i]);
 			weekdays[i].setSelection(settings.getBoolean(keys[i]));
@@ -283,8 +288,12 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			weekdays[i].setSelection(this.settings.getBoolean(keys[i]));
 		}
 
-		Button selectAll = new Button(group, SWT.PUSH);
-		selectAll.setLayoutData(new GridData());
+		Composite dayButtonComposite = new Composite(group, SWT.None);
+		dayButtonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		dayButtonComposite.setLayout(new GridLayout(3, true));
+		
+		Button selectAll = new Button(dayButtonComposite, SWT.PUSH);
+		selectAll.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		selectAll.setText("Alle auswählen");
 		selectAll.addSelectionListener(new SelectionListener() 
 		{
@@ -307,8 +316,8 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			}
 		});
 		
-		Button selectNone = new Button(group, SWT.PUSH);
-		selectNone.setLayoutData(new GridData());
+		Button selectNone = new Button(dayButtonComposite, SWT.PUSH);
+		selectNone.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		selectNone.setText("Keinen auswählen");
 		selectNone.addSelectionListener(new SelectionListener() 
 		{
@@ -331,8 +340,8 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			}
 		});
 		
-		Button reverse = new Button(group, SWT.PUSH);
-		reverse.setLayoutData(new GridData());
+		Button reverse = new Button(dayButtonComposite, SWT.PUSH);
+		reverse.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		reverse.setText("Auswahl umkehren");
 		reverse.addSelectionListener(new SelectionListener() 
 		{
@@ -356,15 +365,15 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		});
 		
 		gridData = new GridData(GridData.FILL_BOTH);
-		gridData.horizontalSpan = 2;
 		
 		group = new Group(composite, SWT.SHADOW_ETCHED_IN);
-		group.setLayoutData(gridData);
+		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setLayout(new GridLayout());
 		group.setText("Optionen");
 
 		this.selectNonSalesToo = new Button(group, SWT.CHECK);
-		this.selectNonSalesToo.setText("Nicht umssatzrelevanten Warengruppen berücksichtigen");
+		this.selectNonSalesToo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.selectNonSalesToo.setText("Nicht umssatzrelevante Warengruppen berücksichtigen");
 		this.selectNonSalesToo.addSelectionListener(new SelectionListener()
 		{
 			@Override
@@ -382,9 +391,49 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		});
 		this.selectNonSalesToo.setSelection(this.settings.getBoolean("non.sales.too"));
 		
-		label = new Label(group, SWT.MULTI | SWT.WRAP);
-		label.setLayoutData(new GridData(GridData.FILL_BOTH));
-		label.setText("Die Tagesstatistik liefert Informationen über die Umsätze im Tagesverlauf einer oder mehrerer Kassen über den gewählten Zeitraum hinweg.\n\n So führen Sie eine Tagesstatistik durch:\n\n- Wählen Sie die Kassen, deren Belege in der Statistik berücksichtigt werden sollen\n- Wählen Sie Anfangs- und Enddatum\n- Wählen Sie den Zeitraum aus\n- Wählen Sie den oder die Wochentage, die berüchsichtigt werden sollen\n- Wählen Sie den oder die gewünschten Wochentage aus.");
+		this.showReceiptCount = new Button(group, SWT.CHECK);
+		this.showReceiptCount.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.showReceiptCount.setText("Anzahl Belege anzeigen");
+		this.showReceiptCount.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				Button button = (Button) e.getSource();
+				TimeRangeView.this.settings.put("show.receipt.count", button.getSelection());
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+				widgetSelected(e);
+			}
+		});
+		this.showReceiptCount.setSelection(this.settings.getBoolean("show.receipt.count"));
+		
+		this.showReceiptStats = new Button(group, SWT.CHECK);
+		this.showReceiptStats.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.showReceiptStats.setText("Durchschnittlichen Belegbetrag anzeigen");
+		this.showReceiptStats.addSelectionListener(new SelectionListener()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e) 
+			{
+				Button button = (Button) e.getSource();
+				TimeRangeView.this.settings.put("show.receipt.stat", button.getSelection());
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) 
+			{
+				widgetSelected(e);
+			}
+		});
+		this.showReceiptStats.setSelection(this.settings.getBoolean("show.receipt.stat"));
+		
+		label = new Label(composite, SWT.None);
+		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		label.setText("Die Tagesstatistik liefert Informationen über die Umsätze im Tagesverlauf einer oder mehrerer Kassen innerhalb des gewählten Zeitraums.\n\n So führen Sie eine Tagesstatistik durch:\n\n- Wählen Sie die Kassen, deren Belege in der Statistik berücksichtigt werden sollen\n- Wählen Sie Anfangs- und Enddatum\n- Wählen Sie den Zeitraum aus\n- Wählen Sie den oder die gewünschten Wochentage aus\n- Wählen Sie die gewünschten Optionen");
 
 		Composite buttonComposite = new Composite(parent, SWT.NONE);
 		buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -631,7 +680,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			if (service != null)
 			{
 				final PositionQuery query = (PositionQuery) service.getServerService().getQuery(Position.class);
-				result = query.selectDayHourStatisticsRange(this.selectedSalespoints, this.selectedDateRange, this.getSelectedWeekdays(), this.getSelectedHours(), this.selectNonSalesToo.getSelection(), true);
+				result = query.selectDayHourStatisticsRange(this.selectedSalespoints, this.selectedDateRange, this.getSelectedWeekdays(), this.getSelectedHours(), this.selectNonSalesToo.getSelection(), showReceiptCount.getSelection());
 			}
 		}
 		finally
@@ -652,10 +701,11 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		return startTime.getSelection() < (endTime.getSelection());
 	}
 
-	private Element createTextField(Namespace ns, int x, int width, int y, int height, String cdata, String textAlignment)
+	private Element createTextField(Namespace ns, String pattern, int x, int width, int y, int height, String cdata, String textAlignment)
 	{
 		Element textField = new Element("textField", ns);
-		textField.setAttribute(new Attribute("pattern", "##,##0.00"));
+		textField.setAttribute(new Attribute("pattern", pattern));
+		textField.setAttribute(new Attribute("isBlankWhenNull", "true"));
 		Element reportElement = new Element("reportElement", ns);
 		reportElement.setAttribute(new Attribute("uuid", UUID.randomUUID().toString()));
 		reportElement.setAttribute(new Attribute("positionType", "Float"));
@@ -678,6 +728,29 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		return textField;
 	}
 
+	private Element createLabel(Namespace ns, int x, int width, int y, int height, int fontSize, String value)
+	{
+		Element label = new Element("staticText", ns);
+		Element reportElement = new Element("reportElement", ns);
+		reportElement.setAttribute(new Attribute("positionType", "Float"));
+		reportElement.setAttribute(new Attribute("x", new Integer(x).toString()));
+		reportElement.setAttribute(new Attribute("y", new Integer(y).toString()));
+		reportElement.setAttribute(new Attribute("width", new Integer(width).toString()));
+		reportElement.setAttribute(new Attribute("height", new Integer(height).toString()));
+		reportElement.setAttribute(new Attribute("uuid", "c43dc746-19ac-42e1-b880-c76b17638d9c"));
+		Element textElement = new Element("textElement", ns);
+		Element font = new Element("font", ns);
+		font.setAttribute(new Attribute("size", new Integer(fontSize).toString()));
+		textElement.addContent(font);
+		Element text = new Element("text", ns);
+		CDATA cdata = new CDATA(value);
+		text.addContent(cdata);
+		label.addContent(reportElement);
+		label.addContent(textElement);
+		label.addContent(text);
+		return label;
+	}
+
 	private int getHours()
 	{
 		return endTime.getSelection() - startTime.getSelection();
@@ -691,7 +764,7 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			SAXBuilder builder = new SAXBuilder();
 			Document document = builder.build(is);
 			is.close();
-			
+
 			Namespace ns = Namespace.getNamespace("http://jasperreports.sourceforge.net/jasperreports");
 			// The pageheader section
 			Element band = document.getRootElement().getChild("pageHeader", ns).getChild("band", ns);
@@ -699,27 +772,88 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 			int width = (708 - 80) / count;
 			for (int i = 0; i < count; i++)
 			{
-				int pos = 80 + (i * width);
+				int x = 80 + (i * width);
+				int y = 4;
 				int no = startTime.getSelection() + i;
-				band.addContent(createTextField(ns, pos, width, 4, 12, "$P{h" + no + "}", "Right"));
+				band.addContent(createTextField(ns, "##,##0.00", x, width, y, 12, "$P{amount@" + no + "}", "Right"));
 			}
 
 			// The detail section
+			
 			band = document.getRootElement().getChild("detail", ns).getChild("band", ns);
+			int y = 4;
+			if (this.showReceiptCount.getSelection())
+			{
+				y += 12;
+				int height = band.getAttribute("height").getIntValue();
+				band.setAttribute(new Attribute("height", new Integer(height + 12).toString()));
+				band.addContent(createLabel(ns, 20, 60, 16, 12, 8, "Belege"));
+				band.addContent(createTextField(ns, "##,##0", 696, 48, y, 12, "$F{count}", "Right"));
+			}
+			if (this.showReceiptStats.getSelection())
+			{
+				y += 12;
+				int height = band.getAttribute("height").getIntValue();
+				band.setAttribute(new Attribute("height", new Integer(height + 12).toString()));
+				band.addContent(createLabel(ns, 20, 60, 28, 12, 8, "Betrag/Beleg"));
+				band.addContent(createTextField(ns, "##,##0.00", 696, 48, y, 12, "$V{stats}", "Right"));
+			}
 			for (int i = 0; i < count; i++)
 			{
-				int pos = 80 + i * width;
+				int x = 80 + (i * width);
+				y = 4;
 				int no = startTime.getSelection() + i;
-				band.addContent(createTextField(ns, pos, width, 4, 12, "$F{h" + no + "}", "Right"));
+				band.addContent(createTextField(ns, "##,##0.00", x, width, y, 12, "$F{amount@" + no + "}", "Right"));
+				if (this.showReceiptCount.getSelection())
+				{
+					y += 12;
+					band.addContent(createTextField(ns, "##,##0", x, width, y, 12, "$F{count@" + no + "}", "Right"));
+				}
+				if (this.showReceiptStats.getSelection())
+				{
+					y +=12;
+					band.addContent(createTextField(ns, "##,##0.00", x, width, y, 12, "$V{stats@" + no + "}", "Right"));
+				}
 			}
 
 			band = document.getRootElement().getChild("summary", ns).getChild("band", ns);
+			int height = band.getAttribute("height").getIntValue();
+			y = 8;
+			if (this.showReceiptCount.getSelection())
+			{
+				y += 12;
+				band.setAttribute(new Attribute("height", new Integer(height + y).toString()));
+				band.addContent(createLabel(ns, 20, 60, y, 12, 8, "Belege"));
+				band.addContent(createTextField(ns, "##,##0", 696, 48, y, 12, "$F{count}", "Right"));
+			}
+			if (this.showReceiptStats.getSelection())
+			{
+				y += 12;
+				band.setAttribute(new Attribute("height", new Integer(height + y).toString()));
+				band.addContent(createLabel(ns, 20, 60, y, 12, 8, "Betrag/Beleg"));
+				band.addContent(createTextField(ns, "##,##0.00", 696, 48, y, 12, "$V{stats}", "Right"));
+			}
 			for (int i = 0; i < count; i++)
 			{
-				int pos = 80 + i * width;
+				int x = 80 + i * width;
+				y = 8;
 				int no = startTime.getSelection() + i;
-				band.addContent(createTextField(ns, pos, width, 8, 12, "$V{h" + no + "}", "Right"));
+				band.addContent(createTextField(ns, "##,##0.00", x, width, y, 12, "$V{amount@" + no + "}", "Right"));
+				if (this.showReceiptCount.getSelection())
+				{
+					y +=12;
+					band.addContent(createTextField(ns, "##,##0", x, width, y, 12, "$V{count@" + no + "}", "Right"));
+				}
+				if (this.showReceiptStats.getSelection())
+				{
+					y +=12;
+					band.addContent(createTextField(ns, "##,##0.00", x, width, y, 12, "$V{stats@" + no + "}", "Right"));
+				}
 			}
+			List<Element> lines = band.getChildren("line", ns);
+			Element endLine = lines.get(lines.size() - 1);
+			Element reportElement = endLine.getChild("reportElement", ns);
+			reportElement.setAttribute("y", new Integer(band.getAttribute("height").getIntValue() - 2).toString());
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			XMLOutputter outputter = new XMLOutputter();
 			outputter.output(document, out);
@@ -759,9 +893,9 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 		int count = getHours();
 		for (int i = 0; i < count; i++)
 		{
-			parameters.put("h" + new Integer(startTime.getSelection() + i).toString(), hourFormatter.format(startTime.getSelection() + i) + "-" + hourFormatter.format(startTime.getSelection() + i + 1));
+			parameters.put("amount@" + new Integer(startTime.getSelection() + i).toString(), hourFormatter.format(startTime.getSelection() + i) + "-" + hourFormatter.format(startTime.getSelection() + i + 1));
 		}
-		parameters.put("total", "Total");
+		parameters.put("amount", "Total");
 		
 		StringBuilder days = new StringBuilder("Gewählte Wochentage: ");
 		for (int i = 0; i < weekdays.length; i++)
@@ -774,6 +908,10 @@ public class TimeRangeView extends ViewPart implements IViewPart, ISelectionList
 					days = days.append(", ");
 				}
 			}
+		}
+		if (this.selectNonSalesToo.getSelection())
+		{
+			days.append("nicht umsatzrelevante Warengruppen berücksichtigt");
 		}
 		parameters.put("weekday", days.toString());
 

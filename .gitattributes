@@ -2061,9 +2061,6 @@ ch.eugster.colibri.report.time/reports/Day24HourStatistics.jrxml -text
 ch.eugster.colibri.report.time/reports/DayHourStatistics.jrxml -text
 ch.eugster.colibri.report.time/src/ch/eugster/colibri/report/time/Activator.java -text
 ch.eugster.colibri.report.time/src/ch/eugster/colibri/report/time/ReportTimeRangePerspective.java -text
-ch.eugster.colibri.report.time/src/ch/eugster/colibri/report/time/model/Section.java -text
-ch.eugster.colibri.report.time/src/ch/eugster/colibri/report/time/model/SettlementEntry.java -text
-ch.eugster.colibri.report.time/src/ch/eugster/colibri/report/time/views/Row.java -text
 ch.eugster.colibri.report.time/src/ch/eugster/colibri/report/time/views/TimeRangeView.java -text
 ch.eugster.colibri.report/.classpath -text
 ch.eugster.colibri.report/.project -text

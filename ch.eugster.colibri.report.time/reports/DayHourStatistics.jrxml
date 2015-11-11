@@ -6,133 +6,308 @@
 	<parameter name="salespoints" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="dateRange" class="java.lang.String" isForPrompting="false"/>
 	<parameter name="weekday" class="java.lang.String"/>
-	<parameter name="h0" class="java.lang.String"/>
-	<parameter name="h1" class="java.lang.String"/>
-	<parameter name="h2" class="java.lang.String"/>
-	<parameter name="h3" class="java.lang.String"/>
-	<parameter name="h4" class="java.lang.String"/>
-	<parameter name="h5" class="java.lang.String"/>
-	<parameter name="h6" class="java.lang.String"/>
-	<parameter name="h7" class="java.lang.String"/>
-	<parameter name="h8" class="java.lang.String"/>
-	<parameter name="h9" class="java.lang.String"/>
-	<parameter name="h10" class="java.lang.String"/>
-	<parameter name="h11" class="java.lang.String"/>
-	<parameter name="h12" class="java.lang.String"/>
-	<parameter name="h13" class="java.lang.String"/>
-	<parameter name="h14" class="java.lang.String"/>
-	<parameter name="h15" class="java.lang.String"/>
-	<parameter name="h16" class="java.lang.String"/>
-	<parameter name="h17" class="java.lang.String"/>
-	<parameter name="h18" class="java.lang.String"/>
-	<parameter name="h19" class="java.lang.String"/>
-	<parameter name="h20" class="java.lang.String"/>
-	<parameter name="h21" class="java.lang.String"/>
-	<parameter name="h22" class="java.lang.String"/>
-	<parameter name="h23" class="java.lang.String"/>
-	<parameter name="total" class="java.lang.String"/>
 	<parameter name="name" class="java.lang.String"/>
 	<parameter name="header" class="java.lang.String"/>
+	<parameter name="amount@0" class="java.lang.String"/>
+	<parameter name="amount@1" class="java.lang.String"/>
+	<parameter name="amount@2" class="java.lang.String"/>
+	<parameter name="amount@3" class="java.lang.String"/>
+	<parameter name="amount@4" class="java.lang.String"/>
+	<parameter name="amount@5" class="java.lang.String"/>
+	<parameter name="amount@6" class="java.lang.String"/>
+	<parameter name="amount@7" class="java.lang.String"/>
+	<parameter name="amount@8" class="java.lang.String"/>
+	<parameter name="amount@9" class="java.lang.String"/>
+	<parameter name="amount@10" class="java.lang.String"/>
+	<parameter name="amount@11" class="java.lang.String"/>
+	<parameter name="amount@12" class="java.lang.String"/>
+	<parameter name="amount@13" class="java.lang.String"/>
+	<parameter name="amount@14" class="java.lang.String"/>
+	<parameter name="amount@15" class="java.lang.String"/>
+	<parameter name="amount@16" class="java.lang.String"/>
+	<parameter name="amount@17" class="java.lang.String"/>
+	<parameter name="amount@18" class="java.lang.String"/>
+	<parameter name="amount@19" class="java.lang.String"/>
+	<parameter name="amount@20" class="java.lang.String"/>
+	<parameter name="amount@21" class="java.lang.String"/>
+	<parameter name="amount@22" class="java.lang.String"/>
+	<parameter name="amount@23" class="java.lang.String"/>
+	<parameter name="amount" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
-	<field name="h0" class="java.lang.Double"/>
-	<field name="h1" class="java.lang.Double"/>
-	<field name="h2" class="java.lang.Double"/>
-	<field name="h3" class="java.lang.Double"/>
-	<field name="h4" class="java.lang.Double"/>
-	<field name="h5" class="java.lang.Double"/>
-	<field name="h6" class="java.lang.Double"/>
-	<field name="h7" class="java.lang.Double"/>
-	<field name="h8" class="java.lang.Double"/>
-	<field name="h9" class="java.lang.Double"/>
-	<field name="h10" class="java.lang.Double"/>
-	<field name="h11" class="java.lang.Double"/>
-	<field name="h12" class="java.lang.Double"/>
-	<field name="h13" class="java.lang.Double"/>
-	<field name="h14" class="java.lang.Double"/>
-	<field name="h15" class="java.lang.Double"/>
-	<field name="h16" class="java.lang.Double"/>
-	<field name="h17" class="java.lang.Double"/>
-	<field name="h18" class="java.lang.Double"/>
-	<field name="h19" class="java.lang.Double"/>
-	<field name="h20" class="java.lang.Double"/>
-	<field name="h21" class="java.lang.Double"/>
-	<field name="h22" class="java.lang.Double"/>
-	<field name="h23" class="java.lang.Double"/>
-	<field name="total" class="java.lang.Double"/>
-	<variable name="h0" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h0}]]></variableExpression>
+	<field name="amount@0" class="java.lang.Double"/>
+	<field name="amount@1" class="java.lang.Double"/>
+	<field name="amount@2" class="java.lang.Double"/>
+	<field name="amount@3" class="java.lang.Double"/>
+	<field name="amount@4" class="java.lang.Double"/>
+	<field name="amount@5" class="java.lang.Double"/>
+	<field name="amount@6" class="java.lang.Double"/>
+	<field name="amount@7" class="java.lang.Double"/>
+	<field name="amount@8" class="java.lang.Double"/>
+	<field name="amount@9" class="java.lang.Double"/>
+	<field name="amount@10" class="java.lang.Double"/>
+	<field name="amount@11" class="java.lang.Double"/>
+	<field name="amount@12" class="java.lang.Double"/>
+	<field name="amount@13" class="java.lang.Double"/>
+	<field name="amount@14" class="java.lang.Double"/>
+	<field name="amount@15" class="java.lang.Double"/>
+	<field name="amount@16" class="java.lang.Double"/>
+	<field name="amount@17" class="java.lang.Double"/>
+	<field name="amount@18" class="java.lang.Double"/>
+	<field name="amount@19" class="java.lang.Double"/>
+	<field name="amount@20" class="java.lang.Double"/>
+	<field name="amount@21" class="java.lang.Double"/>
+	<field name="amount@22" class="java.lang.Double"/>
+	<field name="amount@23" class="java.lang.Double"/>
+	<field name="amount" class="java.lang.Double"/>
+	<field name="count@0" class="java.lang.Integer"/>
+	<field name="count@1" class="java.lang.Integer"/>
+	<field name="count@2" class="java.lang.Integer"/>
+	<field name="count@3" class="java.lang.Integer"/>
+	<field name="count@4" class="java.lang.Integer"/>
+	<field name="count@5" class="java.lang.Integer"/>
+	<field name="count@6" class="java.lang.Integer"/>
+	<field name="count@7" class="java.lang.Integer"/>
+	<field name="count@8" class="java.lang.Integer"/>
+	<field name="count@9" class="java.lang.Integer"/>
+	<field name="count@10" class="java.lang.Integer"/>
+	<field name="count@11" class="java.lang.Integer"/>
+	<field name="count@12" class="java.lang.Integer"/>
+	<field name="count@13" class="java.lang.Integer"/>
+	<field name="count@14" class="java.lang.Integer"/>
+	<field name="count@15" class="java.lang.Integer"/>
+	<field name="count@16" class="java.lang.Integer"/>
+	<field name="count@17" class="java.lang.Integer"/>
+	<field name="count@18" class="java.lang.Integer"/>
+	<field name="count@19" class="java.lang.Integer"/>
+	<field name="count@20" class="java.lang.Integer"/>
+	<field name="count@21" class="java.lang.Integer"/>
+	<field name="count@22" class="java.lang.Integer"/>
+	<field name="count@23" class="java.lang.Integer"/>
+	<field name="count" class="java.lang.Integer"/>
+	<variable name="amount@0" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@0}]]></variableExpression>
 	</variable>
-	<variable name="h1" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h1}]]></variableExpression>
+	<variable name="amount@1" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@1}]]></variableExpression>
 	</variable>
-	<variable name="h2" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h2}]]></variableExpression>
+	<variable name="amount@2" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@2}]]></variableExpression>
 	</variable>
-	<variable name="h3" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h3}]]></variableExpression>
+	<variable name="amount@3" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@3}]]></variableExpression>
 	</variable>
-	<variable name="h4" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h4}]]></variableExpression>
+	<variable name="amount@4" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@4}]]></variableExpression>
 	</variable>
-	<variable name="h5" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h5}]]></variableExpression>
+	<variable name="amount@5" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@5}]]></variableExpression>
 	</variable>
-	<variable name="h6" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h6}]]></variableExpression>
+	<variable name="amount@6" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@6}]]></variableExpression>
 	</variable>
-	<variable name="h7" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h7}]]></variableExpression>
+	<variable name="amount@7" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@7}]]></variableExpression>
 	</variable>
-	<variable name="h8" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h8}]]></variableExpression>
+	<variable name="amount@8" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@8}]]></variableExpression>
 	</variable>
-	<variable name="h9" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h9}]]></variableExpression>
+	<variable name="amount@9" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@9}]]></variableExpression>
 	</variable>
-	<variable name="h10" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h10}]]></variableExpression>
+	<variable name="amount@10" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@10}]]></variableExpression>
 	</variable>
-	<variable name="h11" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h11}]]></variableExpression>
+	<variable name="amount@11" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@11}]]></variableExpression>
 	</variable>
-	<variable name="h12" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h12}]]></variableExpression>
+	<variable name="amount@12" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@12}]]></variableExpression>
 	</variable>
-	<variable name="h13" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h13}]]></variableExpression>
+	<variable name="amount@13" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@13}]]></variableExpression>
 	</variable>
-	<variable name="h14" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h14}]]></variableExpression>
+	<variable name="amount@14" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@14}]]></variableExpression>
 	</variable>
-	<variable name="h15" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h15}]]></variableExpression>
+	<variable name="amount@15" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@15}]]></variableExpression>
 	</variable>
-	<variable name="h16" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h16}]]></variableExpression>
+	<variable name="amount@16" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@16}]]></variableExpression>
 	</variable>
-	<variable name="h17" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h17}]]></variableExpression>
+	<variable name="amount@17" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@17}]]></variableExpression>
 	</variable>
-	<variable name="h18" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h18}]]></variableExpression>
+	<variable name="amount@18" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@18}]]></variableExpression>
 	</variable>
-	<variable name="h19" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h19}]]></variableExpression>
+	<variable name="amount@19" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@19}]]></variableExpression>
 	</variable>
-	<variable name="h20" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h20}]]></variableExpression>
+	<variable name="amount@20" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@20}]]></variableExpression>
 	</variable>
-	<variable name="h21" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h21}]]></variableExpression>
+	<variable name="amount@21" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@21}]]></variableExpression>
 	</variable>
-	<variable name="h22" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h22}]]></variableExpression>
+	<variable name="amount@22" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@22}]]></variableExpression>
 	</variable>
-	<variable name="h23" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{h23}]]></variableExpression>
+	<variable name="amount@23" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount@23}]]></variableExpression>
 	</variable>
-	<variable name="ltotal" class="java.lang.Double" calculation="Sum">
-		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	<variable name="amount" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+	</variable>
+	<variable name="count@0" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@0}]]></variableExpression>
+	</variable>
+	<variable name="count@1" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@1}]]></variableExpression>
+	</variable>
+	<variable name="count@2" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@2}]]></variableExpression>
+	</variable>
+	<variable name="count@3" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@3}]]></variableExpression>
+	</variable>
+	<variable name="count@4" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@4}]]></variableExpression>
+	</variable>
+	<variable name="count@5" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@5}]]></variableExpression>
+	</variable>
+	<variable name="count@6" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@6}]]></variableExpression>
+	</variable>
+	<variable name="count@7" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@7}]]></variableExpression>
+	</variable>
+	<variable name="count@8" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@8}]]></variableExpression>
+	</variable>
+	<variable name="count@9" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@9}]]></variableExpression>
+	</variable>
+	<variable name="count@10" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@10}]]></variableExpression>
+	</variable>
+	<variable name="count@11" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@11}]]></variableExpression>
+	</variable>
+	<variable name="count@12" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@12}]]></variableExpression>
+	</variable>
+	<variable name="count@13" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@13}]]></variableExpression>
+	</variable>
+	<variable name="count@14" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@14}]]></variableExpression>
+	</variable>
+	<variable name="count@15" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@15}]]></variableExpression>
+	</variable>
+	<variable name="count@16" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@16}]]></variableExpression>
+	</variable>
+	<variable name="count@17" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@17}]]></variableExpression>
+	</variable>
+	<variable name="count@18" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@18}]]></variableExpression>
+	</variable>
+	<variable name="count@19" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@19}]]></variableExpression>
+	</variable>
+	<variable name="count@20" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@20}]]></variableExpression>
+	</variable>
+	<variable name="count@21" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@21}]]></variableExpression>
+	</variable>
+	<variable name="count@22" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@22}]]></variableExpression>
+	</variable>
+	<variable name="count@23" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count@23}]]></variableExpression>
+	</variable>
+	<variable name="count" class="java.lang.Integer" calculation="Sum">
+		<variableExpression><![CDATA[$F{count}]]></variableExpression>
+	</variable>
+	<variable name="stats@0" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@0}/$F{count@0}]]></variableExpression>
+	</variable>
+	<variable name="stats@1" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@1}/$F{count@1}]]></variableExpression>
+	</variable>
+	<variable name="stats@2" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@2}/$F{count@2}]]></variableExpression>
+	</variable>
+	<variable name="stats@3" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@3}/$F{count@3}]]></variableExpression>
+	</variable>
+	<variable name="stats@4" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@4}/$F{count@4}]]></variableExpression>
+	</variable>
+	<variable name="stats@5" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@5}/$F{count@5}]]></variableExpression>
+	</variable>
+	<variable name="stats@6" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@6}/$F{count@6}]]></variableExpression>
+	</variable>
+	<variable name="stats@7" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@7}/$F{count@7}]]></variableExpression>
+	</variable>
+	<variable name="stats@8" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@8}/$F{count@8}]]></variableExpression>
+	</variable>
+	<variable name="stats@9" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@9}/$F{count@9}]]></variableExpression>
+	</variable>
+	<variable name="stats@10" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@10}/$F{count@10}]]></variableExpression>
+	</variable>
+	<variable name="stats@11" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@11}/$F{count@11}]]></variableExpression>
+	</variable>
+	<variable name="stats@12" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@12}/$F{count@12}]]></variableExpression>
+	</variable>
+	<variable name="stats@13" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@13}/$F{count@13}]]></variableExpression>
+	</variable>
+	<variable name="stats@14" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@14}/$F{count@14}]]></variableExpression>
+	</variable>
+	<variable name="stats@15" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@15}/$F{count@15}]]></variableExpression>
+	</variable>
+	<variable name="stats@16" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@16}/$F{count@16}]]></variableExpression>
+	</variable>
+	<variable name="stats@17" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@17}/$F{count@17}]]></variableExpression>
+	</variable>
+	<variable name="stats@18" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@18}/$F{count@18}]]></variableExpression>
+	</variable>
+	<variable name="stats@19" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@19}/$F{count@19}]]></variableExpression>
+	</variable>
+	<variable name="stats@20" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@20}/$F{count@20}]]></variableExpression>
+	</variable>
+	<variable name="stats@21" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@21}/$F{count@21}]]></variableExpression>
+	</variable>
+	<variable name="stats@22" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@22}/$F{count@22}]]></variableExpression>
+	</variable>
+	<variable name="stats@23" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount@23}/$F{count@23}]]></variableExpression>
+	</variable>
+	<variable name="stats" class="java.lang.Double">
+		<variableExpression><![CDATA[$F{amount}/$F{count}]]></variableExpression>
 	</variable>
 	<group name="SalespointGroup">
 		<groupExpression><![CDATA[$F{name}]]></groupExpression>
@@ -140,45 +315,45 @@
 	<title>
 		<band height="112" splitType="Stretch">
 			<staticText>
-				<reportElement uuid="c43dc746-19ac-42e1-b880-c76b17638d9c" positionType="Float" x="0" y="46" width="357" height="20"/>
+				<reportElement positionType="Float" x="0" y="46" width="357" height="20" uuid="c43dc746-19ac-42e1-b880-c76b17638d9c"/>
 				<textElement>
 					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Tagesumsatzstatistik]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="2747a41a-f08c-4833-9e23-a53d1fcc6749" positionType="Float" x="525" y="0" width="219" height="14"/>
+				<reportElement positionType="Float" x="525" y="0" width="219" height="14" uuid="2747a41a-f08c-4833-9e23-a53d1fcc6749"/>
 				<textElement textAlignment="Right">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{printTime}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="2fa04c9d-4c62-4689-af29-bae9f8306bcf" positionType="Float" x="0" y="66" width="600" height="14"/>
+				<reportElement positionType="Float" x="0" y="66" width="600" height="14" uuid="2fa04c9d-4c62-4689-af29-bae9f8306bcf"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{salespoints}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="1b29acc0-9be2-4307-aba4-896fc3680471" positionType="Float" x="0" y="78" width="600" height="14"/>
+				<reportElement positionType="Float" x="0" y="78" width="600" height="14" uuid="1b29acc0-9be2-4307-aba4-896fc3680471"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{dateRange}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="2136256c-fff7-480d-b3ac-1ae2013c0c29" positionType="Float" x="0" y="90" width="600" height="14"/>
+				<reportElement positionType="Float" x="0" y="90" width="600" height="14" uuid="2136256c-fff7-480d-b3ac-1ae2013c0c29"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{weekday}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement uuid="cb7d0809-e818-4bba-9282-7def343a3eea" positionType="Float" x="1" y="107" width="746" height="1"/>
+				<reportElement positionType="Float" x="1" y="107" width="746" height="1" uuid="cb7d0809-e818-4bba-9282-7def343a3eea"/>
 			</line>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="c13654ea-d26f-4d75-b773-ffb242b69812" positionType="Float" x="0" y="0" width="517" height="47"/>
+				<reportElement positionType="Float" x="0" y="0" width="517" height="47" uuid="c13654ea-d26f-4d75-b773-ffb242b69812"/>
 				<textElement>
 					<font size="8"/>
 				</textElement>
@@ -189,20 +364,20 @@
 	<pageHeader>
 		<band height="24" splitType="Stretch">
 			<textField pattern="##,##0.00" isBlankWhenNull="false">
-				<reportElement uuid="b9d30879-a326-4541-b272-fb434cfc306c" positionType="Float" x="696" y="4" width="48" height="12"/>
+				<reportElement positionType="Float" x="696" y="4" width="48" height="12" uuid="b9d30879-a326-4541-b272-fb434cfc306c"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{total}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{amount}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement uuid="aae1941f-8f2c-48ca-88f2-17acc283b15d" positionType="Float" x="0" y="20" width="745" height="1"/>
+				<reportElement positionType="Float" x="0" y="20" width="745" height="1" uuid="aae1941f-8f2c-48ca-88f2-17acc283b15d"/>
 				<graphicElement>
 					<pen lineWidth="0.5" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<textField isBlankWhenNull="true">
-				<reportElement uuid="5fc2af06-4267-4976-ad58-dce4f17de055" positionType="Float" x="0" y="4" width="80" height="12"/>
+				<reportElement positionType="Float" x="0" y="4" width="80" height="12" uuid="5fc2af06-4267-4976-ad58-dce4f17de055"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
@@ -212,49 +387,51 @@
 	</pageHeader>
 	<detail>
 		<band height="16" splitType="Stretch">
+			<property name="local_mesure_unitheight" value="pixel"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField pattern="#,##0" isBlankWhenNull="true">
-				<reportElement uuid="2813247a-3eb0-4414-8964-23d760f64564" positionType="Float" x="0" y="2" width="80" height="12"/>
+				<reportElement positionType="Float" x="0" y="2" width="80" height="12" uuid="2813247a-3eb0-4414-8964-23d760f64564"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<textField pattern="##,##0.00" isBlankWhenNull="true">
-				<reportElement uuid="7e360a52-5aed-4650-9b5f-1541b07e188e" positionType="Float" x="696" y="4" width="48" height="12">
+				<reportElement positionType="Float" x="696" y="4" width="48" height="12" uuid="7e360a52-5aed-4650-9b5f-1541b07e188e">
 					<property name="local_mesure_unity" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{total}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
 	<summary>
-		<band height="32" splitType="Stretch">
+		<band height="25" splitType="Stretch">
 			<textField pattern="##,##0.00" isBlankWhenNull="false">
-				<reportElement uuid="317d29c0-c9a4-4d24-b1eb-8d53ed4bf7e9" positionType="Float" x="696" y="8" width="48" height="12"/>
+				<reportElement positionType="Float" x="696" y="8" width="48" height="12" uuid="317d29c0-c9a4-4d24-b1eb-8d53ed4bf7e9"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Arial" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{ltotal}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{amount}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="9655925d-14ea-43ba-9da0-17da45e9e711" positionType="Float" x="0" y="8" width="80" height="12"/>
+				<reportElement positionType="Float" x="0" y="8" width="80" height="12" uuid="9655925d-14ea-43ba-9da0-17da45e9e711"/>
 				<textElement>
 					<font fontName="Arial" size="8"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<line>
-				<reportElement uuid="24cfc29e-96c1-46a3-ae76-8f49d41a1330" positionType="Float" x="0" y="4" width="744" height="1"/>
+				<reportElement positionType="Float" x="0" y="4" width="744" height="1" uuid="24cfc29e-96c1-46a3-ae76-8f49d41a1330"/>
 				<graphicElement>
 					<pen lineWidth="0.5" lineStyle="Solid"/>
 				</graphicElement>
 			</line>
 			<line>
-				<reportElement uuid="7bbfa2ca-ad17-4bd3-88c0-e37187bf2eb3" positionType="Float" x="0" y="25" width="744" height="1"/>
+				<reportElement positionType="Float" x="0" y="20" width="744" height="1" uuid="7bbfa2ca-ad17-4bd3-88c0-e37187bf2eb3"/>
 				<graphicElement>
 					<pen lineWidth="0.5" lineStyle="Solid"/>
 				</graphicElement>
