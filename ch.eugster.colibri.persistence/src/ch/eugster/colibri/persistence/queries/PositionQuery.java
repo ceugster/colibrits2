@@ -1546,6 +1546,7 @@ public class PositionQuery extends AbstractQuery<Position>
 		reportQuery.addAttribute("id", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("id"), String.class);
 		reportQuery.addAttribute("name", new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name"), String.class);
 		reportQuery.addAttribute("hour", new ExpressionBuilder().get("receipt").get("hour"), Integer.class);
+//		reportQuery.addAttribute("count", new ExpressionBuilder().get("receipt").count());
 //		reportQuery.addSum("quantity", Integer.class);
 		reportQuery.addSum("amount", this.getAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO), Double.class);
 		reportQuery.addOrdering(new ExpressionBuilder().get("receipt").get("settlement").get("salespoint").get("name").ascending());
@@ -1559,13 +1560,13 @@ public class PositionQuery extends AbstractQuery<Position>
 		{
 			for (ReportQueryResult result : results)
 			{
-				long receipts =0L;
+				long count =0L;
 				if (showReceiptsCount)
 				{
 					Long salespointId = (Long) result.get("id");
 					int hour = ((Integer) result.get("hour")).intValue();
 					ReceiptQuery query = (ReceiptQuery) this.getConnectionService().getQuery(Receipt.class);
-					receipts = query.countDayHourStatisticsRange(salespointId, dateRange, weekdays, hour, nonSalesToo);
+					count = query.countDayHourStatisticsRange(salespointId, dateRange, weekdays, hour, nonSalesToo);
 				}
 				Long id = (Long) result.get("id");
 				String name = (String) result.get("name");
@@ -1574,7 +1575,7 @@ public class PositionQuery extends AbstractQuery<Position>
 				DayTimeRow row = rows.get(id);
 				if (row == null)
 				{
-					row = new DayTimeRow(id, name, hour, amount, Long.valueOf(receipts).intValue());
+					row = new DayTimeRow(id, name, hour, amount, new Integer(Long.valueOf(count).intValue()));
 					for (int i = hourRange[0]; i <= hourRange[1]; i++)
 					{
 						String key = "h" + new Integer(i).toString();
@@ -1587,7 +1588,7 @@ public class PositionQuery extends AbstractQuery<Position>
 				}
 				else
 				{
-					row.add(hour, amount);
+					row.add(hour, amount, new Integer(Long.valueOf(count).intValue()));
 				}
 			}
 		}

@@ -470,10 +470,8 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 			expression = expression.and(weekdayExpression);
 		}
 
-		expression.and(new ExpressionBuilder().get("hour").equal(hourRange));
-
-		Expression deleted = new ExpressionBuilder().get("deleted").equal(false);
-		expression = expression.and(deleted);
+		expression = expression.and(new ExpressionBuilder().get("hour").equal(hourRange));
+		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
 		return super.count(expression);
 	}
 
