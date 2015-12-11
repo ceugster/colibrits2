@@ -67,9 +67,11 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	private Label receiptCountLabel;
+	private Label totalLabel;
 
-	private Label totalAmountLabel;
+	private Label savedLabel;
+
+	private Label reversedLabel;
 
 	private NumberFormat inf;
 
@@ -79,8 +81,12 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 
 	private void setSummary(Object[] items)
 	{
-		this.receiptCountLabel.setText("Anzahl Belege: " + items.length);
-		double total = 0d;
+		double totalAmount = 0d;
+		int savedCount = 0;
+		double savedAmount = 0d;
+		int reversedCount = 0;
+		double reversedAmount = 0d;
+		
 		for (int i = 0; i < items.length; i++)
 		{
 			Receipt receipt = null;
@@ -103,11 +109,23 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 				{
 					dnf.setCurrency(receipt.getDefaultCurrency().getCurrency());
 				}
-				total += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+				totalAmount += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+				if (receipt.getState().equals(Receipt.State.SAVED))
+				{
+					savedCount++;
+					savedAmount += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+				}
+				if (receipt.getState().equals(Receipt.State.REVERSED))
+				{
+					reversedCount++;
+					reversedAmount += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_CURRENCY, Position.AmountType.NETTO);
+				}
 			}
 		}
 
-		this.totalAmountLabel.setText("Gesamtbetrag: " + dnf.format(total));
+		this.totalLabel.setText(items.length + " Belege: " + dnf.format(totalAmount));
+		this.savedLabel.setText(savedCount + " gespeichert: " + dnf.format(savedAmount));
+		this.reversedLabel.setText(reversedCount + " storniert: " + dnf.format(reversedAmount));
 	}
 
 	@Override
@@ -278,15 +296,19 @@ public class ReceiptListView extends ViewPart implements ISelectionListener
 
 		Composite info = new Composite(composite, SWT.NONE);
 		info.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		info.setLayout(new GridLayout(2, true));
+		info.setLayout(new GridLayout(3, true));
 
-		this.receiptCountLabel = new Label(info, SWT.NONE);
-		this.receiptCountLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		this.receiptCountLabel.setText("");
+		this.totalLabel = new Label(info, SWT.LEFT);
+		this.totalLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.totalLabel.setText("");
 
-		this.totalAmountLabel = new Label(info, SWT.NONE);
-		this.totalAmountLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		this.totalAmountLabel.setText("");
+		this.savedLabel = new Label(info, SWT.CENTER);
+		this.savedLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.savedLabel.setText("");
+
+		this.reversedLabel = new Label(info, SWT.RIGHT);
+		this.reversedLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		this.reversedLabel.setText("");
 
 		final TableColumn[] columns = this.viewer.getTable().getColumns();
 		for (final TableColumn column : columns)
