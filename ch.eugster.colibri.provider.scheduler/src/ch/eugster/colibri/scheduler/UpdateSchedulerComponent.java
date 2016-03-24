@@ -28,7 +28,11 @@ import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
+import ch.eugster.colibri.persistence.model.Receipt;
+import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
+import ch.eugster.colibri.persistence.queries.ReceiptQuery;
+import ch.eugster.colibri.persistence.queries.SettlementQuery;
 import ch.eugster.colibri.persistence.rules.ServerDatabaseRule;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
@@ -58,6 +62,10 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 	private UpdateSchedulerJob updateScheduler;
 
 	private Map<String, IProperty> schedulerProperties;
+	
+	private boolean showFailoverMessage = true;
+	
+	private Dictionary<String, Object> properties;
 	
 	private void setRunning(boolean _running)
 	{
@@ -119,10 +127,9 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 		this.context = componentContext;
 	
 		String topics[] = new String[] {"ch/eugster/colibri/persistence/replication/completed", Topic.LOCK.topic(), Topic.UNLOCK.topic() };
-		Hashtable<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.EVENT_TOPIC, topics);
-		Activator.getDefault().getBundleContext().registerService(EventHandler.class, this, properties);
-		
+		Hashtable<String, Object> serviceProperties = new Hashtable<String, Object>();
+		serviceProperties.put(EventConstants.EVENT_TOPIC, topics);
+		Activator.getDefault().getBundleContext().registerService(EventHandler.class, this, serviceProperties);
 	}
 	
 	public void handleEvent(Event event)
@@ -192,14 +199,98 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 			this.updateScheduler.cancel();
 			this.updateScheduler = null;
 		}
+		this.sendUpdateEvent(Topic.SCHEDULED_TRANSFER, Status.OK_STATUS);
+		this.sendUpdateEvent(Topic.SCHEDULED_PROVIDER_UPDATE, Status.OK_STATUS);
 		this.context = null;
 		this.log(LogService.LOG_DEBUG, "Service " + this.getClass().getName() + " deaktiviert.");
 	}
+	
+	private long countTransfers()
+	{
+		final ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+		long count = receiptQuery.countRemainingToTransfer();
+		final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
+		count += settlementQuery.countTransferables();
+		return count;
+	}
 
+	private long countProviderUpdates()
+	{
+		long count = 0L;
+		for (ProviderUpdater providerUpdater : providerUpdaters)
+		{
+			if (providerUpdater.isActive())
+			{
+				count += providerUpdater.countPositions(UpdateSchedulerComponent.this.persistenceService);
+				count += providerUpdater.countPayments(UpdateSchedulerComponent.this.persistenceService);
+			}
+		}
+		return count;
+	}
+	
+	private void sendUpdateEvent(Topic topic, IStatus status)
+	{
+		long count = 0;
+		if (UpdateSchedulerComponent.this.eventAdmin != null)
+		{
+			if (topic.equals(Topic.SCHEDULED) || topic.equals(Topic.SCHEDULED_PROVIDER_UPDATE))
+			{
+				count = countProviderUpdates();
+			}
+			else if (topic.equals(Topic.SCHEDULED_TRANSFER))
+			{
+				count = countTransfers();
+			}
+			
+			Dictionary<String, Object> properties = createBasicProperties(topic, status);
+			properties.put("topic", topic);
+			properties.put("status", status);
+			properties.put("count", count);
+			final Event event = new Event(topic.topic(), properties);
+			UpdateSchedulerComponent.this.eventAdmin.sendEvent(event);
+		}
+	}
+	
+	private Dictionary<String, Object> createBasicProperties(Topic topic, IStatus status)
+	{
+		this.properties = new Hashtable<String, Object>();
+		this.properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundleContext().getBundle().getSymbolicName());
+		this.properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
+		if (status.getSeverity() == IStatus.WARNING)
+		{
+			if (status.getException() != null)
+			{
+				String msg = status.getException().getMessage();
+				this.properties.put(EventConstants.MESSAGE, msg == null ? "" : msg);
+			}
+		}
+		else
+		{
+			if (status.getException() != null)
+			{
+				this.properties.put(EventConstants.EXCEPTION, status.getException());
+				String msg = status.getException().getMessage();
+				this.properties.put(EventConstants.EXCEPTION_MESSAGE, msg == null ? "" : msg);
+
+				if (this.showFailoverMessage)
+				{
+					this.properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
+					this.showFailoverMessage = false;
+				}
+			}
+			else
+			{
+				if (!this.showFailoverMessage)
+				{
+					this.showFailoverMessage = true;
+				}
+			}
+		}
+		return properties;
+	}
+	
 	private class UpdateSchedulerJob extends Job
 	{
-		private boolean showFailoverMessage = true;
-		
 		UpdateSchedulerJob(String name)
 		{
 			super(name);
@@ -232,8 +323,6 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 						{
 							status = providerStatus;
 						}
-//						persistenceService.getCacheService().clearCache();
-//						persistenceService.getServerService().clearCache();
 					}
 				}
 				finally
@@ -244,61 +333,6 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 				}
 			}
 			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED.topic());
-		}
-		
-		private void sendUpdateEvent(Topic topic, IStatus status)
-		{
-			if (UpdateSchedulerComponent.this.eventAdmin != null)
-			{
-				final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-				properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundleContext().getBundle());
-				properties.put(EventConstants.BUNDLE_ID,
-						Long.valueOf(Activator.getDefault().getBundleContext().getBundle().getBundleId()));
-				properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.getDefault().getBundleContext().getBundle().getSymbolicName());
-				properties.put(EventConstants.SERVICE,
-						UpdateSchedulerComponent.this.context.getServiceReference());
-				properties.put(EventConstants.SERVICE_ID, UpdateSchedulerComponent.this.context
-						.getProperties().get("component.id"));
-				properties.put(EventConstants.SERVICE_OBJECTCLASS, this.getClass().getName());
-				properties.put(EventConstants.SERVICE_PID, UpdateSchedulerComponent.this.context
-						.getProperties().get("component.name"));
-				properties
-						.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
-				if (status.getSeverity() == IStatus.WARNING)
-				{
-					if (status.getException() != null)
-					{
-						String msg = status.getException().getMessage();
-						properties.put(EventConstants.MESSAGE, msg == null ? "" : msg);
-					}
-				}
-				else
-				{
-					if (status.getException() != null)
-					{
-						properties.put(EventConstants.EXCEPTION, status.getException());
-						String msg = status.getException().getMessage();
-						properties.put(EventConstants.EXCEPTION_MESSAGE, msg == null ? "" : msg);
-	
-						if (this.showFailoverMessage)
-						{
-							properties.put("show.failover.message", Boolean.valueOf(this.showFailoverMessage));
-							this.showFailoverMessage = false;
-						}
-					}
-					else
-					{
-						if (!this.showFailoverMessage)
-						{
-							this.showFailoverMessage = true;
-						}
-					}
-				}
-				properties.put("topic", topic);
-				properties.put("status", status);
-				final Event event = new Event(topic.topic(), properties);
-				UpdateSchedulerComponent.this.eventAdmin.sendEvent(event);
-			}
 		}
 		
 		private IStatus transfer(IProgressMonitor monitor)
@@ -367,7 +401,7 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 		{
 			if (providerUpdater.doUpdatePositions())
 			{
-				Collection<Position> positions = providerUpdater.getPositions(persistenceService, getSchedulerCount());
+				List<Position> positions = providerUpdater.getPositions(persistenceService, getSchedulerCount());
 				return providerUpdater.updatePositions(persistenceService, positions);
 			}
 			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
@@ -377,11 +411,12 @@ public class UpdateSchedulerComponent implements UpdateScheduler, EventHandler
 		{
 			if (providerUpdater.doUpdatePayments())
 			{
-				Collection<Payment> payments = providerUpdater.getPayments(persistenceService.getCacheService(), getSchedulerCount());
+				List<Payment> payments = providerUpdater.getPayments(persistenceService, getSchedulerCount());
 				return providerUpdater.updatePayments(persistenceService, payments);
 			}
 			return new Status(IStatus.OK, Activator.getDefault().getBundleContext().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		}
+
 	}
 	
 	public long getRepeatDelay()
