@@ -20,15 +20,12 @@ public class ShowProviderErrorListDialog extends MessageDialog
 {
 	private TableViewer viewer;
 
-	private PersistenceService persistenceService;
-	
 	public ShowProviderErrorListDialog(Shell parentShell, String dialogTitle,
 			Image dialogTitleImage, String dialogMessage, int dialogImageType,
 			String[] dialogButtonLabels, int defaultIndex, PersistenceService persistenceService, Salespoint salespoint) 
 	{
 		super(parentShell, dialogTitle, dialogTitleImage, dialogMessage,
 				dialogImageType, dialogButtonLabels, defaultIndex);
-		this.persistenceService = persistenceService; 
 	}
 
 	@Override

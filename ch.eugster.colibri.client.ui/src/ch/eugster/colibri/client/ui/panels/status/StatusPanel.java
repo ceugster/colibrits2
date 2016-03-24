@@ -26,6 +26,11 @@ import ch.eugster.colibri.persistence.model.Profile;
 
 public class StatusPanel extends MainPanel implements LogListener, EventHandler
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6349735586239284067L;
+
 	private JTextArea textArea;
 
 	private ServiceTracker<LogReaderService, LogReaderService> tracker;

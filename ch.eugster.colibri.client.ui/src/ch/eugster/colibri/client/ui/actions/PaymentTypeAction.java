@@ -153,9 +153,6 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 	@Override
 	public boolean getState(final StateChangeEvent event)
 	{
-		double inputAmount = this.userPanel.getValueDisplay().testAmount();
-		double receiptDiff = this.userPanel.getReceiptWrapper().getReceiptDifference();
-		
 		if (key.getLabel().equals("Barzahlung"))
 		{
 			System.out.println(this.userPanel.getReceiptWrapper().getReceiptDifference());
@@ -183,8 +180,6 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 
 	public void propertyChange(final PropertyChangeEvent event)
 	{
-		double inputAmount = this.userPanel.getValueDisplay().testAmount();
-		double receiptDiff = this.userPanel.getReceiptWrapper().getReceiptDifference();
 		if (key.getLabel().equals("Barzahlung"))
 		{
 			System.out.println();
@@ -204,7 +199,6 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 				else
 				{
 					this.setEnabled(this.userPanel.getReceiptWrapper().getReceiptDifference() > 0D);
-//					this.setEnabled(this.userPanel.getValueDisplay().testAmount() != 0d);
 				}
 			}
 		}

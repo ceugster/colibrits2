@@ -56,7 +56,6 @@ import ch.eugster.colibri.client.ui.panels.user.receipts.CurrentReceiptListPanel
 import ch.eugster.colibri.client.ui.panels.user.settlement.CoinCounterPanel;
 import ch.eugster.colibri.client.ui.views.ClientView;
 import ch.eugster.colibri.persistence.model.Configurable;
-import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Profile;
 import ch.eugster.colibri.persistence.model.Profile.PanelType;
 import ch.eugster.colibri.persistence.model.Receipt;

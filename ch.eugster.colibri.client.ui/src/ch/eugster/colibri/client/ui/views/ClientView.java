@@ -553,12 +553,16 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					event.getTopic().equals(Topic.STORE_RECEIPT.topic()) ||
 					event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
 			{
-				final ProviderQuery provider = providerQueryTracker.getService();
-				if (provider == null || !provider.isConnect())
+				long myCount = 0L;
+				if (event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()))
 				{
-					return;
+					myCount = ((Long) event.getProperty("count")).longValue();
 				}
-	
+				else
+				{
+					myCount = this.countProviderUpdates(this.salespoint);
+				}
+				final long count = myCount;
 				final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
 				{
 					@Override
@@ -568,27 +572,16 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 						final ImageRegistry registry = Activator.getDefault().getImageRegistry();
 						if (status.getSeverity() == IStatus.ERROR)
 						{
-							status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
+							status = new Status(status.getSeverity(), Activator.getDefault().getBundle().getSymbolicName(),
 									"Keine Verbindung!");
 							ClientView.this.providerInformation.setImage(null);
 							ClientView.this.providerInformation.setText(null);
 							ClientView.this.providerInformation.setErrorText(status.getMessage());
 							ClientView.this.providerInformation.setErrorImage(registry.get("error"));
 						}
-						else if (status.getSeverity() == IStatus.WARNING)
+						else
 						{
-							long count = countProviderUpdates(salespoint, provider.getProviderId());
-							status = new Status(IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
-									"Verbuchen: " + count);
-							ClientView.this.providerInformation.setErrorImage(null);
-							ClientView.this.providerInformation.setErrorText(null);
-							ClientView.this.providerInformation.setText(status.getMessage());
-							ClientView.this.providerInformation.setImage(registry.get(Topic.SCHEDULED_PROVIDER_UPDATE.icon(status)));
-						}
-						else if (status.getSeverity() == IStatus.OK)
-						{
-							long count = countProviderUpdates(salespoint, provider.getProviderId());
-							status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
+							status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING, Activator.getDefault().getBundle().getSymbolicName(),
 									"Verbuchen: " + count);
 							ClientView.this.providerInformation.setErrorImage(null);
 							ClientView.this.providerInformation.setErrorText(null);
@@ -604,20 +597,6 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		}
 	}
 
-	private long countProviderUpdates(Salespoint salespoint, String providerId)
-	{
-		long count = 0L;
-		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
-		if (persistenceService != null)
-		{
-			PositionQuery positionQuery = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
-			count = positionQuery.countProviderUpdates(salespoint, providerId, !persistenceService.getServerService().isLocal());
-			PaymentQuery paymentQuery = (PaymentQuery) persistenceService.getCacheService().getQuery(Payment.class);
-			count += paymentQuery.countProviderUpdates(salespoint, providerId);
-		}
-		return count;
-	}
-	
 	private String checkReferenceCurrency(Salespoint salespoint)
 	{
 		String msg = "Es wurde noch keine Referenzwährung definiert\n";
@@ -704,71 +683,21 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 		EntityMediator.addListener(Salespoint.class, this.mainTabbedPane);
 
-		String count = "?";
-		Image image = null;
-
-		PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
-		if (persistenceService != null)
-		{
-			if (!persistenceService.getServerService().isLocal())
-			{
-				this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
-				this.transferInformation.setErrorText("");
-				ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
-				long counted = receiptQuery.countRemainingToTransfer();
-				final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
-				counted += settlementQuery.countTransferables();
-				count = Long.valueOf(counted).toString();
-				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
-				this.transferInformation.setText("Zu übertragen: " + count);
-				this.transferInformation.setImage(image);
-				this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.transferInformation);
-
-			}
-		}
+		long count = this.countTransfers(this.salespoint);
+		Image image = Activator.getDefault().getImageRegistry().get(count == 0L ? "ok" : "exclamation");
+		this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
+		this.transferInformation.setText("Zu übertragen: " + count);
+		this.transferInformation.setImage(image);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.transferInformation);
 
 		this.providerInformation = new StatusLineContributionItem("provider.information", true, 32);
 		this.providerInformation.setErrorText("");
-		persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-				.getService();
-		if (persistenceService != null)
-		{
-			ProviderQuery provider = (ProviderQuery) this.providerQueryTracker.getService();
-			if (provider == null || !provider.isConnect())
-			{
-				this.providerInformation.setText("");
-				this.providerInformation.setImage(null);
-			}
-			else
-			{
-				final long counted = countProviderUpdates(salespoint, provider.getProviderId());
-				count = Long.valueOf(counted).toString();
-				image = Activator.getDefault().getImageRegistry().get(counted == 0L ? "ok" : "exclamation");
-				this.providerInformation.setText("Verbuchen: " + count);
-				this.providerInformation.setImage(image);
-			}
-		}
-//		this.providerInformation.setActionHandler(new Action() 
-//		{
-//			@Override
-//			public void run() 
-//			{
-//				System.out.println();
-//			}
-//
-//			@Override
-//			public void runWithEvent(org.eclipse.swt.widgets.Event event) 
-//			{
-//				System.out.println();
-//			}
-//		});
-		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.providerInformation);
+		count = this.countProviderUpdates(this.salespoint);
+		image = Activator.getDefault().getImageRegistry().get(count == 0L ? "ok" : "exclamation");
+		this.providerInformation.setText("Verbuchen: " + count);
+		this.providerInformation.setImage(image);
 
-//		this.customerInformation = new StatusLineContributionItem("customer.information", true, 84);
-//		// this.customerInformation = new
-//		// StatusLineContributionItem("customer.information", 48);
-//		this.customerInformation.setText("Kunde: ");
-//		this.getViewSite().getActionBars().getStatusLineManager().prependToGroup(StatusLineManager.BEGIN_GROUP, this.customerInformation);
+		this.getViewSite().getActionBars().getStatusLineManager().appendToGroup(StatusLineManager.BEGIN_GROUP, this.providerInformation);
 
 		this.timeInformation = new StatusLineContributionItem("time.information", true, 24);
 		this.timeInformation.setText("");
@@ -950,6 +879,16 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 					event.getTopic().equals(Topic.STORE_RECEIPT.topic()) ||
 							event.getTopic().equals(Topic.SETTLE_PERFORMED.topic()))
 			{
+				long myCount = 0L;
+				if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+				{
+					myCount = ((Long) event.getProperty("count")).longValue();
+				}
+				else
+				{
+					myCount = this.countTransfers(salespoint);
+				}
+				final long count = myCount;
 				final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
 				{
 					@Override
@@ -959,43 +898,32 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 						IStatus status = (IStatus) event.getProperty("status");
 						if (status.getSeverity() == IStatus.OK)
 						{
-							final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker
-									.getService();
-							if (persistenceService != null)
+							if ((status == null) || (status.getSeverity() == IStatus.OK))
 							{
-								final ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(
-										Receipt.class);
-								long count = receiptQuery.countRemainingToTransfer();
-								final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(
-										Settlement.class);
-								count += settlementQuery.countTransferables();
-								if ((status == null) || (status.getSeverity() == IStatus.OK))
-								{
-									status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING,
-											(String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME), "Transfer: "
-													+ count);
-								}
-								else
-								{
-									status = new Status(IStatus.ERROR, status.getPlugin(), "Keine Verbindung");
-								}
-								if (status.getSeverity() == IStatus.OK)
-								{
-									ClientView.this.transferInformation.setErrorImage(null);
-									ClientView.this.transferInformation.setErrorText(null);
-									ClientView.this.transferInformation.setText(status.getMessage());
-									ClientView.this.transferInformation.setImage(registry.get("ok"));
-								}
-								else if (status.getSeverity() == IStatus.WARNING)
-								{
-									ClientView.this.transferInformation.setErrorImage(null);
-									ClientView.this.transferInformation.setErrorText(null);
-									ClientView.this.transferInformation.setText(status.getMessage());
-									ClientView.this.transferInformation.setImage(registry.get("exclamation"));
-								}
-								else if (status.getSeverity() == IStatus.ERROR)
-								{
-								}
+								status = new Status(count == 0L ? IStatus.OK : IStatus.WARNING,
+										(String) event.getProperty(EventConstants.BUNDLE_SYMBOLICNAME), "Transfer: "
+												+ count);
+							}
+							else
+							{
+								status = new Status(IStatus.ERROR, status.getPlugin(), "Keine Verbindung");
+							}
+							if (status.getSeverity() == IStatus.OK)
+							{
+								ClientView.this.transferInformation.setErrorImage(null);
+								ClientView.this.transferInformation.setErrorText(null);
+								ClientView.this.transferInformation.setText(status.getMessage());
+								ClientView.this.transferInformation.setImage(registry.get("ok"));
+							}
+							else if (status.getSeverity() == IStatus.WARNING)
+							{
+								ClientView.this.transferInformation.setErrorImage(null);
+								ClientView.this.transferInformation.setErrorText(null);
+								ClientView.this.transferInformation.setText(status.getMessage());
+								ClientView.this.transferInformation.setImage(registry.get("exclamation"));
+							}
+							else if (status.getSeverity() == IStatus.ERROR)
+							{
 							}
 						}
 						else
@@ -1014,6 +942,39 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		}
 	}
 
+	private long countProviderUpdates(Salespoint salespoint)
+	{
+		long count = 0L;
+		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			ServiceReference<ProviderQuery>[] references = this.providerQueryTracker.getServiceReferences();
+			for (ServiceReference<ProviderQuery> reference : references)
+			{
+				ProviderQuery query = this.providerQueryTracker.getService(reference);
+				PositionQuery positionQuery = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
+				count += positionQuery.countProviderUpdates(salespoint, query.getProviderId(), !persistenceService.getServerService().isLocal());
+				PaymentQuery paymentQuery = (PaymentQuery) persistenceService.getCacheService().getQuery(Payment.class);
+				count += paymentQuery.countProviderUpdates(salespoint, query.getProviderId());
+			}
+		}
+		return count;
+	}
+	
+	private long countTransfers(Salespoint salespoint)
+	{
+		long count = 0L;
+		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
+		if (persistenceService != null)
+		{
+			final ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+			count = receiptQuery.countRemainingToTransfer();
+			final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
+			count += settlementQuery.countTransferables();
+		}
+		return count;
+	}
+	
 	public static ClientView getClientView()
 	{
 		return ClientView.instance;
