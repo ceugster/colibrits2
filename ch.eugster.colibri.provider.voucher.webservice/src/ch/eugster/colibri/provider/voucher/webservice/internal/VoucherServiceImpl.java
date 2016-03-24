@@ -36,7 +36,6 @@ import ch.eugster.colibri.persistence.queries.PaymentQuery;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IDirtyable;
 import ch.eugster.colibri.provider.configuration.IProperty;
@@ -486,7 +485,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	}
 
 	@Override
-	public Collection<Position> getPositions(PersistenceService service,
+	public List<Position> getPositions(PersistenceService service,
 			int max)
 	{
 		SalespointQuery salespointQuery = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);
@@ -501,7 +500,7 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 
 	@Override
 	public IStatus updatePositions(PersistenceService persistenceService,
-			Collection<Position> positions) 
+			List<Position> positions) 
 	{
 		IStatus status = Status.OK_STATUS;
 		for (Position position : positions)
@@ -515,22 +514,21 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 		return status;
 	}
 
-	@Override
-	public Collection<Payment> getPayments(ConnectionService service, int max) 
+	public List<Payment> getPayments(PersistenceService service, int max) 
 	{
-		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
+		SalespointQuery salespointQuery = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
 		if (salespoint == null)
 		{
 			return new ArrayList<Payment>();
 		}
-		PaymentQuery query = (PaymentQuery) service.getQuery(Payment.class);
+		PaymentQuery query = (PaymentQuery) service.getCacheService().getQuery(Payment.class);
 		return query.selectProviderUpdates(salespoint, getProviderId(), max);
 	}
 
 	@Override
 	public IStatus updatePayments(PersistenceService persistenceService,
-			Collection<Payment> payments) 
+			List<Payment> payments) 
 	{
 		IStatus status = Status.OK_STATUS;
 		for (Payment payment : payments)
@@ -878,5 +876,17 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 			}
 			}
 		}
+	}
+
+	@Override
+	public long countPositions(PersistenceService service) 
+	{
+		return this.getPositions(service, 0).size();
+	}
+
+	@Override
+	public long countPayments(PersistenceService service) 
+	{
+		return this.getPayments(service, 0).size();
 	}
 }
