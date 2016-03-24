@@ -5,7 +5,6 @@ Bundle-SymbolicName: ch.eugster.colibri.report.pdf;singleton:=true
 Bundle-Version: 1.0.1
 Bundle-ClassPath: lib/iText-2.1.7.js1.jar,
  .
-Bundle-Activator: ch.eugster.colibri.report.pdf.Activator
 Bundle-Vendor: Christian Eugster
 Export-Package: com.lowagie.text,
  com.lowagie.text.exceptions,
