@@ -1,7 +1,6 @@
 package ch.eugster.colibri.provider.service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
@@ -12,7 +11,6 @@ import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.queries.PaymentQuery;
 import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractProviderUpdater extends AbstractProviderService implements ProviderUpdater 
@@ -35,7 +33,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 	
 	@Override
 	public IStatus updatePositions(PersistenceService persistenceService,
-			Collection<Position> positions)
+			List<Position> positions)
 	{
 		IStatus status = getStatus(null);
 		if (positions.size() == 0)
@@ -92,21 +90,21 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 	}
 
 	@Override
-	public Collection<Payment> getPayments(ConnectionService service, int max) 
+	public List<Payment> getPayments(PersistenceService service, int max) 
 	{
-		SalespointQuery salespointQuery = (SalespointQuery) service.getQuery(Salespoint.class);
+		SalespointQuery salespointQuery = (SalespointQuery) service.getCacheService().getQuery(Salespoint.class);
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
 		if (salespoint == null)
 		{
 			return new ArrayList<Payment>();
 		}
-		PaymentQuery query = (PaymentQuery) service.getQuery(Payment.class);
+		PaymentQuery query = (PaymentQuery) service.getCacheService().getQuery(Payment.class);
 		return query.selectProviderUpdates(salespoint, this.getProviderId(), max);
 	}
 
 	@Override
 	public IStatus updatePayments(PersistenceService persistenceService,
-			Collection<Payment> payments) 
+			List<Payment> payments) 
 	{
 		IStatus status = getStatus(null);
 		for (Payment payment : payments)

@@ -1,13 +1,12 @@
 package ch.eugster.colibri.provider.service;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 
 import ch.eugster.colibri.persistence.model.Payment;
 import ch.eugster.colibri.persistence.model.Position;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.IProperty.Section;
@@ -38,17 +37,21 @@ public interface ProviderUpdater extends Comparable<ProviderUpdater>
 	
 	Integer getRanking();
 
-	Collection<Position> getPositions(PersistenceService service, int max);
+	List<Position> getPositions(PersistenceService service, int max);
 
-	IStatus updatePositions(PersistenceService persistenceService, Collection<Position> positions);
+	IStatus updatePositions(PersistenceService persistenceService, List<Position> positions);
 
-	Collection<Payment> getPayments(ConnectionService service, int max);
+	List<Payment> getPayments(PersistenceService service, int max);
 
-	IStatus updatePayments(PersistenceService persistenceService, Collection<Payment> payments);
+	IStatus updatePayments(PersistenceService persistenceService, List<Payment> payments);
 
 	boolean doUpdatePositions();
 
 	boolean doUpdatePayments();
 	
 	boolean isActive();
+	
+	long countPositions(PersistenceService service);
+	
+	long countPayments(PersistenceService service);
 }
