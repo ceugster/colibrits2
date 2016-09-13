@@ -382,6 +382,10 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			userPanel.getReceiptWrapper().parkReceipt();
 		}
 		this.remove(userPanel);
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(userPanel);
+		this.clientView.getReceiptChangeMediator().dispose();
+		this.clientView.propertyChange(new PropertyChangeEvent(userPanel.getReceiptWrapper().getReceipt(),
+				"receipt", null, null));
 		userPanel.dispose();
 		UIJob job = new UIJob("")
 		{
