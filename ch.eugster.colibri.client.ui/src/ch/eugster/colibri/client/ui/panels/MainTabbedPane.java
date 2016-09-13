@@ -187,7 +187,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 	@Override
 	public void handleEvent(Event event) 
 	{
-		this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
+		this.setFailOver(event.getProperty(EventConstants.EXCEPTION) != null);
 	}
 
 	public boolean isFailOver()

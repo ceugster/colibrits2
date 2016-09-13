@@ -43,9 +43,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolTip;
+import org.eclipse.swt.widgets.Tray;
+import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
@@ -135,12 +139,31 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	private long lastWarnMessage = 0l;
 	
 	private Long frequency = null;
+
+	private Image trayItemImage = null;
+	
+	private TrayItem trayItem = null;
+	
+	private ToolTip toolTip;
 	
 	private final Collection<ShutdownListener> shutdownListeners = new ArrayList<ShutdownListener>();
 
 	public boolean addShutdownListener(final ShutdownListener listener)
 	{
 		return this.shutdownListeners.add(listener);
+	}
+	
+	public ClientView()
+	{
+		toolTip = new ToolTip(new Shell(), SWT.BALLOON | SWT.ICON_INFORMATION);
+		Tray tray = Display.getDefault().getSystemTray();
+		if (tray != null) {
+			trayItem = new TrayItem(tray, SWT.NONE);
+			trayItemImage = Display.getDefault().getSystemImage(SWT.ICON_INFORMATION);
+			trayItem.setImage(trayItemImage);
+			toolTip.setText("Verbindungsproblem");
+			trayItem.setToolTip(toolTip);
+		}
 	}
 	
 	public Salespoint getSalespoint()
@@ -262,6 +285,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	@Override
 	public void dispose()
 	{
+		if (trayItemImage != null && !trayItemImage.isDisposed()) trayItemImage.dispose();
+		if (trayItem != null && !trayItem.isDisposed()) trayItem.dispose();
 		if (this.timer != null)
 		{
 			this.timer.cancel();
@@ -351,8 +376,20 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 						+ "\n\nFalls das Problem weiterhin besteht, kontaktieren Sie bitte die Hotline von Comelivres AG.";
 				if (message != null)
 				{
-					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-									.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
+					final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
+					{
+						@Override
+						public IStatus runInUIThread(final IProgressMonitor monitor)
+						{
+							toolTip.setMessage(message);
+							toolTip.setVisible(true);
+							return Status.OK_STATUS;
+						}
+					};
+					uiJob.setPriority(Job.DECORATE);
+					uiJob.schedule();
+//					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+//									.getProfile(), "Verbindungsproblem", message, MessageDialog.TYPE_ERROR);
 				}
 			}
 		}
@@ -882,7 +919,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				long myCount = 0L;
 				if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 				{
-					myCount = ((Long) event.getProperty("count")).longValue();
+					Long count = (Long) event.getProperty("count");
+					myCount = count == null ? 0L : count.longValue();
 				}
 				else
 				{
