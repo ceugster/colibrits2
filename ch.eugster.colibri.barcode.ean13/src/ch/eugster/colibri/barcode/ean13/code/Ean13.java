@@ -194,7 +194,7 @@ public class Ean13 extends AbstractBarcode
 			}
 			prefix = code.substring(0, 1).toUpperCase();
 			articleCode = code.toUpperCase().replaceFirst(Ean13.PREFIX_EBOOK, "");
-			if (articleCode.length() == Ean13.EAN13_EBOOK_LENGTH - 1)
+			if (articleCode.length() == Ean13.EAN13_LENGTH - 1)
 			{
 				articleCode = articleCode + Integer.valueOf(Ean13.computeChecksum(articleCode));
 			}
