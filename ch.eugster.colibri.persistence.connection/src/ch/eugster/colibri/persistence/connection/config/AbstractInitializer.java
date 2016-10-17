@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 

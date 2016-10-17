@@ -164,4 +164,11 @@ public class PersistenceServiceImpl implements PersistenceService
 		return this.databaseCompatibilityError;
 	}
 
+	@Override
+	public void close() 
+	{
+		this.getCacheService().close();
+		this.getServerService().close();
+	}
+
 }

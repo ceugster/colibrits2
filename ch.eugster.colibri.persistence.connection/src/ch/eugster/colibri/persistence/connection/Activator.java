@@ -3,12 +3,22 @@ package ch.eugster.colibri.persistence.connection;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Dictionary;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Properties;
@@ -18,6 +28,7 @@ import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.spi.PersistenceProvider;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
@@ -33,7 +44,11 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
+import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -41,18 +56,46 @@ import ch.eugster.colibri.encryption.service.EncryptionService;
 import ch.eugster.colibri.persistence.connection.service.PersistenceServiceImpl;
 import ch.eugster.colibri.persistence.connection.wizard.DatabaseWizard;
 import ch.eugster.colibri.persistence.connection.wizard.WizardDialog;
-import ch.eugster.colibri.persistence.service.ConnectionService;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin
+public class Activator extends AbstractUIPlugin implements EventHandler
 {
 	public static final String PLUGIN_ID = "ch.eugster.colibri.persistence.connection";
 
+	public static final String KEY_USE_EMBEDDED_DATABASE = "ch.eugster.colibri.persistence.impl.use.embedded.database";
+
+	public static final String KEY_NAME = "ch.eugster.colibri.persistence.server.connection.name";
+
+	public static final String KEY_LOCAL_SCHEMA = "ch.eugster.colibri.persistence.local.schema";
+
+	private static final String CONFIGURATION_DTD_FILE = "database.dtd";
+
+	public static final String KEY_PERSISTENCE_UNIT = "ch.eugster.colibri.persistence.unit";
+
+	public static final String PERSISTENCE_UNIT_SERVER = "ch.eugster.colibri.persistence.server";
+
+	public static final String PERSISTENCE_UNIT_LOCAL = "ch.eugster.colibri.persistence.local";
+
+	private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+	
 	private static Activator plugin;
 
+	private static final String LOCAL_DATABASE_DIRECTORY = "cache";
+	
+	private static final String BACKUP_DIRECTORY = "backup";
+	
+	private static final String CONFIGURATION_DIRECTORY = "configuration";
+
+	private static final String CONFIGURATION_XML_FILE = "database.xml";
+
+	private static final String OJB_MIGRATION_COLIBRI_XML_FILE = "colibri.xml";
+	
+	private static final String OJB_MIGRATION_DIRECTORY = "Migration";
+	
 	private ServiceTracker<EncryptionService, EncryptionService> encryptionServiceTracker;
 
 	private ServiceTracker<LogService, LogService> logServiceTracker;
@@ -63,6 +106,8 @@ public class Activator extends AbstractUIPlugin
 
 	private PersistenceProvider persistenceProvider;
 	
+	private PersistenceService persistenceService;
+	
 	private EntityManager cacheEntityManager;
 
 	private Document document;
@@ -70,6 +115,15 @@ public class Activator extends AbstractUIPlugin
 	private Document oldDocument;
 	
 	private Context ctx;
+	
+	private long openTransfers;
+
+	private long openUpdates;
+
+	private Properties properties;
+	
+	private ServiceRegistration<EventHandler> eventHandlerRegistration;
+	
 	/**
 	 * The constructor
 	 */
@@ -145,42 +199,37 @@ public class Activator extends AbstractUIPlugin
 	
 	public String getPersistenceLogDir()
 	{
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final File root = workspace.getRoot().getRawLocation().toFile();
-		return root.getAbsolutePath() + File.separator + "logs";
+
+		return this.getWorkspace().getAbsolutePath() + File.separator + "logs";
 	}
 
 	public File getFile()
 	{
-		File cfgFile = null;
+		File configurationFile = null;
 		try
 		{
-			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			final File root = workspace.getRoot().getRawLocation().toFile();
-
-			final File cfgFolder = new File(root.getAbsolutePath() + File.separator
-					+ ConnectionService.CONFIGURATION_DIR);
-			if (!cfgFolder.exists())
+			File configurationDirectory = getConfigurationDirectory();
+			if (!configurationDirectory.exists())
 			{
-				cfgFolder.mkdir();
+				configurationDirectory.mkdirs();
 			}
-			if (cfgFolder.exists())
+			if (configurationDirectory.exists())
 			{
-				File dtdFile = new File(cfgFolder.getAbsolutePath() + File.separator
-						+ ConnectionService.CONFIGURATION_DTD_FILE);
-				if (!dtdFile.exists())
+				File configurationFileDTD = new File(configurationDirectory.getAbsolutePath() + File.separator
+						+ Activator.CONFIGURATION_DTD_FILE);
+				if (!configurationFileDTD.exists())
 				{
-					createDTDFile(dtdFile);
+					createDTDFile(configurationFileDTD);
 				}
-				cfgFile = new File(cfgFolder.getAbsolutePath() + File.separator
-						+ ConnectionService.CONFIGURATION_XML_FILE);
+				configurationFile = new File(configurationDirectory.getAbsolutePath() + File.separator
+						+ Activator.CONFIGURATION_XML_FILE);
 			}
 		}
 		catch (final Exception e)
 		{
 			e.printStackTrace();
 		}
-		return cfgFile;
+		return configurationFile;
 	}
 
 	public File getOldFile()
@@ -189,11 +238,11 @@ public class Activator extends AbstractUIPlugin
 		try
 		{
 			final File cfgFolder = new File(System.getProperty("user.home") + File.separator
-					+ ConnectionService.OJB_MIGRATION_DIR);
+					+ Activator.OJB_MIGRATION_DIRECTORY);
 			if (cfgFolder.exists())
 			{
 				cfgFile = new File(cfgFolder.getAbsolutePath()+ File.separator
-						+ ConnectionService.OJB_MIGRATION_COLIBRI_XML_FILE);
+						+ Activator.OJB_MIGRATION_COLIBRI_XML_FILE);
 			}
 		}
 		catch (final Exception e)
@@ -203,7 +252,48 @@ public class Activator extends AbstractUIPlugin
 		return cfgFile;
 	}
 
-	public void createDTDFile(File dtdFile)
+	/**
+	 * Returns the shared instance
+	 * 
+	 * @return the shared instance
+	 */
+	public static Activator getDefault()
+	{
+		return Activator.plugin;
+	}
+
+	public int getLogLevel(int statusSeverity)
+	{
+		switch(statusSeverity)
+		{
+		case IStatus.CANCEL:
+		{
+			return LogService.LOG_WARNING;
+		}
+		case IStatus.ERROR:
+		{
+			return LogService.LOG_ERROR;
+		}
+		case IStatus.INFO:
+		{
+			return LogService.LOG_INFO;
+		}
+		case IStatus.OK:
+		{
+			return LogService.LOG_INFO;
+		}
+		case IStatus.WARNING:
+		{
+			return LogService.LOG_WARNING;
+		}
+		default:
+		{
+			return LogService.LOG_INFO;
+		}
+		}
+	}
+
+	private void createDTDFile(File dtdFile)
 	{
 		try
 		{
@@ -258,6 +348,19 @@ public class Activator extends AbstractUIPlugin
 		}
 	}
 
+	@Override
+	public void handleEvent(Event event) 
+	{
+		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+		{
+			this.openTransfers = ((Long) event.getProperty("count"));
+		}
+		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+		{
+			this.openUpdates = ((Long) event.getProperty("count"));
+		}
+	}
+
 	public String getLogLevel()
 	{
 		return this.document.getRootElement().getChild("current").getAttributeValue("log-level");
@@ -265,7 +368,7 @@ public class Activator extends AbstractUIPlugin
 
 	public void printProperties(final Map<String, Object> properties)
 	{
-		final String persistenceUnit = (String) properties.get(ConnectionService.KEY_PERSISTENCE_UNIT);
+		final String persistenceUnit = (String) properties.get(Activator.KEY_PERSISTENCE_UNIT);
 		final String driver = properties.get(PersistenceUnitProperties.JDBC_DRIVER).toString();
 		final String url = properties.get(PersistenceUnitProperties.JDBC_URL).toString();
 		final String username = properties.get(PersistenceUnitProperties.JDBC_USER).toString();
@@ -296,15 +399,72 @@ public class Activator extends AbstractUIPlugin
 		this.encryptionServiceTracker = new ServiceTracker<EncryptionService, EncryptionService>(context, EncryptionService.class, null);
 		this.encryptionServiceTracker.open();
 
-//		this.persistenceProviderTracker = new ServiceTracker<PersistenceProvider, PersistenceProvider>(context, PersistenceProvider.class, null);
-//		this.persistenceProviderTracker.open();
+		File file = getStatusFile();
+		properties = new Properties();
+		if (file.exists())
+		{
+			SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
+			InputStream is = new FileInputStream(file);
+			try
+			{
+				properties.load(is);
+			}
+			finally
+			{
+				is.close();
+			}
+			String lastBackup = properties.getProperty("last.backup");
+			if (lastBackup == null)
+			{
+				lastBackup = sdf.format(GregorianCalendar.getInstance().getTime());
+			}
+			Calendar calendar = GregorianCalendar.getInstance();
+			calendar.setTime(sdf.parse(lastBackup));
+			int days = 8;
+			long count = 0;
+			String dayString = properties.getProperty("next.backup.after.days");
+			try
+			{
+				days = Integer.parseInt(dayString == null ? "8" : dayString);
+			}
+			catch (NumberFormatException e)
+			{
+				days = 8;
+			}
+			properties.setProperty("next.backup.after.days", Integer.toString(days));
+			
+			calendar.add(Calendar.DATE, days);
+			if (calendar.after(GregorianCalendar.getInstance()))
+			{
+				String countString = properties.getProperty("count");
+				try
+				{
+					count = Long.parseLong(countString == null ? "0" : countString);
+				}
+				catch (NumberFormatException e)
+				{
+					count = 0L;
+				}
+				if (count == 0L)
+				{
+					this.backupDerbyHome();
+				}
+			}
+		}
+
+		this.setDerbyHome();
+		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		final Collection<String> topicNames = new ArrayList<String>();
+		topicNames.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		topicNames.add(Topic.SCHEDULED_TRANSFER.topic());
+		final String[] topics = topicNames.toArray(new String[topicNames.size()]);
+		properties.put(EventConstants.EVENT_TOPIC, topics);
+		eventHandlerRegistration = context.registerService(EventHandler.class, this, properties);
 		
 		this.eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(context, EventAdmin.class, null);
 		this.eventAdminTracker.open();
 		
-		this.setDerbyHome();
-
-		final File file = this.getFile();
+		file = this.getFile();
 		if (!file.exists())
 		{
 			this.initializeConfiguration(file);
@@ -330,12 +490,12 @@ public class Activator extends AbstractUIPlugin
 		this.log(LogService.LOG_DEBUG, "Bundle " + Activator.getDefault().getBundle().getSymbolicName() + " gestoppt.");
 
 		this.eventAdminTracker.close();
-//		this.persistenceProviderTracker.close();
 		this.encryptionServiceTracker.close();
 		this.logServiceTracker.close();
-		
+		this.stopPersistenceService();
+		this.eventHandlerRegistration.unregister();
 		this.saveDocument(document);
-
+		this.saveState();
 		ctx.close();
 
 		Activator.plugin = null;
@@ -345,10 +505,15 @@ public class Activator extends AbstractUIPlugin
 	public void startPersistenceService()
 	{
 		log(LogService.LOG_INFO, "Starte Persistenz Service...");
-		PersistenceService persistenceService = new PersistenceServiceImpl();
+		persistenceService = new PersistenceServiceImpl();
 		log(LogService.LOG_INFO, "Registriere Persistenz Service...");
 		getBundle().getBundleContext().registerService(PersistenceService.class, persistenceService, new Hashtable<String, Object>());
 		log(LogService.LOG_INFO, "Persistenz Service registriert.");
+	}
+	
+	public void stopPersistenceService()
+	{
+		persistenceService.close();
 	}
 	
 	@Override
@@ -449,13 +614,24 @@ public class Activator extends AbstractUIPlugin
 		}
 		return null;
 	}
+	
+	private void saveState() throws IOException
+	{
+		properties.setProperty("count", NumberFormat.getIntegerInstance().format(openTransfers + openUpdates));
+		OutputStream os = new FileOutputStream(getStatusFile());
+		try
+		{
+			properties.store(os, "Der Inhalt diese Datei darf nicht gerändert werden!");
+		}
+		finally
+		{
+			os.close();
+		}
+	}
 
 	private void setDerbyHome()
 	{
-		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		final File root = workspace.getRoot().getRawLocation().toFile();
-
-		final File cacheFolder = new File(root.getAbsolutePath() + File.separator + "cache");
+		final File cacheFolder = this.getLocalDatabaseDirectory();
 		if (!cacheFolder.exists())
 		{
 			cacheFolder.mkdir();
@@ -468,48 +644,50 @@ public class Activator extends AbstractUIPlugin
 			this.log(LogService.LOG_INFO, "Derby home gesetzt: " + System.getProperty("derby.system.home"));
 		}
 	}
-
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault()
+	
+	private void backupDerbyHome() throws IOException
 	{
-		return Activator.plugin;
-	}
-
-	public int getLogLevel(int statusSeverity)
-	{
-		switch(statusSeverity)
+		Calendar calendar = GregorianCalendar.getInstance();
+		String backupPath = getBackupDirectory().getAbsolutePath();
+		File localDatabaseDirectory = getLocalDatabaseDirectory();
+		File targetBackup = new File(backupPath + File.separator + localDatabaseDirectory.getName() + "_" + new SimpleDateFormat("yyyyMMddHHmmss").format(calendar.getTime()));
+		if (localDatabaseDirectory.exists())
 		{
-		case IStatus.CANCEL:
-		{
-			return LogService.LOG_WARNING;
-		}
-		case IStatus.ERROR:
-		{
-			return LogService.LOG_ERROR;
-		}
-		case IStatus.INFO:
-		{
-			return LogService.LOG_INFO;
-		}
-		case IStatus.OK:
-		{
-			return LogService.LOG_INFO;
-		}
-		case IStatus.WARNING:
-		{
-			return LogService.LOG_WARNING;
-		}
-		default:
-		{
-			return LogService.LOG_INFO;
-		}
+			FileUtils.copyDirectory(localDatabaseDirectory, targetBackup);
+			FileUtils.deleteDirectory(localDatabaseDirectory);
+			SimpleDateFormat sdf = new SimpleDateFormat(DATE_TIME_PATTERN);
+			properties.setProperty("last.backup", sdf.format(calendar.getTime()));
+			properties.setProperty("backup.directory", targetBackup.getAbsolutePath());
+			this.saveState();
 		}
 	}
+	
+	private File getWorkspace()
+	{
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		return workspace.getRoot().getRawLocation().toFile();
+	}
 
+	private File getConfigurationDirectory()
+	{
+		return new File(getWorkspace().getAbsolutePath() + File.separator + Activator.CONFIGURATION_DIRECTORY);
+	}
+	
+	private File getLocalDatabaseDirectory()
+	{
+		return new File(getWorkspace().getAbsolutePath() + File.separator + Activator.LOCAL_DATABASE_DIRECTORY);
+	}
+
+	private File getBackupDirectory()
+	{
+		return new File(getWorkspace().getAbsolutePath() + File.separator + Activator.BACKUP_DIRECTORY);
+	}
+	
+	private File getStatusFile()
+	{
+		return new File(this.getConfigurationDirectory().getAbsolutePath() + File.separator + "status.cfg");
+	}
+	
 	public enum ResultType
 	{
 		CONNECT_NORMAL, UPDATE_CURRENT_VERSION, NO_CONNECTION, EXIT_PROGRAM;

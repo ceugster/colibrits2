@@ -547,19 +547,10 @@ public abstract class AbstractConnectionService implements ConnectionService
 		}
 		finally
 		{
-			if (entityManager != null)
-			{
-				closeEntityManager(entityManager);
-			}
 		}
 		return entity;
 	}
 	
-	private void closeEntityManager(EntityManager entityManager)
-	{
-		// Do nothing
-	}
-
 	@Override
 	public AbstractEntity merge(final AbstractEntity entity) throws Exception
 	{
@@ -623,8 +614,6 @@ public abstract class AbstractConnectionService implements ConnectionService
 					{
 						updateReplicationValue(entity);
 					}
-//					entityManager.clear();
-//					closeEntityManager(entityManager);
 				}
 			}
 		}
@@ -683,9 +672,7 @@ public abstract class AbstractConnectionService implements ConnectionService
 				{
 					tx.rollback();
 				}
-//				entityManager.clear();
 				updateReplicationValue(entity);
-				closeEntityManager(entityManager);
 			}
 		}
 	}
@@ -720,7 +707,6 @@ public abstract class AbstractConnectionService implements ConnectionService
 				{
 					tx.rollback();
 				}
-				closeEntityManager(entityManager);
 			}
 		}
 	}

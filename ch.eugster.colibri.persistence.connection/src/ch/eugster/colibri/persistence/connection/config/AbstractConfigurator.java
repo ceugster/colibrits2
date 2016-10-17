@@ -17,7 +17,6 @@ import org.osgi.util.tracker.ServiceTracker;
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.queries.SequenceQuery;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractConfigurator
@@ -53,7 +52,7 @@ public abstract class AbstractConfigurator
 			{
 				Element current = Activator.getDefault().getCurrentConnectionElement();
 				boolean embedded = Boolean.parseBoolean(current
-						.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
+						.getAttributeValue(Activator.KEY_USE_EMBEDDED_DATABASE));
 				if (embedded)
 				{
 					factory = persistenceService.getCacheService().getEntityManagerFactory();

@@ -7,28 +7,6 @@ import ch.eugster.colibri.persistence.queries.AbstractQuery;
 
 public interface ConnectionService
 {
-	public static final String KEY_USE_EMBEDDED_DATABASE = "ch.eugster.colibri.persistence.impl.use.embedded.database";
-
-	public static final String KEY_NAME = "ch.eugster.colibri.persistence.server.connection.name";
-
-	public static final String KEY_LOCAL_SCHEMA = "ch.eugster.colibri.persistence.local.schema";
-
-	public static final String CONFIGURATION_DIR = "configuration";
-
-	public static final String CONFIGURATION_XML_FILE = "database.xml";
-
-	public static final String CONFIGURATION_DTD_FILE = "database.dtd";
-
-	public static final String KEY_PERSISTENCE_UNIT = "ch.eugster.colibri.persistence.unit";
-
-	public static final String PERSISTENCE_UNIT_SERVER = "ch.eugster.colibri.persistence.server";
-
-	public static final String PERSISTENCE_UNIT_LOCAL = "ch.eugster.colibri.persistence.local";
-
-	public static final String OJB_MIGRATION_COLIBRI_XML_FILE = "colibri.xml";
-	
-	public static final String OJB_MIGRATION_DIR = "Migration";
-	
 	AbstractEntity delete(AbstractEntity entity) throws Exception;
 
 	AbstractEntity find(Class<? extends AbstractEntity> clazz, Long id);
@@ -69,6 +47,8 @@ public interface ConnectionService
 	int getTimeout();
 	
 	ConnectionType getConnectionType();
+	
+	void close();
 	
 	public enum ConnectionType
 	{

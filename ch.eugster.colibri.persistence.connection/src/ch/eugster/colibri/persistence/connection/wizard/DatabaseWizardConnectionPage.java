@@ -75,7 +75,6 @@ import org.jdom.Element;
 
 import ch.eugster.colibri.persistence.connection.Activator;
 import ch.eugster.colibri.persistence.model.Version;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 
 
 public class DatabaseWizardConnectionPage extends WizardPage implements IPageChangedListener
@@ -774,7 +773,7 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 		DatabaseWizard wizard = (DatabaseWizard) DatabaseWizardConnectionPage.this.getWizard();
 		Element connection = wizard.getSelectedConnection() == null ? new Element("connection") : wizard.getSelectedConnection();
 		connection.setText(text);
-		connection.setAttribute(new Attribute(ConnectionService.KEY_USE_EMBEDDED_DATABASE, Boolean
+		connection.setAttribute(new Attribute(Activator.KEY_USE_EMBEDDED_DATABASE, Boolean
 				.toString(embedded)));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.TARGET_DATABASE, target));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_DRIVER, driver));
@@ -869,7 +868,7 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 
 		final Element connection = new Element("connection");
 		connection.setText(noSelectPage ? "colibri" : "");
-		connection.setAttribute(new Attribute(ConnectionService.KEY_USE_EMBEDDED_DATABASE, "true"));
+		connection.setAttribute(new Attribute(Activator.KEY_USE_EMBEDDED_DATABASE, "true"));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_DRIVER, SupportedDriver.DERBY_EMBEDDED
 				.getDriver()));
 		connection.setAttribute(new Attribute(PersistenceUnitProperties.JDBC_URL, SupportedDriver.DERBY_EMBEDDED
@@ -940,7 +939,7 @@ public class DatabaseWizardConnectionPage extends WizardPage implements IPageCha
 	{
 		this.connectionName.setText(element.getText());
 		final Boolean embedded = Boolean
-				.valueOf(element.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
+				.valueOf(element.getAttributeValue(Activator.KEY_USE_EMBEDDED_DATABASE));
 		DatabaseWizardConnectionPage.this.embedded.setSelection(embedded == null ? true : embedded);
 		this.drivers.setInput(SupportedDriver.values());
 		final String driverName = element.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);

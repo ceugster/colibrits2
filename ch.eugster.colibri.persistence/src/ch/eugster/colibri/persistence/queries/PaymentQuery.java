@@ -378,7 +378,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		return value;
 	}
 
-	public Collection<Payment> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows)
+	public List<Payment> selectProviderUpdates(final Salespoint salespoint, String providerId, final int maxRows)
 	{
 		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
 
@@ -396,7 +396,7 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
 		final Expression states = expression.and(deleted).and(saved.or(reversed));
-		final Collection<Payment> payments = this.select(states, maxRows);
+		final List<Payment> payments = this.select(states, maxRows);
 		return payments;
 	}
 

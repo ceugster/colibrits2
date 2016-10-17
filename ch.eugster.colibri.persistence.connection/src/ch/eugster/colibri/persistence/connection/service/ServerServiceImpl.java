@@ -29,7 +29,6 @@ import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.AbstractQuery;
 import ch.eugster.colibri.persistence.queries.UserQuery;
 import ch.eugster.colibri.persistence.queries.VersionQuery;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.service.ServerService;
 
@@ -90,7 +89,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	{
 		final Element connection = Activator.getDefault().getCurrentConnectionElement();
 		if (Boolean.valueOf(connection
-				.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE)).booleanValue())
+				.getAttributeValue(Activator.KEY_USE_EMBEDDED_DATABASE)).booleanValue())
 		{
 			return Status.OK_STATUS;
 		}
@@ -102,7 +101,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	{
 		final Element connection = Activator.getDefault().getCurrentConnectionElement();
 		final Boolean embedded = Boolean.valueOf(connection
-				.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
+				.getAttributeValue(Activator.KEY_USE_EMBEDDED_DATABASE));
 		final String driverName = connection.getAttributeValue(PersistenceUnitProperties.JDBC_DRIVER);
 		final String url = connection.getAttributeValue(PersistenceUnitProperties.JDBC_URL);
 		final String username = connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER);
@@ -111,9 +110,9 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 
 		final Properties properties = new Properties();
 		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
-		properties.setProperty(ConnectionService.KEY_NAME, connection.getText());
-		properties.setProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE, embedded.toString());
-		properties.setProperty(ConnectionService.KEY_PERSISTENCE_UNIT, ConnectionService.PERSISTENCE_UNIT_SERVER);
+		properties.setProperty(Activator.KEY_NAME, connection.getText());
+		properties.setProperty(Activator.KEY_USE_EMBEDDED_DATABASE, embedded.toString());
+		properties.setProperty(Activator.KEY_PERSISTENCE_UNIT, Activator.PERSISTENCE_UNIT_SERVER);
 		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER,
 				embedded.booleanValue() ? EmbeddedDriver.class.getName() : driverName);
 		properties.setProperty(PersistenceUnitProperties.JDBC_URL,
@@ -140,7 +139,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		{
 			final String key = keys.nextElement();
 			Object value = properties.getProperty(key);
-			if (key.equals(ConnectionService.KEY_USE_EMBEDDED_DATABASE))
+			if (key.equals(Activator.KEY_USE_EMBEDDED_DATABASE))
 			{
 				value = value == null ? true : Boolean.valueOf((String) value);
 			}
@@ -182,7 +181,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	protected EntityManagerFactory createEntityManagerFactory(IStatus status, Properties properties)
 	{
 		EntityManagerFactory factory = null;
-		Boolean embedded = Boolean.valueOf(properties.getProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE));
+		Boolean embedded = Boolean.valueOf(properties.getProperty(Activator.KEY_USE_EMBEDDED_DATABASE));
 		if (embedded.booleanValue())
 		{
 			factory = this.getPersistenceService().getCacheService().getEntityManagerFactory();
@@ -191,8 +190,8 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		{
 			Map<String, Object> map = getEntityManagerProperties(status, properties);
 			factory = this.getPersistenceService().getPersistenceProvider()
-					.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_SERVER, map);
-			log(LogService.LOG_INFO, "EntityManagerFactory for " + ConnectionService.PERSISTENCE_UNIT_SERVER + " created.");
+					.createEntityManagerFactory(Activator.PERSISTENCE_UNIT_SERVER, map);
+			log(LogService.LOG_INFO, "EntityManagerFactory for " + Activator.PERSISTENCE_UNIT_SERVER + " created.");
 		}
 		return factory;
 	}
@@ -228,6 +227,13 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	public Topic getDatabaseCompatibilityErrorTopic() 
 	{
 		return this.databaseCompatibilityErrorTopic;
+	}
+
+	@Override
+	public void close() 
+	{
+		this.getEntityManager().close();
+		this.getEntityManagerFactory().close();
 	}
 
 }

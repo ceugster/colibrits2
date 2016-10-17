@@ -33,4 +33,6 @@ public interface PersistenceService
 	void setDatabaseCompatibilityError(Topic topic);
 
 	Topic getDatabaseCompatibilityError();
+	
+	void close();
 }

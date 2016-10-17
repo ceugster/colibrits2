@@ -1271,6 +1271,7 @@ ch.eugster.colibri.persistence.connection/icons/database_go.png -text
 ch.eugster.colibri.persistence.connection/icons/db.gif -text
 ch.eugster.colibri.persistence.connection/icons/delete_16.png -text
 ch.eugster.colibri.persistence.connection/icons/error.png -text
+ch.eugster.colibri.persistence.connection/lib/commons-io-2.4.jar -text
 ch.eugster.colibri.persistence.connection/lib/jdom.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/antlr-2.7.5.jar -text
 ch.eugster.colibri.persistence.connection/lib/migration/commons-beanutils-1.7.0.jar -text

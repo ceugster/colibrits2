@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/commons-io-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/migration/commons-codec-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/migration/commons-lang-2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/migration/antlr-2.7.5.jar"/>

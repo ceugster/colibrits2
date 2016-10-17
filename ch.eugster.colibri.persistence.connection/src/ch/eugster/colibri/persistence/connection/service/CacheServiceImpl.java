@@ -22,7 +22,6 @@ import ch.eugster.colibri.persistence.model.AbstractEntity;
 import ch.eugster.colibri.persistence.model.Entity;
 import ch.eugster.colibri.persistence.queries.AbstractQuery;
 import ch.eugster.colibri.persistence.service.CacheService;
-import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class CacheServiceImpl extends AbstractConnectionService implements CacheService
@@ -43,18 +42,18 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	@Override
 	public Properties getProperties()
 	{
-		log(LogService.LOG_INFO, "Reading properties for " + ConnectionService.PERSISTENCE_UNIT_LOCAL);
+		log(LogService.LOG_INFO, "Reading properties for " + Activator.PERSISTENCE_UNIT_LOCAL);
 		final Element connection = Activator.getDefault().getCurrentConnectionElement();
 		/*
 		 * Use ONLY the embedded (local) database, no server database!
 		 */
-		final String embedded = connection.getAttributeValue(ConnectionService.KEY_USE_EMBEDDED_DATABASE);
+		final String embedded = connection.getAttributeValue(Activator.KEY_USE_EMBEDDED_DATABASE);
 
 		final Properties properties = new Properties();
 		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
-		properties.setProperty(ConnectionService.KEY_NAME, connection.getText());
-		properties.setProperty(ConnectionService.KEY_USE_EMBEDDED_DATABASE, embedded);
-		properties.setProperty(ConnectionService.KEY_PERSISTENCE_UNIT, ConnectionService.PERSISTENCE_UNIT_LOCAL);
+		properties.setProperty(Activator.KEY_NAME, connection.getText());
+		properties.setProperty(Activator.KEY_USE_EMBEDDED_DATABASE, embedded);
+		properties.setProperty(Activator.KEY_PERSISTENCE_UNIT, Activator.PERSISTENCE_UNIT_LOCAL);
 		properties.setProperty(PersistenceUnitProperties.JDBC_DRIVER, EmbeddedDriver.class.getName());
 		properties.setProperty(PersistenceUnitProperties.JDBC_URL, "jdbc:derby:" + connection.getText());
 		properties.setProperty(PersistenceUnitProperties.JDBC_USER, connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER));
@@ -70,7 +69,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 			{
 				if (dir.getAbsolutePath().equals(Activator.getDefault().getDerbyHome().getAbsolutePath()))
 				{
-					return name.toUpperCase().equals(properties.getProperty(ConnectionService.KEY_NAME).toUpperCase());
+					return name.toUpperCase().equals(properties.getProperty(Activator.KEY_NAME).toUpperCase());
 				}
 				return false;
 			}
@@ -88,7 +87,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 
 	private Map<String, Object> getEntityManagerProperties(final Properties properties)
 	{
-		log(LogService.LOG_INFO, "Collecting properties for " + ConnectionService.PERSISTENCE_UNIT_LOCAL);
+		log(LogService.LOG_INFO, "Collecting properties for " + Activator.PERSISTENCE_UNIT_LOCAL);
 		final Map<String, Object> map = new HashMap<String, Object>();
 
 		@SuppressWarnings("unchecked")
@@ -97,7 +96,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 		{
 			final String key = keys.nextElement();
 			Object value = properties.getProperty(key);
-			if (key.equals(ConnectionService.KEY_USE_EMBEDDED_DATABASE))
+			if (key.equals(Activator.KEY_USE_EMBEDDED_DATABASE))
 			{
 				value = value == null ? true : Boolean.valueOf((String) value);
 			}
@@ -120,7 +119,7 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 			{
 				if (dir.getAbsolutePath().equals(Activator.getDefault().getDerbyHome().getAbsolutePath()))
 				{
-					return name.toUpperCase().equals(properties.getProperty(ConnectionService.KEY_NAME).toUpperCase());
+					return name.toUpperCase().equals(properties.getProperty(Activator.KEY_NAME).toUpperCase());
 				}
 				return false;
 			}
@@ -154,8 +153,8 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	{
 		Map<String, Object> map = getEntityManagerProperties(properties);
 		EntityManagerFactory factory = this.getPersistenceService().getPersistenceProvider()
-				.createEntityManagerFactory(ConnectionService.PERSISTENCE_UNIT_LOCAL, map);
-		log(LogService.LOG_INFO, "EntityManagerFactory for " + ConnectionService.PERSISTENCE_UNIT_LOCAL + " created.");
+				.createEntityManagerFactory(Activator.PERSISTENCE_UNIT_LOCAL, map);
+		log(LogService.LOG_INFO, "EntityManagerFactory for " + Activator.PERSISTENCE_UNIT_LOCAL + " created.");
 		return factory;
 	}
 
@@ -169,6 +168,13 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	public ConnectionType getConnectionType() 
 	{
 		return ConnectionType.LOCAL;
+	}
+	
+	public void close()
+	{
+		this.getEntityManager().clear();
+		this.getEntityManager().close();
+		this.getEntityManagerFactory().close();
 	}
 
 }
