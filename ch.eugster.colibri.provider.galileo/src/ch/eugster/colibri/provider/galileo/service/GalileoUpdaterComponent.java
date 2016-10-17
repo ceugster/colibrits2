@@ -2,6 +2,7 @@ package ch.eugster.colibri.provider.galileo.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -57,8 +58,21 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	}
 	
 	@Override
+	public long countPositions(PersistenceService service) 
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public long countPayments(PersistenceService service) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
 	public IStatus updatePositions(PersistenceService persistenceService,
-			Collection<Position> positions)
+			List<Position> positions)
 	{
 		IStatus status = super.updatePositions(persistenceService, positions);
 		this.providerQuery.setStatus(status);
@@ -67,7 +81,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	
 	@Override
 	public IStatus updatePayments(PersistenceService persistenceService,
-			Collection<Payment> payments)
+			List<Payment> payments)
 	{
 		IStatus status = super.updatePayments(persistenceService, payments);
 		this.providerQuery.setStatus(status);
@@ -291,5 +305,4 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	{
 		return false;
 	}
-	
 }

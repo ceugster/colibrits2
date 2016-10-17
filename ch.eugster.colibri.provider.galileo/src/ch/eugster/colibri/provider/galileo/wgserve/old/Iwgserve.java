@@ -1,13 +1,6 @@
 package ch.eugster.colibri.provider.galileo.wgserve.old  ;
 
-import com4j.Com4jObject;
-import com4j.DISPID;
-import com4j.DefaultMethod;
-import com4j.IID;
-import com4j.MarshalAs;
-import com4j.NativeType;
-import com4j.ReturnValue;
-import com4j.VTID;
+import com4j.*;
 
 @IID("{9C3F93A1-270D-11D8-B851-0002E3178697}")
 public interface Iwgserve extends Com4jObject {

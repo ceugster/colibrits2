@@ -1,6 +1,6 @@
 package ch.eugster.colibri.provider.galileo.kundenserver.sql  ;
 
-import com4j.COM4J;
+import com4j.*;
 
 /**
  * Defines methods to create COM objects

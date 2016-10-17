@@ -44,8 +44,6 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 
 	private boolean showFailoverMessage = true;
 	
-	private IStatus status;
-	
 	private final Collection<BarcodeVerifier> barcodeVerifiers = new ArrayList<BarcodeVerifier>();
 
 	public GalileoQueryComponent()
@@ -76,7 +74,6 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 
 	public void setStatus(IStatus status)
 	{
-		this.status = status;
 	}
 	
 	@Override
@@ -168,7 +165,6 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 	protected void activate(final ComponentContext componentContext)
 	{
 		super.activate(componentContext);
-		this.status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
 		this.loadProperties(persistenceService.getCacheService(), Activator.getDefault().getConfiguration().getProviderId(), GalileoConfiguration.GalileoProperty.asMap());
 		this.startFindArticleServer();
 		if (this.findArticleServer == null)

@@ -1743,10 +1743,10 @@ ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/hand
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/CustomerServer.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/CustomerServerFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/ICustomerServer.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/ClassFactory.java -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/ClassFactory.java -text svneol=unset#text/plain
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/CustomerServerOld.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/Ikundenserver.java -text
-ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/package.html -text
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/Ikundenserver.java -text svneol=unset#text/plain
+ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/old/package.html -text svneol=unset#text/plain
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/sql/ClassFactory.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/sql/CustomerServerSql.java -text
 ch.eugster.colibri.provider.galileo/src/ch/eugster/colibri/provider/galileo/kundenserver/sql/Ikundenserver2g.java -text

@@ -9,9 +9,7 @@ import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
-import ch.eugster.colibri.provider.galileo.service.GalileoConfiguratorComponent;
 import ch.eugster.colibri.provider.galileo.service.GalileoIdService;
-import ch.eugster.colibri.provider.service.ProviderConfigurator;
 import ch.eugster.colibri.provider.service.ProviderIdService;
 
 /**

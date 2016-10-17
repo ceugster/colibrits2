@@ -132,14 +132,14 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 								{
 									msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
 											+ barcode.getProductCode() + " konnte nicht gefunden werden.";
-									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic(), new Exception(msg));
 									log(LogService.LOG_INFO, (msg));
 								}
 								else
 								{
 									msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
 											+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell.";
-									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), msg);
+									status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic(), new Exception(msg));
 									log(LogService.LOG_INFO, (msg));
 								}
 							}
@@ -148,12 +148,11 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 						{
 							msg = barcode.getType().getArticle() + " " + barcode.getType() + " mit dem Code "
 									+ barcode.getProductCode() + " konnte nicht gefunden werden.\nBitte erfassen Sie die zusätzlich benötigten Daten manuell. " + e.getLocalizedMessage();
-							status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg);
+							status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic(), new Exception(msg));
 							log(LogService.LOG_ERROR, (msg));
 						}
 					}
 				}
-
 				this.close();
 			}
 			else
@@ -162,6 +161,10 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 				{
 					log(LogService.LOG_INFO, "Suchwert auf null setzen.");
 					position.setSearchValue(null);
+				}
+				else
+				{
+					barcode.updatePosition(position);
 				}
 				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
 			}
