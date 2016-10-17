@@ -1,5 +1,6 @@
 package ch.eugster.colibri.admin.provider.editors;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -140,7 +141,8 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 			if (this.checkValues())
 			{
 				String value = null;
-				for (final IProperty property : input.getProperties().values())
+				Collection<IProperty> properties = input.getProperties().values();
+				for (final IProperty property : properties)
 				{
 					boolean update = false;
 					if (property.control().equals(FileDialog.class.getName()))
