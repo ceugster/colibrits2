@@ -232,8 +232,14 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 	@Override
 	public void close() 
 	{
-		this.getEntityManager().close();
-		this.getEntityManagerFactory().close();
+		if (this.getEntityManager() != null)
+		{
+			this.getEntityManager().close();
+		}
+		if (this.getEntityManagerFactory() != null)
+		{
+			this.getEntityManagerFactory().close();
+		}
 	}
 
 }

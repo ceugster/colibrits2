@@ -172,9 +172,15 @@ public class CacheServiceImpl extends AbstractConnectionService implements Cache
 	
 	public void close()
 	{
-		this.getEntityManager().clear();
-		this.getEntityManager().close();
-		this.getEntityManagerFactory().close();
+		if (this.getEntityManager() != null)
+		{
+			this.getEntityManager().clear();
+			this.getEntityManager().close();
+		}
+		if (this.getEntityManagerFactory() != null)
+		{
+			this.getEntityManagerFactory().close();
+		}
 	}
 
 }
