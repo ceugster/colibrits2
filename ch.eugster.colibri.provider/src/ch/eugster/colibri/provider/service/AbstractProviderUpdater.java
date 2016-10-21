@@ -29,8 +29,6 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 		return query.selectProviderUpdates(salespoint, getProviderId(), !service.getServerService().isLocal(), max);
 	}
 	
-	protected abstract IStatus checkConnection();
-	
 	@Override
 	public IStatus updatePositions(PersistenceService persistenceService,
 			List<Position> positions)
@@ -39,6 +37,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 		if (positions.size() == 0)
 		{
 			status = this.checkConnection();
+			this.failOverMode = !status.isOK();
 		}
 		if (status.isOK())
 		{

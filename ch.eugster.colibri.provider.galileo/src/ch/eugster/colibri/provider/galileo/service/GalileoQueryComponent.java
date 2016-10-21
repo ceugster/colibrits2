@@ -63,7 +63,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			try
 			{
 				int customerId = Integer.valueOf(code);
-				receipt.setCustomer(this.findArticleServer.getCustomer(customerId));
+				receipt.setCustomer(this.findArticleServer.getCustomer(customerId, this.failOverMode));
 			}
 			catch (NumberFormatException e)
 			{
@@ -108,7 +108,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			if (findArticleServer.isConnect())
 			{
 				log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
-				status = this.findArticleServer.findAndRead(barcode, position);
+				status = this.findArticleServer.findAndRead(barcode, position, this.failOverMode);
 				if ((status.isOK()) || (status.getSeverity() == IStatus.ERROR))
 				{
 					log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
@@ -136,7 +136,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 	@Override
 	public IStatus selectCustomer(final Position position, ProductGroup productGroup)
 	{
-		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic());
 		if (this.customerServer.isConnect())
 		{
 			log(LogService.LOG_INFO, "Starte Kundensuche...");
@@ -148,7 +148,6 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			{
 				status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Fehler bei Aufruf von Kundensuche. " + e.getLocalizedMessage(),e);
 				log(LogService.LOG_ERROR, status.getMessage());
-//				this.sendEvent(this.getEvent(status, true));
 			}
 			finally
 			{

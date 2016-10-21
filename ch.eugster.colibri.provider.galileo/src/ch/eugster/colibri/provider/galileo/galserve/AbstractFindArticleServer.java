@@ -20,10 +20,19 @@ import ch.eugster.colibri.provider.galileo.Activator;
 
 public abstract class AbstractFindArticleServer extends AbstractGalileoServer
 {
+	protected boolean isFailOverMode;
+	
 	public AbstractFindArticleServer(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
 	}
+	
+	/*
+	 * The failOverMode indicates the state of connection. If failOverMode == false 
+	 * set the variable open to false and set this.status to ERROR. Use this method
+	 * only in case where the program should stay responsible to user (i.e. findAndRead)
+	 */
+	public abstract boolean open(boolean failOverMode);
 	
 	protected ExternalProductGroup findExternalProductGroup(String code)
 	{

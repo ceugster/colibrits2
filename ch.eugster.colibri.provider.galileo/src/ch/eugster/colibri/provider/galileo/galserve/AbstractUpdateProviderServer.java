@@ -42,12 +42,18 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.ProviderState;
 import ch.eugster.colibri.provider.galileo.Activator;
 
-public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer
+public abstract class AbstractUpdateProviderServer extends AbstractGalileoServer implements IUpdateProviderServer
 {
 	public AbstractUpdateProviderServer(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see ch.eugster.colibri.provider.galileo.galserve.IServer#open()
+	 */
+	public abstract boolean open();
 
 	public IStatus updateProvider(final Position position)
 	{

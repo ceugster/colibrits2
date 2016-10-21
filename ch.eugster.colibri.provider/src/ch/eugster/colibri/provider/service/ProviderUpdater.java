@@ -29,6 +29,8 @@ public interface ProviderUpdater extends Comparable<ProviderUpdater>
 
 	boolean doCheckFailover();
 	
+	IStatus checkConnection();
+
 	IStatus testConnection(Map<String, IProperty> properties);
 	
 	boolean isSalespointSpecificPossible();

@@ -8,9 +8,9 @@ import ch.eugster.colibri.persistence.model.product.Customer;
 
 public interface IFindArticleServer extends IServer
 {
-	IStatus findAndRead(final Barcode barcode, final Position position);
+	IStatus findAndRead(final Barcode barcode, final Position position, boolean failOverMode);
 
 	boolean isConnect();
 	
-	Customer getCustomer(int customerId);
+	Customer getCustomer(int customerId, boolean failOverMode);
 }

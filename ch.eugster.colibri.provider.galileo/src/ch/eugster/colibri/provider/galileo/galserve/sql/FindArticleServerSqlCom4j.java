@@ -47,13 +47,13 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		super(persistenceService, properties);
 	}
 
-	public Customer getCustomer(int customerId)
+	public Customer getCustomer(int customerId, boolean failOverMode)
 	{
 		Customer customer = null;
 		if (isConnect())
 		{
 			log(LogService.LOG_INFO, "Verbindung öffnen.");
-			if (this.open())
+			if (this.open(failOverMode))
 			{
 				if (this.galserve.do_getkunde(customerId))
 				{
@@ -68,7 +68,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 	}
 	
 	@Override
-	public IStatus findAndRead(final Barcode barcode, final Position position)
+	public IStatus findAndRead(final Barcode barcode, final Position position, boolean failOverMode)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
 		String msg = null;
@@ -77,7 +77,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		if (isConnect())
 		{
 			log(LogService.LOG_INFO, "Verbindung öffnen.");
-			if (this.open())
+			if (this.open(failOverMode))
 			{
 				if (barcode.getType().equals(Barcode.Type.CUSTOMER))
 				{
@@ -384,25 +384,34 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		this.status = Status.CANCEL_STATUS;
 	}
 
-	public boolean open()
+	public boolean open(boolean failOverMode)
 	{
-		IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
-		String database = property.value();
-		this.wasOpen = this.open;
-		if (!this.open)
+		if (failOverMode)
 		{
-			try
+			this.wasOpen = this.open;
+			this.open = false;
+			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
+		}
+		else
+		{
+			IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
+			String database = property.value();
+			this.wasOpen = this.open;
+			if (!this.open)
 			{
-				this.open = this.galserve.do_NOpen(database);
-				if (!this.open)
+				try
 				{
-					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
+					this.open = this.galserve.do_NOpen(database);
+					if (!this.open)
+					{
+						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
+					}
 				}
-			}
-			catch (Exception e)
-			{
-				e.printStackTrace();
-				this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+				}
 			}
 		}
 		return this.open;

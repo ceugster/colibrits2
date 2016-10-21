@@ -12,13 +12,9 @@ public interface IServer
 {
 	public static final String PROPERTY_DATA_PATH = "CDATAPATH";
 
-	IStatus checkConnection();
-
 	IStatus start();
 	
 	void stop();
-	
-	boolean open();
 	
 	void close();
 	

@@ -16,7 +16,6 @@ import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.barcode.code.Barcode;
 import ch.eugster.colibri.barcode.service.BarcodeVerifier;
-import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -170,23 +169,6 @@ public abstract class AbstractGalileoServer implements IServer
 	}
 	
 	@Override
-	public IStatus checkConnection()
-	{
-		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(),
-				"Die Verbindung zur Warenbewirtschaftung Galileo wurde erfolgreich hergestellt.");
-		if (this.open())
-		{
-			this.close();
-		}
-		else
-		{
-			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(),
-					Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
-		}
-		return status;
-	}
-
-	@Override
 	public IStatus start()
 	{
 		logServiceTracker = new ServiceTracker<LogService, LogService>(Activator.getDefault().getBundle().getBundleContext(), LogService.class, null);
@@ -195,8 +177,6 @@ public abstract class AbstractGalileoServer implements IServer
 		barcodeVerifierTracker.open();
 		return status;
 	}
-
-	public abstract boolean open();
 
 	public abstract void close();
 
