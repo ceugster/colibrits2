@@ -7,6 +7,7 @@ import java.util.List;
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
 
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.Settlement;
@@ -111,6 +112,34 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		final Expression states = saved.or(reversed);
 		final long value = this.count(deleted.and(states));
 		return value;
+	}
+
+	public double selectByCustomerCodeNotUpdated(String customerCode)
+	{
+		Expression deleted = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
+		deleted = deleted.and(new ExpressionBuilder().anyOfAllowingNone("positions").get("deleted").equal(false));
+
+		final Expression update = new ExpressionBuilder().anyOfAllowingNone("positions").get("bookProvider")
+				.equal(true);
+
+		Expression saved = new ExpressionBuilder().get("state").equal(Receipt.State.SAVED);
+		saved = saved.and(update.and(new ExpressionBuilder().anyOfAllowingNone("positions").get("providerBooked")
+				.equal(false)));
+
+		Expression reversed = new ExpressionBuilder().get("state").equal(Receipt.State.REVERSED);
+		reversed = reversed.and(update.and(new ExpressionBuilder().anyOfAllowingNone("positions").get("providerBooked")
+				.equal(true)));
+
+		Expression customer = new ExpressionBuilder().get("customerCode").equal(customerCode);
+
+		final Expression expression = customer.and(saved.or(reversed));
+		List<Receipt> receipts = this.select(expression);
+		double amount = 0;
+		for (Receipt receipt : receipts)
+		{
+			amount += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+		}
+		return amount;
 	}
 
 	private Expression createSelectTransferablesExpression()

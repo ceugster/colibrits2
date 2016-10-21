@@ -194,11 +194,11 @@ public enum Topic
 		}
 		case LOCK:
 		{
-			return "Beleg wird gespeichert.";
+			return "Kasse gesperrt.";
 		}
 		case UNLOCK:
 		{
-			return "Beleg wurde gespeichert.";
+			return "Kasse entsperrt.";
 		}
 		default:
 		{
@@ -289,11 +289,11 @@ public enum Topic
 		}
 		case LOCK:
 		{
-			return "Beleg wird gespeichert.";
+			return "Kasse gesperrt.";
 		}
 		case UNLOCK:
 		{
-			return "Beleg wurde gespeichert.";
+			return "Kasse entsperrt.";
 		}
 		default:
 		{
