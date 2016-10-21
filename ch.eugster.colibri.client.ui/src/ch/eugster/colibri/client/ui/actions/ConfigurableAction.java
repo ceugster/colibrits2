@@ -71,14 +71,7 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 				}
 				else
 				{
-//					if (this.button != null)
-//					{
-//						state = !this.button.isFailOver();
-//					}
-//					else
-//					{
-						state = true;
-//					}
+					state = true;
 				}
 			}
 			else
