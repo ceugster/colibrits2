@@ -30,6 +30,7 @@ import ch.eugster.colibri.persistence.model.Stock;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.PrintoutQuery;
+import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
 import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
@@ -199,7 +200,16 @@ public abstract class AbstractPrintService implements PrintService, EventHandler
 													log(LogService.LOG_INFO, "Schublade " + currency.getCode() + " geöffnet.");
 												}
 											}
-
+										}
+									}
+									if (printable instanceof Receipt)
+									{
+										Receipt receipt = (Receipt) printable;
+										if (receipt.getCustomer() != null)
+										{
+											ReceiptQuery query = (ReceiptQuery) connectionService.getQuery(Receipt.class);
+											double amount = query.selectByCustomerCodeNotUpdated(receipt.getCustomerCode());
+											receipt.getCustomer().addAccount(amount);
 										}
 									}
 									Integer copies = (Integer) event.getProperty("copies");

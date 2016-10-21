@@ -171,14 +171,14 @@ public class ReceiptLayoutCustomerSection extends AbstractLayoutSection
 		
 		private double computeAmount(double account, Receipt receipt)
 		{
-			if (receipt.getState().equals(Receipt.State.REVERSED) && receipt.isProviderUpdated())
-			{
-				return account - receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
-			}
-			else if (receipt.getState().equals(Receipt.State.SAVED) && !receipt.isProviderUpdated())
-			{
-				return account + receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
-			}
+//			if (receipt.getState().equals(Receipt.State.REVERSED) && receipt.isProviderUpdated())
+//			{
+//				return account - receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+//			}
+//			else if (receipt.getState().equals(Receipt.State.SAVED) && !receipt.isProviderUpdated())
+//			{
+//				return account + receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+//			}
 			return account;
 		}
 }
