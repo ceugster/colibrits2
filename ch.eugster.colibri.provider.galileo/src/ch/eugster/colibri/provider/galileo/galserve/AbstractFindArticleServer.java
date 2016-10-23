@@ -20,8 +20,6 @@ import ch.eugster.colibri.provider.galileo.Activator;
 
 public abstract class AbstractFindArticleServer extends AbstractGalileoServer
 {
-	protected boolean isFailOverMode;
-	
 	public AbstractFindArticleServer(PersistenceService persistenceService, Map<String, IProperty> properties)
 	{
 		super(persistenceService, properties);

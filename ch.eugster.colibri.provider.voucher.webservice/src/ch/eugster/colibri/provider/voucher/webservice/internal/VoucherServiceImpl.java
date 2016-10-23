@@ -889,4 +889,10 @@ public class VoucherServiceImpl implements VoucherService, ProviderUpdater
 	{
 		return this.getPayments(service, 0).size();
 	}
+
+	@Override
+	public IStatus checkConnection() {
+		// TODO Auto-generated method stub
+		return Status.OK_STATUS;
+	}
 }

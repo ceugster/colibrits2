@@ -18,8 +18,10 @@ import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Position.Option;
 import ch.eugster.colibri.persistence.model.Product;
 import ch.eugster.colibri.persistence.model.ProductGroup;
+import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.queries.ProductQuery;
+import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.galileo.Activator;
@@ -43,53 +45,55 @@ public class CustomerServerSql extends CustomerServer
 	
 	public IStatus selectCustomer(final Position position, final ProductGroup productGroup)
 	{
+		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic());
 		IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
 		String database = property.value();
 		boolean wasopen = this.open;
 		if (!this.open)
 		{
-			this.open = CustomerServerSql.this.kserver.db_open(database);
+			this.open = this.kserver.db_open(database);
 		}
 		if (this.open)
 		{
 			Customer customer = null;
-			final int result = CustomerServerSql.this.kserver.getkundennr();
+			final int result = this.kserver.getkundennr();
 			if ((result != 0))
 			{
+				double amount = this.addNotUpdatedAmount(Integer.valueOf(result).toString());
 				customer = new Customer();
 				customer.setId(result);
-				customer.setSalutation(CustomerServerSql.this.kserver.canrede().toString());
-				customer.setEmail(CustomerServerSql.this.kserver.cemail().toString());
-				customer.setCountry(CustomerServerSql.this.kserver.cland().toString());
-				customer.setLastname(CustomerServerSql.this.kserver.cnamE1().toString());
-				customer.setLastname2(CustomerServerSql.this.kserver.cnamE2().toString());
-				customer.setLastname3(CustomerServerSql.this.kserver.cnamE3().toString());
-				customer.setMobile(CustomerServerSql.this.kserver.cnatel().toString());
-				customer.setCity(CustomerServerSql.this.kserver.cort().toString());
-				customer.setZip(CustomerServerSql.this.kserver.cplz().toString());
-				customer.setAddress(CustomerServerSql.this.kserver.cstrasse().toString());
-				customer.setFax(CustomerServerSql.this.kserver.ctelefax().toString());
-				customer.setPhone(CustomerServerSql.this.kserver.ctelefon().toString());
-				customer.setPhone2(CustomerServerSql.this.kserver.ctelefoN2().toString());
-				customer.setPersonalTitle(CustomerServerSql.this.kserver.ctitel().toString());
-				customer.setFirstname(CustomerServerSql.this.kserver.cvorname().toString());
-				customer.setHasAccount((Boolean) CustomerServerSql.this.kserver.lkundkarte());
-				customer.setAccount((Double) CustomerServerSql.this.kserver.nkundkonto());
-//				final double nachlass = Math.abs((Double) CustomerServerSql.this.kserver.nnachlass());
+				customer.setSalutation(this.kserver.canrede().toString());
+				customer.setEmail(this.kserver.cemail().toString());
+				customer.setCountry(this.kserver.cland().toString());
+				customer.setLastname(this.kserver.cnamE1().toString());
+				customer.setLastname2(this.kserver.cnamE2().toString());
+				customer.setLastname3(this.kserver.cnamE3().toString());
+				customer.setMobile(this.kserver.cnatel().toString());
+				customer.setCity(this.kserver.cort().toString());
+				customer.setZip(this.kserver.cplz().toString());
+				customer.setAddress(this.kserver.cstrasse().toString());
+				customer.setFax(this.kserver.ctelefax().toString());
+				customer.setPhone(this.kserver.ctelefon().toString());
+				customer.setPhone2(this.kserver.ctelefoN2().toString());
+				customer.setPersonalTitle(this.kserver.ctitel().toString());
+				customer.setFirstname(this.kserver.cvorname().toString());
+				customer.setHasAccount((Boolean) this.kserver.lkundkarte());
+				customer.setAccount(((Double) this.kserver.nkundkonto()).doubleValue() + amount);
+//				final double nachlass = Math.abs((Double) CustomerServerOld.this.kserver.nnachlass());
 //				final double discount = BigDecimal.valueOf(nachlass / 100).round(new MathContext(2)).doubleValue();
 //				customer.setDiscount(discount);
-				Object object = CustomerServerSql.this.kserver.lrggewaehlt();
+				Object object = this.kserver.lrggewaehlt();
 				if (object instanceof Boolean && ((Boolean) object).booleanValue())
 				{
-					Integer value = (Integer) CustomerServerSql.this.kserver.nrgnummer();
-					this.status = checkInvoice(value.toString());
+					Integer value = (Integer) this.kserver.nrgnummer();
+					status = checkInvoice(value.toString());
 					if (status.isOK())
 					{
 						final Product product = Product.newInstance(position);
 						product.setInvoiceNumber(value.toString());
 						position.setProduct(product);
 						position.setQuantity(1);
-						position.setPrice((Double) CustomerServerSql.this.kserver.nrgbetrag());
+						position.setPrice((Double) this.kserver.nrgbetrag());
 //						position.setDiscount(discount);
 						position.setSearchValue(product.getInvoiceNumber());
 						position.setProductGroup(productGroup);
@@ -99,7 +103,7 @@ public class CustomerServerSql extends CustomerServer
 			}
 			else
 			{
-				CustomerServerSql.this.status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(),
+				status = new Status(IStatus.CANCEL, Activator.getDefault().getBundle().getSymbolicName(),
 						Topic.CUSTOMER_UPDATE.topic());
 			}
 			position.getReceipt().setCustomer(customer);
@@ -110,7 +114,7 @@ public class CustomerServerSql extends CustomerServer
 			{
 				if (!wasopen)
 				{
-					this.open = !((Boolean) CustomerServerSql.this.kserver.db_close()).booleanValue();
+					this.open = !((Boolean) this.kserver.db_close()).booleanValue();
 				}
 			}
 		}
@@ -118,7 +122,7 @@ public class CustomerServerSql extends CustomerServer
 		{
 			status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic(), new Exception("Keine Verbindung"));
 		}
-		return this.status;
+		return status;
 	}
 
 	private IStatus checkInvoice(String invoiceNumber)
@@ -163,6 +167,27 @@ public class CustomerServerSql extends CustomerServer
 			tracker.close();
 		}
 		return status;
+	}
+	
+	private double addNotUpdatedAmount(String customerCode)
+	{
+		double amount = 0D;
+		ServiceTracker<PersistenceService, PersistenceService> tracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(), PersistenceService.class, null);
+		tracker.open();
+		try
+		{
+			PersistenceService service = tracker.getService();
+			if (service != null)
+			{
+				ReceiptQuery query = (ReceiptQuery) service.getCacheService().getQuery(Receipt.class);
+				amount = query.selectByCustomerCodeNotUpdated(customerCode);
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
+		return amount;
 	}
 	
 	public IStatus start()

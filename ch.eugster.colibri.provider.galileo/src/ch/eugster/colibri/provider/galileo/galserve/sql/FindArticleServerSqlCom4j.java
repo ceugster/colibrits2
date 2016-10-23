@@ -47,13 +47,13 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		super(persistenceService, properties);
 	}
 
-	public Customer getCustomer(int customerId, boolean failOverMode)
+	public Customer getCustomer(int customerId, boolean isCurrentlyFailoverMode)
 	{
 		Customer customer = null;
 		if (isConnect())
 		{
 			log(LogService.LOG_INFO, "Verbindung öffnen.");
-			if (this.open(failOverMode))
+			if (this.open(isCurrentlyFailoverMode))
 			{
 				if (this.galserve.do_getkunde(customerId))
 				{
@@ -68,7 +68,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 	}
 	
 	@Override
-	public IStatus findAndRead(final Barcode barcode, final Position position, boolean failOverMode)
+	public IStatus findAndRead(final Barcode barcode, final Position position, boolean isCurrentlyFailoverMode)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.PROVIDER_QUERY.topic());
 		String msg = null;
@@ -77,7 +77,7 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		if (isConnect())
 		{
 			log(LogService.LOG_INFO, "Verbindung öffnen.");
-			if (this.open(failOverMode))
+			if (this.open(isCurrentlyFailoverMode))
 			{
 				if (barcode.getType().equals(Barcode.Type.CUSTOMER))
 				{
@@ -384,9 +384,9 @@ public class FindArticleServerSqlCom4j extends AbstractFindArticleServer impleme
 		this.status = Status.CANCEL_STATUS;
 	}
 
-	public boolean open(boolean failOverMode)
+	public boolean open(boolean isCurrentlyFailoverMode)
 	{
-		if (failOverMode)
+		if (isCurrentlyFailoverMode)
 		{
 			this.wasOpen = this.open;
 			this.open = false;

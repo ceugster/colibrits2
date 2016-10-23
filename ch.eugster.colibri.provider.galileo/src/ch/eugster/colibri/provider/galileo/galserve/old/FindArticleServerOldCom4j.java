@@ -47,13 +47,13 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 		super(persistenceService, properties);
 	}
 
-	public Customer getCustomer(int customerId, boolean failOverMode)
+	public Customer getCustomer(int customerId, boolean isCurrentlyFailoverMode)
 	{
 		Customer customer = null;
 		if (isConnect())
 		{
 			log(LogService.LOG_INFO, "Verbindung öffnen.");
-			if (this.open(failOverMode))
+			if (this.open(isCurrentlyFailoverMode))
 			{
 				if (this.galserve.do_getkunde(customerId))
 				{
@@ -384,9 +384,9 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 		this.status = Status.CANCEL_STATUS;
 	}
 
-	public boolean open(boolean failOverMode)
+	public boolean open(boolean isCurrentlyFailoverMode)
 	{
-		if (failOverMode)
+		if (isCurrentlyFailoverMode)
 		{
 			this.wasOpen = this.open;
 			this.open = false;

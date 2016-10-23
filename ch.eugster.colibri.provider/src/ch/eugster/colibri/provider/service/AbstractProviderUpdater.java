@@ -37,7 +37,7 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 		if (positions.size() == 0)
 		{
 			status = this.checkConnection();
-			this.failOverMode = !status.isOK();
+			isCurrentlyFailoverMode = !status.isOK();
 		}
 		if (status.isOK())
 		{
@@ -106,6 +106,11 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 			List<Payment> payments) 
 	{
 		IStatus status = getStatus(null);
+		if (payments.size() == 0)
+		{
+			status = this.checkConnection();
+			isCurrentlyFailoverMode = !status.isOK();
+		}
 		for (Payment payment : payments)
 		{
 			if (!payment.isProviderBooked() || ! payment.isServerUpdated())

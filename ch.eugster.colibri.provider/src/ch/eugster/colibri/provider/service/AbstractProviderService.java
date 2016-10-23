@@ -21,7 +21,7 @@ import ch.eugster.colibri.provider.configuration.IProperty;
 
 public abstract class AbstractProviderService implements ProviderService
 {
-	protected boolean failOverMode;
+	protected static boolean isCurrentlyFailoverMode;
 	
 	protected ComponentContext context;
 
