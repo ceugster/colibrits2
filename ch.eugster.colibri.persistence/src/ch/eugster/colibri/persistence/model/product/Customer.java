@@ -48,6 +48,8 @@ public class Customer
 
 	private double account; // NKUNDKARTE
 
+	private double tmpAccount = 0D;
+	
 	private boolean hasAccount; // LKUNDKARTE
 
 	private double discount; // NNACHLASS
@@ -65,28 +67,8 @@ public class Customer
 
 	public double getAccount()
 	{
-		return account;
+		return account + tmpAccount;
 	}
-
-	// public CustomerImpl(IJIDispatch dispatch) throws JIException
-	// {
-	// this.setAddress(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_ADDRESS).getObjectAsString2());
-	// this.setSalutation(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_SALUTATION).getObjectAsString2());
-	// this.setPersonalTitle(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_TITLE).getObjectAsString2());
-	// this.setFirstname(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_FIRST_NAME).getObjectAsString2());
-	// this.setLastname(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_LAST_NAME_1).getObjectAsString2());
-	// this.setLastname2(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_LAST_NAME_2).getObjectAsString2());
-	// this.setLastname3(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_LAST_NAME_3).getObjectAsString2());
-	// this.setCountry(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_COUNTRY).getObjectAsString2());
-	// this.setZip(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_ZIP).getObjectAsString2());
-	// this.setCity(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_CITY).getObjectAsString2());
-	// this.setPhone(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_PHONE_1).getObjectAsString2());
-	// this.setPhone2(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_PHONE_2).getObjectAsString2());
-	// this.setFax(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_FAX).getObjectAsString2());
-	// this.setMobile(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_PHONE_MOBILE).getObjectAsString2());
-	// this.setEmail(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_EMAIL).getObjectAsString2());
-	// this.setAccount(dispatch.get(GalileoItem.PROPERTY_CUSTOMER_ACCOUNT).getObjectAsDouble());
-	// }
 
 	public String getAddress()
 	{
@@ -326,6 +308,6 @@ public class Customer
 	
 	public void addAccount(double amount)
 	{
-		this.account += amount;
+		this.tmpAccount = amount;
 	}
 }
