@@ -36,6 +36,7 @@ import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.model.product.ProductGroupGroup;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 
 @Entity
 @AttributeOverrides({ @AttributeOverride(name = "timestamp", column = @Column(name = "re_timestamp")),
@@ -395,6 +396,27 @@ public class Receipt extends AbstractEntity implements IPrintable
 			}
 		}
 		return activePositions;
+	}
+
+	/**
+	 * 
+	 * @param productGroupType
+	 * @return
+	 */
+	public double getAmount(ProductGroupType productGroupType)
+	{
+		double amount = 0D;
+		if (this.getCustomer() != null && !this.providerUpdated)
+		{
+			for (Position position : this.positions)
+			{
+				if (!position.isDeleted() && position.getProductGroup().getProductGroupType().equals(productGroupType))
+				{
+					amount = position.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.NETTO);
+				}
+			}
+		}
+		return amount;
 	}
 
 	public Long getNumber()

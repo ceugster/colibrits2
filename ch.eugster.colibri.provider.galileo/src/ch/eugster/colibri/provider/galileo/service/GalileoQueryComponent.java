@@ -63,7 +63,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			try
 			{
 				int customerId = Integer.valueOf(code);
-				receipt.setCustomer(this.findArticleServer.getCustomer(customerId, isCurrentlyFailoverMode));
+				receipt.setCustomer(this.findArticleServer.getCustomer(customerId));
 			}
 			catch (NumberFormatException e)
 			{
@@ -108,9 +108,10 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			if (findArticleServer.isConnect())
 			{
 				log(LogService.LOG_INFO, "Suche in Warenbewirtschaftung nach \"" + barcode.getCode() + "\".");
-				status = this.findArticleServer.findAndRead(barcode, position, isCurrentlyFailoverMode);
+				status = this.findArticleServer.findAndRead(barcode, position);
 				if ((status.isOK()) || (status.getSeverity() == IStatus.ERROR))
 				{
+					Activator.getDefault().setCurrentlyFailoverMode(status.getSeverity() == IStatus.ERROR);
 					log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
 					this.sendEvent(this.getEvent(status, false));
 				}

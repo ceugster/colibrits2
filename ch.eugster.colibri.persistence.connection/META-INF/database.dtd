@@ -15,5 +15,5 @@
             javax.persistence.jdbc.user        (CDATA)     #REQUIRED
             javax.persistence.jdbc.password    (CDATA)     #REQUIRED
             eclipselink.target-database        (CDATA)     #REQUIRED
-            
+            eclipselink.jdbc.timeout           (CDATA)     #IMPLIED
 >

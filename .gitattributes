@@ -1832,6 +1832,7 @@ ch.eugster.colibri.provider/icons/save_edit.png -text
 ch.eugster.colibri.provider/icons/undo_edit.png -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/Activator.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IDirtyable.java -text
+ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IFailoverPerceptible.java -text svneol=unset#text/plain
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/IProperty.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderConfiguration.java -text
 ch.eugster.colibri.provider/src/ch/eugster/colibri/provider/configuration/ProviderState.java -text

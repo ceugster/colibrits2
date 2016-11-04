@@ -110,6 +110,8 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public abstract class AbstractConnectionService implements ConnectionService
 {
+	private int timeout;
+	
 	private PersistenceService persistenceService;
 
 	private EntityManagerFactory entityManagerFactory;
@@ -120,17 +122,22 @@ public abstract class AbstractConnectionService implements ConnectionService
 
 	protected abstract Properties getProperties();
 
-	public int getTimeout()
-	{
-		return persistenceService.getTimeout();
-	}
-	
 	protected void log(int level, String message)
 	{
 		if (Activator.getDefault() != null)
 		{
 			Activator.getDefault().log(LogService.LOG_DEBUG, "Enter AbstractConnectionService.getEntityManager()");
 		}
+	}
+	
+	protected void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
+	}
+
+	public int getTimeout()
+	{
+		return this.timeout;
 	}
 	
 	public void clearCache()

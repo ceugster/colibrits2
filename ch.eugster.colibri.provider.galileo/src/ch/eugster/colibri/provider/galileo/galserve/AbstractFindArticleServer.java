@@ -25,13 +25,6 @@ public abstract class AbstractFindArticleServer extends AbstractGalileoServer
 		super(persistenceService, properties);
 	}
 	
-	/*
-	 * The failOverMode indicates the state of connection. If failOverMode == false 
-	 * set the variable open to false and set this.status to ERROR. Use this method
-	 * only in case where the program should stay responsible to user (i.e. findAndRead)
-	 */
-	public abstract boolean open(boolean failOverMode);
-	
 	protected ExternalProductGroup findExternalProductGroup(String code)
 	{
 		ExternalProductGroup externalProductGroup = null;

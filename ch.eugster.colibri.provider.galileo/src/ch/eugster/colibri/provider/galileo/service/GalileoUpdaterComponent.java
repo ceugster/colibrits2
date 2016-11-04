@@ -122,6 +122,7 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 		if (updateProviderServer != null && updateProviderServer.isConnect())
 		{
 			status = this.updateProviderServer.checkConnection();
+			Activator.getDefault().setCurrentlyFailoverMode(!status.isOK());
 		}
 		else
 		{

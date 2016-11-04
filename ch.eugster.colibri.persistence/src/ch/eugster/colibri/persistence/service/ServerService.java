@@ -13,5 +13,4 @@ public interface ServerService extends ConnectionService
 	Topic getDatabaseCompatibilityErrorTopic();
 
 	boolean isLocal();
-
 }

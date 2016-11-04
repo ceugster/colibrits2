@@ -42,9 +42,9 @@ public interface ConnectionService
 	
 	void resetEntityManager(Exception exception);
 
-	boolean connect();
-	
 	int getTimeout();
+
+	boolean connect();
 	
 	ConnectionType getConnectionType();
 	

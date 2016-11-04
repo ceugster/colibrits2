@@ -28,8 +28,6 @@ public interface PersistenceService
 
 	void sendEvent(Event event);
 	
-	int getTimeout();
-	
 	void setDatabaseCompatibilityError(Topic topic);
 
 	Topic getDatabaseCompatibilityError();

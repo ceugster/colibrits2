@@ -16,7 +16,7 @@ import ch.eugster.colibri.persistence.service.ServerService;
 
 public class PersistenceServiceImpl implements PersistenceService
 {
-	private int timeout;
+	private int timeout = 1;
 	
 	private CacheService cacheService;
 

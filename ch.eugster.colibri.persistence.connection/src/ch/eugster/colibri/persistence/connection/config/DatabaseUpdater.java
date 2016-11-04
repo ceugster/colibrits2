@@ -1,5 +1,6 @@
 package ch.eugster.colibri.persistence.connection.config;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -1011,6 +1012,17 @@ public abstract class DatabaseUpdater extends AbstractInitializer
 									result = stm.executeUpdate(sql);
 									log(LogService.LOG_INFO, "SQL STATE:" + result + " OK)");
 								}
+								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
+										: structureVersion;
+							}
+							else if (structureVersion == 29)
+							{
+								File dtd = new File(System.getProperty("user.home") + "/colibri/configuration/database.dtd");
+								if (dtd.exists())
+								{
+									dtd.delete();
+								}
+								Activator.getDefault().getFile();
 								structureVersion = structureVersion < Version.STRUCTURE ? ++structureVersion
 										: structureVersion;
 							}

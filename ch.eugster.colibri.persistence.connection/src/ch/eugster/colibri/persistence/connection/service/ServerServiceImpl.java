@@ -12,6 +12,7 @@ import org.apache.derby.jdbc.EmbeddedDriver;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import org.eclipse.persistence.config.QueryHints;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.jdom.Element;
@@ -43,7 +44,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		super(persistenceService);
 		ServerExceptionHandler.setServerService(this);
 	}
-
+	
 	@Override
 	public AbstractQuery<? extends AbstractEntity> getQuery(final Class<? extends AbstractEntity> adaptable)
 	{
@@ -107,7 +108,15 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		final String username = connection.getAttributeValue(PersistenceUnitProperties.JDBC_USER);
 		final String password = connection.getAttributeValue(PersistenceUnitProperties.JDBC_PASSWORD);
 		final String target = connection.getAttributeValue(PersistenceUnitProperties.TARGET_DATABASE);
-
+		final String timeout = connection.getAttributeValue(QueryHints.JDBC_TIMEOUT);
+		try
+		{
+			this.setTimeout(Integer.valueOf(timeout).intValue());
+		}
+		catch (NumberFormatException e)
+		{
+			this.setTimeout(5);
+		}
 		final Properties properties = new Properties();
 		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
 		properties.setProperty(Activator.KEY_NAME, connection.getText());
@@ -122,6 +131,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		properties.setProperty(PersistenceUnitProperties.TARGET_DATABASE, target);
 		properties.setProperty(PersistenceUnitProperties.CONNECTION_POOL_WAIT, "3000");
 		properties.setProperty(PersistenceUnitProperties.QUERY_TIMEOUT, "0");
+		properties.setProperty(QueryHints.JDBC_TIMEOUT, "0");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_FILE, Activator.getDefault().getPersistenceLogDir()+ File.separator + "persistence.log");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_TIMESTAMP, "true");
 		properties.setProperty(PersistenceUnitProperties.LOGGING_LOGGER, "DefaultLogger");

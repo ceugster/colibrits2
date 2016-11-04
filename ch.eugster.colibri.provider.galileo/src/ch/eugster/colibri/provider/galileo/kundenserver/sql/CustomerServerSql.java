@@ -53,6 +53,7 @@ public class CustomerServerSql extends CustomerServer
 		{
 			this.open = this.kserver.db_open(database);
 		}
+		Activator.getDefault().setCurrentlyFailoverMode(!this.open);
 		if (this.open)
 		{
 			Customer customer = null;

@@ -353,11 +353,17 @@ public class Activator extends AbstractUIPlugin implements EventHandler
 	{
 		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 		{
-			this.openTransfers = ((Long) event.getProperty("count"));
+			if (event.getProperty("count") != null)
+			{
+				this.openTransfers = ((Long) event.getProperty("count"));
+			}
 		}
 		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 		{
-			this.openUpdates = ((Long) event.getProperty("count"));
+			if (event.getProperty("count") != null)
+			{
+				this.openUpdates = ((Long) event.getProperty("count"));
+			}
 		}
 	}
 

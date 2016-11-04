@@ -40,6 +40,7 @@ import ch.eugster.colibri.persistence.model.Position.AmountType;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
+import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.model.product.ProductGroupType;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 
@@ -326,14 +327,18 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		{
 			try
 			{
-				this.sendEvent(receipt, Topic.LOCK);
-				persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
-				
-				if (!ReceiptWrapper.this.receipt.isDeleted())
+				this.sendEvent(ReceiptWrapper.this.receipt, Topic.LOCK);
+				Customer customer = ReceiptWrapper.this.receipt.getCustomer();
+				ReceiptWrapper.this.receipt = (Receipt) persistenceService.getCacheService().merge(ReceiptWrapper.this.receipt);
+				if (customer != null)
 				{
-					ReceiptWrapper.this.updateCustomerForReceiptPrint();
-					ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, Topic.STORE_RECEIPT);
+					ReceiptWrapper.this.receipt.setCustomer(customer);
+					if (!ReceiptWrapper.this.receipt.isDeleted())
+					{
+						ReceiptWrapper.this.receipt.getCustomer().addAccount(this.receipt.getAmount(ProductGroupType.SALES_RELATED));
+					}
 				}
+				ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, Topic.STORE_RECEIPT);
 				userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
 				ReceiptWrapper.this.prepareReceipt();
 				ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
@@ -355,20 +360,6 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		}
 	}
 
-	private void updateCustomerForReceiptPrint()
-	{
-		if (this.receipt.getCustomer() != null)
-		{
-			for (Position position : this.receipt.getPositions())
-			{
-				if (position.getProductGroup().getProductGroupType().equals(ProductGroupType.SALES_RELATED))
-				{
-					receipt.getCustomer().addAccount(position.getAmount(Receipt.QuotationType.FOREIGN_CURRENCY, Position.AmountType.NETTO));
-				}
-			}
-		}
-	}
-	
 	public void fireReceiptChangeEvent(final ReceiptChangeEvent event)
 	{
 		final ReceiptChangeListener[] listeners = this.receiptChangeListeners.toArray(new ReceiptChangeListener[0]);

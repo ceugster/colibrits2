@@ -37,52 +37,48 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 		if (positions.size() == 0)
 		{
 			status = this.checkConnection();
-			isCurrentlyFailoverMode = !status.isOK();
 		}
 		if (status.isOK())
 		{
 			for (Position position : positions)
 			{
 				status = updateProvider(position);
-//				if (status.isOK())
-//				{
-					try
+				try
+				{
+					if (!position.isServerUpdated())
 					{
-						if (!position.isServerUpdated())
+						if (position.getOtherId() != null)
 						{
-							if (position.getOtherId() != null)
+							try
 							{
-								try
+								Position serverPosition = (Position) persistenceService.getServerService().find(Position.class, position.getOtherId());
+								if (serverPosition != null)
 								{
-									Position serverPosition = (Position) persistenceService.getServerService().find(Position.class, position.getOtherId());
-									if (serverPosition != null)
-									{
-										serverPosition.setServerUpdated(true);
-										serverPosition.setProviderBooked(position.isProviderBooked());
-										serverPosition.setProviderState(position.getProviderState());
-										persistenceService.getServerService().merge(serverPosition);
-									}
-									position.setServerUpdated(true);
+									serverPosition.setServerUpdated(true);
+									serverPosition.setProviderBooked(position.isProviderBooked());
+									serverPosition.setProviderState(position.getProviderState());
+									persistenceService.getServerService().merge(serverPosition);
 								}
-								catch (Exception e)
-								{
-									status = getStatus(e);
-								}
+								position.setServerUpdated(true);
+							}
+							catch (Exception e)
+							{
+								status = getStatus(e);
 							}
 						}
 					}
-					finally
+				}
+				finally
+				{
+					try
 					{
-						try
-						{
-							position = (Position) persistenceService.getCacheService().merge(position);
-						}
-						catch(Exception e)
-						{
-							status = getStatus(e);
-						}
+						position = (Position) persistenceService.getCacheService().merge(position);
 					}
-//				}
+					catch(Exception e)
+					{
+						status = getStatus(e);
+					}
+				}
 			}
 		}
 		return status;
@@ -109,55 +105,57 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 		if (payments.size() == 0)
 		{
 			status = this.checkConnection();
-			isCurrentlyFailoverMode = !status.isOK();
 		}
-		for (Payment payment : payments)
+		if (status.isOK())
 		{
-			if (!payment.isProviderBooked() || ! payment.isServerUpdated())
+			for (Payment payment : payments)
 			{
-				if (!payment.isProviderBooked())
+				if (!payment.isProviderBooked() || ! payment.isServerUpdated())
 				{
-					status = updateProvider(payment);
-				}
-				if (status.getSeverity() == IStatus.ERROR)
-				{
-					return status;
-				}
-				if (status.getSeverity() == IStatus.OK)
-				{
-					try
+					if (!payment.isProviderBooked())
 					{
-						if (!payment.isServerUpdated())
+						status = updateProvider(payment);
+					}
+					if (status.getSeverity() == IStatus.ERROR)
+					{
+						return status;
+					}
+					if (status.getSeverity() == IStatus.OK)
+					{
+						try
 						{
-							if (payment.getOtherId() != null)
+							if (!payment.isServerUpdated())
 							{
-								try
+								if (payment.getOtherId() != null)
 								{
-									Payment serverPayment = (Payment) persistenceService.getServerService().find(Payment.class, payment.getOtherId());
-									serverPayment.setServerUpdated(true);
-									serverPayment.setProviderBooked(payment.isProviderBooked());
-									serverPayment.setProviderState(payment.getProviderState());
-									persistenceService.getServerService().merge(serverPayment);
-								}
-								catch (Exception e)
-								{
-									status = getStatus(e);
+									try
+									{
+										Payment serverPayment = (Payment) persistenceService.getServerService().find(Payment.class, payment.getOtherId());
+										serverPayment.setServerUpdated(true);
+										serverPayment.setProviderBooked(payment.isProviderBooked());
+										serverPayment.setProviderState(payment.getProviderState());
+										persistenceService.getServerService().merge(serverPayment);
+									}
+									catch (Exception e)
+									{
+										status = getStatus(e);
+									}
 								}
 							}
 						}
-					}
-					finally
-					{
-						if (status.getSeverity() == IStatus.OK)
+						finally
 						{
-							try
+							if (status.getSeverity() == IStatus.OK)
 							{
-								payment.setServerUpdated(true);
-								payment = (Payment) persistenceService.getCacheService().merge(payment);
-							}
-							catch(Exception e)
-							{
-								status = getStatus(e);
+								try
+								{
+									payment.setServerUpdated(true);
+									payment = (Payment) persistenceService.getCacheService().merge(payment);
+								}
+								catch(Exception e)
+								{
+									status = getStatus(e);
+								}
 							}
 						}
 					}
