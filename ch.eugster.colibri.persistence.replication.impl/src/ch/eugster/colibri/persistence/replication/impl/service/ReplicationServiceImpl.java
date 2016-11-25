@@ -48,6 +48,8 @@ import ch.eugster.colibri.persistence.service.PersistenceService;
 
 public class ReplicationServiceImpl implements ReplicationService
 {
+	private boolean lastReplicationSucceeded;
+	
 	private LogService logService;
 
 	private PersistenceService persistenceService;
@@ -55,6 +57,11 @@ public class ReplicationServiceImpl implements ReplicationService
 	private PersistenceService getPersistenceService()
 	{
 		return this.persistenceService;
+	}
+	
+	public boolean lastReplicationSucceeded()
+	{
+		return this.lastReplicationSucceeded;
 	}
 	
 	public boolean isLocalService()
@@ -65,6 +72,7 @@ public class ReplicationServiceImpl implements ReplicationService
 	@Override
 	public IStatus replicate(final Shell shell, final boolean force)
 	{
+		this.lastReplicationSucceeded = true;
 		IStatus status = Status.OK_STATUS;
 		if (!this.persistenceService.getServerService().isLocal())
 		{
@@ -116,14 +124,6 @@ public class ReplicationServiceImpl implements ReplicationService
 
 								new ProfileReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), true);
-//								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
-//										.replicate(new SubProgressMonitor(monitor, 1), force);
-//								new TabReplicator(ReplicationServiceImpl.this.persistenceService)
-//										.replicate(new SubProgressMonitor(monitor, 1), force);
-//								new KeyReplicator(ReplicationServiceImpl.this.persistenceService)
-//										.replicate(new SubProgressMonitor(monitor, 1), force);
-//								new ConfigurableReplicator(ReplicationServiceImpl.this.persistenceService)
-//										.setDefaultTabs(new SubProgressMonitor(monitor, 1));
 
 								new CommonSettingsReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
@@ -168,13 +168,10 @@ public class ReplicationServiceImpl implements ReplicationService
 
 								new PrintoutReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), true);
-//								new PrintoutAreaReplicator(ReplicationServiceImpl.this.persistenceService)
-//										.replicate(new SubProgressMonitor(monitor, 1), force);
 
 								new DisplayReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
-//								new DisplayAreaReplicator(ReplicationServiceImpl.this.persistenceService)
-//										.replicate(new SubProgressMonitor(monitor, 1), force);
+
 								new SalespointReplicator(ReplicationServiceImpl.this.persistenceService)
 										.setPrintoutAndDisplay(new SubProgressMonitor(monitor, 1));
 
@@ -204,6 +201,7 @@ public class ReplicationServiceImpl implements ReplicationService
 					}
 					catch (final Exception e)
 					{
+						this.lastReplicationSucceeded = false;
 						e.printStackTrace();
 						status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Fehler beim replizieren der Daten.", e);
 					}
@@ -211,6 +209,7 @@ public class ReplicationServiceImpl implements ReplicationService
 			}
 			else
 			{
+				this.lastReplicationSucceeded = false;
 				status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Die Daten konnten nicht repliziert werden, weil keine Verbindung zur Serverdatenbank hergestellt werden kann.");
 			}
 		}

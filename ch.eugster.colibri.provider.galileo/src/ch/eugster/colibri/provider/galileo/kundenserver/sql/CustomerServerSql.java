@@ -30,6 +30,8 @@ import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServer;
 
 public class CustomerServerSql extends CustomerServer
 {
+	private boolean wasOpen;
+	
 	private Ikundenserver2g kserver;
 
 	public CustomerServerSql(Map<String, IProperty> properties)
@@ -46,15 +48,7 @@ public class CustomerServerSql extends CustomerServer
 	public IStatus selectCustomer(final Position position, final ProductGroup productGroup)
 	{
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), Topic.CUSTOMER_UPDATE.topic());
-		IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
-		String database = property.value();
-		boolean wasopen = this.open;
-		if (!this.open)
-		{
-			this.open = this.kserver.db_open(database);
-		}
-		Activator.getDefault().setCurrentlyFailoverMode(!this.open);
-		if (this.open)
+		if (this.open())
 		{
 			Customer customer = null;
 			final int result = this.kserver.getkundennr();
@@ -109,15 +103,7 @@ public class CustomerServerSql extends CustomerServer
 			}
 			position.getReceipt().setCustomer(customer);
 
-			property = properties.get(GalileoProperty.KEEP_CONNECTION.key());
-			int keepConnection = Integer.valueOf(property.value()).intValue();
-			if (keepConnection == 0)
-			{
-				if (!wasopen)
-				{
-					this.open = !((Boolean) this.kserver.db_close()).booleanValue();
-				}
-			}
+			this.close();
 		}
 		else
 		{
@@ -212,6 +198,52 @@ public class CustomerServerSql extends CustomerServer
 		{
 			this.kserver = null;
 		}
+	}
+
+	protected boolean open()
+	{
+		if (Activator.getDefault().isCurrentlyFailoverMode())
+		{
+			this.wasOpen = this.open;
+			this.open = false;
+			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
+		}
+		else
+		{
+			IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
+			String database = property.value();
+			this.wasOpen = this.open;
+			if (!this.open)
+			{
+				try
+				{
+					this.open = this.kserver.db_open(database);
+					if (!this.open)
+					{
+						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
+					}
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
+				}
+			}
+		}
+		return this.open;
+	}
+
+	protected boolean close()
+	{
+		IProperty keepConnection 	= properties.get(GalileoProperty.KEEP_CONNECTION.key());
+		int keep = Integer.valueOf(keepConnection.value()).intValue();
+		if (!this.wasOpen && this.open && keep == 0)
+		{
+			this.kserver.db_close();
+			this.open = false;
+			this.wasOpen = false;
+		}
+		return true;
 	}
 
 }

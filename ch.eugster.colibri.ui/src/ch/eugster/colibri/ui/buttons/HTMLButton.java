@@ -13,6 +13,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.UIManager;
@@ -55,7 +57,7 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 
 	private int fgFailOver;
 
-	protected boolean failOver;
+	protected static Map<String, Boolean> failOver = new HashMap<String, Boolean>();
 
 	public HTMLButton()
 	{
@@ -64,25 +66,14 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 	
 	public boolean isFailOver()
 	{
-		return this.failOver;
-	}
-
-	public HTMLButton(final BasicAction action, final int fgNormal, boolean isFailOver)
-	{
-		super(action);
-		this.failOver = isFailOver;
-		setActionCommand(action.getActionCommand());
-		this.init(fgNormal, fgFailOver);
-		setFocusable(false);
-		action.addPropertyChangeListener(this);
+		return failOver.size() > 0;
 	}
 
 	public HTMLButton(final BasicAction action, final int fgNormal, final int fgFailOver, boolean isFailOver)
 	{
 		super(action);
-		this.failOver = isFailOver;
 		setActionCommand(action.getActionCommand());
-		this.init(fgNormal, fgFailOver);
+		this.init(fgNormal, fgFailOver, isFailOver);
 		setFocusable(false);
 		action.addPropertyChangeListener(this);
 	}
@@ -90,7 +81,7 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 	public HTMLButton(final int fgNormal, final int fgFailOver)
 	{
 		super();
-		this.init(fgNormal, fgFailOver);
+		this.init(fgNormal, fgFailOver, isFailOver());
 	}
 
 	public String extractText(final String labelText)
@@ -299,17 +290,21 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		return HTMLButton.FONT_PATTERN_START + colorAttribute + " " + fontSizeAttribute + HTMLButton.FONT_PATTERN_END;
 	}
 
-	private void init(final int fgNormal, final int fgFailOver)
-	{
-		this.init(fgNormal, fgFailOver, failOver);
-	}
-
-	private void init(final int fgNormal, final int fgFailOver, boolean failOver)
+	private void init(final int fgNormal, final int fgFailOver, boolean isFailOver)
 	{
 //		this.fgNormal = fgNormal;
 		this.fgFailOver = fgFailOver;
-		this.failOver = failOver;
-
+		if (isFailOver)
+		{
+			failOver.put("transfer", Boolean.TRUE);
+		}
+		else
+		{
+			if (failOver.containsKey("transfer"))
+			{
+				failOver.remove("transfer");
+			}
+		}
 		setFocusable(true);
 
 		setMinimumSize(HTMLButton.MIN_BUTTON_SIZE);

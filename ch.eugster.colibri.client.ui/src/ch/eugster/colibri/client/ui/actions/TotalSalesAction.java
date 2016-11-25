@@ -12,10 +12,14 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
@@ -36,6 +40,8 @@ public class TotalSalesAction extends ConfigurableAction
 {
 	private static final long serialVersionUID = 0l;
 
+	private EventAdmin eventAdmin;
+	
 	public TotalSalesAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
@@ -52,6 +58,16 @@ public class TotalSalesAction extends ConfigurableAction
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.handlerRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);
+		ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+		tracker.open();
+		try
+		{
+			this.eventAdmin = tracker.getService();
+		}
+		finally
+		{
+			tracker.close();
+		}
 	}
 
 	private boolean isConnected(PersistenceService service)
@@ -78,6 +94,12 @@ public class TotalSalesAction extends ConfigurableAction
 				MessageDialog dialog = null;
 				if (isConnected(service))
 				{
+					Map<String, Object> properties = new HashMap<String, Object>();
+					properties.put("provider", "transfer");
+					properties.put("failover", Boolean.FALSE);
+					properties.put("status", Status.OK_STATUS);
+					eventAdmin.sendEvent(new Event(Topic.PROVIDER_QUERY.topic(), properties));
+
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
 					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
 
@@ -86,6 +108,12 @@ public class TotalSalesAction extends ConfigurableAction
 				}
 				else
 				{
+					Map<String, Object> properties = new HashMap<String, Object>();
+					properties.put("provider", "transfer");
+					properties.put("failover", Boolean.TRUE);
+					properties.put("status", new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Umsatz kann nicht abgefragt werden."));
+					eventAdmin.sendEvent(new Event(Topic.PROVIDER_QUERY.topic(), properties));
+					
 					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
 					dialog.setMessage("Zur Zeit kann der Umsatz nicht abgefragt werden.\nDie Verbindung zum Datenbankserver ist unterbrochen.");
 				}

@@ -67,16 +67,16 @@ public class ReceiptLayoutType extends AbstractLayoutType
 		final Collection<String> document = new ArrayList<String>();
 		if (printable instanceof Receipt)
 		{
-//			Receipt receipt = (Receipt) printable;
+			Receipt receipt = (Receipt) printable;
 			final ReceiptLayoutSectionType[] layoutSectionTypes = (ReceiptLayoutSectionType[]) this
 					.getLayoutSectionTypes();
 			for (final ReceiptLayoutSectionType layoutSectionType : layoutSectionTypes)
 			{
-//				if (!layoutSectionType.equals(ReceiptLayoutSectionType.CUSTOMER) || receipt.getCustomer() != null)
-//				{
+				if (!layoutSectionType.equals(ReceiptLayoutSectionType.CUSTOMER) || (receipt.getCustomer() != null && receipt.getCustomer().getHasAccount()))
+				{
 					final ILayoutSection layoutSection = layoutSectionType.getLayoutSection();
 					document.addAll(layoutSection.prepareSection(printable));
-//				}
+				}
 			}
 			final String text = this.finish(document);
 			this.getReceiptPrinterService().print(text);

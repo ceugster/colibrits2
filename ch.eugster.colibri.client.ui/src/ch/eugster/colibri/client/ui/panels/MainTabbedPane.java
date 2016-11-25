@@ -15,9 +15,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -59,6 +61,7 @@ import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
+import ch.eugster.colibri.persistence.replication.service.ReplicationService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
@@ -92,8 +95,8 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private DisplayService displayService;
 	
-	private boolean failOver;
-
+	private Map<String, Boolean> failOvers = new HashMap<String, Boolean>();
+	
 	private ServiceRegistration<EventHandler> eventHandlerServiceRegistration;
 	
 	public MainTabbedPane(final ClientView clientView)
@@ -139,6 +142,23 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 				}
 			}
 		}
+		ServiceTracker<ReplicationService, ReplicationService> tracker = new ServiceTracker<ReplicationService, ReplicationService>(Activator.getDefault().getBundle().getBundleContext(), ReplicationService.class, null);
+		tracker.open();
+		try
+		{
+			ReplicationService service = tracker.getService();
+			if (service != null)
+			{
+				if (!service.lastReplicationSucceeded())
+				{
+					this.failOvers.put("transfer", Boolean.TRUE);
+				}
+			}
+		}
+		finally
+		{
+			tracker.close();
+		}
 
 		final Profile profile = this.getSalespoint().getProfile();
 
@@ -174,7 +194,8 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		List<String> topics = new ArrayList<String>();
-		topics.add(Topic.SCHEDULED.topic());
+		topics.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		topics.add(Topic.SCHEDULED_TRANSFER.topic());
 		topics.add(Topic.PROVIDER_QUERY.topic());
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
@@ -187,19 +208,25 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 	@Override
 	public void handleEvent(Event event) 
 	{
-		this.setFailOver(event.getProperty(EventConstants.EXCEPTION) != null);
+		Boolean failOverRelevant = (Boolean) event.getProperty("failover");
+		if (failOverRelevant != null)
+		{
+			if (failOverRelevant.booleanValue())
+			{
+				this.failOvers.put((String)event.getProperty("provider"), Boolean.TRUE);
+			}
+			else
+			{
+				this.failOvers.remove((String)event.getProperty("provider"));
+			}
+		}
 	}
 
 	public boolean isFailOver()
 	{
-		return this.failOver;
+		return this.failOvers.size() > 0;
 	}
 	
-	public void setFailOver(boolean failOver)
-	{
-		this.failOver = failOver;
-	}
-
 	public boolean settlementRequired()
 	{
 		if (!this.getSalespoint().isForceSettlement())
@@ -559,37 +586,6 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		final Profile profile = this.getCurrentPanel().getProfile();
 		MessageDialog.showInformation(frame, profile, providerName, msg, MessageDialog.TYPE_WARN);
 	}
-
-//	private void sendEvent(String topics)
-//	{
-//		ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
-//		try
-//		{
-//			tracker.open();
-//			final EventAdmin eventAdmin = (EventAdmin) tracker.getService();
-//			if (eventAdmin != null)
-//			{
-//				eventAdmin.sendEvent(this.getEvent(tracker.getServiceReference(), topics));
-//			}
-//		}
-//		finally
-//		{
-//			tracker.close();
-//		}
-//	}
-//
-//	private Event getEvent(ServiceReference<EventAdmin> reference, final String topics)
-//	{
-//		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-//		properties.put(EventConstants.BUNDLE, Activator.getDefault().getBundle().getBundleContext().getBundle());
-//		properties.put(EventConstants.BUNDLE_ID,
-//				Long.valueOf(Activator.getDefault().getBundle().getBundleContext().getBundle().getBundleId()));
-//		properties.put(EventConstants.BUNDLE_SYMBOLICNAME, Activator.PLUGIN_ID);
-//		properties.put(EventConstants.SERVICE, reference);
-//		properties.put(EventConstants.SERVICE_ID, reference.getProperty("service.id"));
-//		properties.put(EventConstants.TIMESTAMP, Long.valueOf(GregorianCalendar.getInstance(Locale.getDefault()).getTimeInMillis()));
-//		return new Event(topics, properties);
-//	}
 
 	public enum State
 	{

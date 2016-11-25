@@ -340,8 +340,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 	
 	private void showErrorMessage(Event event)
 	{
-		if (event.getTopic().equals(Topic.SCHEDULED.topic()) || 
-				event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
+		if (event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
 				event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()) ||
 				event.getTopic().equals(Topic.PROVIDER_QUERY.topic()))
 		{
@@ -405,7 +404,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private void showWarningMessage(Event event)
 	{
-		if (event.getTopic().equals(Topic.SCHEDULED.topic()) || 
+		if (event.getTopic().equals(Topic.PROVIDER_QUERY.topic()) || 
 				event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
 				event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
 		{
@@ -489,7 +488,6 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		ClientView.instance = this;
 
 		final Collection<String> t = new ArrayList<String>();
-		t.add(Topic.SCHEDULED.topic());
 		t.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		t.add(Topic.SCHEDULED_TRANSFER.topic());
 		t.add(Topic.STORE_RECEIPT.topic());

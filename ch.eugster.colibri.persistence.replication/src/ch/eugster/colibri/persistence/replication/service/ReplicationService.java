@@ -8,4 +8,6 @@ public interface ReplicationService
 	boolean isLocalService();
 	
 	IStatus replicate(Shell shell, boolean force);
+	
+	boolean lastReplicationSucceeded();
 }

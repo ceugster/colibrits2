@@ -41,4 +41,7 @@ public abstract class CustomerServer implements ICustomerServer
 	
 	public abstract IStatus selectCustomer(Position position, ProductGroup productGroup);
 	
+	protected abstract boolean open();
+	
+	protected abstract boolean close();
 }

@@ -153,10 +153,7 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			finally
 			{
 				log(LogService.LOG_INFO, position.getReceipt().getCustomer() == null ? "Kundensuche abgebrochen." : "Kunden ausgewählt: " + position.getReceipt().getCustomerCode() + " - " + position.getReceipt().getCustomer().getFullname() + ".");
-				if (status.isOK())
-				{
-					this.sendEvent(this.getEvent(status, true));
-				}
+				this.sendEvent(this.getEvent(status, true));
 			}
 		}
 		return status;
@@ -225,6 +222,8 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 		properties.put("message", "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden. Die Daten müssen manuell erfasst werden.");
 		properties.put("status", status);
 		properties.put("force", Boolean.valueOf(force));
+		properties.put("provider", this.getProviderId());
+		properties.put("failover", Boolean.valueOf(status.getException() != null));
 		for (Topic t : Topic.values())
 		{
 			if (t.topic().equals(status.getMessage()))

@@ -70,7 +70,6 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		List<String> topics = new ArrayList<String>();
-		topics.add(Topic.SCHEDULED.topic());
 		topics.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
 		topics.add(Topic.SCHEDULED_TRANSFER.topic());
 		topics.add(Topic.PROVIDER_QUERY.topic());
@@ -107,20 +106,21 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 	public void handleEvent(final Event event)
 	{
-		this.failOver = event.getProperty(EventConstants.EXCEPTION) != null;
-		if (this.failOver)
+		Boolean isFailOver = (Boolean) event.getProperty("failover");
+		if (isFailOver != null)
 		{
-			this.update(this.failOver);
-		}
-		else
-		{
-			if (event.getTopic().equals(Topic.SCHEDULED.topic()) ||
-					event.getTopic().equals(Topic.SCHEDULED_PROVIDER_UPDATE.topic()) ||
-					event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+			String provider = (String) event.getProperty("provider");
+			if (isFailOver.booleanValue())
 			{
-				this.update(this.failOver);
+				failOver.put(provider, Boolean.TRUE);
 			}
-			
+			else
+			{
+				if (failOver.containsKey(provider))
+				{
+					failOver.remove(provider);
+				}
+			}
 		}
 	}
 
@@ -152,7 +152,7 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 			if (entity.getId().equals(this.key.getId()))
 			{
 				this.key = (Key) entity;
-				this.update(this.failOver);
+				this.update(this.isFailOver());
 			}
 		}
 	}

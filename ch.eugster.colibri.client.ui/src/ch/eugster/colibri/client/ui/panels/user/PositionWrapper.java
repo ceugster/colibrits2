@@ -306,241 +306,66 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 			final String input = this.valueDisplay.readAndInitDisplay();
 			if ((input != null) && (input.length() > 0))
 			{
-//				if (input.toUpperCase().startsWith(Barcode.PREFIX_VOUCHER))
-//				{
-//					if (this.userPanel.getCurrentState().equals(UserPanel.State.POSITION_INPUT))
-//					{
-//						log(LogService.LOG_INFO, "eGutschein gescant.");
-//						log(LogService.LOG_INFO, "Prüfe eGutschein Service Verfügbarkeit...");
-//						ServiceTracker<VoucherService, VoucherService> tracker = new ServiceTracker<VoucherService, VoucherService>(Activator.getDefault().getBundle().getBundleContext(), VoucherService.class, null);
-//						tracker.open();
-//						try
-//						{
-//							VoucherService service = tracker.getService();
-//							if (service == null)
-//							{
-//								log(LogService.LOG_INFO, "eGutschein Service nicht verfügbar.");
-//								final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-//										.getReceipt().getSettlement().getSalespoint().getProfile(), "Service nicht verfügbar",
-//										new int[] { MessageDialog.BUTTON_OK }, 0);
-//								dialog.setMessage("Der Service für die Bearbeitung von eGutscheinen ist nicht verfügbar.");
-//								dialog.pack();
-//								dialog.setVisible(true);
-//							}
-//							else
-//							{
-//								currencyFormatter.setCurrency(userPanel.getSalespoint().getPaymentType().getCurrency().getCurrency());
-//								log(LogService.LOG_INFO, "eGutschein Service verfügbar.");
-//								if (userPanel.getCurrentState().equals(UserPanel.State.POSITION_INPUT))
-//								{
-//									Result result = service.getAccountBalance(input);
-//									if (result.isOK())
-//									{
-//										log(LogService.LOG_INFO, "Verfügbarer Betrag: " + currencyFormatter.format(result.getAmount()) + ".");
-//										double balance = result.getAmount();
-//										double creditAmount = userPanel.getValueDisplay().getAmount();
-//										creditAmount = CreditAccountDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Kontostandabfrage", userPanel.getSalespoint().getPaymentType().getCurrency(), balance, creditAmount, CreditAccountDialog.TYPE_INFORMATION);
-//										if (creditAmount > 0D)
-//										{
-////											PersistenceService persistenceService = persistenceServiceTracker.getService();
-////											if (persistenceService != null)
-////											{
-//												this.position.setProductGroup(this.getDefaultVoucherProductGroup());
-//												this.position.setBookProvider(true);
-//												this.position.setProviderBooked(false);
-//												this.position.setPrice(creditAmount);
-//												this.position.setQuantity(1);
-////												this.position.getReceipt().setState(Receipt.State.)
-////												this.position.setProviderState(ProviderState.OPEN);
-//												this.position.setProvider(service.getProviderId());
-//												if (this.position.getQuantity() == 0)
-//												{
-//													this.position.setQuantity(1);
-//												}
-//												this.position.setSearchValue(input);
-////											}
-//										}	
-//									}
-//									else
-//									{
-////										log(LogService.LOG_INFO, "Ungültiger Betrag für die Aufladung.");
-////										final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-////												.getReceipt().getSettlement().getSalespoint().getProfile(), "Ungültiger Betrag",
-////												new int[] { MessageDialog.BUTTON_OK }, 0);
-////										dialog.setMessage("Der Betrag von " + currencyFormatter.format(amount) + " ist ungültig.\n\n Sie müssen einen Betrag grösser als " + currencyFormatter.format(0D) + " eingeben.");
-////										dialog.pack();
-////										dialog.setVisible(true);
-//										final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-//												.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
-//												new int[] { MessageDialog.BUTTON_OK }, 0);
-//										dialog.setMessage(result.getErrorMessage());
-//										dialog.pack();
-//										dialog.setVisible(true);
-//									}
-////										log(LogService.LOG_INFO, "Das eGutschein-Konto für " + input + " soll mit " + currencyFormatter.format(amount) + " aufgeladen werden.");
-////										result = service.getAccountBalance(input);
-////										if (result.isOK())
-////										{
-////											log(LogService.LOG_INFO, "Verfügbarer Betrag: " + currencyFormatter.format(result.getAmount()) + ".");
-////											PersistenceService persistenceService = persistenceServiceTracker.getService();
-////											if (persistenceService != null)
-////											{
-////												this.position.setProductGroup(this.getDefaultVoucherProductGroup());
-////												this.position.setBookProvider(true);
-////												this.position.setProviderBooked(false);
-////												this.position.setProviderState(ProviderState.OPEN);
-////												this.position.setProvider(service.getProviderId());
-////												if (this.position.getQuantity() == 0)
-////												{
-////													this.position.setQuantity(1);
-////												}
-////												this.position.setSearchValue(input);
-////											}
-////										}
-////										else
-////										{
-////											final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-////													.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
-////													new int[] { MessageDialog.BUTTON_OK }, 0);
-////											dialog.setMessage(result.getErrorMessage());
-////											dialog.pack();
-////											dialog.setVisible(true);
-////										}
-////									}
-//								}
-//								else if (userPanel.getCurrentState().equals(UserPanel.State.PAYMENT_INPUT))
-//								{
-//									log(LogService.LOG_INFO, "Das eGutschein-Konto für " + input + " soll belastet werden.");
-//									Result result = service.getAccountBalance(input);
-//									if (result.isOK())
-//									{
-//										double balanceAmount = result.getAmount();
-//										double paymentAmount = this.userPanel.getPaymentWrapper().getPayment().getAmount();
-//										if (paymentAmount == 0D)
-//										{
-//											paymentAmount = this.userPanel.getReceiptWrapper().getReceiptDifference();
-//										}
-//										if (Math.abs(paymentAmount) <= Math.abs(balanceAmount))
-//										{
-//											result = service.reserveAmount(input, paymentAmount);
-//											if (result.isOK())
-//											{
-//												Payment payment = this.userPanel.getPaymentWrapper().getPayment();
-//												payment.setBookProvider(true);
-//												payment.setProviderId(service.getProviderId());
-//												payment.setCode(input);
-//												payment.setProviderBooked(false);
-//												payment.setProviderState(ProviderState.RESERVED);
-//												payment.setAmount(paymentAmount);
-//												payment.setBack(false);
-//												payment.setPaymentType(getDefaultVoucherPaymentType());
-//												this.userPanel.getPaymentWrapper().replacePayment(payment);
-//											}
-//											else
-//											{
-//												log(LogService.LOG_INFO, "Fehler " + result.getErrorCode() + ": " + result.getErrorMessage());
-//												final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-//														.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
-//														new int[] { MessageDialog.BUTTON_OK }, 0);
-//												dialog.setMessage(result.getErrorMessage());
-//												dialog.pack();
-//												dialog.setVisible(true);
-//											}
-//										}
-//										else
-//										{
-//											log(LogService.LOG_INFO, "Der Bezahlungsbetrag ist nicht gedeckt (verfügbarer Betrag: " + currencyFormatter.format(paymentAmount) + ", Verfügbarer Betrag: " + currencyFormatter.format(balanceAmount) + ").");
-//											final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-//													.getReceipt().getSettlement().getSalespoint().getProfile(), "Ungültiger Betrag",
-//													new int[] { MessageDialog.BUTTON_OK }, 0);
-//											dialog.setMessage("Der Betrag von " + currencyFormatter.format(paymentAmount) + " ist nicht gedeckt.\n\nEs sind maximal " + currencyFormatter.format(balanceAmount) + " verfügbar.");
-//											dialog.pack();
-//											dialog.setVisible(true);
-//										}
-//									}
-//									else
-//									{
-//										final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-//												.getReceipt().getSettlement().getSalespoint().getProfile(), "Fehler",
-//												new int[] { MessageDialog.BUTTON_OK }, 0);
-//										dialog.setMessage(result.getErrorMessage());
-//										dialog.pack();
-//										dialog.setVisible(true);
-//									}
-//								}
-//							}
-//						}
-//						finally
-//						{
-//							tracker.close();
-//						}
-//					}
-//				}
-//				else
-//				{
-					final Barcode barcode = this.verifyInput(input);
-					if (barcode instanceof Barcode)
+				final Barcode barcode = this.verifyInput(input);
+				if (barcode instanceof Barcode)
+				{
+					if (this.userPanel.getReceiptWrapper().getReceipt().isInternal())
 					{
-						if (this.userPanel.getReceiptWrapper().getReceipt().isInternal())
-						{
-							MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Geldeinlagen und -entnahmen dürfen keine anderen Positionen enthalten.", MessageDialog.TYPE_WARN);
-						}
-						else
-						{
-							log(LogService.LOG_INFO, "Barcode: " + barcode.getName());
-							if (barcode.getCode().startsWith(Barcode.PREFIX_CUSTOMER))
-							{
-								log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
-								this.position.getReceipt().setCustomerCode(barcode.getDetail());
-								this.findAndRead(barcode);
-							}
-							else if (barcode.isEbook())
-							{
-								log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
-								this.position.setEbook(barcode.isEbook());
-								this.setDefaultProductGroup();
-								this.findAndRead(barcode);
-							}
-							else if (this.verifyOrderedNotYetScanned(barcode))
-							{
-								log(LogService.LOG_INFO, "Provider wird gesetzt.");
-								this.setProviderId(barcode);
-								log(LogService.LOG_INFO, "Default-WG setzen.");
-								this.setDefaultProductGroup();
-								log(LogService.LOG_INFO, "Start Titelsuche.");
-								this.findAndRead(barcode);
-							}
-						}
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Geldeinlagen und -entnahmen dürfen keine anderen Positionen enthalten.", MessageDialog.TYPE_WARN);
 					}
 					else
 					{
-						final String[] descs = this.getAvailableBarcodeNames();
-						StringBuilder text = new StringBuilder("<html>\n");
-						text = text.append("Die Eingabe '" + input + "' kann nicht verarbeitet werden.");
-						if (descs.length > 0)
+						log(LogService.LOG_INFO, "Barcode: " + barcode.getName());
+						if (barcode.getCode().startsWith(Barcode.PREFIX_CUSTOMER))
 						{
-							text = text.append(" Folgende Barcodes werden erkannt:\n<ul>\n");
-							for (final String desc : descs)
-							{
-								text = text.append("<li>" + desc + "\n");
-							}
-							text.append("</ul>\n");
+							log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
+							this.position.getReceipt().setCustomerCode(barcode.getDetail());
+							this.findAndRead(barcode);
 						}
-						final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
-								.getReceipt().getSettlement().getSalespoint().getProfile(), "Barcode ungültig",
-								new int[] { MessageDialog.BUTTON_OK }, 0);
-						dialog.setMessage(text.toString());
-						// dialog.setPreferredSize(new Dimension(480, 240 +
-						// descs.length * 80));
-						dialog.pack();
-						dialog.setVisible(true);
+						else if (barcode.isEbook())
+						{
+							log(LogService.LOG_INFO, "Typ: " + barcode.getType().toString());
+							this.position.setEbook(barcode.isEbook());
+							this.setDefaultProductGroup();
+							this.findAndRead(barcode);
+						}
+						else if (this.verifyOrderedNotYetScanned(barcode))
+						{
+							log(LogService.LOG_INFO, "Provider wird gesetzt.");
+							this.setProviderId(barcode);
+							log(LogService.LOG_INFO, "Default-WG setzen.");
+							this.setDefaultProductGroup();
+							log(LogService.LOG_INFO, "Start Titelsuche.");
+							this.findAndRead(barcode);
+						}
 					}
 				}
-				if (this.keyListener != null)
+				else
 				{
-					this.keyListener.keyPressed(event);
+					final String[] descs = this.getAvailableBarcodeNames();
+					StringBuilder text = new StringBuilder("<html>\n");
+					text = text.append("Die Eingabe '" + input + "' kann nicht verarbeitet werden.");
+					if (descs.length > 0)
+					{
+						text = text.append(" Folgende Barcodes werden erkannt:\n<ul>\n");
+						for (final String desc : descs)
+						{
+							text = text.append("<li>" + desc + "\n");
+						}
+						text.append("</ul>\n");
+					}
+					final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
+							.getReceipt().getSettlement().getSalespoint().getProfile(), "Barcode ungültig",
+							new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog.setMessage(text.toString());
+					dialog.pack();
+					dialog.setVisible(true);
 				}
-//			}
+			}
+			if (this.keyListener != null)
+			{
+				this.keyListener.keyPressed(event);
+			}
 		}
 	}
 	

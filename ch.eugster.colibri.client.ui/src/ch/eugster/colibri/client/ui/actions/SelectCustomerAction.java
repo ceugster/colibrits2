@@ -10,10 +10,13 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
@@ -35,6 +38,8 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
+	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;
+	
 	public SelectCustomerAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
@@ -42,6 +47,7 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 		
 		final Collection<String> t = new ArrayList<String>();
 		t.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
+		t.add(Topic.PROVIDER_QUERY.topic());
 		final String[] topics = t.toArray(new String[t.size()]);
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
@@ -52,6 +58,9 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
+		this.eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(),
+				EventAdmin.class, null);
+		this.eventAdminTracker.open();
 	}
 
 	public ProductGroup getProductGroup()
@@ -90,6 +99,16 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 					MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), "Lesen der Kundendaten",
 							status.getMessage(), MessageDialog.BUTTON_OK);
 				}
+				EventAdmin eventAdmin = this.eventAdminTracker.getService();
+				if (eventAdmin != null)
+				{
+					Map<String, Object> properties = new HashMap<String, Object>();
+					properties.put("provider", providerQuery.getProviderId());
+					properties.put("failover", Boolean.valueOf(status.getException() != null));
+					properties.put("status", status);
+					properties.put("topic", Topic.PROVIDER_QUERY);
+					eventAdmin.sendEvent(new Event(Topic.PROVIDER_QUERY.topic(), properties));
+				}
 			}
 		}
 		finally
@@ -123,5 +142,6 @@ public class SelectCustomerAction extends ConfigurableAction implements DisposeL
 	public void dispose()
 	{
 		this.persistenceServiceTracker.close();
+		this.eventAdminTracker.close();
 	}
 }
