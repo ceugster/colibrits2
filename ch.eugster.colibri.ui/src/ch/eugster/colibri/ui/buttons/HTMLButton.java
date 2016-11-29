@@ -13,8 +13,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.UIManager;
@@ -53,22 +51,15 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 
 	public static final Dimension MAX_BUTTON_SIZE = new Dimension(480, 360);
 
-//	private int fgNormal;
+	private int fgNormal;
 
 	private int fgFailOver;
-
-	protected static Map<String, Boolean> failOver = new HashMap<String, Boolean>();
 
 	public HTMLButton()
 	{
 		super();
 	}
 	
-	public boolean isFailOver()
-	{
-		return failOver.size() > 0;
-	}
-
 	public HTMLButton(final BasicAction action, final int fgNormal, final int fgFailOver, boolean isFailOver)
 	{
 		super(action);
@@ -78,10 +69,10 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		action.addPropertyChangeListener(this);
 	}
 
-	public HTMLButton(final int fgNormal, final int fgFailOver)
+	public HTMLButton(final int fgNormal, final int fgFailOver, boolean isFailOver)
 	{
 		super();
-		this.init(fgNormal, fgFailOver, isFailOver());
+		this.init(fgNormal, fgFailOver, isFailOver);
 	}
 
 	public String extractText(final String labelText)
@@ -150,10 +141,13 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 	@Override
 	public void setEnabled(final boolean enabled)
 	{
+		if (this.getText().equals("Umsatz") || this.getText().equals("Kunde"))
+		{
+			System.out.println(this.getText());
+		}
 		super.setEnabled(enabled);
 		if (getText().toLowerCase().startsWith(HTMLButton.HTML_PATTERN))
 		{
-			// TODO
 			super.setText(updateLabel(!true));
 		}
 	}
@@ -164,7 +158,6 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		super.setFont(font);
 		if (super.getText().toLowerCase().startsWith(HTMLButton.HTML_PATTERN))
 		{
-			// TODO
 			super.setText(createLabel(getText(), !true));
 		}
 	}
@@ -206,14 +199,14 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		{
 			text = extractText(labelText);
 			int fg = 0;
-			if (isEnabled())
-			{
+//			if (isEnabled())
+//			{
 				fg = fgFailOver;
-			}
-			else
-			{
-				fg = java.awt.Color.GRAY.getRGB();
-			}
+//			}
+//			else
+//			{
+//				fg = java.awt.Color.GRAY.getRGB();
+//			}
 
 			if (text.contains("|"))
 			{
@@ -239,10 +232,10 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 			int fg = this.getForeground().getRGB();
 			if (!isEnabled())
 			{
-				// fg = fgNormal;
-				// }
-				// else
-				// {
+				fg = fgNormal;
+			}
+			else
+			{
 				fg = java.awt.Color.GRAY.getRGB();
 			}
 
@@ -292,21 +285,10 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 
 	private void init(final int fgNormal, final int fgFailOver, boolean isFailOver)
 	{
-//		this.fgNormal = fgNormal;
+		this.fgNormal = fgNormal;
 		this.fgFailOver = fgFailOver;
-		if (isFailOver)
-		{
-			failOver.put("transfer", Boolean.TRUE);
-		}
-		else
-		{
-			if (failOver.containsKey("transfer"))
-			{
-				failOver.remove("transfer");
-			}
-		}
-		setFocusable(true);
 
+		setFocusable(true);
 		setMinimumSize(HTMLButton.MIN_BUTTON_SIZE);
 		setPreferredSize(HTMLButton.PREFERRED_BUTTON_SIZE);
 		setMaximumSize(HTMLButton.MAX_BUTTON_SIZE);

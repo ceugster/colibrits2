@@ -266,17 +266,31 @@ public class SettlementDateRangeComposite extends AbstractSettlementCompositeChi
 	protected Map<Long, SettlementEntry> createRestitutedPositionSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementRestitutedPosition> internals = query.selectRestitutedPositions(this.parentView.getSelectedSalespoints(),
-				this.parentView.getSelectedDateRange());
-		return createRestitutedPositionSection(new HashMap<Long, SettlementEntry>(), internals);
+		try
+		{
+			List<SettlementRestitutedPosition> internals = query.selectRestitutedPositions(this.parentView.getSelectedSalespoints(),
+					this.parentView.getSelectedDateRange());
+			return createRestitutedPositionSection(new HashMap<Long, SettlementEntry>(), internals);
+		}
+		catch (Exception e)
+		{
+			return new HashMap<Long, SettlementEntry>();
+		}
 	}
 
 	protected Map<Long, SettlementEntry> createPayedInvoiceSection(ServerService service)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		Collection<SettlementPayedInvoice> payedInvoices = query.selectPayedInvoices(this.parentView.getSelectedSalespoints(),
-				this.parentView.getSelectedDateRange());
-		return createPayedInvoiceSection(new HashMap<Long, SettlementEntry>(), payedInvoices);
+		try
+		{
+			Collection<SettlementPayedInvoice> payedInvoices = query.selectPayedInvoices(this.parentView.getSelectedSalespoints(),
+					this.parentView.getSelectedDateRange());
+			return createPayedInvoiceSection(new HashMap<Long, SettlementEntry>(), payedInvoices);
+		}
+		catch (Exception e)
+		{
+			return new HashMap<Long, SettlementEntry>();
+		}
 	}
 
 	protected Map<Long, SettlementEntry> createReversedReceiptsSection(ServerService service)

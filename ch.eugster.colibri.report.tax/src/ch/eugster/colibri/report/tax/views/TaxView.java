@@ -246,6 +246,7 @@ public class TaxView extends ViewPart implements IViewPart, ISelectionListener, 
 				}
 			}
 		}
+		catch (Exception e){}
 		finally
 		{
 			tracker.close();

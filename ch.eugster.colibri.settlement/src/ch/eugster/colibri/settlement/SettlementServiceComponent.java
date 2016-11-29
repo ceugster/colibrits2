@@ -1,5 +1,6 @@
 package ch.eugster.colibri.settlement;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
@@ -193,14 +194,28 @@ public class SettlementServiceComponent implements SettlementService
 			final Settlement settlement)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		return query.selectPayedInvoices(settlement);
+		try
+		{
+			return query.selectPayedInvoices(settlement);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<SettlementPayedInvoice>();
+		}
 	}
 
 	private List<SettlementRestitutedPosition> getRestitutedPositions(final ConnectionService service,
 			final Settlement settlement)
 	{
 		final PositionQuery query = (PositionQuery) service.getQuery(Position.class);
-		return query.selectRestitutedPositions(settlement);
+		try
+		{
+			return query.selectRestitutedPositions(settlement);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<SettlementRestitutedPosition>();
+		}
 	}
 
 	private List<SettlementInternal> getInternals(final ConnectionService service, final Settlement settlement)
