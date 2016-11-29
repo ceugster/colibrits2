@@ -1,7 +1,6 @@
 package ch.eugster.colibri.persistence.queries;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,6 +59,7 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 		}
 		return entity;
 	}
@@ -94,15 +94,22 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 	}
 
 	@Override
-	public Collection<T> selectAll(final boolean deletedToo)
+	public List<T> selectAll(final boolean deletedToo)
 	{
-		if (deletedToo)
+		try
 		{
-			return this.select(new ExpressionBuilder(this.getEntityClass()));
+			if (deletedToo)
+			{
+				return this.select(new ExpressionBuilder(this.getEntityClass()));
+			}
+			else
+			{
+				return this.select(new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false));
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			return this.select(new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false));
+			return new ArrayList<T>();
 		}
 	}
 
@@ -211,15 +218,21 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		return sps;
 	}
 
-	protected List<T> select(final Expression expression)
+	protected List<T> select(final Expression expression) throws Exception
 	{
 		return this.select(expression, 0);
 	}
 	
 	protected Query createQuery(EntityManager entityManager, DatabaseQuery databaseQuery, int maxResults)
 	{
+		return createQuery(entityManager, databaseQuery, maxResults, this.getConnectionService().getTimeout());
+	}
+
+	protected Query createQuery(EntityManager entityManager, DatabaseQuery databaseQuery, int maxResults, int timeout)
+	{
 		final Query query = JpaHelper.createQuery(databaseQuery, entityManager);
-		query.setHint(QueryHints.JDBC_TIMEOUT, this.getConnectionService().getTimeout());
+		query.setHint(QueryHints.JDBC_TIMEOUT, timeout);
+		query.setHint(QueryHints.PESSIMISTIC_LOCK_TIMEOUT, timeout);
 		if (maxResults > 0)
 		{
 			query.setMaxResults(maxResults);
@@ -232,40 +245,40 @@ public abstract class AbstractQuery<T extends AbstractEntity> implements IQuery<
 		final JpaEntityManager em = JpaHelper.getEntityManager(entityManager);
 		final Query query = em.createQuery(expression, this.getEntityClass());
 		query.setHint(QueryHints.JDBC_TIMEOUT, this.getConnectionService().getTimeout());
+		query.setHint(QueryHints.PESSIMISTIC_LOCK_TIMEOUT, this.getConnectionService().getTimeout());
 		return query;
 	}
 
-	protected List<T> select(final Expression expression, final int maxResults)
+	protected List<T> select(final Expression expression, final int maxResults) throws Exception
 	{
 		return select(expression, null, maxResults);
 	}
 
+	protected List<T> select(final Expression expression, final int maxResults, int timeout) throws Exception
+	{
+		return select(expression, null, maxResults, timeout);
+	}
+
+	protected List<T> select(final Expression expression, final List<Expression> order, final int maxResults) throws Exception
+	{
+		return select(expression, order, maxResults, 0);
+	}
+	
 	@SuppressWarnings("unchecked")
-	protected List<T> select(final Expression expression, final List<Expression> order, final int maxResults)
+	protected List<T> select(final Expression expression, final List<Expression> order, final int maxResults, int timeout) throws Exception
 	{
 		List<T> result = new ArrayList<T>();
 		EntityManager entityManager = null;
-		try
+		entityManager = this.connectionService.getEntityManager();
+		if (entityManager != null)
 		{
-			entityManager = this.connectionService.getEntityManager();
-			if (entityManager != null)
+			final ReadAllQuery readAllQuery = new ReadAllQuery(this.getEntityClass(), expression);
+			if (order != null)
 			{
-				final ReadAllQuery readAllQuery = new ReadAllQuery(this.getEntityClass(), expression);
-				if (order != null)
-				{
-					readAllQuery.setOrderByExpressions(order);
-				}
-				final Query query = createQuery(entityManager, readAllQuery, maxResults);
-//				Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
-//				String time = SimpleDateFormat.getDateTimeInstance().format(calendar.getTime());
-				result = query.getResultList();
+				readAllQuery.setOrderByExpressions(order);
 			}
-		}
-		catch (Exception e)
-		{
-			
-			e.printStackTrace();
-			this.connectionService.resetEntityManager(e);
+			final Query query = createQuery(entityManager, readAllQuery, maxResults, timeout);
+			result = query.getResultList();
 		}
 		return result;
 	}

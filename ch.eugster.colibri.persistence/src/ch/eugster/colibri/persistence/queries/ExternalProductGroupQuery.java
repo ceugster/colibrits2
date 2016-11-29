@@ -1,7 +1,8 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -20,10 +21,17 @@ public class ExternalProductGroupQuery extends AbstractQuery<ExternalProductGrou
 		return this.count(expression);
 	}
 	
-	public Collection<ExternalProductGroup> selectByProvider(final String provider)
+	public List<ExternalProductGroup> selectByProvider(final String provider)
 	{
-		final Expression p = new ExpressionBuilder().get("provider").equal(provider);
-		return this.select(p);
+		try
+		{
+			final Expression p = new ExpressionBuilder().get("provider").equal(provider);
+			return this.select(p);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<ExternalProductGroup>();
+		}
 	}
 
 	public ExternalProductGroup selectByProviderAndCode(final String provider, final String code)
@@ -35,25 +43,39 @@ public class ExternalProductGroupQuery extends AbstractQuery<ExternalProductGrou
 		return this.find(providerCriteria.and(codeCriteria).and(deletedCriteria));
 	}
 
-	public Collection<ExternalProductGroup> selectUnmapped(final String providerId)
+	public List<ExternalProductGroup> selectUnmapped(final String providerId)
 	{
-		Expression expression = new ExpressionBuilder(ExternalProductGroup.class).get("provider").equal(providerId);
-		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
-		Expression type = new ExpressionBuilder().get("productGroupMapping").isNull();
-		type = type.or(new ExpressionBuilder().get("productGroupMapping").get("deleted").equal(true));
-		expression = expression.and(type);
-		Collection<ExternalProductGroup> externalProductGroups = this.select(expression);
-		return externalProductGroups;
+		try
+		{
+			Expression expression = new ExpressionBuilder(ExternalProductGroup.class).get("provider").equal(providerId);
+			expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
+			Expression type = new ExpressionBuilder().get("productGroupMapping").isNull();
+			type = type.or(new ExpressionBuilder().get("productGroupMapping").get("deleted").equal(true));
+			expression = expression.and(type);
+			List<ExternalProductGroup> externalProductGroups = this.select(expression);
+			return externalProductGroups;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<ExternalProductGroup>();
+		}
 	}
 	
-	public Collection<ExternalProductGroup> selectMapped(final String providerId)
+	public List<ExternalProductGroup> selectMapped(final String providerId)
 	{
-		Expression expression = new ExpressionBuilder(ExternalProductGroup.class).get("provider").equal(providerId);
-		Expression type = new ExpressionBuilder().get("productGroupMapping").notNull();
-		type = type.and(new ExpressionBuilder().get("productGroupMapping").get("deleted").equal(false));
-		expression = expression.and(type);
-		Collection<ExternalProductGroup> externalProductGroups = this.select(expression);
-		return externalProductGroups;
+		try
+		{
+			Expression expression = new ExpressionBuilder(ExternalProductGroup.class).get("provider").equal(providerId);
+			Expression type = new ExpressionBuilder().get("productGroupMapping").notNull();
+			type = type.and(new ExpressionBuilder().get("productGroupMapping").get("deleted").equal(false));
+			expression = expression.and(type);
+			List<ExternalProductGroup> externalProductGroups = this.select(expression);
+			return externalProductGroups;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<ExternalProductGroup>();
+		}
 	}
 	
 	public boolean isCodeUnique(String code, Long id)

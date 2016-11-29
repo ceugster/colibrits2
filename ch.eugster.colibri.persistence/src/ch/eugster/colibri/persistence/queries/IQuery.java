@@ -20,5 +20,5 @@ public interface IQuery<T extends Entity>
 
 	// Collection<T> select(Expression expression);
 
-	Collection<T> selectAll(boolean deletedToo);
+	Collection<T> selectAll(boolean deletedToo) throws Exception;
 }

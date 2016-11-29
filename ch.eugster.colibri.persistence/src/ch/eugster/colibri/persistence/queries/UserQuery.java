@@ -1,7 +1,8 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -46,10 +47,17 @@ public class UserQuery extends AbstractQuery<User>
 		return super.isUniqueValue(params, id);
 	}
 
-	public Collection<User> selectByRole(final Role role)
+	public List<User> selectByRole(final Role role)
 	{
 		final Expression roleExpr = new ExpressionBuilder().get("role").equal(role);
-		return this.select(roleExpr);
+		try
+		{
+			return this.select(roleExpr);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<User>();
+		}
 	}
 
 	@Override

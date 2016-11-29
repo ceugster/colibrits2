@@ -1,7 +1,6 @@
 package ch.eugster.colibri.persistence.queries;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -34,28 +33,48 @@ public class DisplayQuery extends AbstractQuery<Display>
 		return this.find(builder);
 	}
 
-	public Collection<Display> selectAll()
+	public List<Display> selectAll()
 	{
-		final Expression expression = new ExpressionBuilder(Display.class);
-
-		final List<Expression> orders = new ArrayList<Expression>();
-		orders.add(new ExpressionBuilder().get("salespoint").isNull().ascending());
-		final Collection<Display> displays = this.select(expression, orders, 0);
-		return displays;
+		try
+		{
+			final Expression expression = new ExpressionBuilder(Display.class);
+			final List<Expression> orders = new ArrayList<Expression>();
+			orders.add(new ExpressionBuilder().get("salespoint").isNull().ascending());
+			final List<Display> displays = this.select(expression, orders, 0);
+			return displays;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Display>();
+		}
 	}
 
-	public Collection<Display> selectDisplayChildren()
+	public List<Display> selectDisplayChildren()
 	{
-		final Expression builder = new ExpressionBuilder(Display.class).get("display").notNull();
-		final Collection<Display> displays = this.select(builder);
-		return displays;
+		try
+		{
+			final Expression builder = new ExpressionBuilder(Display.class).get("display").notNull();
+			final List<Display> displays = this.select(builder);
+			return displays;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Display>();
+		}
 	}
 
-	public Collection<Display> selectDisplayParents()
+	public List<Display> selectDisplayParents()
 	{
-		final Expression builder = new ExpressionBuilder(Display.class).get("display").isNull();
-		final Collection<Display> displays = this.select(builder);
-		return displays;
+		try
+		{
+			final Expression builder = new ExpressionBuilder(Display.class).get("display").isNull();
+			final List<Display> displays = this.select(builder);
+			return displays;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Display>();
+		}
 	}
 
 	@Override

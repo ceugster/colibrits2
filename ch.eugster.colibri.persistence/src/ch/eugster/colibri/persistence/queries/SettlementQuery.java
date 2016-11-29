@@ -46,8 +46,15 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 			salespointCriteria.or(new ExpressionBuilder().get("salespoint").equal(salespoints[i]));
 		}
 		final Expression settledCriteria = new ExpressionBuilder().get("settled").between(dateRange[0], dateRange[1]);
-		List<Settlement> settlements = this.select(salespointCriteria.and(settledCriteria));
-		return settlements;
+		try
+		{
+			List<Settlement> settlements = this.select(salespointCriteria.and(settledCriteria));
+			return settlements;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Settlement>();
+		}
 	}
 
 	public Collection<Settlement> selectBySalespointsAndSettled(final Salespoint[] salespoints, final Long settledFrom,
@@ -91,8 +98,15 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		{
 			salespoint = salespoint.and(settled);
 		}
-		Collection<Settlement> settlements = this.select(salespoint);
-		return settlements;
+		try
+		{
+			List<Settlement> settlements = this.select(salespoint);
+			return settlements;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Settlement>();
+		}
 	}
 
 	@Override
@@ -109,8 +123,15 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 
 	public List<Settlement> selectTransferables()
 	{
-		List<Settlement> settlements = this.select(createTransferablesExpression(), 0);
-		return settlements;
+		try
+		{
+			List<Settlement> settlements = this.select(createTransferablesExpression(), 0);
+			return settlements;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Settlement>();
+		}
 	}
 
 	private Expression createTransferablesExpression()

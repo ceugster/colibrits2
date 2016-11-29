@@ -1,6 +1,7 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
@@ -25,34 +26,62 @@ public class PaymentTypeQuery extends AbstractQuery<PaymentType>
 		return this.find(expression);
 	}
 
-	public Collection<PaymentType> selectByChange(final boolean isChange)
+	public List<PaymentType> selectByChange(final boolean isChange)
 	{
 		Expression expression = new ExpressionBuilder(PaymentType.class).get("changer").equal(isChange);
 		expression = expression.and(new ExpressionBuilder().get("paymentTypeGroup").equal(PaymentTypeGroup.CASH));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<PaymentType>();
+		}
 	}
 
-	public Collection<PaymentType> selectByCode(String code)
+	public List<PaymentType> selectByCode(String code)
 	{
 		Expression expression = new ExpressionBuilder(PaymentType.class).get("currency").get("code").equal(code);
 		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
 		expression = expression.and(new ExpressionBuilder().get("paymentTypeGroup").equal(PaymentTypeGroup.CASH));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<PaymentType>();
+		}
 	}
 
-	public Collection<PaymentType> selectByGroup(final PaymentTypeGroup paymentTypeGroup)
+	public List<PaymentType> selectByGroup(final PaymentTypeGroup paymentTypeGroup)
 	{
 		final Expression builder = new ExpressionBuilder().get("paymentTypeGroup").equal(paymentTypeGroup);
-		return this.select(builder);
+		try
+		{
+			return this.select(builder);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<PaymentType>();
+		}
 	}
 
-	public Collection<PaymentType> selectByPaymentTypeGroupAndCurrency(final PaymentTypeGroup paymentTypeGroup,
+	public List<PaymentType> selectByPaymentTypeGroupAndCurrency(final PaymentTypeGroup paymentTypeGroup,
 			final Currency currency)
 	{
 		final Expression currencyCriteria = new ExpressionBuilder().get("currency").equal(currency);
 		final Expression paymentTypeGroupCriteria = new ExpressionBuilder().get("paymentTypeGroup").equal(
 				paymentTypeGroup);
-		return this.select(paymentTypeGroupCriteria.and(currencyCriteria));
+		try
+		{
+			return this.select(paymentTypeGroupCriteria.and(currencyCriteria));
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<PaymentType>();
+		}
 	}
 
 	public long countWithoutMapping()

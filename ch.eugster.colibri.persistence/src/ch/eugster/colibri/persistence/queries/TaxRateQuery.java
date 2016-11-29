@@ -1,7 +1,8 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.persistence.expressions.ExpressionBuilder;
@@ -22,9 +23,16 @@ public class TaxRateQuery extends AbstractQuery<TaxRate>
 		return this.find(new ExpressionBuilder().get("code").equal(code));
 	}
 
-	public Collection<TaxRate> selectExceptCode(String code)
+	public List<TaxRate> selectExceptCode(String code)
 	{
-		return this.select(new ExpressionBuilder().get("code").notEqual(code));
+		try
+		{
+			return this.select(new ExpressionBuilder().get("code").notEqual(code));
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<TaxRate>();
+		}
 	}
 
 	@Override

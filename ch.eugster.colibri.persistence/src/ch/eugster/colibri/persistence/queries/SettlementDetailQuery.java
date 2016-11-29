@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -182,8 +183,15 @@ public class SettlementDetailQuery extends AbstractQuery<Settlement>
 		{
 			salespoint = salespoint.and(settled);
 		}
-		Collection<Settlement> settlements = this.select(salespoint);
-		return settlements;
+		try
+		{
+			List<Settlement> settlements = this.select(salespoint);
+			return settlements;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Settlement>();
+		}
 	}
 
 	@Override

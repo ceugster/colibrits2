@@ -50,7 +50,14 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.SAVED));
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public long countParked(final User user)
@@ -133,13 +140,20 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression customer = new ExpressionBuilder().get("customerCode").equal(customerCode);
 
 		final Expression expression = customer.and(saved.or(reversed));
-		List<Receipt> receipts = this.select(expression);
-		double amount = 0;
-		for (Receipt receipt : receipts)
+		try
 		{
-			amount += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+			List<Receipt> receipts = this.select(expression);
+			double amount = 0;
+			for (Receipt receipt : receipts)
+			{
+				amount += receipt.getPositionAmount(Receipt.QuotationType.DEFAULT_FOREIGN_CURRENCY, Position.AmountType.NETTO);
+			}
+			return amount;
 		}
-		return amount;
+		catch (Exception e)
+		{
+			return 0d;
+		}
 	}
 
 	private Expression createSelectTransferablesExpression()
@@ -200,9 +214,15 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder(Receipt.class).get("settlement").get("salespoint")
 				.equal(salespoint);
 		expression = expression.and(new ExpressionBuilder().get("timestamp").between(from, to));
-		final List<Receipt> receipts = this.select(expression);
-		return receipts;
-
+		try
+		{
+			final List<Receipt> receipts = this.select(expression);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public Receipt findBySalespointAndTimestamp(Salespoint salespoint, Calendar calendar)
@@ -221,17 +241,29 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 				.equal(salespoint);
 		expression = expression.and(new ExpressionBuilder().get("number").equal(number));
 		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
-		final List<Receipt> receipts = this.select(expression);
-		return receipts;
-
+		try
+		{
+			final List<Receipt> receipts = this.select(expression);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<Receipt> selectByNumber(Long number)
 	{
 		Expression expression = new ExpressionBuilder(Receipt.class).get("number").equal(number);
-		final List<Receipt> receipts = this.select(expression);
-		return receipts;
-
+		try
+		{
+			final List<Receipt> receipts = this.select(expression);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<Receipt> selectBySettlement(final Settlement settlement, Receipt.State[] states)
@@ -257,8 +289,15 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder(Receipt.class).get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
 		expression = expression.and(state);
-		final List<Receipt> receipts = this.select(expression);
-		return receipts;
+		try
+		{
+			final List<Receipt> receipts = this.select(expression);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<Receipt> selectBySettlementAndUser(final Settlement settlement, final User user,
@@ -286,8 +325,15 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		expression = expression.and(new ExpressionBuilder().get("user").equal(user));
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
 		expression = expression.and(state);
-		final List<Receipt> receipts = this.select(expression);
-		return receipts;
+		try
+		{
+			final List<Receipt> receipts = this.select(expression);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<Receipt> selectParked(final Salespoint salespoint)
@@ -295,7 +341,14 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settlement").get("salespoint").equal(salespoint));
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<Receipt> selectParked(final User user)
@@ -303,7 +356,14 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("user").equal(user));
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 	
 	public List<Receipt> selectParked(final Settlement settlement)
@@ -311,7 +371,14 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		Expression expression = new ExpressionBuilder().get("deleted").equal(false);
 		expression = expression.and(new ExpressionBuilder().get("settlement").equal(settlement));
 		expression = expression.and(new ExpressionBuilder().get("state").equal(Receipt.State.PARKED));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 	
 	public int removeParked(final Salespoint salespoint)
@@ -350,8 +417,15 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 				.equal(true)));
 
 		final Expression states = saved.or(reversed);
-		final List<Receipt> receipts = this.select(deleted.and(states), maxResults);
-		return receipts;
+		try
+		{
+			final List<Receipt> receipts = this.select(deleted.and(states), maxResults);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<SettlementReceipt> selectReversed(final Settlement settlement)
@@ -378,12 +452,26 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 
 	public List<Receipt> selectTransferables(final int maxResults)
 	{
-		return this.select(createSelectTransferablesExpression(), maxResults);
+		try
+		{
+			return this.select(createSelectTransferablesExpression(), maxResults);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public List<Receipt> selectTransferables(final Settlement settlement, final int maxResults)
 	{
-		return this.select(createSelectTransferablesFromSettlementExpression(settlement), maxResults);
+		try
+		{
+			return this.select(createSelectTransferablesFromSettlementExpression(settlement), maxResults);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public long countTransferables(Settlement settlement)
@@ -415,8 +503,15 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 				.equal(settlement.getSalespoint()));
 		expression = expression.and(new ExpressionBuilder().get("settlement").get("settled").isNull());
 		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
-		List<Receipt> receipts = this.select(expression);
-		return receipts;
+		try
+		{
+			List<Receipt> receipts = this.select(expression);
+			return receipts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	private List<Receipt> selectReversedBySalespointsAndDateRange(final Salespoint[] salespoints,
@@ -447,7 +542,14 @@ public class ReceiptQuery extends AbstractQuery<Receipt>
 		{
 			expression = expression.and(new ExpressionBuilder().get("timestamp").lessThanEqual(dateRange[1]));
 		}
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Receipt>();
+		}
 	}
 
 	public long countDayHourStatisticsRange(final Long salespointId,

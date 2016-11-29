@@ -1,7 +1,9 @@
 package ch.eugster.colibri.persistence.queries;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -62,19 +64,19 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 						{
 							final SettlementQuery queryService = (SettlementQuery) this.getConnectionService()
 									.getQuery(Settlement.class);
-							Collection<Settlement> settlements = queryService.select(new ExpressionBuilder(
-									Settlement.class).get("salespoint").equal(this.thisSalespoint)
-									.and(new ExpressionBuilder(Settlement.class).get("settled").isNull()));
-							if (settlements.isEmpty())
-							{
-								this.thisSalespoint.setSettlement(Settlement.newInstance(this.thisSalespoint));
-							}
-							else
-							{
-								this.thisSalespoint.setSettlement(settlements.iterator().next());
-							}
 							try
 							{
+								List<Settlement> settlements = queryService.select(new ExpressionBuilder(
+										Settlement.class).get("salespoint").equal(this.thisSalespoint)
+										.and(new ExpressionBuilder(Settlement.class).get("settled").isNull()));
+								if (settlements.isEmpty())
+								{
+									this.thisSalespoint.setSettlement(Settlement.newInstance(this.thisSalespoint));
+								}
+								else
+								{
+									this.thisSalespoint.setSettlement(settlements.iterator().next());
+								}
 								this.thisSalespoint = (Salespoint) this.getConnectionService().merge(this.thisSalespoint);
 							} 
 							catch (Exception e) 
@@ -93,10 +95,17 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 		return this.thisSalespoint;
 	}
 
-	public Collection<Salespoint> selectByMapping(String mapping)
+	public List<Salespoint> selectByMapping(String mapping)
 	{
 		Expression expression = new ExpressionBuilder(Salespoint.class).get("mapping").equal(mapping);
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Salespoint>();
+		}
 	}
 
 	public String getHostname(final HostnameResolver resolver)
@@ -113,10 +122,17 @@ public class SalespointQuery extends AbstractQuery<Salespoint>
 		return this.isUniqueValue(params, id);
 	}
 
-	public Collection<Salespoint> selectByHost(final String host)
+	public List<Salespoint> selectByHost(final String host)
 	{
-		return this.select(new ExpressionBuilder(Salespoint.class).get("host").equal(host)
-				.and(new ExpressionBuilder().get("deleted").equal(false)));
+		try
+		{
+			return this.select(new ExpressionBuilder(Salespoint.class).get("host").equal(host)
+					.and(new ExpressionBuilder().get("deleted").equal(false)));
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Salespoint>();
+		}
 	}
 
 	@Override

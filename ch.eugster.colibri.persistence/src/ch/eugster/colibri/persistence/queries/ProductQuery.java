@@ -1,5 +1,6 @@
 package ch.eugster.colibri.persistence.queries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -18,6 +19,13 @@ public class ProductQuery extends AbstractQuery<Product>
 	public List<Product> selectInvoice(String number)
 	{
 		Expression select = new ExpressionBuilder(Product.class).get("invoiceNumber").equal(number);
-		return this.select(select);
+		try
+		{
+			return this.select(select);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Product>();
+		}
 	}
 }

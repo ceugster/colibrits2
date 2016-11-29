@@ -1,7 +1,7 @@
 package ch.eugster.colibri.persistence.queries;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
 import org.eclipse.persistence.expressions.ExpressionBuilder;
@@ -21,21 +21,25 @@ public class KeyQuery extends AbstractQuery<Key>
 		return Key.class;
 	}
 	
-	public Collection<Key> selectVouchers(Profile profile, Currency currency)
+	public List<Key> selectVouchers(Profile profile, Currency currency)
 	{
-		Collection<Key> vouchers = new ArrayList<Key>();
-		Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
-		expression = expression.and(new ExpressionBuilder().get("keyType").equal(KeyType.PAYMENT_TYPE));
-		Collection<Key> keys = this.select(expression);
-		for (Key key : keys)
+		List<Key> vouchers = new ArrayList<Key>();
+		try
 		{
-			PaymentType paymentType = (PaymentType) this.getConnectionService().find(PaymentType.class, key.getParentId());
-			if (paymentType != null && paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER) && paymentType.getCurrency().getId().equals( currency.getId()))
+			Expression expression = new ExpressionBuilder(this.getEntityClass()).get("deleted").equal(false);
+			expression = expression.and(new ExpressionBuilder().get("keyType").equal(KeyType.PAYMENT_TYPE));
+			List<Key> keys = this.select(expression);
+			for (Key key : keys)
 			{
-				key.paymentType = paymentType;
-				vouchers.add(key);
+				PaymentType paymentType = (PaymentType) this.getConnectionService().find(PaymentType.class, key.getParentId());
+				if (paymentType != null && paymentType.getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER) && paymentType.getCurrency().getId().equals( currency.getId()))
+				{
+					key.paymentType = paymentType;
+					vouchers.add(key);
+				}
 			}
 		}
+		catch (Exception e) {}
 		return vouchers;
 	}
 }

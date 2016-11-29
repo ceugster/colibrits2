@@ -1,7 +1,9 @@
 package ch.eugster.colibri.persistence.queries;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -12,12 +14,12 @@ import ch.eugster.colibri.persistence.model.Salespoint;
 
 public class ProviderPropertyQuery extends AbstractQuery<ProviderProperty>
 {
-	public Collection<ProviderProperty> selectByProvider(final String provider)
+	public List<ProviderProperty> selectByProvider(final String provider)
 	{
 		return this.selectByProviderAndSalespoint(provider, null);
 	}
 
-	public Collection<ProviderProperty> selectByProviderAndSalespoint(final String provider, final Salespoint salespoint)
+	public List<ProviderProperty> selectByProviderAndSalespoint(final String provider, final Salespoint salespoint)
 	{
 		final ExpressionBuilder builder = new ExpressionBuilder(ProviderProperty.class);
 
@@ -32,8 +34,14 @@ public class ProviderPropertyQuery extends AbstractQuery<ProviderProperty>
 		{
 			s = builder.get("salespoint").equal(salespoint);
 		}
-
-		return this.select(p.and(s));
+		try
+		{
+			return this.select(p.and(s));
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<ProviderProperty>();
+		}
 	}
 
 	public Map<String, ProviderProperty> selectByProviderAndSalespointAsMap(final String provider, final Salespoint salespoint)

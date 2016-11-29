@@ -13,7 +13,7 @@ public class CurrencyQuery extends AbstractQuery<Currency>
 
 	private static NumberFormat roundFactorFormatter;
 
-	public boolean isCodeUnique(final String code, final Long id)
+	public boolean isCodeUnique(final String code, final Long id) throws Exception
 	{
 		Expression codeExpr = new ExpressionBuilder().get("code").equal(code);
 		codeExpr = codeExpr.and(new ExpressionBuilder().get("deleted").equal(false));

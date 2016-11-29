@@ -1,6 +1,7 @@
 package ch.eugster.colibri.persistence.queries;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -21,20 +22,20 @@ public class CurrentTaxQuery extends AbstractQuery<CurrentTax>
 		return CurrentTax.class;
 	}
 
-	public Collection<CurrentTax> selectNewerThan(Tax tax, long date)
+	public List<CurrentTax> selectNewerThan(Tax tax, long date) throws Exception
 	{
 		Expression expression = new ExpressionBuilder(CurrentTax.class).get("tax").equal(tax);
 		expression = expression.and(new ExpressionBuilder().get("validFrom").greaterThan(date));
 		expression = expression.and(new ExpressionBuilder().get("deleted").equal(false));
-		Collection<CurrentTax> currentTaxes = this.select(expression);
+		List<CurrentTax> currentTaxes = this.select(expression);
 		return currentTaxes;
 	}
 	
-	public Collection<CurrentTax> selectByValidFrom(Tax tax, long date)
+	public List<CurrentTax> selectByValidFrom(Tax tax, long date) throws Exception
 	{
 		Expression expression = new ExpressionBuilder(CurrentTax.class).get("tax").equal(tax);
 		expression = expression.and(new ExpressionBuilder().get("validFrom").equal(date));
-		Collection<CurrentTax> currentTaxes = this.select(expression);
+		List<CurrentTax> currentTaxes = this.select(expression);
 		return currentTaxes;
 	}
 	

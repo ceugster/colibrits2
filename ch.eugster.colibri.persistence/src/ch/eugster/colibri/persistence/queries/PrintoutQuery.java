@@ -1,7 +1,6 @@
 package ch.eugster.colibri.persistence.queries;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -34,28 +33,49 @@ public class PrintoutQuery extends AbstractQuery<Printout>
 		return this.find(builder);
 	}
 
-	public Collection<Printout> selectAll()
+	public List<Printout> selectAll()
 	{
 		final Expression expression = new ExpressionBuilder(Printout.class);
 
 		final List<Expression> orders = new ArrayList<Expression>();
 		orders.add(new ExpressionBuilder().get("salespoint").isNull().ascending());
-		final Collection<Printout> printouts = this.select(expression, orders, 0);
-		return printouts;
+		try
+		{
+			final List<Printout> printouts = this.select(expression, orders, 0);
+			return printouts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Printout>();
+		}
 	}
 
-	public Collection<Printout> selectPrintoutChildren()
+	public List<Printout> selectPrintoutChildren()
 	{
 		final Expression builder = new ExpressionBuilder(Printout.class).get("printout").notNull();
-		final Collection<Printout> printouts = this.select(builder);
-		return printouts;
+		try
+		{
+			final List<Printout> printouts = this.select(builder);
+			return printouts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Printout>();
+		}
 	}
 
-	public Collection<Printout> selectPrintoutParents()
+	public List<Printout> selectPrintoutParents()
 	{
 		final Expression builder = new ExpressionBuilder(Printout.class).get("printout").isNull();
-		final Collection<Printout> printouts = this.select(builder);
-		return printouts;
+		try
+		{
+			final List<Printout> printouts = this.select(builder);
+			return printouts;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Printout>();
+		}
 	}
 
 	@Override

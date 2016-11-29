@@ -2,7 +2,6 @@ package ch.eugster.colibri.persistence.queries;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,7 @@ import ch.eugster.colibri.persistence.model.payment.PaymentTypeGroup;
 
 public class PaymentQuery extends AbstractQuery<Payment>
 {
-	public Collection<Payment> selectVoucherUpdates(final Salespoint salespoint, String providerId, final int maxRows)
+	public List<Payment> selectVoucherUpdates(final Salespoint salespoint, String providerId, final int maxRows)
 	{
 		Expression expression = new ExpressionBuilder(Payment.class).get("receipt").get("settlement").get("salespoint").equal(salespoint);
 
@@ -45,8 +44,15 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		reversed = reversed.and(update.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
 		final Expression states = expression.and(deleted).and(saved.or(reversed));
-		final Collection<Payment> payments = this.select(states, maxRows);
-		return payments;
+		try
+		{
+			final List<Payment> payments = this.select(states, maxRows);
+			return payments;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Payment>();
+		}
 	}
 
 	private List<ReportQueryResult> selectPaymentsBySettlement(final Settlement settlement)
@@ -396,8 +402,15 @@ public class PaymentQuery extends AbstractQuery<Payment>
 		reversed = reversed.and(provider.and(new ExpressionBuilder().get("providerBooked").equal(true)));
 
 		final Expression states = expression.and(deleted).and(saved.or(reversed));
-		final List<Payment> payments = this.select(states, maxRows);
-		return payments;
+		try
+		{
+			final List<Payment> payments = this.select(states, maxRows);
+			return payments;
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Payment>();
+		}
 	}
 
 }

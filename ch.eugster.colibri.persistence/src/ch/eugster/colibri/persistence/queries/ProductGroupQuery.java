@@ -1,7 +1,8 @@
 package ch.eugster.colibri.persistence.queries;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.persistence.expressions.Expression;
@@ -48,19 +49,33 @@ public class ProductGroupQuery extends AbstractQuery<ProductGroup>
 		return this.isUniqueValue(params, id);
 	}
 
-	public Collection<ProductGroup> selectByProductGroupType(final ProductGroupType productGroupType)
+	public List<ProductGroup> selectByProductGroupType(final ProductGroupType productGroupType)
 	{
 		final ExpressionBuilder expressionBuilder = new ExpressionBuilder(ProductGroup.class);
 		final Expression expression = expressionBuilder.get("productGroupType").equal(productGroupType);
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<ProductGroup>();
+		}
 	}
 
-	public Collection<ProductGroup> selectByProductGroupTypeWithoutPayedInvoice(final ProductGroupType productGroupType)
+	public List<ProductGroup> selectByProductGroupTypeWithoutPayedInvoice(final ProductGroupType productGroupType)
 	{
 		final ExpressionBuilder criteria = new ExpressionBuilder(ProductGroup.class);
 		Expression expression = criteria.get("productGroupType").equal(productGroupType)
 				.and(new ExpressionBuilder().get("proposalOption").notEqual(Option.PAYED_INVOICE));
-		return this.select(expression);
+		try
+		{
+			return this.select(expression);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<ProductGroup>();
+		}
 	}
 
 	public long countWithoutMapping()
