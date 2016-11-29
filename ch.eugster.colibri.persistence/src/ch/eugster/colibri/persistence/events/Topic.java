@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IStatus;
 
 public enum Topic 
 {
-	SCHEDULED, SCHEDULED_PROVIDER_UPDATE, SCHEDULED_TRANSFER, CUSTOMER_UPDATE, STORE_RECEIPT, PRINT_SETTLEMENT, PRINT_RECEIPT, PRINT_VOUCHER, SETTLE_PERFORMED, LOCAL_DATABASE, DISPLAY_ERROR, PRINT_ERROR, USER_LOGGED_IN, SALESPOINT_CLOSED, PAYMENT_ADDED, POSITION_ADDED, CLIENT_STARTED, PROVIDER_QUERY, DATABASE_COMPATIBILITY_ERROR, LOCK, UNLOCK;
+	SCHEDULED, SCHEDULED_PROVIDER_UPDATE, SCHEDULED_TRANSFER, CUSTOMER_UPDATE, STORE_RECEIPT, PRINT_SETTLEMENT, PRINT_RECEIPT, PRINT_VOUCHER, SETTLE_PERFORMED, LOCAL_DATABASE, DISPLAY_ERROR, PRINT_ERROR, USER_LOGGED_IN, SALESPOINT_CLOSED, PAYMENT_ADDED, POSITION_ADDED, CLIENT_STARTED, PROVIDER_QUERY, DATABASE_COMPATIBILITY_ERROR, LOCK, UNLOCK, FAIL_OVER;
 	
 	public static String[] topics()
 	{
@@ -105,6 +105,10 @@ public enum Topic
 		{
 			return "ch/eugster/colibri/local/database/unlock";
 		}
+		case FAIL_OVER:
+		{
+			return "ch/eugster/colibri/failover";
+		}
 		default:
 		{
 			return "";
@@ -194,11 +198,15 @@ public enum Topic
 		}
 		case LOCK:
 		{
-			return "Kasse gesperrt.";
+			return "Beleg wird gespeichert.";
 		}
 		case UNLOCK:
 		{
-			return "Kasse entsperrt.";
+			return "Beleg wurde gespeichert.";
+		}
+		case FAIL_OVER:
+		{
+			return "Fail over occurred.";
 		}
 		default:
 		{
@@ -289,11 +297,15 @@ public enum Topic
 		}
 		case LOCK:
 		{
-			return "Kasse gesperrt.";
+			return "Beleg wird gespeichert.";
 		}
 		case UNLOCK:
 		{
-			return "Kasse entsperrt.";
+			return "Beleg wurde gespeichert.";
+		}
+		case FAIL_OVER:
+		{
+			return "Fail over occurred.";
 		}
 		default:
 		{
