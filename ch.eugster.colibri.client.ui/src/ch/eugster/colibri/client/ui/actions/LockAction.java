@@ -59,7 +59,7 @@ public class LockAction extends ConfigurableAction implements DisposeListener
 				final String title = "Ungültiges Passwort";
 				final String message = "Das eingegebene Passwort ist ungültig.";
 				final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
-				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), title, message, messageType);
+				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), userPanel.getProfile(), title, message, messageType, this.userPanel.getMainTabbedPane().isFailOver());
 			}
 		}
 		else

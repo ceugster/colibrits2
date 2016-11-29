@@ -34,6 +34,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
@@ -89,6 +90,8 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	private ServiceTracker<ProviderUpdater, ProviderUpdater> providerUpdaterTracker;
 
+	private ServiceTracker<EventAdmin, EventAdmin> eventAdminTracker;
+
 	private State state;
 
 	private ClientView clientView;
@@ -105,6 +108,9 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 		this.clientView = clientView;
 		this.addChangeListener(this.clientView);
+
+		this.eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
+		this.eventAdminTracker.open();
 
 		this.transferServiceTracker = new ServiceTracker<TransferAgent, TransferAgent>(Activator.getDefault().getBundle().getBundleContext(),
 				TransferAgent.class, null);
@@ -170,7 +176,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 //		final StatusPanel statusPanel = new StatusPanel(this.getSalespoint().getProfile());
 //		this.add("Status", statusPanel);
 
-		final LoginPanel loginPanel = new LoginPanel(this.getSalespoint().getProfile());
+		final LoginPanel loginPanel = new LoginPanel(this.getSalespoint().getProfile(), isFailOver());
 		loginPanel.addLoginListener(this);
 		this.addChangeListener(this);
 		this.add("Anmelden", loginPanel);
@@ -205,27 +211,64 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	}
 	
+	public boolean isFailOver()
+	{
+		return !this.failOvers.isEmpty();
+	}
+	
 	@Override
 	public void handleEvent(Event event) 
 	{
 		Boolean failOverRelevant = (Boolean) event.getProperty("failover");
 		if (failOverRelevant != null)
 		{
+			boolean update = false;
+			String provider = (String) event.getProperty("provider");
+			Boolean failOver = this.failOvers.get(provider);
 			if (failOverRelevant.booleanValue())
 			{
-				this.failOvers.put((String)event.getProperty("provider"), Boolean.TRUE);
+				if (failOver == null || !failOver.booleanValue())
+				{
+					this.failOvers.put((String)event.getProperty("provider"), Boolean.TRUE);
+					update = true;
+				}
 			}
 			else
 			{
-				this.failOvers.remove((String)event.getProperty("provider"));
+				if (failOver != null && failOver.booleanValue())
+				{
+					this.failOvers.remove((String)event.getProperty("provider"));
+					update = true;
+				}
+			}
+			if (update)
+			{
+				EventAdmin eventAdmin = eventAdminTracker.getService();
+				if (eventAdmin != null)
+				{
+					Map<String, Object> properties = new HashMap<String, Object>();
+					String[] names = event.getPropertyNames();
+					for (String name : names)
+					{
+						properties.put(name, event.getProperty(name));
+					}
+					String[] keys = this.failOvers.keySet().toArray(new String[0]);
+					for (String key : keys)
+					{
+						properties.put(key, this.failOvers.get(key));
+					}
+					properties.put("failover-list", this.failOvers);
+					Event evt = new Event(Topic.FAIL_OVER.topic(), properties);
+					eventAdmin.sendEvent(evt);
+				}
 			}
 		}
 	}
 
-	public boolean isFailOver()
-	{
-		return this.failOvers.size() > 0;
-	}
+//	public boolean isFailOver()
+//	{
+//		return this.failOvers.size() > 0;
+//	}
 	
 	public boolean settlementRequired()
 	{
@@ -456,6 +499,10 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 				userPanel.dispose();
 			}
 		}
+		if (this.eventAdminTracker != null)
+		{
+			this.eventAdminTracker.close();
+		}
 		if (this.persistenceServiceTracker != null)
 		{
 			this.persistenceServiceTracker.close();
@@ -584,7 +631,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 				: "Die Verbindung zu " + providerName + " konnte wiederhergestellt werden.";
 		final Frame frame = Activator.getDefault().getFrame();
 		final Profile profile = this.getCurrentPanel().getProfile();
-		MessageDialog.showInformation(frame, profile, providerName, msg, MessageDialog.TYPE_WARN);
+		MessageDialog.showInformation(frame, profile, providerName, msg, MessageDialog.TYPE_WARN, this.isFailOver());
 	}
 
 	public enum State

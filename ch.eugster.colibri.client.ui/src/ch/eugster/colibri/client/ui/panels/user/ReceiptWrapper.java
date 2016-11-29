@@ -207,7 +207,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 			catch (Exception e) 
 			{
 				e.printStackTrace();
-				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht geparkt werden.", MessageDialog.TYPE_ERROR);
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht geparkt werden.", MessageDialog.TYPE_ERROR, userPanel.getMainTabbedPane().isFailOver());
 			}
 		}
 	}
@@ -351,7 +351,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 				this.sendEvent(receipt, Topic.UNLOCK);
 				e.printStackTrace();
 				ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, Topic.STORE_RECEIPT, e);
-				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR);
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Beleg konnte nicht gespeichert werden.", MessageDialog.TYPE_ERROR, userPanel.getMainTabbedPane().isFailOver());
 			}
 			finally
 			{

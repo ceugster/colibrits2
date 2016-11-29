@@ -311,7 +311,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				{
 					if (this.userPanel.getReceiptWrapper().getReceipt().isInternal())
 					{
-						MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Geldeinlagen und -entnahmen dürfen keine anderen Positionen enthalten.", MessageDialog.TYPE_WARN);
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Geldeinlagen und -entnahmen dürfen keine anderen Positionen enthalten.", MessageDialog.TYPE_WARN, userPanel.getMainTabbedPane().isFailOver());
 					}
 					else
 					{
@@ -356,7 +356,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 					}
 					final MessageDialog dialog = new MessageDialog(Activator.getDefault().getFrame(), this.position
 							.getReceipt().getSettlement().getSalespoint().getProfile(), "Barcode ungültig",
-							new int[] { MessageDialog.BUTTON_OK }, 0);
+							new int[] { MessageDialog.BUTTON_OK }, 0, userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage(text.toString());
 					dialog.pack();
 					dialog.setVisible(true);
@@ -484,7 +484,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 						log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
 						MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
 								.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
-								MessageDialog.BUTTON_OK);
+								MessageDialog.BUTTON_OK, userPanel.getMainTabbedPane().isFailOver());
 					}
 					else
 					{
@@ -493,7 +493,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 							log(LogService.LOG_WARNING, "Artikel " + barcode.getProductCode() + " wurde nicht gefunden.");
 							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.position.getReceipt()
 									.getSettlement().getSalespoint().getProfile(), "Nicht gefunden", status.getMessage(),
-									MessageDialog.BUTTON_OK);
+									MessageDialog.BUTTON_OK, userPanel.getMainTabbedPane().isFailOver());
 						}
 					}
 				}
@@ -575,7 +575,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				{
 					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.position.getReceipt()
 							.getSettlement().getSalespoint().getProfile(), "Bereits erfasst", "Der Abholfachbeleg "
-							+ barcode.getCode() + " wurde bereits erfasst.", MessageDialog.TYPE_WARN);
+							+ barcode.getCode() + " wurde bereits erfasst.", MessageDialog.TYPE_WARN, userPanel.getMainTabbedPane().isFailOver());
 					return false;
 				}
 			}
@@ -617,7 +617,7 @@ public class PositionWrapper implements PropertyChangeListener, DisposeListener
 				MessageDialog.showInformation(Activator.getDefault().getFrame(), this.position.getReceipt()
 						.getSettlement().getSalespoint().getProfile(), "Bereits erfasst", "Der Abholfachbeleg "
 						+ barcode.getCode() + " wurde bereits im geparkten Beleg " + number
-						+ " erfasst.", MessageDialog.TYPE_WARN);
+						+ " erfasst.", MessageDialog.TYPE_WARN, userPanel.getMainTabbedPane().isFailOver());
 				return false;
 			}
 		}

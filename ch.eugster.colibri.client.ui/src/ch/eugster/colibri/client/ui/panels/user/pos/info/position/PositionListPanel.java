@@ -94,7 +94,7 @@ public class PositionListPanel extends ProfilePanel implements TableModelListene
 								Frame frame = Activator.getDefault().getFrame();
 								Profile profile = PositionListPanel.this.userPanel.getProfile();
 								if (ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(frame,
-										profile, title, message, MessageDialog.TYPE_QUESTION) == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
+										profile, title, message, MessageDialog.TYPE_QUESTION, this.userPanel.getMainTabbedPane().isFailOver()) == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 								{
 									if (userPanel.getReceiptWrapper().getReceipt().getId() != null)
 									{

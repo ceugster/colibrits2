@@ -26,7 +26,6 @@ public class CommonSettingsPropertyReplicator extends AbstractEntityReplicator<C
 	@Override
 	public void replicate(final IProgressMonitor monitor, boolean force)
 	{
-
 		int i = 0;
 
 		final CommonSettingsPropertyQuery query = (CommonSettingsPropertyQuery) this.persistenceService.getServerService().getQuery(CommonSettingsProperty.class);

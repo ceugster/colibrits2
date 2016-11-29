@@ -48,7 +48,7 @@ public final class PriceAction extends UserPanelProfileAction
 			final String message = "Der eingegebene Preis ist sehr hoch. Soll er trotzdem akzeptiert werden?";
 			final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_QUESTION;
 			result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
-					.getFrame(), profile, title, message, messageType);
+					.getFrame(), profile, title, message, messageType, this.userPanel.getMainTabbedPane().isFailOver());
 		}
 		if (result == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 		{

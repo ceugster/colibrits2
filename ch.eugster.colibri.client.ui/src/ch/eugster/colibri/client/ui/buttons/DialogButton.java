@@ -12,10 +12,10 @@ public class DialogButton extends ProfileButton
 {
 	public static final long serialVersionUID = 0l;
 
-	public DialogButton(final String text, final Profile profile)
+	public DialogButton(final String text, final Profile profile, boolean isFailOver)
 	{
-		super(profile);
+		super(profile, isFailOver);
 		setText(text);
-		updateNormal();
+		update(isFailOver);
 	}
 }

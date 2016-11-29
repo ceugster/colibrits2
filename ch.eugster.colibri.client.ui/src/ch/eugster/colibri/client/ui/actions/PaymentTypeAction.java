@@ -84,13 +84,13 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 				{
 					if (Math.abs(value) > Math.abs(max))
 					{
-						MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getProfile(), "Eingabe zu hoch", "Der eingegebene Betrag ist höher als zugelassen.\nBitte korrigieren Sie den Betrag.", MessageDialog.TYPE_ERROR);
+						MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getProfile(), "Eingabe zu hoch", "Der eingegebene Betrag ist höher als zugelassen.\nBitte korrigieren Sie den Betrag.", MessageDialog.TYPE_ERROR, this.userPanel.getMainTabbedPane().isFailOver());
 						setAmount = false;
 						return;
 					}
 					else
 					{
-						if (MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.userPanel.getProfile(), "Eingabe sehr hoch", "Der eingegebene Betrag ist sehr hoch.\nWollen Sie ihn trotzdem verwenden?", MessageDialog.TYPE_QUESTION, new int[] { MessageDialog.BUTTON_YES, MessageDialog.BUTTON_NO}, 0) != MessageDialog.BUTTON_YES)
+						if (MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.userPanel.getProfile(), "Eingabe sehr hoch", "Der eingegebene Betrag ist sehr hoch.\nWollen Sie ihn trotzdem verwenden?", MessageDialog.TYPE_QUESTION, new int[] { MessageDialog.BUTTON_YES, MessageDialog.BUTTON_NO}, 0, this.userPanel.getMainTabbedPane().isFailOver()) != MessageDialog.BUTTON_YES)
 						{
 							setAmount = false;
 						}

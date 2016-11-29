@@ -37,13 +37,16 @@ public class DeleteParkedReceiptAction extends UserPanelProfileAction implements
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
+	private UserPanel userPanel;
+	
 	public DeleteParkedReceiptAction(final UserPanel userPanel, final Profile profile, final ParkedReceiptListModel tableModel,
 			final ParkedReceiptListSelectionModel selectionModel)
 	{
 		super(DeleteParkedReceiptAction.TEXT, DeleteParkedReceiptAction.ACTION_COMMAND, userPanel, profile);
+		this.userPanel = userPanel;
 		this.tableModel = tableModel;
 		this.selectionModel = selectionModel;
-		userPanel.addDisposeListener(this);
+		this.userPanel.addDisposeListener(this);
 
 		this.persistenceServiceTracker = new ServiceTracker<PersistenceService, PersistenceService>(Activator.getDefault().getBundle().getBundleContext(),
 				PersistenceService.class, null);
@@ -64,7 +67,7 @@ public class DeleteParkedReceiptAction extends UserPanelProfileAction implements
 			catch (Exception ex) 
 			{
 				ex.printStackTrace();
-				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der parkierte Beleg konnte nicht gelöscht werden.", MessageDialog.TYPE_ERROR);
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der parkierte Beleg konnte nicht gelöscht werden.", MessageDialog.TYPE_ERROR, this.userPanel.getMainTabbedPane().isFailOver());
 			}
 		}
 	}

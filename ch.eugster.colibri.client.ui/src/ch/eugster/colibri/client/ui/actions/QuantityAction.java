@@ -47,7 +47,7 @@ public final class QuantityAction extends UserPanelProfileAction
 			final String message = "Die eingegebene Menge ist sehr hoch. Soll sie trotzdem akzeptiert werden?";
 			final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_QUESTION;
 			result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
-					.getFrame(), profile, title, message, messageType);
+					.getFrame(), profile, title, message, messageType, this.userPanel.getMainTabbedPane().isFailOver());
 		}
 		else if (userPanel.getPositionWrapper().getPosition().isOrdered())
 		{
@@ -57,7 +57,7 @@ public final class QuantityAction extends UserPanelProfileAction
 				final String message = "Die eingegebene Menge ist höher als die bestellte Menge.";
 				final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
 				result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
-						.getFrame(), profile, title, message, messageType);
+						.getFrame(), profile, title, message, messageType, this.userPanel.getMainTabbedPane().isFailOver());
 				userPanel.getValueDisplay().getQuantity();
 				return;
 			}

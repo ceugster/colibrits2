@@ -115,7 +115,7 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 		}
 		catch (NumberFormatException e)
 		{
-			this.setTimeout(5);
+			this.setTimeout(0);
 		}
 		final Properties properties = new Properties();
 		properties.setProperty("derby.system.home", Activator.getDefault().getDerbyHome().getAbsolutePath());
@@ -164,8 +164,9 @@ public class ServerServiceImpl extends AbstractConnectionService implements Serv
 //		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, ServerExceptionHandler.class.getName());
 //		map.put(PersistenceUnitProperties.LOGGING_LEVEL, SessionLog.SEVERE_LABEL);
 		map.put(PersistenceUnitProperties.CLASSLOADER, this.getClass().getClassLoader());
-		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, "ch.eugster.colibri.persistence.connection.ServerExceptionHandler");
-
+//		map.put(PersistenceUnitProperties.EXCEPTION_HANDLER_CLASS, "ch.eugster.colibri.persistence.connection.service.ServerExceptionHandler");
+//		map.put("eclipselink.session.customizer", "ch.eugster.colibri.persistence.connection.handlers.ColibriSessionCustomizer");
+		
 		if (status.getSeverity() == IStatus.OK)
 		{
 			properties.setProperty(PersistenceUnitProperties.DDL_GENERATION, PersistenceUnitProperties.NONE);

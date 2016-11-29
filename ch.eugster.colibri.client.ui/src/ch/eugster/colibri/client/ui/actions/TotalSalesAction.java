@@ -9,19 +9,13 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -45,19 +39,7 @@ public class TotalSalesAction extends ConfigurableAction
 	public TotalSalesAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
-		registerHandler();
-	}
-	
-	private void registerHandler()
-	{
-		final Collection<String> t = new ArrayList<String>();
-		t.add(Topic.SCHEDULED_TRANSFER.topic());
-		final String[] topics = t.toArray(new String[t.size()]);
-		final EventHandler eventHandler = this;
-		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.EVENT_TOPIC, topics);
-		this.handlerRegistration = Activator.getDefault().getBundle().getBundleContext()
-				.registerService(EventHandler.class, eventHandler, properties);
+
 		ServiceTracker<EventAdmin, EventAdmin> tracker = new ServiceTracker<EventAdmin, EventAdmin>(Activator.getDefault().getBundle().getBundleContext(), EventAdmin.class, null);
 		tracker.open();
 		try
@@ -86,14 +68,14 @@ public class TotalSalesAction extends ConfigurableAction
 			final PersistenceService service = (PersistenceService) serviceTracker.getService();
 			if (isConnected(service))
 			{
-				final PositionQuery positionQuery = (PositionQuery) service.getServerService().getQuery(Position.class);
-				final double sales = positionQuery.sumCurrent(ProductGroupType.SALES_RELATED);
-
+				MessageDialog dialog = null;
 				final Frame frame = Activator.getDefault().getFrame();
 				final Profile profile = this.userPanel.getSalespoint().getProfile();
-				MessageDialog dialog = null;
-				if (isConnected(service))
+				try
 				{
+					final PositionQuery positionQuery = (PositionQuery) service.getServerService().getQuery(Position.class);
+					final double sales = positionQuery.sumCurrent(ProductGroupType.SALES_RELATED, 5);
+				
 					Map<String, Object> properties = new HashMap<String, Object>();
 					properties.put("provider", "transfer");
 					properties.put("failover", Boolean.FALSE);
@@ -103,10 +85,13 @@ public class TotalSalesAction extends ConfigurableAction
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
 					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
 
-					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Gesamtumsatz:   " + formatter.format(sales));
+					dialog.pack();
+					dialog.centerInScreen();
+					dialog.setVisible(true);
 				}
-				else
+				catch (Exception e)
 				{
 					Map<String, Object> properties = new HashMap<String, Object>();
 					properties.put("provider", "transfer");
@@ -114,12 +99,12 @@ public class TotalSalesAction extends ConfigurableAction
 					properties.put("status", new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), "Umsatz kann nicht abgefragt werden."));
 					eventAdmin.sendEvent(new Event(Topic.PROVIDER_QUERY.topic(), properties));
 					
-					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, true);
 					dialog.setMessage("Zur Zeit kann der Umsatz nicht abgefragt werden.\nDie Verbindung zum Datenbankserver ist unterbrochen.");
+					dialog.pack();
+					dialog.centerInScreen();
+					dialog.setVisible(true);
 				}
-				dialog.pack();
-				dialog.centerInScreen();
-				dialog.setVisible(true);
 			}
 		}
 		finally
@@ -152,20 +137,13 @@ public class TotalSalesAction extends ConfigurableAction
 	@Override
 	public void handleEvent(Event event) 
 	{
-		if (event.getTopic().equals(Topic.SCHEDULED_TRANSFER.topic()))
+		if (event.getTopic().equals(Topic.FAIL_OVER.topic()))
 		{
-			Object property = event.getProperty("status");
-			if (property instanceof IStatus)
+			String provider = (String) event.getProperty("provider");
+			if (provider != null && provider.equals("transfer"))
 			{
-				IStatus status = (IStatus) property;
-				if (status.getSeverity() == IStatus.ERROR)
-				{
-					this.setEnabled(false);
-				}
-				else
-				{
-					this.setEnabled(getState(new StateChangeEvent(this.userPanel.getCurrentState(), this.userPanel.getCurrentState())) && status.getSeverity() == IStatus.OK);
-				}
+				Boolean result = (Boolean) event.getProperty("failover");
+				this.setEnabled(result == null || !result.booleanValue());
 			}
 		}
 	}

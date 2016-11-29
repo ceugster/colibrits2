@@ -398,7 +398,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
 					: status.getMessage();
 			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
-					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
+					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR, this.mainTabbedPane.isFailOver());
 		}
 	}
 
@@ -433,7 +433,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				if (message != null)
 				{
 					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
-									.getProfile(), "Aktualisierungsproblem", message, MessageDialog.TYPE_WARN);
+									.getProfile(), "Aktualisierungsproblem", message, MessageDialog.TYPE_WARN, this.mainTabbedPane.isFailOver());
 				}
 			}
 		}
@@ -443,7 +443,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
 					: status.getMessage();
 			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
-					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR);
+					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR, this.mainTabbedPane.isFailOver());
 		}
 	}
 
@@ -985,13 +985,16 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		if (persistenceService != null)
 		{
 			ServiceReference<ProviderQuery>[] references = this.providerQueryTracker.getServiceReferences();
-			for (ServiceReference<ProviderQuery> reference : references)
+			if (references != null)
 			{
-				ProviderQuery query = this.providerQueryTracker.getService(reference);
-				PositionQuery positionQuery = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
-				count += positionQuery.countProviderUpdates(salespoint, query.getProviderId(), !persistenceService.getServerService().isLocal());
-				PaymentQuery paymentQuery = (PaymentQuery) persistenceService.getCacheService().getQuery(Payment.class);
-				count += paymentQuery.countProviderUpdates(salespoint, query.getProviderId());
+				for (ServiceReference<ProviderQuery> reference : references)
+				{
+					ProviderQuery query = this.providerQueryTracker.getService(reference);
+					PositionQuery positionQuery = (PositionQuery) persistenceService.getCacheService().getQuery(Position.class);
+					count += positionQuery.countProviderUpdates(salespoint, query.getProviderId(), !persistenceService.getServerService().isLocal());
+					PaymentQuery paymentQuery = (PaymentQuery) persistenceService.getCacheService().getQuery(Payment.class);
+					count += paymentQuery.countProviderUpdates(salespoint, query.getProviderId());
+				}
 			}
 		}
 		return count;

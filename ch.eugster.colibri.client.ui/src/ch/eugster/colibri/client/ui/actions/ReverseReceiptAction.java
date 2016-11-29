@@ -95,7 +95,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 				catch (Exception ex) 
 				{
 					ex.printStackTrace();
-					MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Status des Belegs konnte nicht gändert werden.", MessageDialog.TYPE_ERROR);
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), userPanel.getProfile(), "Fehler", "Der Status des Belegs konnte nicht gändert werden.", MessageDialog.TYPE_ERROR, this.userPanel.getMainTabbedPane().isFailOver());
 				}
 
 				if (this.printReceiptAction != null)
@@ -237,7 +237,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 					message = message.append(msg);
 				}
 				MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getSalespoint()
-						.getProfile(), "Bezahlte Rechnungen", message.toString(), MessageDialog.TYPE_INFORMATION);
+						.getProfile(), "Bezahlte Rechnungen", message.toString(), MessageDialog.TYPE_INFORMATION, this.userPanel.getMainTabbedPane().isFailOver());
 			}
 		}
 	}

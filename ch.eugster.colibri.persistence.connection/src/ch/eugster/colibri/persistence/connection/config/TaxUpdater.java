@@ -15,7 +15,7 @@ import ch.eugster.colibri.persistence.service.ConnectionService;
 
 public class TaxUpdater
 {
-	public static void updateTaxes(ConnectionService service)
+	public static void updateTaxes(ConnectionService service) throws Exception
 	{
 		Calendar calendar = GregorianCalendar.getInstance(Locale.getDefault());
 		TaxQuery taxQuery = (TaxQuery) service.getQuery(Tax.class);
@@ -31,14 +31,7 @@ public class TaxUpdater
 						&& currentTax.getValidFrom().longValue() <= calendar.getTimeInMillis())
 				{
 					tax.setCurrentTax(currentTax);
-					try
-					{
-						tax = (Tax) service.merge(tax);
-					} 
-					catch (Exception e) 
-					{
-						e.printStackTrace();
-					}
+					tax = (Tax) service.merge(tax);
 				}
 			}
 		}

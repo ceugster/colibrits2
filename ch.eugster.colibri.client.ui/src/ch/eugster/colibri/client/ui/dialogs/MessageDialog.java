@@ -89,11 +89,11 @@ public class MessageDialog extends JDialog
 	 * @param title
 	 * @throws java.awt.HeadlessException
 	 */
-	public MessageDialog(final Frame owner, final Profile profile, final String title, final int[] buttons, final int defaultButton)
+	public MessageDialog(final Frame owner, final Profile profile, final String title, final int[] buttons, final int defaultButton, boolean isFailOver)
 			throws HeadlessException
 	{
 		super(owner, title, true);
-		init(profile, buttons, defaultButton);
+		init(profile, buttons, defaultButton, isFailOver);
 	}
 
 	public void setImage(final String path)
@@ -107,7 +107,7 @@ public class MessageDialog extends JDialog
 		messageLabel.setText(message);
 	}
 
-	private DialogButton createButton(final Profile profile, final int type)
+	private DialogButton createButton(final Profile profile, final int type, boolean isFailOver)
 	{
 		String text = "";
 		String cmd = "";
@@ -138,7 +138,7 @@ public class MessageDialog extends JDialog
 				break;
 			}
 		}
-		final DialogButton button = new DialogButton(text, profile);
+		final DialogButton button = new DialogButton(text, profile, isFailOver);
 		button.setActionCommand(cmd);
 		button.addActionListener(new ActionListener()
 		{
@@ -168,12 +168,12 @@ public class MessageDialog extends JDialog
 		return button;
 	}
 
-	private void init(final Profile profile, final int[] b, final int defaultButton)
+	private void init(final Profile profile, final int[] b, final int defaultButton, boolean isFailOver)
 	{
 		buttons = new DialogButton[b.length];
 		for (int i = 0; i < b.length; i++)
 		{
-			buttons[i] = createButton(profile, b[i]);
+			buttons[i] = createButton(profile, b[i], isFailOver);
 			buttons[i].setDefaultCapable(b[i] == defaultButton);
 		}
 
@@ -212,11 +212,11 @@ public class MessageDialog extends JDialog
 		setResizable(false);
 	}
 
-	public static void showInformation(final Frame owner, final Profile profile, final String title, final String message, final int messageType)
+	public static void showInformation(final Frame owner, final Profile profile, final String title, final String message, final int messageType, boolean isFailOver)
 	{
 		Toolkit.getDefaultToolkit().beep();
 
-		final MessageDialog dialog = new MessageDialog(owner, profile, title, new int[] { MessageDialog.BUTTON_OK }, -1);
+		final MessageDialog dialog = new MessageDialog(owner, profile, title, new int[] { MessageDialog.BUTTON_OK }, -1, isFailOver);
 		dialog.setIconImage(MessageDialog.getImage(messageType));
 		dialog.setModal(true);
 		dialog.setMessage(MessageDialog.prepareMessage(message));
@@ -233,11 +233,11 @@ public class MessageDialog extends JDialog
 	}
 
 	public static int showQuestion(final Frame owner, final Profile profile, final String title, final String message, final int messageType,
-			final int[] buttons, final int defaultButton)
+			final int[] buttons, final int defaultButton, boolean isFailOver)
 	{
 		Toolkit.getDefaultToolkit().beep();
 
-		final MessageDialog dialog = new MessageDialog(owner, profile, title, buttons, defaultButton);
+		final MessageDialog dialog = new MessageDialog(owner, profile, title, buttons, defaultButton, isFailOver);
 		dialog.setIconImage(MessageDialog.getImage(messageType));
 		dialog.setModal(true);
 		dialog.setMessage(MessageDialog.prepareMessage(message));
@@ -255,19 +255,18 @@ public class MessageDialog extends JDialog
 
 	}
 
-	public static int showSimpleDialog(final Frame owner, final Profile profile, final String title, final String message, final int messageType)
+	public static int showSimpleDialog(final Frame owner, final Profile profile, final String title, final String message, final int messageType, final boolean isFailOver)
 	{
 		switch (messageType)
 		{
 			case 0:
 			{
-				MessageDialog.showInformation(owner, profile, title, message, messageType);
+				MessageDialog.showInformation(owner, profile, title, message, messageType, isFailOver);
 				return 0;
 			}
 			case 1:
 			{
-				return MessageDialog.showQuestion(owner, profile, title, message, messageType, new int[] { MessageDialog.BUTTON_YES,
-						MessageDialog.BUTTON_NO }, 0);
+				return MessageDialog.showQuestion(owner, profile, title, message, messageType, new int[] { MessageDialog.BUTTON_YES, MessageDialog.BUTTON_NO }, 0, isFailOver);
 			}
 			default:
 				return 0;

@@ -71,7 +71,7 @@ public class SettleAction extends ProfileAction
 				{
 					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.profile,
 							"Keine Vorgänge", "Es stehen keine Vorgänge zur Durchführung an.",
-							MessageDialog.TYPE_INFORMATION);
+							MessageDialog.TYPE_INFORMATION, false);
 					return;
 				}
 				if (this.coinCounterPanel.getUserPanel().getSalespoint().isForceCashCheck())
@@ -80,7 +80,7 @@ public class SettleAction extends ProfileAction
 					{
 						MessageDialog.showInformation(Activator.getDefault().getFrame(), this.profile,
 								"Kassensturz", "Vor dem Abschluss müssen Sie den Kassensturz vornehmen.",
-								MessageDialog.TYPE_INFORMATION);
+								MessageDialog.TYPE_INFORMATION, false);
 						return;
 					}
 				}
@@ -91,7 +91,7 @@ public class SettleAction extends ProfileAction
 					int result = MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.profile,
 							"Provisorischer Abschluss", "Wollen Sie einen provisorischen Abschluss vornehmen?",
 							MessageDialog.TYPE_QUESTION, new int[] { MessageDialog.BUTTON_NO, MessageDialog.BUTTON_YES,
-									MessageDialog.BUTTON_CANCEL }, MessageDialog.BUTTON_CANCEL);
+									MessageDialog.BUTTON_CANCEL }, MessageDialog.BUTTON_CANCEL, false);
 					if (result == MessageDialog.BUTTON_CANCEL)
 					{
 						return;
@@ -119,7 +119,7 @@ public class SettleAction extends ProfileAction
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			MessageDialog.showInformation(Activator.getDefault().getFrame(), coinCounterPanel.getProfile(), "Fehler", "Beim Speichern des Tagesabschlusses ist ein Fehler aufgetreten.", MessageDialog.TYPE_ERROR);
+			MessageDialog.showInformation(Activator.getDefault().getFrame(), coinCounterPanel.getProfile(), "Fehler", "Beim Speichern des Tagesabschlusses ist ein Fehler aufgetreten.", MessageDialog.TYPE_ERROR, false);
 		}
 		finally
 		{

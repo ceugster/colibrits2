@@ -6,9 +6,10 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.log.LogService;
 
 import ch.eugster.colibri.persistence.events.Topic;
+import ch.eugster.colibri.persistence.model.Position;
 import ch.eugster.colibri.persistence.model.Receipt;
-import ch.eugster.colibri.persistence.model.Version;
-import ch.eugster.colibri.persistence.queries.VersionQuery;
+import ch.eugster.colibri.persistence.model.product.ProductGroupType;
+import ch.eugster.colibri.persistence.queries.PositionQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.impl.Activator;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
@@ -41,9 +42,8 @@ public class TransferAgentImpl implements TransferAgent
 			 */
 			try
 			{
-				VersionQuery query = (VersionQuery) persistenceService.getServerService().getQuery(Version.class);
-				Version version = query.findDefault();
-				persistenceService.getServerService().refresh(version);
+				final PositionQuery positionQuery = (PositionQuery) this.persistenceService.getServerService().getQuery(Position.class);
+				positionQuery.sumCurrent(ProductGroupType.WITHDRAWAL);
 
 				ReceiptTransfer receiptTransfer = new ReceiptTransfer(this.logService, this.persistenceService);
 				status = receiptTransfer.transferReceipts(count);

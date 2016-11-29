@@ -396,10 +396,19 @@ public class CurrencyEditor extends AbstractEntityEditor<Currency>
 			final Currency currency = (Currency) ((CurrencyEditorInput) this.getEditorInput()).getAdapter(Currency.class);
 			final String code = this.code.getText();
 			final CurrencyQuery query = (CurrencyQuery) persistenceService.getServerService().getQuery(Currency.class);
-			if (query.isCodeUnique(code, currency.getId()))
+			try
+			{
+				if (query.isCodeUnique(code, currency.getId()))
+				{
+					msg = new Message(this.name, "Fehler");
+					msg.setMessage("Der gewählte Code wird bereits verwendet.");
+					return msg;
+				}
+			}
+			catch (Exception e)
 			{
 				msg = new Message(this.name, "Fehler");
-				msg.setMessage("Der gewählte Code wird bereits verwendet.");
+				msg.setMessage(e.getLocalizedMessage());
 				return msg;
 			}
 		}

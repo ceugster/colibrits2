@@ -81,11 +81,11 @@ public class CreditAccountDialog extends JDialog implements ActionListener
 	 * @param title
 	 * @throws java.awt.HeadlessException
 	 */
-	public CreditAccountDialog(final Frame owner, final Profile profile, final String title, final Currency currency, final double balance, final double credit)
+	public CreditAccountDialog(final Frame owner, final Profile profile, final String title, final Currency currency, final double balance, final double credit, boolean isFailOver)
 			throws HeadlessException
 	{
 		super(owner, title, true);
-		init(profile, currency, balance, credit);
+		init(profile, currency, balance, credit, isFailOver);
 	}
 
 	public void setImage(final String path)
@@ -99,7 +99,7 @@ public class CreditAccountDialog extends JDialog implements ActionListener
 //		messagePanel.setText(message);
 //	}
 
-	private DialogButton createButton(final Profile profile, final int type)
+	private DialogButton createButton(final Profile profile, final int type, boolean isFailOver)
 	{
 		String text = "";
 		String cmd = "";
@@ -130,7 +130,7 @@ public class CreditAccountDialog extends JDialog implements ActionListener
 //				break;
 //			}
 		}
-		final DialogButton button = new DialogButton(text, profile);
+		final DialogButton button = new DialogButton(text, profile, isFailOver);
 		button.setActionCommand(cmd);
 		button.addActionListener(new ActionListener()
 		{
@@ -160,13 +160,13 @@ public class CreditAccountDialog extends JDialog implements ActionListener
 		return button;
 	}
 
-	private void init(final Profile profile, final Currency currency, final double balance, final double credit)
+	private void init(final Profile profile, final Currency currency, final double balance, final double credit, boolean isFailOver)
 	{
 		this.currency = currency;
 		
-		creditButton = createButton(profile, CreditAccountDialog.BUTTON_CREDIT);
+		creditButton = createButton(profile, CreditAccountDialog.BUTTON_CREDIT, isFailOver);
 		creditButton.setDefaultCapable(true);
-		cancelButton = createButton(profile, CreditAccountDialog.BUTTON_CANCEL);
+		cancelButton = createButton(profile, CreditAccountDialog.BUTTON_CANCEL, isFailOver);
 		cancelButton.setDefaultCapable(true);
 
 		final Container main = new Container();
@@ -303,11 +303,11 @@ public class CreditAccountDialog extends JDialog implements ActionListener
 		return panel;
 	}
 	
-	public static double showInformation(final Frame owner, final Profile profile, final String title, final Currency currency, final double balance, final double credit, final int messageType)
+	public static double showInformation(final Frame owner, final Profile profile, final String title, final Currency currency, final double balance, final double credit, final int messageType, boolean isFailOver)
 	{
 		Toolkit.getDefaultToolkit().beep();
 
-		final CreditAccountDialog dialog = new CreditAccountDialog(owner, profile, title, currency, balance, credit);
+		final CreditAccountDialog dialog = new CreditAccountDialog(owner, profile, title, currency, balance, credit, isFailOver);
 		dialog.setIconImage(CreditAccountDialog.getImage(messageType));
 		dialog.setModal(true);
 		dialog.pack();

@@ -9,15 +9,9 @@ package ch.eugster.colibri.client.ui.actions;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 import org.eclipse.core.runtime.IStatus;
 import org.osgi.service.event.Event;
-import org.osgi.service.event.EventConstants;
-import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -39,21 +33,8 @@ public class SalespointSalesAction extends ConfigurableAction
 	public SalespointSalesAction(final UserPanel userPanel, final Key key)
 	{
 		super(userPanel, key);
-		registerHandler();
 	}
 
-	private void registerHandler()
-	{
-		final Collection<String> t = new ArrayList<String>();
-		t.add(Topic.SCHEDULED_TRANSFER.topic());
-		final String[] topics = t.toArray(new String[t.size()]);
-		final EventHandler eventHandler = this;
-		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
-		properties.put(EventConstants.EVENT_TOPIC, topics);
-		this.handlerRegistration = Activator.getDefault().getBundle().getBundleContext()
-				.registerService(EventHandler.class, eventHandler, properties);
-	}
-	
 	private boolean isConnected(PersistenceService service)
 	{
 		return service != null && (service.getServerService().isLocal() || service.getServerService().isConnected());
@@ -81,12 +62,12 @@ public class SalespointSalesAction extends ConfigurableAction
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
 					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
 
-					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Kassenumsatz:   " + formatter.format(sales));
 				}
 				else
 				{
-					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Zur Zeit kann der Umsatz nicht abgefragt werden.\nDie Verbindung zum Datenbankserver ist unterbrochen.");
 				}
 				dialog.pack();

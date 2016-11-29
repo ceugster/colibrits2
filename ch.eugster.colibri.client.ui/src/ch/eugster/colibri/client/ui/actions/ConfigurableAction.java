@@ -6,14 +6,20 @@
  */
 package ch.eugster.colibri.client.ui.actions;
 
+import java.util.Dictionary;
+import java.util.Hashtable;
+
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
 
+import ch.eugster.colibri.client.ui.Activator;
 import ch.eugster.colibri.client.ui.buttons.ConfigurableButton;
 import ch.eugster.colibri.client.ui.events.StateChangeEvent;
 import ch.eugster.colibri.client.ui.events.StateChangeListener;
 import ch.eugster.colibri.client.ui.panels.user.UserPanel;
+import ch.eugster.colibri.persistence.events.Topic;
 import ch.eugster.colibri.persistence.model.Key;
 import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.model.key.KeyType;
@@ -37,8 +43,16 @@ public abstract class ConfigurableAction extends BasicAction implements StateCha
 		this.userPanel = userPanel;
 		this.key = key;
 		this.userPanel.addStateChangeListener(this);
+		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.EVENT_TOPIC, new String[] { Topic.FAIL_OVER.topic() });
+		registerHandler(properties);
 	}
 
+	protected void registerHandler(Dictionary<String, Object> properties)
+	{
+		handlerRegistration = Activator.getDefault().getBundle().getBundleContext().registerService(EventHandler.class, this, properties);
+	}
+	
 	public UserPanel getUserPanel()
 	{
 		return userPanel;

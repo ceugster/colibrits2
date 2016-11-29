@@ -56,7 +56,7 @@ public class RestitutionAction extends ConfigurableAction implements PropertyCha
 			final String message = "Die eingegebene Menge ist sehr hoch. Soll sie trotzdem akzeptiert werden?";
 			final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_QUESTION;
 			result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
-					.getFrame(), this.userPanel.getProfile(), title, message, messageType);
+					.getFrame(), this.userPanel.getProfile(), title, message, messageType, this.userPanel.getMainTabbedPane().isFailOver());
 		}
 		if (result == ch.eugster.colibri.client.ui.dialogs.MessageDialog.BUTTON_YES)
 		{
@@ -77,7 +77,7 @@ public class RestitutionAction extends ConfigurableAction implements PropertyCha
 						final String message = "Kundennummer erfassen nicht vergessen!";
 						final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
 						result = ch.eugster.colibri.client.ui.dialogs.MessageDialog.showSimpleDialog(Activator.getDefault()
-								.getFrame(), this.userPanel.getProfile(), title, message, messageType);
+								.getFrame(), this.userPanel.getProfile(), title, message, messageType, this.userPanel.getMainTabbedPane().isFailOver());
 					}
 				}
 			}

@@ -101,7 +101,9 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 
 	private ServiceTracker<PersistenceService, PersistenceService> persistenceServiceTracker;
 
-	public LoginPanel(final Profile profile)
+	private boolean isFailOver;
+	
+	public LoginPanel(final Profile profile, boolean isFailOver)
 	{
 		super(profile);
 
@@ -112,7 +114,7 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 				PersistenceService.class, null);
 		this.persistenceServiceTracker.open();
 
-		this.init();
+		this.init(isFailOver);
 	}
 
 	public void actionPerformed(final ActionEvent e)
@@ -143,7 +145,7 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 						if (user == null)
 						{
 							MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.profile, "Login ungültig",
-									"Es konnte kein Benutzer mit dem eingegebenen Login gefunden werden.", MessageDialog.TYPE_INFORMATION);
+									"Es konnte kein Benutzer mit dem eingegebenen Login gefunden werden.", MessageDialog.TYPE_INFORMATION, isFailOver);
 							if (log != null)
 							{
 								log.log(LogService.LOG_INFO, "Anmeldung fehlgeschlagen: POS Login " + new String(this.display.getPassword()) + " ungültig.");
@@ -362,14 +364,14 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 		}
 	}
 
-	private LoginButton createButton(final String text, final Profile profile)
+	private LoginButton createButton(final String text, final Profile profile, boolean isFailOver)
 	{
-		return this.createButton(text, text, profile);
+		return this.createButton(text, text, profile, isFailOver);
 	}
 
-	private LoginButton createButton(final String text, final String actionCommand, final Profile profile)
+	private LoginButton createButton(final String text, final String actionCommand, final Profile profile, boolean isFailOver)
 	{
-		final LoginButton button = new LoginButton(new LoginAction(text, actionCommand, profile), text, profile);
+		final LoginButton button = new LoginButton(new LoginAction(text, actionCommand, profile), text, profile, isFailOver);
 		button.setActionCommand(actionCommand);
 		button.addActionListener(this);
 		button.addKeyListener(new KeyAdapter()
@@ -400,8 +402,10 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 		}
 	}
 
-	private void init()
+	private void init(boolean isFailOver)
 	{
+		this.isFailOver = isFailOver;
+		
 		this.setBackground(Color.WHITE);
 		/*
 		 * Display Area
@@ -443,11 +447,11 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 		final String[] labels = new String[] { "7", "8", "9", "4", "5", "6", "1", "2", "3", "0", "00" };
 		for (final String label : labels)
 		{
-			final LoginButton button = this.createButton(label, this.profile);
+			final LoginButton button = this.createButton(label, this.profile, isFailOver);
 			cifferArea.add(button);
 		}
 
-		this.clear = this.createButton(LoginPanel.TEXT_CLEAR, LoginPanel.ACTION_COMMAND_CLEAR, this.profile);
+		this.clear = this.createButton(LoginPanel.TEXT_CLEAR, LoginPanel.ACTION_COMMAND_CLEAR, this.profile, isFailOver);
 		cifferArea.add(this.clear);
 
 		swtImage = Activator.getDefault().getImageRegistry().get("login.png");
@@ -466,9 +470,9 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 		confirmArea.setMinimumSize(new Dimension(200, 80));
 		confirmArea.setPreferredSize(new Dimension(2 * 276, 80));
 		confirmArea.setLayout(new GridLayout(1, 2));
-		this.enter = this.createButton(LoginPanel.TEXT_ENTER, LoginPanel.ACTION_COMMAND_ENTER, this.profile);
+		this.enter = this.createButton(LoginPanel.TEXT_ENTER, LoginPanel.ACTION_COMMAND_ENTER, this.profile, isFailOver);
 		confirmArea.add(this.enter);
-		this.exit = this.createButton(LoginPanel.TEXT_EXIT, LoginPanel.ACTION_COMMAND_EXIT, this.profile);
+		this.exit = this.createButton(LoginPanel.TEXT_EXIT, LoginPanel.ACTION_COMMAND_EXIT, this.profile, isFailOver);
 		confirmArea.add(this.exit);
 
 		final JPanel visibleArea = new JPanel(new GridBagLayout());
@@ -550,9 +554,9 @@ public class LoginPanel extends MainPanel implements ActionListener, TitleProvid
 	{
 		public static final long serialVersionUID = 0l;
 
-		public LoginButton(final LoginAction action, final String text, final Profile profile)
+		public LoginButton(final LoginAction action, final String text, final Profile profile, boolean isFailOver)
 		{
-			super(profile);
+			super(profile, isFailOver);
 			this.setText(text);
 		}
 

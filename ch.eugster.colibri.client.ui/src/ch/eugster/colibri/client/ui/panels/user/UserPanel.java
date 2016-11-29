@@ -193,7 +193,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 						final String message = "Soll der gewählte Rabatt auf alle vorhandenen Positionen angewendet werden? Positionen, die keinen Rabatt erlauben, werden nicht berücksichtigt!";
 						final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_QUESTION;
 						if (MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.profile, title, message,
-								messageType) == MessageDialog.BUTTON_YES)
+								messageType, this.mainTabbedPane.isFailOver()) == MessageDialog.BUTTON_YES)
 						{
 							this.getReceiptWrapper().setDiscount(discount);
 //							Position[] positions = this.getReceiptWrapper().getReceipt().getPositions().toArray(new Position[0]);
@@ -213,7 +213,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 						final String message = "Für die vorhandenen Positionen kann kein Rabatt angewendet werden.";
 						final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
 						MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.profile, title, message,
-								messageType);
+								messageType, this.mainTabbedPane.isFailOver());
 						return;
 					}
 				}
@@ -228,7 +228,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 				final String message = "Für die aktuelle Position kann kein Rabatt angewendet werden.";
 				final int messageType = ch.eugster.colibri.client.ui.dialogs.MessageDialog.TYPE_INFORMATION;
 				MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.profile, title, message,
-						messageType);
+						messageType, this.mainTabbedPane.isFailOver());
 				return;
 			}
 		}

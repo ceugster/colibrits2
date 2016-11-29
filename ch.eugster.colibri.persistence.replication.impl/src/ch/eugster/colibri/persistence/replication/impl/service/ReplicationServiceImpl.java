@@ -178,6 +178,10 @@ public class ReplicationServiceImpl implements ReplicationService
 								new ProviderPropertyReplicator(ReplicationServiceImpl.this.persistenceService)
 										.replicate(new SubProgressMonitor(monitor, 1), force);
 								
+							} 
+							catch (Exception e) 
+							{
+								// TODO Auto-generated catch block
 							}
 							finally
 							{

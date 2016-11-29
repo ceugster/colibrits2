@@ -82,12 +82,12 @@ public class UserSalesAction extends ConfigurableAction
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
 					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
 
-					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Benutzerumsatz:   " + formatter.format(sales));
 				}
 				else
 				{
-					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0);
+					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Zur Zeit kann der Umsatz nicht abgefragt werden.\nDie Verbindung zum Datenbankserver ist unterbrochen.");
 				}
 				dialog.pack();

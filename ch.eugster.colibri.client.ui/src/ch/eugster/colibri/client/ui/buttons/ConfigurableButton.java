@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 
@@ -70,9 +71,7 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 		final EventHandler eventHandler = this;
 		final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 		List<String> topics = new ArrayList<String>();
-		topics.add(Topic.SCHEDULED_PROVIDER_UPDATE.topic());
-		topics.add(Topic.SCHEDULED_TRANSFER.topic());
-		topics.add(Topic.PROVIDER_QUERY.topic());
+		topics.add(Topic.FAIL_OVER.topic());
 		properties.put(EventConstants.EVENT_TOPIC, topics);
 		this.eventHandlerServiceRegistration = Activator.getDefault().getBundle().getBundleContext()
 				.registerService(EventHandler.class, eventHandler, properties);
@@ -106,21 +105,11 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 	public void handleEvent(final Event event)
 	{
-		Boolean isFailOver = (Boolean) event.getProperty("failover");
-		if (isFailOver != null)
+		if (event.getTopic().equals(Topic.FAIL_OVER.topic()))
 		{
-			String provider = (String) event.getProperty("provider");
-			if (isFailOver.booleanValue())
-			{
-				failOver.put(provider, Boolean.TRUE);
-			}
-			else
-			{
-				if (failOver.containsKey(provider))
-				{
-					failOver.remove(provider);
-				}
-			}
+			@SuppressWarnings("unchecked")
+			Map<String, Object> failovers = (Map<String, Object>) event.getProperty("failover-list");
+			this.update(!failovers.isEmpty());
 		}
 	}
 
@@ -152,7 +141,7 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 			if (entity.getId().equals(this.key.getId()))
 			{
 				this.key = (Key) entity;
-				this.update(this.isFailOver());
+				this.update();
 			}
 		}
 	}
@@ -242,8 +231,10 @@ public class ConfigurableButton extends HTMLButton implements EntityListener, Ev
 
 	private void updateFailOver()
 	{
-		this.update(new Color(this.key.getFailOverFg()), new Color(this.key.getFailOverBg()), this.key.getFailOverFontStyle(),
-				this.key.getFailOverFontSize(), this.key.getFailOverHorizontalAlign(), this.key.getFailOverVerticalAlign());
+//		this.update(new Color(this.key.getFailOverFg()), new Color(this.key.getFailOverBg()), this.key.getFailOverFontStyle(),
+//				this.key.getFailOverFontSize(), this.key.getFailOverHorizontalAlign(), this.key.getFailOverVerticalAlign());
+		this.update(new Color(this.key.getTab().getConfigurable().getProfile().getButtonFailOverFg()), new Color(this.key.getTab().getConfigurable().getProfile().getButtonFailOverBg()), this.key.getTab().getConfigurable().getProfile().getButtonFailOverFontStyle(),
+				this.key.getTab().getConfigurable().getProfile().getButtonFailOverFontSize(), this.key.getTab().getConfigurable().getProfile().getButtonFailOverHorizontalAlign(), this.key.getTab().getConfigurable().getProfile().getButtonFailOverVerticalAlign());
 	}
 
 	private void updateNormal()

@@ -150,7 +150,7 @@ public class CoinCounterPanel extends ProfilePanel
 		final JPanel moneyPanel = new JPanel();
 		moneyPanel.setLayout(new GridLayout(moneys.length + 1, 3));
 
-		final ProfileButton deleteButton = new ProfileButton(this.userPanel.getProfile());
+		final ProfileButton deleteButton = new ProfileButton(this.userPanel.getProfile(), userPanel.getMainTabbedPane().isFailOver());
 		this.deleteButtons.add(deleteButton);
 		final JLabel totalCurrencyLabel = new JLabel();
 

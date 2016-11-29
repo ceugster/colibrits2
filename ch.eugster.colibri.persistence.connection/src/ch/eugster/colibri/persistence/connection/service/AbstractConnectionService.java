@@ -728,7 +728,13 @@ public abstract class AbstractConnectionService implements ConnectionService
 				entityManager = this.createEntityManager();
 				if (entityManager != null)
 				{
-					TaxUpdater.updateTaxes(this);
+					try
+					{
+						TaxUpdater.updateTaxes(this);
+					}
+					catch (Exception e)
+					{
+					}
 				}
 			}
 		}
