@@ -1378,10 +1378,17 @@ public class ImportExportView extends ViewPart implements IViewPart, ISelectionL
 		if (service != null)
 		{
 			CurrentTaxQuery query = (CurrentTaxQuery) service.getServerService().getQuery(CurrentTax.class);
-			Collection<CurrentTax> currentTaxes = query.selectByValidFrom(tax, validFrom.longValue());
-			if (currentTaxes.size() > 0)
+			try
 			{
-				return currentTaxes.iterator().next();
+				List<CurrentTax> currentTaxes = query.selectByValidFrom(tax, validFrom.longValue());
+				if (currentTaxes.size() > 0)
+				{
+					return currentTaxes.iterator().next();
+				}
+			}
+			catch (Exception e)
+			{
+				throw new IllegalArgumentException("Die Mehrwertsteuer mit der ExportId " + code + " ist nicht vorhanden.");
 			}
 		}
 		throw new IllegalArgumentException("Die Mehrwertsteuer mit der ExportId " + code + " ist nicht vorhanden.");

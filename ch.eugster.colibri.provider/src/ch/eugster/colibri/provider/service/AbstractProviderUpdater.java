@@ -26,7 +26,14 @@ public abstract class AbstractProviderUpdater extends AbstractProviderService im
 			return new ArrayList<Position>();
 		}
 		PositionQuery query = (PositionQuery) service.getCacheService().getQuery(Position.class);
-		return query.selectProviderUpdates(salespoint, getProviderId(), !service.getServerService().isLocal(), max);
+		try
+		{
+			return query.selectProviderUpdates(salespoint, getProviderId(), !service.getServerService().isLocal(), max);
+		}
+		catch (Exception e)
+		{
+			return new ArrayList<Position>();
+		}
 	}
 	
 	@Override

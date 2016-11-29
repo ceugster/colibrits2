@@ -385,32 +385,23 @@ public class FindArticleServerOldCom4j extends AbstractFindArticleServer impleme
 
 	public boolean open()
 	{
-		if (Activator.getDefault().isCurrentlyFailoverMode())
+		IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
+		String database = property.value();
+		this.wasOpen = this.open;
+		if (!this.open)
 		{
-			this.wasOpen = this.open;
-			this.open = false;
-			this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
-		}
-		else
-		{
-			IProperty property = properties.get(GalileoProperty.DATABASE_PATH.key());
-			String database = property.value();
-			this.wasOpen = this.open;
-			if (!this.open)
+			try
 			{
-				try
+				this.open = this.galserve.do_NOpen(database);
+				if (!this.open)
 				{
-					this.open = this.galserve.do_NOpen(database);
-					if (!this.open)
-					{
-						this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
-					}
+					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), new Exception("Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " kann nicht hergestellt werden."));
 				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-					this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
-				}
+			}
+			catch (Exception e)
+			{
+				e.printStackTrace();
+				this.status = new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), Topic.SCHEDULED_PROVIDER_UPDATE.topic(), e);
 			}
 		}
 		return this.open;

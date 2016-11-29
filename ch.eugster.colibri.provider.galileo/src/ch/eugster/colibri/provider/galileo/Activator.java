@@ -8,7 +8,6 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.log.LogService;
 import org.osgi.util.tracker.ServiceTracker;
 
-import ch.eugster.colibri.provider.configuration.IFailoverPerceptible;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
 import ch.eugster.colibri.provider.galileo.service.GalileoIdService;
 import ch.eugster.colibri.provider.service.ProviderIdService;
@@ -16,10 +15,8 @@ import ch.eugster.colibri.provider.service.ProviderIdService;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin implements IFailoverPerceptible
+public class Activator extends AbstractUIPlugin
 {
-	private boolean isCurrentlyFailoverMode;
-	
 	private ServiceTracker<LogService, LogService> logServiceTracker;
 
 	// The shared instance
@@ -102,17 +99,5 @@ public class Activator extends AbstractUIPlugin implements IFailoverPerceptible
 			this.configuration = new GalileoConfiguration();
 		}
 		return this.configuration;
-	}
-
-	@Override
-	public void setCurrentlyFailoverMode(boolean currentlyFailoverMode) 
-	{
-		this.isCurrentlyFailoverMode = currentlyFailoverMode;
-	}
-
-	@Override
-	public boolean isCurrentlyFailoverMode() 
-	{
-		return this.isCurrentlyFailoverMode;
 	}
 }

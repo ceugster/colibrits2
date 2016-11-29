@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="2.0.51.201611251500" useFeatures="true" includeLaunchers="true">
+<product name="ColibriTS II" id="ch.eugster.colibri.product.product" application="ch.eugster.colibri.admin.application" version="2.0.52.201611291500" useFeatures="true" includeLaunchers="true">
 
    <aboutInfo>
       <image path="/ch.eugster.colibri.product/icons/kasse_128x128.png"/>
@@ -178,7 +178,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <feature id="ch.eugster.colibri.settlement.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.ui.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.persistence.replication.impl.feature" version="1.0.0.qualifier"/>
-      <feature id="org.eclipse.equinox.p2.user.ui" version="2.1.2.R37x_v20110815-1155-6-Bk8pYWZz0qUTX5I15GZWwbXkrl"/>
       <feature id="ch.eugster.colibri.export.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.log.feature" version="1.0.0.qualifier"/>
       <feature id="ch.eugster.colibri.report.export.feature" version="1.0.0.qualifier"/>
@@ -204,9 +203,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.persistence.jpa" autoStart="true" startLevel="3" />
-      <property name="org.eclipse.update.reconcile" value="false" />
    </configurations>
 
 </product>

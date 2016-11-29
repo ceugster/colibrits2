@@ -111,7 +111,6 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 				status = this.findArticleServer.findAndRead(barcode, position);
 				if ((status.isOK()) || (status.getSeverity() == IStatus.ERROR))
 				{
-					Activator.getDefault().setCurrentlyFailoverMode(status.getSeverity() == IStatus.ERROR);
 					log(LogService.LOG_INFO, "Suche nach \"" + barcode.getCode() + "\" abgeschlossen.");
 					this.sendEvent(this.getEvent(status, false));
 				}
