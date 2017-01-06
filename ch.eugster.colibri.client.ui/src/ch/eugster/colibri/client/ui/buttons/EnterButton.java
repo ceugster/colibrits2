@@ -60,15 +60,7 @@ public class EnterButton extends NumericPadButton implements PropertyChangeListe
 
 	private boolean testForCurrentPositionComplete()
 	{
-		if (userPanel.getPositionWrapper().isPositionComplete())
-		{
-			// this.setText("Einfügen");
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return userPanel.getPositionWrapper().isPositionComplete();
 	}
 
 	private boolean testForProductGroup()

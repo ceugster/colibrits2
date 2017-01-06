@@ -398,6 +398,19 @@ public class Receipt extends AbstractEntity implements IPrintable
 		return activePositions;
 	}
 
+	public List<Position> getOrderedPositions()
+	{
+		List<Position> orderedPositions = new Vector<Position>();
+		for (Position position : this.positions)
+		{
+			if (!position.isDeleted() && position.isOrdered())
+			{
+				orderedPositions.add(position);
+			}
+		}
+		return orderedPositions;
+	}
+
 	/**
 	 * 
 	 * @param productGroupType

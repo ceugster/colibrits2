@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Dictionary;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 
 import javax.swing.event.ListSelectionEvent;
@@ -21,6 +22,7 @@ import javax.swing.event.TableModelListener;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
@@ -40,6 +42,7 @@ import ch.eugster.colibri.persistence.model.key.FunctionType;
 import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.service.ProviderQuery;
+import ch.eugster.colibri.provider.service.ProviderService;
 
 public class ReverseReceiptAction extends UserPanelProfileAction implements ListSelectionListener, TableModelListener
 {
@@ -238,6 +241,52 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 				}
 				MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getSalespoint()
 						.getProfile(), "Bezahlte Rechnungen", message.toString(), MessageDialog.TYPE_INFORMATION, this.userPanel.getMainTabbedPane().isFailOver());
+			}
+		}
+		else if (receipt.getState().equals(Receipt.State.REVERSED))
+		{
+			List<Position> ordereds = receipt.getOrderedPositions();
+			if (!ordereds.isEmpty())
+			{
+				ServiceTracker<ProviderService, ProviderService> tracker = new ServiceTracker<ProviderService, ProviderService>(Activator.getDefault().getBundle().getBundleContext(), ProviderService.class, null);
+				tracker.open();
+				try
+				{
+					StringBuilder message = new StringBuilder("Der Beleg enthält folgende bestellten Titel:\n");
+					for (Position ordered : ordereds)
+					{
+						if (ordered.getProduct() != null)
+						{
+							message = message.append("Artikelcode:  " + ordered.getProduct().getCode());
+						}
+						message = message.append("\nBestellung: " + ordered.getSearchValue());
+						message = message.append("Herkunft:     ");
+						ServiceReference<ProviderService>[] references = tracker.getServiceReferences();
+						if (references != null && references.length > 0)
+						{
+							for (ServiceReference<ProviderService> reference : references)
+							{
+								ProviderService service = tracker.getService(reference);
+								if (service != null)
+								{
+									if (ordered.getProvider() != null && ordered.getProvider().equals(service.getProviderId()))
+									{
+										message = message.append(service.getName());
+									}
+								}
+							}
+						}
+						message = message.append("\n");
+					}
+					message = message.append("\nDiese Titel können nicht automatisch in der Lagerbewirtschaftung zurückgebucht werden.\n");
+					message = message.append("Bitte führen Sie die Buchungskorrektur manuell durch.");
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getSalespoint()
+							.getProfile(), "Bestellte Titel", message.toString(), MessageDialog.TYPE_INFORMATION, this.userPanel.getMainTabbedPane().isFailOver());
+				}
+				finally
+				{
+					tracker.close();
+				}
 			}
 		}
 	}
