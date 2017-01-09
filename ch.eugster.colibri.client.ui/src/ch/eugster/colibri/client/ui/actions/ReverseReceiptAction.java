@@ -243,7 +243,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 						.getProfile(), "Bezahlte Rechnungen", message.toString(), MessageDialog.TYPE_INFORMATION, this.userPanel.getMainTabbedPane().isFailOver());
 			}
 		}
-		else if (receipt.getState().equals(Receipt.State.REVERSED))
+		if (receipt.getState().equals(Receipt.State.SAVED))
 		{
 			List<Position> ordereds = receipt.getOrderedPositions();
 			if (!ordereds.isEmpty())

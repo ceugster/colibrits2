@@ -88,7 +88,6 @@ public class PositionQuery extends AbstractQuery<Position>
 
 		Expression reversed = new ExpressionBuilder().get("receipt").get("state").equal(Receipt.State.REVERSED);
 		reversed = reversed.and(new ExpressionBuilder().get("providerBooked").equal(true));
-		reversed = reversed.and(new ExpressionBuilder().get("ordered").equal(false));
 		
 		return deleted.and(provider).and(saved.or(reversed));
 	}
