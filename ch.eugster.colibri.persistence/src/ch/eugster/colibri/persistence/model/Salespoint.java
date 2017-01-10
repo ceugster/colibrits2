@@ -301,6 +301,22 @@ public class Salespoint extends AbstractEntity implements IAdaptable, IReplicata
 	{
 		return this.providerProperties;
 	}
+	
+	public Map<String, Map<String, ProviderProperty>> getProviderPropertiesAsMap()
+	{
+		Map<String, Map<String, ProviderProperty>> properties = new HashMap<String, Map<String, ProviderProperty>>();
+		for (ProviderProperty property : this.providerProperties)
+		{
+			Map<String, ProviderProperty> props = properties.get(property.getProvider());
+			if (props == null)
+			{
+				props = new HashMap<String, ProviderProperty>();
+				properties.put(property.getProvider(), props);
+			}
+			props.put(property.getKey(), property);
+		}
+		return properties;
+	}
 
 	public SalespointReceiptPrinterSettings getReceiptPrinterSettings()
 	{

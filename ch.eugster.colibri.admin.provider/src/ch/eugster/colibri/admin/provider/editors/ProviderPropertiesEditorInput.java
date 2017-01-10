@@ -1,6 +1,6 @@
 package ch.eugster.colibri.admin.provider.editors;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -42,9 +42,10 @@ public class ProviderPropertiesEditorInput implements IEditorInput
 	private Map<String, IProperty> initializeProperties(Map<String, IProperty> properties)
 	{
 		ProviderPropertyQuery query = (ProviderPropertyQuery) persistenceService.getServerService().getQuery(ProviderProperty.class);
-		Collection<ProviderProperty> providerProperties = query.selectByProvider(this.getProviderId());
+		List<ProviderProperty> providerProperties = query.selectByProvider(this.getProviderId());
 		for (ProviderProperty providerProperty : providerProperties)
 		{
+			providerProperty = (ProviderProperty)persistenceService.getServerService().refresh(providerProperty);
 			IProperty property = properties.get(providerProperty.getKey());
 			if (property != null)
 			{

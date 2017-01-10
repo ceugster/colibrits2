@@ -9,7 +9,10 @@ package ch.eugster.colibri.admin.salespoint.editors;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -1651,6 +1654,7 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 				{
 					control.setEnabled(selected);
 				}
+				setDirty(true);
 			}
 
 		});
@@ -2421,9 +2425,9 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		}
 	}
 
-	private Collection<ProviderProperty> getProviderProperties(String providerId)
+	private List<ProviderProperty> getProviderProperties(String providerId)
 	{
-		Collection<ProviderProperty> properties = new ArrayList<ProviderProperty>();
+		List<ProviderProperty> properties = new ArrayList<ProviderProperty>();
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
@@ -2435,33 +2439,50 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 	
 	private void loadProviderPropertyValues()
 	{
-		final Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
-				.getAdapter(Salespoint.class);
-		Collection<ProviderProperty> providerProperties = salespoint.getProviderProperties();
-
-		for (ProviderProperty providerProperty : providerProperties)
+		Set<String> providerKeys = this.providerProperties.keySet();
+		for (String providerKey : providerKeys)
 		{
-			Map<String, IProperty> properties = this.providerProperties.get(providerProperty.getProvider());
-			IProperty property = properties.get(providerProperty.getKey());
-			if (property != null)
+			List<ProviderProperty> providerProperties = getProviderProperties(providerKey);
+			for (ProviderProperty providerProperty : providerProperties)
 			{
-				property.setPersistedProperty(providerProperty);
+				if (!providerProperty.isDeleted())
+				{
+					Map<String, IProperty> properties = this.providerProperties.get(providerKey);
+					IProperty property = properties.get(providerProperty.getKey());
+					if (property != null)
+					{
+						property.setPersistedProperty(providerProperty);
+					}
+				}
+			}
+			Salespoint salespoint = (Salespoint) ((SalespointEditorInput) this.getEditorInput())
+					.getAdapter(Salespoint.class);
+			List<ProviderProperty> salespointProperties = salespoint.getProviderProperties();
+			Collections.sort(providerProperties, new Comparator<ProviderProperty>() 
+			{
+				@Override
+				public int compare(ProviderProperty prop1, ProviderProperty prop2) 
+				{
+					return prop1.getId().compareTo(prop2.getId());
+				}
+			});
+			for (ProviderProperty salespointProperty : salespointProperties)
+			{
+				if (!salespointProperty.isDeleted())
+				{
+					Map<String, IProperty> properties = this.providerProperties.get(salespointProperty.getProvider());
+					IProperty property = properties.get(salespointProperty.getKey());
+					if (property != null)
+					{
+						property.setPersistedProperty(salespointProperty);
+					}
+				}
 			}
 		}
 		Set<String> keys = this.providerProperties.keySet();
 		for (String key : keys)
 		{
 			boolean salespointSpecific = false;
-			Collection<ProviderProperty> persistedProperties = getProviderProperties(key);
-			for (ProviderProperty persistedProperty : persistedProperties)
-			{
-				Map<String, IProperty> properties = this.providerProperties.get(key);
-				IProperty property = properties.get(persistedProperty.getKey());
-				if (property != null)
-				{
-					property.setPersistedProperty(persistedProperty);
-				}
-			}
 			Map<String, IProperty> properties = this.providerProperties.get(key);
 			for (IProperty property : properties.values())
 			{
@@ -2512,61 +2533,39 @@ public class SalespointEditor extends AbstractEntityEditor<Salespoint> implement
 		Set<String> providerKeys = providerProperties.keySet();
 		for (String providerKey : providerKeys)
 		{
+			Map<String, ProviderProperty> salespointProperties = salespoint.getProviderPropertiesAsMap().get(providerKey);			
+			Button salespointSpecific = this.useSalespointSpecificProviderProperties.get(providerKey);
 			Map<String, IProperty> properties = providerProperties.get(providerKey);
 			Set<String> propertyKeys = properties.keySet();
 			for (String propertyKey : propertyKeys)
 			{
-				IProperty property = properties.get(propertyKey);
-				Map<String, Control> controls = this.providerPropertyControls.get(providerKey);
-				if (controls != null)
+				ProviderProperty salespointProperty = null;
+				if (salespointProperties != null)
 				{
-					Control control = controls.get(propertyKey);
-					String value = property.value(property, control);
-					ProviderProperty parent = getParentProperty(providerKey, property.key(), property.getPersistedProperty());
-					ProviderProperty providerProperty = property.getPersistedProperty();
-					if (property.isDefaultValue(value))
+					salespointProperty = salespointProperties.get(propertyKey);
+				}
+				if (salespointSpecific.getSelection())
+				{
+					IProperty property = properties.get(propertyKey);
+					Map<String, Control> controls = this.providerPropertyControls.get(providerKey);
+					if (controls != null)
 					{
-						if (providerProperty != null && providerProperty.getSalespoint() != null)
+						if (salespointProperty == null)
 						{
-							providerProperty.setDeleted(true);
+							salespointProperty = ProviderProperty.newInstance(providerKey, salespoint);
+							salespointProperty.setKey(propertyKey);
+							salespoint.addProviderProperties(salespointProperty);
 						}
+						Control control = controls.get(propertyKey);
+						String value = property.value(property, control);
+						salespointProperty.setValue(value);
 					}
-					else
+				}
+				else
+				{
+					if (salespointProperty != null)
 					{
-						if (providerProperty == null)
-						{
-							providerProperty = ProviderProperty.newInstance(providerKey, parent, salespoint);
-							providerProperty.setKey(property.key());
-							providerProperty.setValue(value, property.defaultValue());
-							property.setPersistedProperty(providerProperty);
-							salespoint.addProviderProperties(providerProperty);
-						}
-						if (providerProperty.getSalespoint() == null)
-						{
-							if (!providerProperty.getValue(property.defaultValue()).equals(value))
-							{
-								providerProperty = ProviderProperty.newInstance(providerKey, parent, salespoint);
-								providerProperty.setKey(property.key());
-								providerProperty.setValue(value, property.defaultValue());
-								property.setPersistedProperty(providerProperty);
-								salespoint.addProviderProperties(providerProperty);
-							}
-						}
-						else
-						{
-							if (providerProperty.getParentValue(property.defaultValue()).equals(value))
-							{
-								providerProperty.setDeleted(true);
-							}
-							else
-							{
-								if (providerProperty.isDeleted())
-								{
-									providerProperty.setDeleted(false);
-								}
-								providerProperty.setValue(value, property.defaultValue());
-							}
-						}
+						salespointProperty.setDeleted(true);
 					}
 				}
 			}

@@ -1,6 +1,5 @@
 package ch.eugster.colibri.admin.provider.editors;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +56,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 	private FormToolkit formToolkit;
 
 	private ScrolledForm scrolledForm;
-	
+
 	@Override
 	public void createPartControl(final Composite parent)
 	{
@@ -141,9 +140,11 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 			if (this.checkValues())
 			{
 				String value = null;
-				Collection<IProperty> properties = input.getProperties().values();
-				for (final IProperty property : properties)
+				Map<String, IProperty> properties = input.getProperties();
+				Set<String> keys = properties.keySet();
+				for (final String key : keys)
 				{
+					IProperty property = input.getProperties().get(key);
 					boolean update = false;
 					if (property.control().equals(FileDialog.class.getName()))
 					{
@@ -175,7 +176,9 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 						{
 							try
 							{
-								property.setPersistedProperty((ProviderProperty) persistenceService.getServerService().merge(property.getPersistedProperty()));
+								ProviderProperty persistedProperty = (ProviderProperty) persistenceService.getServerService().merge(property.getPersistedProperty());
+								property.setPersistedProperty(persistedProperty);
+								input.getProperties().put(key, property);
 							} 
 							catch (Exception e) 
 							{
@@ -328,6 +331,7 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 							providerProperty.setKey(key);
 							providerProperty.setValue(value, property.defaultValue());
 							property.setPersistedProperty(providerProperty);
+							testProperties.put(key, property);
 						}
 					}
 					IStatus status = input.checkConnection(testProperties);
@@ -368,15 +372,34 @@ public class ProviderPropertiesEditor extends EditorPart implements IPropertyLis
 	private void loadValues()
 	{
 		final ProviderPropertiesEditorInput input = (ProviderPropertiesEditorInput) this.getEditorInput();
-		for (IProperty property : input.getProperties().values())
+		Set<String> keys = input.getProperties().keySet();
+		for (String key : keys)
 		{
+			IProperty property = input.getProperties().get(key);
 			final Control control = this.controls.get(property.key());
 			if (control != null)
 			{
 				property.set(property, control, property.value());
+				input.getProperties().put(key, property);
 			}
 		}
 	}
+
+//	private void saveValues()
+//	{
+//		final ProviderPropertiesEditorInput input = (ProviderPropertiesEditorInput) this.getEditorInput();
+//		Set<String> keys = input.getProperties().keySet();
+//		for (String key : keys)
+//		{
+//			IProperty property = input.getProperties().get(key);
+//			final Control control = this.controls.get(property.key());
+//			if (control != null)
+//			{
+//				property.set(property, control, property.value());
+//				input.getProperties().put(key, property);
+//			}
+//		}
+//	}
 
 	public void setDirty(final boolean dirty)
 	{

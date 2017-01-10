@@ -301,9 +301,13 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
 		if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
 		{
-			if (settlementIsBeforeToday(salespoint.getSettlement()))
+			if (settlementIsBeforeToday(salespoint.getSettlement()) && salespoint.getSettlement().getReceiptCount() > 0)
 			{
 				return true;
+			}
+			else
+			{
+				updateSettlementTimestamp();
 			}
 		}
 		else

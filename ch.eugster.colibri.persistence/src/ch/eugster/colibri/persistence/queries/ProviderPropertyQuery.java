@@ -36,7 +36,9 @@ public class ProviderPropertyQuery extends AbstractQuery<ProviderProperty>
 		}
 		try
 		{
-			return this.select(p.and(s));
+			final List<Expression> orders = new ArrayList<Expression>();
+			orders.add(new ExpressionBuilder().get("id").ascending());
+			return this.select(p.and(s), orders, 0);
 		}
 		catch (Exception e)
 		{

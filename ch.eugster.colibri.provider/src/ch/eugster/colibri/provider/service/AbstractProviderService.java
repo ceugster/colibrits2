@@ -1,6 +1,7 @@
 package ch.eugster.colibri.provider.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -97,13 +98,13 @@ public abstract class AbstractProviderService implements ProviderService
 	protected void loadProperties(ConnectionService connectionService, String providerId, Map<String, IProperty> defaultProperties)
 	{
 		properties = defaultProperties;
-		final ProviderPropertyQuery query = (ProviderPropertyQuery) connectionService
+		final ProviderPropertyQuery providerPropertyQuery = (ProviderPropertyQuery) connectionService
 				.getQuery(ProviderProperty.class);
-		Map<String, ProviderProperty>  providerProperties = query.selectByProviderAsMap(providerId);
-		for (final ProviderProperty providerProperty : providerProperties.values())
+		List<ProviderProperty>  providerProperties = providerPropertyQuery.selectByProvider(providerId);
+		for (final ProviderProperty providerProperty : providerProperties)
 		{
 			IProperty property = properties.get(providerProperty.getKey());
-			if (property != null)
+			if (property != null && (property.getPersistedProperty() == null || !property.getPersistedProperty().isDeleted()))
 			{
 				property.setPersistedProperty(providerProperty);
 			}
@@ -113,11 +114,11 @@ public abstract class AbstractProviderService implements ProviderService
 		Salespoint salespoint = salespointQuery.getCurrentSalespoint();
 		if (salespoint != null)
 		{
-			providerProperties = query.selectByProviderAndSalespointAsMap(providerId, salespoint);
-			for (final ProviderProperty providerProperty : providerProperties.values())
+			providerProperties = providerPropertyQuery.selectByProviderAndSalespoint(providerId, salespoint);
+			for (final ProviderProperty providerProperty : providerProperties)
 			{
 				IProperty property = properties.get(providerProperty.getKey());
-				if (property != null)
+				if (property != null && !providerProperty.isDeleted())
 				{
 					property.setPersistedProperty(providerProperty);
 				}

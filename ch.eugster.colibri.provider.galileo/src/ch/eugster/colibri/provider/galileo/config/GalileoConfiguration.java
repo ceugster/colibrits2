@@ -314,7 +314,7 @@ public class GalileoConfiguration implements ProviderConfiguration
 		public void setPersistedProperty(
 				ProviderProperty persistedProperty) 
 		{
-			if (this.persistedProperty == null || this.persistedProperty.isDeleted() || this.persistedProperty.getSalespoint() == null)
+			if (this.persistedProperty == null || this.persistedProperty.isDeleted() || this.persistedProperty.getSalespoint() == null || !this.persistedProperty.equals(persistedProperty))
 			{
 				this.persistedProperty = persistedProperty;
 			}

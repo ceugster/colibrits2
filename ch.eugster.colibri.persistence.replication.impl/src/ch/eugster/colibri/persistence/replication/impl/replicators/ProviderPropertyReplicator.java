@@ -6,7 +6,7 @@
  */
 package ch.eugster.colibri.persistence.replication.impl.replicators;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -27,8 +27,11 @@ public class ProviderPropertyReplicator extends AbstractEntityReplicator<Provide
 
 		int i = 0;
 
-		final ProviderPropertyQuery query = (ProviderPropertyQuery) this.persistenceService.getServerService().getQuery(ProviderProperty.class);
-		final Collection<ProviderProperty> sources = query.selectAll(true);
+		ProviderPropertyQuery query = (ProviderPropertyQuery) this.persistenceService.getServerService().getQuery(ProviderProperty.class);
+		final List<ProviderProperty> sources = query.selectAll(true);
+
+		query = (ProviderPropertyQuery) this.persistenceService.getCacheService().getQuery(ProviderProperty.class);
+		final List<ProviderProperty> targets = query.selectAll(true);
 
 		if (monitor != null)
 		{
@@ -51,12 +54,18 @@ public class ProviderPropertyReplicator extends AbstractEntityReplicator<Provide
 						target = this.replicate(source, target);
 					}
 					merge(target);
+					targets.remove(target);
 				}
 				if (monitor != null)
 				{
 					i++;
 					monitor.worked(i);
 				}
+			}
+			for (ProviderProperty target : targets)
+			{
+				target.setDeleted(true);
+				merge(target);
 			}
 		}
 		finally
