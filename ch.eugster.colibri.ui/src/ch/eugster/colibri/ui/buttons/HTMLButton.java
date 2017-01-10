@@ -230,7 +230,7 @@ public abstract class HTMLButton extends JButton implements PropertyChangeListen
 		{
 			text = extractText(labelText);
 			int fg = this.getForeground().getRGB();
-			if (!isEnabled())
+			if (isEnabled())
 			{
 				fg = fgNormal;
 			}
