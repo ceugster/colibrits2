@@ -133,17 +133,27 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 	@Override
 	public IStatus testConnection(Map<String, IProperty> properties)
 	{
+		log(LogService.LOG_INFO, "Verbindungstest zu " + Activator.getDefault().getConfiguration().getName() + ".");
 		IStatus status = new Status(IStatus.OK, Activator.getDefault().getBundle().getSymbolicName(), "Die Verbindung zu " + Activator.getDefault().getConfiguration().getName() + " wurde erfolgreich hergestellt.");
 		int connect = Integer.valueOf(properties.get(GalileoProperty.CONNECT.key()).value());
 		if (connect > 0)
 		{
+			log(LogService.LOG_INFO, "Initialisiere " + Activator.getDefault().getConfiguration().getName() + " Update Server.");
 			IUpdateProviderServer server = GalserverFactory.createUpdateProviderServer(persistenceService, properties);
+			log(LogService.LOG_INFO, "Starte " + Activator.getDefault().getConfiguration().getName() + " Server.");
 			status = server.start();
 			if (status.isOK())
 			{
+				log(LogService.LOG_INFO, "Stelle Verbindung her zu " + Activator.getDefault().getConfiguration().getName() + " Server.");
 				server.open();
 				status = server.getStatus();	
+				log(LogService.LOG_INFO, status.getMessage());
 				server.close(true);
+			}
+			else
+			{
+				log(LogService.LOG_ERROR, "Fehler beim Starten des " + Activator.getDefault().getConfiguration().getName() + " Server.");
+				log(LogService.LOG_ERROR, status.getMessage());
 			}
 		}
 		else
@@ -238,7 +248,15 @@ public class GalileoUpdaterComponent extends AbstractProviderUpdater
 			this.updateProviderServer = GalserverFactory.createUpdateProviderServer(persistenceService, properties);
 			if (this.updateProviderServer != null)
 			{
-				this.updateProviderServer.start();
+				IProperty property = properties.get(GalileoProperty.CONNECT.key());
+				int connect = Integer.valueOf(property.value()).intValue();
+				log(LogService.LOG_INFO, "Initialisiere " + this.getProviderId() + " galserve" + (connect == 2 ? "2g." : "."));
+				IStatus status = this.updateProviderServer.start();
+				if (!status.isOK())
+				{
+					String emsg = status.getException() == null ? "" : "\n" + status.getException().getLocalizedMessage();
+					log(status.isOK() ? LogService.LOG_INFO : LogService.LOG_ERROR, status.getMessage() + emsg);
+				}
 			}
 		}
 	}

@@ -25,9 +25,11 @@ import ch.eugster.colibri.persistence.model.Tax;
 import ch.eugster.colibri.persistence.model.TaxCodeMapping;
 import ch.eugster.colibri.persistence.queries.TaxCodeMappingQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
+import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.configuration.ProviderConfiguration;
 import ch.eugster.colibri.provider.galileo.Activator;
 import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration;
+import ch.eugster.colibri.provider.galileo.config.GalileoConfiguration.GalileoProperty;
 import ch.eugster.colibri.provider.galileo.galserve.GalserverFactory;
 import ch.eugster.colibri.provider.galileo.galserve.IFindArticleServer;
 import ch.eugster.colibri.provider.galileo.kundenserver.CustomerServerFactory;
@@ -242,7 +244,15 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			this.findArticleServer = GalserverFactory.createFindArticleServer(persistenceService, properties);
 			if (this.findArticleServer != null)
 			{
-				this.findArticleServer.start();
+				IProperty property = properties.get(GalileoProperty.CONNECT.key());
+				int connect = Integer.valueOf(property.value()).intValue();
+				log(LogService.LOG_INFO, "Initialisiere " + this.getProviderId() + " galserve" + (connect == 2 ? "2g." : "."));
+				IStatus status = this.findArticleServer.start();
+				if (!status.isOK())
+				{
+					String emsg = status.getException() == null ? "" : "\n" + status.getException().getLocalizedMessage();
+					log(status.isOK() ? LogService.LOG_INFO : LogService.LOG_ERROR, status.getMessage() + emsg);
+				}
 			}
 		}
 	}
@@ -254,7 +264,15 @@ public class GalileoQueryComponent extends AbstractProviderQuery implements Prov
 			this.customerServer = CustomerServerFactory.createCustomerServer(properties);
 			if (this.customerServer != null)
 			{
-				this.customerServer.start();
+				IProperty property = properties.get(GalileoProperty.CONNECT.key());
+				int connect = Integer.valueOf(property.value()).intValue();
+				log(LogService.LOG_INFO, "Initialisiere " + this.getProviderId() + " Kundenserver" + (connect == 2 ? "2g." : "."));
+				IStatus status = this.customerServer.start();
+				if (!status.isOK())
+				{
+					String emsg = status.getException() == null ? "" : "\n" + status.getException().getLocalizedMessage();
+					log(status.isOK() ? LogService.LOG_INFO : LogService.LOG_ERROR, status.getMessage() + emsg);
+				}
 			}
 		}
 	}
