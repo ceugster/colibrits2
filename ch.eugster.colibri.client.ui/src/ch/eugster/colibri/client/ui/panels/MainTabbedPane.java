@@ -63,6 +63,7 @@ import ch.eugster.colibri.persistence.model.User;
 import ch.eugster.colibri.persistence.model.Version;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.replication.service.ReplicationService;
+import ch.eugster.colibri.persistence.service.ConnectionService;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.persistence.transfer.services.TransferAgent;
 import ch.eugster.colibri.provider.service.ProviderUpdater;
@@ -128,7 +129,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		};
 		this.persistenceServiceTracker.open();
 
-		final SalespointCustomerDisplaySettings customerDisplaySettings = this.getSalespoint().getCustomerDisplaySettings();
+		final SalespointCustomerDisplaySettings customerDisplaySettings = this.getLocalSalespoint().getCustomerDisplaySettings();
 		if (customerDisplaySettings != null)
 		{
 			this.displayTracker = new ServiceTracker<DisplayService, DisplayService>(Activator.getDefault().getBundle().getBundleContext(),
@@ -166,17 +167,17 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 			tracker.close();
 		}
 
-		final Profile profile = this.getSalespoint().getProfile();
+		final Profile profile = this.getLocalSalespoint().getProfile();
 
 		this.setFont(this.getFont().deriveFont(profile.getTabbedPaneFontStyle(), profile.getTabbedPaneFontSize()));
 		this.fgSelected = new java.awt.Color(profile.getTabbedPaneFgSelected());
 		this.fg = new java.awt.Color(profile.getTabbedPaneFg());
 		this.bg = new java.awt.Color(profile.getTabbedPaneBg());
 
-//		final StatusPanel statusPanel = new StatusPanel(this.getSalespoint().getProfile());
+//		final StatusPanel statusPanel = new StatusPanel(this.getLocalSalespoint().getProfile());
 //		this.add("Status", statusPanel);
 
-		final LoginPanel loginPanel = new LoginPanel(this.getSalespoint().getProfile(), isFailOver());
+		final LoginPanel loginPanel = new LoginPanel(this.getLocalSalespoint().getProfile(), isFailOver());
 		loginPanel.addLoginListener(this);
 		this.addChangeListener(this);
 		this.add("Anmelden", loginPanel);
@@ -272,47 +273,50 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 	
 	public boolean settlementRequired()
 	{
-		if (!this.getSalespoint().isForceSettlement())
+		Salespoint serverSalespoint = this.getServerSalespoint();
+		if (serverSalespoint != null)
 		{
-			return false;
-		}
-		if (this.getSalespoint().getSettlement() == null)
-		{
-			updateSettlementTimestamp();
-			return false;
-		}
-		if (this.getSalespoint().getSettlement().getSettled() != null)
-		{
-			updateSettlementTimestamp();
-			return false;
-		}
-		
-		PersistenceService service = persistenceServiceTracker.getService();
-		if (service != null)
-		{
-			return mustSettle(service);
+			if (!serverSalespoint.isForceSettlement())
+			{
+				return false;
+			}
+			PersistenceService service = persistenceServiceTracker.getService();
+			if (service != null && service.getServerService().isConnected())
+			{
+				if (serverSalespoint.getSettlement() == null)
+				{
+					updateSettlementTimestamp(service.getServerService());
+					return false;
+				}
+				if (serverSalespoint.getSettlement().getSettled() != null)
+				{
+					updateSettlementTimestamp(service.getServerService());
+					return false;
+				}
+				return mustSettle(service.getServerService());
+			}
 		}
 		return false;
 	}
 
-	private boolean mustSettle(PersistenceService persistenceService)
+	private boolean mustSettle(ConnectionService service)
 	{
-		Salespoint salespoint = this.clientView.getSalespoint();
-		ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+		Salespoint salespoint = this.clientView.getServerSalespoint();
+		ReceiptQuery query = (ReceiptQuery) service.getQuery(Receipt.class);
 		if (query.countSavedAndReversedBySettlement(salespoint.getSettlement()) > 0L)
 		{
-			if (settlementIsBeforeToday(salespoint.getSettlement()) && salespoint.getSettlement().getReceiptCount() > 0)
+			if (settlementIsBeforeToday(salespoint.getSettlement()))
 			{
 				return true;
 			}
 			else
 			{
-				updateSettlementTimestamp();
+				updateSettlementTimestamp(service);
 			}
 		}
 		else
 		{
-			updateSettlementTimestamp();
+			updateSettlementTimestamp(service);
 		}
 		return false;
 	}
@@ -327,20 +331,19 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		return settlement.getTimestamp().before(today);
 	}
 
-	private void updateSettlementTimestamp()
+	private void updateSettlementTimestamp(ConnectionService service)
 	{
 		try
 		{
-			PersistenceService service = persistenceServiceTracker.getService();
-			if (getSalespoint().getSettlement() == null || getSalespoint().getSettlement().getSettled() != null)
+			if (getServerSalespoint().getSettlement() == null || getServerSalespoint().getSettlement().getSettled() != null)
 			{
-				getSalespoint().setSettlement(Settlement.newInstance(getSalespoint()));
+				getServerSalespoint().setSettlement(Settlement.newInstance(getServerSalespoint()));
 			}
 			else
 			{
-				getSalespoint().getSettlement().setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
+				getServerSalespoint().getSettlement().setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
 			}
-			clientView.updateSalespoint((Salespoint) service.getCacheService().merge(getSalespoint()));
+			clientView.updateServerSalespoint((Salespoint) service.merge(getServerSalespoint()));
 		}
 		catch (Exception e)
 		{
@@ -353,14 +356,19 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 		return (MainPanel) this.getSelectedComponent();
 	}
 
-	public Salespoint getSalespoint()
+	public Salespoint getLocalSalespoint()
 	{
-		return this.clientView.getSalespoint();
+		return this.clientView.getLocalSalespoint();
+	}
+
+	public Salespoint getServerSalespoint()
+	{
+		return this.clientView.getServerSalespoint();
 	}
 
 	public CommonSettings getSetting()
 	{
-		return this.clientView.getSalespoint().getCommonSettings();
+		return this.clientView.getLocalSalespoint().getCommonSettings();
 	}
 
 	public void initFocus()
@@ -425,7 +433,7 @@ public class MainTabbedPane extends JTabbedPane implements ILoginListener, Shutd
 
 	public String prepareTitle()
 	{
-		StringBuilder builder = new StringBuilder(Version.getTitle() + " v" + getVersion() + " :: " + this.getSalespoint().getName());
+		StringBuilder builder = new StringBuilder(Version.getTitle() + " v" + getVersion() + " :: " + this.getLocalSalespoint().getName());
 		if (this.getSelectedComponent() instanceof TitleProvider)
 		{
 			builder = builder.append(" :: " + ((TitleProvider) this.getSelectedComponent()).getTitle());

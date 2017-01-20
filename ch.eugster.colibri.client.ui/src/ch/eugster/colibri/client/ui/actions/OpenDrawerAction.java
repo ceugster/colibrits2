@@ -42,7 +42,7 @@ public class OpenDrawerAction extends ConfigurableAction implements DisposeListe
 	@Override
 	public void actionPerformed(final ActionEvent event)
 	{
-		String componentName = this.getUserPanel().getSalespoint().getReceiptPrinterSettings().getComponentName();
+		String componentName = this.getUserPanel().getLocalSalespoint().getReceiptPrinterSettings().getComponentName();
 		Object[] objects = this.receiptPrinterServiceTracker.getServices();
 		if (objects != null)
 		{

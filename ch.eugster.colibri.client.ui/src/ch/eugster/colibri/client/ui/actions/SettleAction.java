@@ -12,11 +12,14 @@ import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Status;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 import org.osgi.util.tracker.ServiceTracker;
 
 import ch.eugster.colibri.client.ui.Activator;
@@ -33,7 +36,7 @@ import ch.eugster.colibri.persistence.model.print.IPrintable;
 import ch.eugster.colibri.persistence.service.SettlementService;
 import ch.eugster.colibri.ui.actions.ProfileAction;
 
-public class SettleAction extends ProfileAction
+public class SettleAction extends ProfileAction implements EventHandler
 {
 	private static final long serialVersionUID = 0l;
 
@@ -47,6 +50,11 @@ public class SettleAction extends ProfileAction
 	{
 		super(SettleAction.TEXT, SettleAction.ACTION_COMMAND, coinCounterPanel.getProfile());
 		this.coinCounterPanel = coinCounterPanel;
+		this.setEnabled(!this.coinCounterPanel.getUserPanel().getMainTabbedPane().isFailOver());
+		final String[] topics = new String[] { Topic.FAIL_OVER.topic() };
+		Dictionary<String, Object> properties = new Hashtable<String, Object>();
+		properties.put(EventConstants.EVENT_TOPIC, topics);
+		Activator.getDefault().getBundle().getBundleContext().registerService(EventHandler.class, this, properties);
 	}
 
 	@Override
@@ -59,9 +67,9 @@ public class SettleAction extends ProfileAction
 					SettlementService.class, null);
 			tracker.open();
 			SettlementService service = (SettlementService) tracker.getService();
-			if (service != null)
+			if (service != null && this.coinCounterPanel.getUserPanel().getMainTabbedPane().getServerSalespoint() != null)
 			{
-				Settlement settlement = this.coinCounterPanel.getUserPanel().getSalespoint().getSettlement();
+				Settlement settlement = this.coinCounterPanel.getUserPanel().getMainTabbedPane().getServerSalespoint().getSettlement();
 				settlement.setDetails(this.getSettlementDetails(settlement));
 				settlement.setMoneys(this.getSettlementMoney(settlement));
 				settlement.setReceiptCount(service.countReceipts(settlement));
@@ -74,7 +82,7 @@ public class SettleAction extends ProfileAction
 							MessageDialog.TYPE_INFORMATION, false);
 					return;
 				}
-				if (this.coinCounterPanel.getUserPanel().getSalespoint().isForceCashCheck())
+				if (this.coinCounterPanel.getUserPanel().getLocalSalespoint().isForceCashCheck())
 				{
 					if (settlement.getReceiptCount() > 0L && this.coinCounterPanel.getCountMoneySum() == 0D)
 					{
@@ -86,7 +94,7 @@ public class SettleAction extends ProfileAction
 				}
 
 				SettlementService.State state = SettlementService.State.DEFINITIVE;
-				if (coinCounterPanel.getUserPanel().getSalespoint().isAllowTestSettlement())
+				if (coinCounterPanel.getUserPanel().getLocalSalespoint().isAllowTestSettlement())
 				{
 					int result = MessageDialog.showQuestion(Activator.getDefault().getFrame(), this.profile,
 							"Provisorischer Abschluss", "Wollen Sie einen provisorischen Abschluss vornehmen?",
@@ -106,8 +114,8 @@ public class SettleAction extends ProfileAction
 				if (state.equals(SettlementService.State.DEFINITIVE))
 				{
 					Salespoint salespoint = service.updateSettlement(settlement.getSalespoint());
-					this.coinCounterPanel.getUserPanel().setSalespoint(salespoint);
-						this.coinCounterPanel.getUserPanel().getReceiptWrapper().prepareReceipt();
+					this.coinCounterPanel.getUserPanel().setServerSalespoint(salespoint);
+					this.coinCounterPanel.getUserPanel().getReceiptWrapper().prepareReceipt();
 					this.coinCounterPanel.clear();
 					this.coinCounterPanel.getUserPanel().fireStateChange(
 							new StateChangeEvent(coinCounterPanel.getUserPanel().getCurrentState(),
@@ -168,6 +176,32 @@ public class SettleAction extends ProfileAction
 	private List<SettlementMoney> getSettlementMoney(final Settlement settlement)
 	{
 		return this.coinCounterPanel.getSettlementMoney(settlement);
+	}
+
+	@Override
+	public void handleEvent(Event event) 
+	{
+		if (event.getTopic().equals(Topic.FAIL_OVER.topic()))
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, Boolean> list = (Map<String, Boolean>) event.getProperty("failover-list");
+			if (list != null)
+			{
+				Set<String> keys = list.keySet();
+				for (String key : keys)
+				{
+					Boolean value = list.get(key);
+					if (value != null && value.booleanValue())
+					{
+						setEnabled(false);
+						return;
+					}
+				}
+			}
+			setEnabled(true);
+		}
+		// TODO Auto-generated method stub
+		
 	}
 
 }

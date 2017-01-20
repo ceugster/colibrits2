@@ -70,7 +70,7 @@ public class TotalSalesAction extends ConfigurableAction
 			{
 				MessageDialog dialog = null;
 				final Frame frame = Activator.getDefault().getFrame();
-				final Profile profile = this.userPanel.getSalespoint().getProfile();
+				final Profile profile = this.userPanel.getLocalSalespoint().getProfile();
 				try
 				{
 					final PositionQuery positionQuery = (PositionQuery) service.getServerService().getQuery(Position.class);
@@ -83,7 +83,7 @@ public class TotalSalesAction extends ConfigurableAction
 					eventAdmin.sendEvent(new Event(Topic.PROVIDER_QUERY.topic(), properties));
 
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
-					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
+					formatter.setCurrency(this.userPanel.getLocalSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
 
 					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Gesamtumsatz:   " + formatter.format(sales));

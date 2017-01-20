@@ -52,15 +52,15 @@ public class SalespointSalesAction extends ConfigurableAction
 			if (isConnected(service))
 			{
 				final PositionQuery positionQuery = (PositionQuery) service.getServerService().getQuery(Position.class);
-				final double sales = positionQuery.sumCurrent(ProductGroupType.SALES_RELATED, this.userPanel.getSalespoint());
+				final double sales = positionQuery.sumCurrent(ProductGroupType.SALES_RELATED, this.userPanel.getLocalSalespoint());
 
 				final Frame frame = Activator.getDefault().getFrame();
-				final Profile profile = this.userPanel.getSalespoint().getProfile();
+				final Profile profile = this.userPanel.getLocalSalespoint().getProfile();
 				MessageDialog dialog = null;
 				if (isConnected(service))
 				{
 					final NumberFormat formatter = NumberFormat.getCurrencyInstance();
-					formatter.setCurrency(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
+					formatter.setCurrency(this.userPanel.getLocalSalespoint().getCommonSettings().getReferenceCurrency().getCurrency());
 
 					dialog = new MessageDialog(frame, profile, "Umsatz", new int[] { MessageDialog.BUTTON_OK }, 0, this.userPanel.getMainTabbedPane().isFailOver());
 					dialog.setMessage("Kassenumsatz:   " + formatter.format(sales));

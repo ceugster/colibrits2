@@ -104,7 +104,7 @@ public abstract class AbstractProviderService implements ProviderService
 		for (final ProviderProperty providerProperty : providerProperties)
 		{
 			IProperty property = properties.get(providerProperty.getKey());
-			if (property != null && (property.getPersistedProperty() == null || !property.getPersistedProperty().isDeleted()))
+			if (property != null && (property.getPersistedProperty() == null || property.getPersistedProperty().isDeleted()))
 			{
 				property.setPersistedProperty(providerProperty);
 			}

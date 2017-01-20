@@ -58,7 +58,7 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 			{
 				if (!this.getPaymentType().getPaymentTypeGroup().equals(PaymentTypeGroup.VOUCHER))
 				{
-					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getSalespoint().getCommonSettings().getReferenceCurrency().getId()))
+					if (this.getPaymentType().getCurrency().getId().equals(this.userPanel.getLocalSalespoint().getCommonSettings().getReferenceCurrency().getId()))
 					{
 						double difference = this.userPanel.getReceiptWrapper().getReceiptDifference();
 						this.userPanel.getPaymentWrapper().getPayment().setBack(difference < 0);
@@ -78,8 +78,8 @@ public class PaymentTypeAction extends ConfigurableAction implements PropertyCha
 			else
 			{
 				boolean setAmount = true;
-				double range = this.userPanel.getSalespoint().getCommonSettings().getMaxPaymentRange();
-				double max = this.userPanel.getSalespoint().getCommonSettings().getMaxPaymentAmount();
+				double range = this.userPanel.getLocalSalespoint().getCommonSettings().getMaxPaymentRange();
+				double max = this.userPanel.getLocalSalespoint().getCommonSettings().getMaxPaymentAmount();
 				if (Math.abs(value) > Math.abs(range))
 				{
 					if (Math.abs(value) > Math.abs(max))

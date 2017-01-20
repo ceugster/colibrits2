@@ -85,7 +85,6 @@ import ch.eugster.colibri.persistence.model.ProductGroup;
 import ch.eugster.colibri.persistence.model.ProviderProperty;
 import ch.eugster.colibri.persistence.model.Receipt;
 import ch.eugster.colibri.persistence.model.Salespoint;
-import ch.eugster.colibri.persistence.model.Settlement;
 import ch.eugster.colibri.persistence.model.product.Customer;
 import ch.eugster.colibri.persistence.queries.CommonSettingsQuery;
 import ch.eugster.colibri.persistence.queries.ExternalProductGroupQuery;
@@ -96,7 +95,6 @@ import ch.eugster.colibri.persistence.queries.ProductGroupQuery;
 import ch.eugster.colibri.persistence.queries.ProviderPropertyQuery;
 import ch.eugster.colibri.persistence.queries.ReceiptQuery;
 import ch.eugster.colibri.persistence.queries.SalespointQuery;
-import ch.eugster.colibri.persistence.queries.SettlementQuery;
 import ch.eugster.colibri.persistence.service.PersistenceService;
 import ch.eugster.colibri.provider.configuration.IProperty;
 import ch.eugster.colibri.provider.service.ProviderIdService;
@@ -132,7 +130,9 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 	private ReceiptChangeMediator receiptChangeMediator;
 
-	private Salespoint salespoint;
+	private Salespoint localSalespoint;
+	
+	private Salespoint serverSalespoint;
 	
 	private long lastFailoverMessage = 0l;
 	
@@ -166,14 +166,33 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		}
 	}
 	
-	public Salespoint getSalespoint()
+	public Salespoint getLocalSalespoint()
 	{
-		return this.salespoint;
+		return this.localSalespoint;
 	}
 
-	public void updateSalespoint(Salespoint salespoint)
+	public void updateLocalSalespoint(Salespoint salespoint)
 	{
-		this.salespoint = salespoint;
+		this.localSalespoint = salespoint;
+	}
+	
+	public Salespoint getServerSalespoint()
+	{
+		if (this.serverSalespoint == null)
+		{
+			PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
+			if (persistenceService != null)
+			{
+				SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getServerService().getQuery(Salespoint.class);
+				this.serverSalespoint = salespointQuery.getCurrentSalespoint();
+			}
+		}
+		return this.serverSalespoint;
+	}
+
+	public void updateServerSalespoint(Salespoint salespoint)
+	{
+		this.serverSalespoint = salespoint;
 	}
 	
 	@Override
@@ -197,21 +216,21 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		{
 			final SalespointQuery salespointQuery = (SalespointQuery) persistenceService.getCacheService().getQuery(
 					Salespoint.class);
-			salespoint = salespointQuery.getCurrentSalespoint();
+			this.localSalespoint = salespointQuery.getCurrentSalespoint();
 			msg = "Für diese Arbeitsstation ist noch keine Kasse registriert.";
-			errors = errors.append(salespoint == null ? msg : "");
-			if (salespoint != null)
+			errors = errors.append(this.localSalespoint == null ? msg : "");
+			if (this.localSalespoint != null)
 			{
 				msg = "Für diese Kasse ist noch kein Profil definiert.";
-				errors = errors.append(salespoint.getProfile() == null ? msg : "");
-				if (salespoint.getProfile() != null)
+				errors = errors.append(this.localSalespoint.getProfile() == null ? msg : "");
+				if (this.localSalespoint.getProfile() != null)
 				{
-					errors = errors.append(this.checkReferenceCurrency(salespoint));
-					errors = errors.append(this.checkDefaultProductGroup(salespoint));
-					errors = errors.append(this.checkPayedInvoice(salespoint));
+					errors = errors.append(this.checkReferenceCurrency(this.localSalespoint));
+					errors = errors.append(this.checkDefaultProductGroup(this.localSalespoint));
+					errors = errors.append(this.checkPayedInvoice(this.localSalespoint));
 					errors = errors.append(this.checkProviderTaxMapped());
-					errors = errors.append(this.checkExport(salespoint));
-					errors = errors.append(this.checkEBooks(salespoint));
+					errors = errors.append(this.checkExport(this.localSalespoint));
+					errors = errors.append(this.checkEBooks(this.localSalespoint));
 
 					final ServiceTracker<ProviderIdService, ProviderIdService> tracker = new ServiceTracker<ProviderIdService, ProviderIdService>(Activator.getDefault().getBundle()
 							.getBundleContext(), ProviderIdService.class, null);
@@ -397,7 +416,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			final IStatus status = (IStatus) event.getProperty("status");
 			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
 					: status.getMessage();
-			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
+			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.getLocalSalespoint()
 					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR, this.mainTabbedPane.isFailOver());
 		}
 	}
@@ -432,7 +451,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				final String message = (String) event.getProperty(EventConstants.MESSAGE);
 				if (message != null)
 				{
-					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.mainTabbedPane.getSalespoint()
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), ClientView.this.getLocalSalespoint()
 									.getProfile(), "Aktualisierungsproblem", message, MessageDialog.TYPE_WARN, this.mainTabbedPane.isFailOver());
 				}
 			}
@@ -442,7 +461,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 			final IStatus status = (IStatus) event.getProperty("status");
 			final String message = status.getMessage() == null ? "Der Belegdrucker kann nicht angesprochen werden"
 					: status.getMessage();
-			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.mainTabbedPane.getSalespoint()
+			MessageDialog.showSimpleDialog(Activator.getDefault().getFrame(), this.getLocalSalespoint()
 					.getProfile(), "Problem mit Belegdrucker", message, MessageDialog.TYPE_ERROR, this.mainTabbedPane.isFailOver());
 		}
 	}
@@ -595,7 +614,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				else
 				{
-					myCount = this.countProviderUpdates(this.salespoint);
+					myCount = this.countProviderUpdates(this.localSalespoint);
 				}
 				final long count = myCount;
 				final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
@@ -718,7 +737,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 		EntityMediator.addListener(Salespoint.class, this.mainTabbedPane);
 
-		long count = this.countTransfers(this.salespoint);
+		long count = this.countTransfers(this.localSalespoint);
 		Image image = Activator.getDefault().getImageRegistry().get(count == 0L ? "ok" : "exclamation");
 		this.transferInformation = new StatusLineContributionItem("transfer.information", true, 36);
 		this.transferInformation.setText("Zu übertragen: " + count);
@@ -727,7 +746,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 
 		this.providerInformation = new StatusLineContributionItem("provider.information", true, 32);
 		this.providerInformation.setErrorText("");
-		count = this.countProviderUpdates(this.salespoint);
+		count = this.countProviderUpdates(this.localSalespoint);
 		image = Activator.getDefault().getImageRegistry().get(count == 0L ? "ok" : "exclamation");
 		this.providerInformation.setText("Verbuchen: " + count);
 		this.providerInformation.setImage(image);
@@ -922,7 +941,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 				}
 				else
 				{
-					myCount = this.countTransfers(salespoint);
+					myCount = this.countTransfers(this.localSalespoint);
 				}
 				final long count = myCount;
 				final UIJob uiJob = new UIJob("Aktualisiere Meldung...")
@@ -1000,7 +1019,7 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		return count;
 	}
 	
-	private long countTransfers(Salespoint salespoint)
+	public long countTransfers(Salespoint salespoint)
 	{
 		long count = 0L;
 		final PersistenceService persistenceService = (PersistenceService) ClientView.this.persistenceServiceTracker.getService();
@@ -1008,8 +1027,8 @@ public class ClientView extends ViewPart implements IWorkbenchListener, Property
 		{
 			final ReceiptQuery receiptQuery = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
 			count = receiptQuery.countRemainingToTransfer();
-			final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
-			count += settlementQuery.countTransferables();
+//			final SettlementQuery settlementQuery = (SettlementQuery) persistenceService.getCacheService().getQuery(Settlement.class);
+//			count += settlementQuery.countTransferables();
 		}
 		return count;
 	}

@@ -239,7 +239,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 					message = message.append(pim);
 					message = message.append(msg);
 				}
-				MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getSalespoint()
+				MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getLocalSalespoint()
 						.getProfile(), "Bezahlte Rechnungen", message.toString(), MessageDialog.TYPE_INFORMATION, this.userPanel.getMainTabbedPane().isFailOver());
 			}
 		}
@@ -280,7 +280,7 @@ public class ReverseReceiptAction extends UserPanelProfileAction implements List
 					}
 					message = message.append("\nDiese Titel können nicht automatisch in der Lagerbewirtschaftung zurückgebucht werden.\n");
 					message = message.append("Bitte führen Sie die Buchungskorrektur manuell durch.");
-					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getSalespoint()
+					MessageDialog.showInformation(Activator.getDefault().getFrame(), this.userPanel.getLocalSalespoint()
 							.getProfile(), "Bestellte Titel", message.toString(), MessageDialog.TYPE_INFORMATION, this.userPanel.getMainTabbedPane().isFailOver());
 				}
 				finally

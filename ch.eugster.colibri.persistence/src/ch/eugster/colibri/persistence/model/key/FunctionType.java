@@ -34,6 +34,22 @@ public enum FunctionType
 			{
 				return false;
 			}
+			case FUNCTION_SHOW_COIN_COUNTER_PANEL:
+			{
+				return false;
+			}
+			case FUNCTION_TOTAL_SALES:
+			{
+				return false;
+			}
+			case FUNCTION_SALESPOINT_SALES:
+			{
+				return false;
+			}
+			case FUNCTION_USER_SALES:
+			{
+				return false;
+			}
 			default:
 			{
 				return true;

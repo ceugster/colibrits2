@@ -491,7 +491,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 
 		try
 		{
-			final java.util.Currency currency = Currency.getInstance(this.userPanel.getMainTabbedPane().getSalespoint().getPaymentType().getCurrency()
+			final java.util.Currency currency = Currency.getInstance(this.userPanel.getMainTabbedPane().getLocalSalespoint().getPaymentType().getCurrency()
 					.getCode());
 			minFractionDigits = currency.getDefaultFractionDigits();
 			maxFractionDigits = currency.getDefaultFractionDigits();
@@ -515,7 +515,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 		}
 		if (this.currentTaxValueLabel.getText().isEmpty())
 		{
-			final Tax tax = this.userPanel.getSalespoint().getProposalTax();
+			final Tax tax = this.userPanel.getLocalSalespoint().getProposalTax();
 			if (tax != null)
 			{
 				this.updateTaxLabel(tax.getCurrentTax());
@@ -527,7 +527,7 @@ public class PositionDetailPanel extends ProfilePanel implements ActionListener,
 		}
 		if (this.quantityValueLabel.getText().isEmpty())
 		{
-			this.updateQuantityLabel(this.userPanel.getSalespoint().getProposalQuantity());
+			this.updateQuantityLabel(this.userPanel.getLocalSalespoint().getProposalQuantity());
 		}
 		if (this.priceValueLabel.getText().isEmpty())
 		{

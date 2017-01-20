@@ -108,14 +108,14 @@ public class SettlementServiceComponent implements SettlementService
 			{
 				settlement.setReceiptCount(SettlementServiceComponent.this.countReceipts(settlement));
 				settlement.setTimestamp(GregorianCalendar.getInstance(Locale.getDefault()));
-				settlement.setPositions(SettlementServiceComponent.this.getPositions(persistenceService.getCacheService(), settlement));
-				settlement.setPayments(SettlementServiceComponent.this.getPayments(persistenceService.getCacheService(), settlement));
-				settlement.setTaxes(SettlementServiceComponent.this.getTaxes(persistenceService.getCacheService(), settlement));
-				settlement.setPayedInvoices(SettlementServiceComponent.this.getPayedInvoices(persistenceService.getCacheService(), settlement));
+				settlement.setPositions(SettlementServiceComponent.this.getPositions(persistenceService.getServerService(), settlement));
+				settlement.setPayments(SettlementServiceComponent.this.getPayments(persistenceService.getServerService(), settlement));
+				settlement.setTaxes(SettlementServiceComponent.this.getTaxes(persistenceService.getServerService(), settlement));
+				settlement.setPayedInvoices(SettlementServiceComponent.this.getPayedInvoices(persistenceService.getServerService(), settlement));
 				settlement
-						.setRestitutedPositions(SettlementServiceComponent.this.getRestitutedPositions(persistenceService.getCacheService(), settlement));
-				settlement.setInternals(SettlementServiceComponent.this.getInternals(persistenceService.getCacheService(), settlement));
-				settlement.setReversedReceipts(SettlementServiceComponent.this.getReversedReceipts(persistenceService.getCacheService(), settlement));
+						.setRestitutedPositions(SettlementServiceComponent.this.getRestitutedPositions(persistenceService.getServerService(), settlement));
+				settlement.setInternals(SettlementServiceComponent.this.getInternals(persistenceService.getServerService(), settlement));
+				settlement.setReversedReceipts(SettlementServiceComponent.this.getReversedReceipts(persistenceService.getServerService(), settlement));
 
 				if (state.equals(State.DEFINITIVE))
 				{
@@ -128,8 +128,7 @@ public class SettlementServiceComponent implements SettlementService
 
 					try
 					{
-						settlement = (Settlement) persistenceService.getCacheService().merge(settlement);
-//						settlement.setSalespoint((Salespoint) persistenceService.getCacheService().merge(settlement.getSalespoint()));
+						settlement = (Settlement) persistenceService.getServerService().merge(settlement);
 						eventAdmin.sendEvent(getEvent());
 					}
 					catch (Exception e)
@@ -168,7 +167,7 @@ public class SettlementServiceComponent implements SettlementService
 		salespoint.setSettlement(Settlement.newInstance(salespoint));
 		try
 		{
-			salespoint = (Salespoint) persistenceService.getCacheService().merge(salespoint);
+			salespoint = (Salespoint) persistenceService.getServerService().merge(salespoint);
 		}
 		catch (Exception e)
 		{
@@ -262,14 +261,14 @@ public class SettlementServiceComponent implements SettlementService
 	@Override
 	public long countReceipts(final Settlement settlement)
 	{
-		final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+		final ReceiptQuery query = (ReceiptQuery) persistenceService.getServerService().getQuery(Receipt.class);
 		return query.countSavedBySettlement(settlement);
 	}
 
 	@Override
 	public List<SettlementReceipt> getReversedReceipts(final Settlement settlement)
 	{
-		final ReceiptQuery query = (ReceiptQuery) persistenceService.getCacheService().getQuery(Receipt.class);
+		final ReceiptQuery query = (ReceiptQuery) persistenceService.getServerService().getQuery(Receipt.class);
 		return query.selectReversed(settlement);
 	}
 }

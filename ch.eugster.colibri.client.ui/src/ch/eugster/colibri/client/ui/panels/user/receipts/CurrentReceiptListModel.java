@@ -262,7 +262,7 @@ public class CurrentReceiptListModel extends AbstractTableModel implements Actio
 
 	public void loadReceipts()
 	{
-		this.setReceipts(this.getReceipts(this.userPanel.getSalespoint().getSettlement(), this.userPanel.getUser()));
+		this.setReceipts(this.getReceipts(this.userPanel.getLocalSalespoint().getSettlement(), this.userPanel.getUser()));
 	}
 
 	public void setSelectionListModel(final CurrentReceiptListSelectionModel selectionListModel)

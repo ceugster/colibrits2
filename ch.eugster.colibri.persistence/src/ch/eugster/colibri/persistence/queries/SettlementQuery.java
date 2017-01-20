@@ -115,31 +115,31 @@ public class SettlementQuery extends AbstractQuery<Settlement>
 		return Settlement.class;
 	}
 
-	public long countTransferables()
-	{
-		long count = this.count(createTransferablesExpression());
-		return count;
-	}
+//	public long countTransferables()
+//	{
+//		long count = this.count(createTransferablesExpression());
+//		return count;
+//	}
 
-	public List<Settlement> selectTransferables()
-	{
-		try
-		{
-			List<Settlement> settlements = this.select(createTransferablesExpression(), 0);
-			return settlements;
-		}
-		catch (Exception e)
-		{
-			return new ArrayList<Settlement>();
-		}
-	}
+//	public List<Settlement> selectTransferables()
+//	{
+//		try
+//		{
+//			List<Settlement> settlements = this.select(createTransferablesExpression(), 0);
+//			return settlements;
+//		}
+//		catch (Exception e)
+//		{
+//			return new ArrayList<Settlement>();
+//		}
+//	}
 
-	private Expression createTransferablesExpression()
-	{
-		Expression expression = new ExpressionBuilder(Settlement.class).get("deleted").equal(false);
-		expression = expression.and(new ExpressionBuilder().get("settled").notNull());
-		expression = expression.and(new ExpressionBuilder().get("otherId").isNull());
-		return expression;
-	}
+//	private Expression createTransferablesExpression()
+//	{
+//		Expression expression = new ExpressionBuilder(Settlement.class).get("deleted").equal(false);
+//		expression = expression.and(new ExpressionBuilder().get("settled").notNull());
+//		expression = expression.and(new ExpressionBuilder().get("otherId").isNull());
+//		return expression;
+//	}
 
 }

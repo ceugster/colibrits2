@@ -189,7 +189,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 	public void parkReceipt()
 	{
 		this.receipt.setState(Receipt.State.PARKED);
-		this.receipt.setNumber(this.userPanel.getSalespoint().getNextParkedReceiptNumber());
+		this.receipt.setNumber(this.userPanel.getLocalSalespoint().getNextParkedReceiptNumber());
 		final PersistenceService persistenceService = (PersistenceService) this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
 		{
@@ -197,7 +197,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 			{
 				persistenceService.getCacheService().merge(this.receipt);
 				
-				userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
+				userPanel.setLocalSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getLocalSalespoint()));
 				ReceiptWrapper.this.prepareReceipt();
 				ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
 				ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
@@ -252,7 +252,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 		{
 			this.receipt.removePropertyChangeListener("customer", this);
 		}
-		final Receipt newReceipt = Receipt.newInstance(this.userPanel.getSalespoint().getSettlement(),
+		final Receipt newReceipt = Receipt.newInstance(this.userPanel.getLocalSalespoint().getSettlement(),
 				this.userPanel.getUser());
 		newReceipt.addPropertyChangeListener("customer", this);
 		this.fireReceiptChangeEvent(new ReceiptChangeEvent(this.receipt, newReceipt));
@@ -320,7 +320,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 	{
 		ReceiptWrapper.this.receipt.setDeleted(deleted);
 		ReceiptWrapper.this.receipt.setState(Receipt.State.SAVED);
-		ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getSalespoint().getNextReceiptNumber());
+		ReceiptWrapper.this.receipt.setNumber(ReceiptWrapper.this.userPanel.getLocalSalespoint().getNextReceiptNumber());
 
 		final PersistenceService persistenceService = (PersistenceService) ReceiptWrapper.this.persistenceServiceTracker.getService();
 		if (persistenceService != null)
@@ -339,7 +339,7 @@ public class ReceiptWrapper implements DisposeListener, PropertyChangeListener
 					}
 				}
 				ReceiptWrapper.this.sendEvent(ReceiptWrapper.this.receipt, Topic.STORE_RECEIPT);
-				userPanel.setSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getSalespoint()));
+				userPanel.setLocalSalespoint((Salespoint) persistenceService.getCacheService().merge(userPanel.getLocalSalespoint()));
 				ReceiptWrapper.this.prepareReceipt();
 				ReceiptWrapper.this.userPanel.getPositionWrapper().preparePosition(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);
 				ReceiptWrapper.this.userPanel.getPaymentWrapper().preparePayment(ReceiptWrapper.this.userPanel.getReceiptWrapper().receipt);

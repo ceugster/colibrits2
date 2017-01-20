@@ -47,11 +47,11 @@ public class TransferAgentImpl implements TransferAgent
 
 				ReceiptTransfer receiptTransfer = new ReceiptTransfer(this.logService, this.persistenceService);
 				status = receiptTransfer.transferReceipts(count);
-				if (status.getSeverity() == IStatus.OK)
-				{
-					SettlementTransfer settlementTransfer = new SettlementTransfer(this.logService, this.persistenceService);
-					status = settlementTransfer.transferSettlements(count);
-				}
+//				if (status.getSeverity() == IStatus.OK)
+//				{
+//					SettlementTransfer settlementTransfer = new SettlementTransfer(this.logService, this.persistenceService);
+//					status = settlementTransfer.transferSettlements(count);
+//				}
 			}
 			catch (Exception e)
 			{

@@ -84,7 +84,7 @@ public class CoinCounterPanel extends ProfilePanel
 	public List<SettlementDetail> getSettlementDetails(final Settlement settlement)
 	{
 		final List<SettlementDetail> details = new ArrayList<SettlementDetail>();
-		final List<Stock> stocks = this.userPanel.getSalespoint().getStocks();
+		final List<Stock> stocks = this.userPanel.getServerSalespoint().getStocks();
 		for (final Stock stock : stocks)
 		{
 			details.addAll(this.getSettlementDetails(stock, settlement));
@@ -95,7 +95,7 @@ public class CoinCounterPanel extends ProfilePanel
 	public List<SettlementMoney> getSettlementMoney(final Settlement settlement)
 	{
 		final List<SettlementMoney> moneys = new ArrayList<SettlementMoney>();
-		final List<Stock> stocks = this.userPanel.getSalespoint().getStocks();
+		final List<Stock> stocks = this.userPanel.getServerSalespoint().getStocks();
 		for (final Stock stock : stocks)
 		{
 			moneys.addAll(this.getSettlementMoney(stock, settlement));
@@ -547,7 +547,7 @@ public class CoinCounterPanel extends ProfilePanel
 	{
 		this.setLayout(new BorderLayout());
 
-		final Stock[] stocks = this.userPanel.getSalespoint().getStocks().toArray(new Stock[0]);
+		final Stock[] stocks = this.userPanel.getServerSalespoint().getStocks().toArray(new Stock[0]);
 		if (stocks.length > 0)
 		{
 			final java.util.Currency currency = stocks[0].getSalespoint().getPaymentType().getCurrency().getCurrency();

@@ -128,7 +128,7 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 
 	public UserPanel(MainTabbedPane mainTabbedPane, final User user)
 	{
-		super(mainTabbedPane.getSalespoint().getProfile());
+		super(mainTabbedPane.getLocalSalespoint().getProfile());
 		this.mainTabbedPane = mainTabbedPane;
 		this.user = user;
 		this.init();
@@ -327,15 +327,25 @@ public class UserPanel extends MainPanel implements StateChangeProvider, StateCh
 		return this.receiptWrapper;
 	}
 
-	public Salespoint getSalespoint()
+	public Salespoint getLocalSalespoint()
 	{
-		return mainTabbedPane.getSalespoint();
+		return mainTabbedPane.getLocalSalespoint();
 	}
 
-	public void setSalespoint(Salespoint salespoint)
+	public Salespoint getServerSalespoint()
 	{
-		ClientView.getClientView().updateSalespoint(salespoint);
+		return mainTabbedPane.getServerSalespoint();
+	}
+
+	public void setLocalSalespoint(Salespoint salespoint)
+	{
+		ClientView.getClientView().updateLocalSalespoint(salespoint);
 		this.prepareReceipt();
+	}
+
+	public void setServerSalespoint(Salespoint salespoint)
+	{
+		ClientView.getClientView().updateServerSalespoint(salespoint);
 	}
 
 	@Override
